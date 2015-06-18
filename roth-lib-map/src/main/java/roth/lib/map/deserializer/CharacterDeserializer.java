@@ -1,0 +1,27 @@
+package roth.lib.map.deserializer;
+
+
+public class CharacterDeserializer extends PrimitiveDeserializer<Character>
+{
+	
+	public CharacterDeserializer(boolean nullable)
+	{
+		super(nullable);
+	}
+	
+	@Override
+	public Character deserialize(String value)
+	{
+		Character object = isNullable() ? null : '\u0000';
+		try
+		{
+			object = value.charAt(0);
+		}
+		catch(Exception e)
+		{
+			
+		}
+		return object;
+	}
+	
+}

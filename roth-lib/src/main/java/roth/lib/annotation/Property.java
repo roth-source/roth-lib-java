@@ -1,0 +1,28 @@
+package roth.lib.annotation;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+@Target({FIELD}) 
+@Retention(RUNTIME)
+public @interface Property
+{
+	String name();
+	boolean entityName()		default false;
+	
+	boolean rdb() 				default true;
+	String rdbName()			default "";
+	
+	boolean xml() 				default true;
+	String xmlName()			default "";
+	
+	boolean json() 				default true;
+	String jsonName()			default "";
+	
+	boolean form() 				default true;
+	String formName()			default "";
+	
+}
