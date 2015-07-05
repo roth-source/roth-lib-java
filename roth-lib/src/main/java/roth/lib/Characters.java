@@ -1,5 +1,6 @@
 package roth.lib;
 
+
 public interface Characters
 {
 	char NULL					= '\u0000';	// 000
