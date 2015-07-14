@@ -55,7 +55,7 @@ public abstract class HttpTask implements Runnable, Callable<Boolean>
 	protected void waitAction(int seconds)
 	{
 		updateAction(String.format("waiting %d secs", seconds));
-		ThreadUtil.wait(seconds);
+		ThreadUtil.waitSeconds(seconds);
 	}
 	
 	protected void endAction()
@@ -71,7 +71,7 @@ public abstract class HttpTask implements Runnable, Callable<Boolean>
 	protected void completeTask()
 	{
 		addProgress(getElapsedTime() + " COMPLETE");
-		ThreadUtil.wait(10);
+		ThreadUtil.waitSeconds(10);
 		TaskUtil.completeProgress(session, taskId);
 	}
 	

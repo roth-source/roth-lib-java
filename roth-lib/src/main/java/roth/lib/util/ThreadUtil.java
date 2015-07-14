@@ -1,5 +1,7 @@
 package roth.lib.util;
 
+import java.util.Calendar;
+
 public class ThreadUtil
 {
 	
@@ -8,21 +10,36 @@ public class ThreadUtil
 		
 	}
 	
-	public static void wait(int seconds)
+	public static void waitSeconds(int seconds)
 	{
-		wait((double) seconds);
+		waitSeconds((double) seconds);
 	}
 	
-	public static void wait(double seconds)
+	public static void waitSeconds(double seconds)
+	{
+		waitMillis(Math.round(seconds * 1000));
+	}
+	
+	public static void waitMillis(long millis)
 	{
 		try
 		{
-			Thread.sleep(Math.round(seconds * 1000));
+			Thread.sleep(millis);
 		}
 		catch(Exception e)
 		{
 			
 		}
+	}
+	
+	public static void waitUntil(Calendar time)
+	{
+		waitUntil(time.getTimeInMillis());
+	}
+	
+	public static void waitUntil(long millis)
+	{
+		waitMillis(System.currentTimeMillis() - millis);
 	}
 	
 }

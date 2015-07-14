@@ -136,9 +136,23 @@ public class CalendarUtil
 	
 	public static Calendar month()
 	{
-		Calendar month = today();
-		month.set(Calendar.DAY_OF_MONTH, 1);
-		return month;
+		return month(now(), false);
+	}
+	
+	public static Calendar month(Calendar calendar)
+	{
+		return month(calendar, true);
+	}
+	
+	public static Calendar month(Calendar calendar, boolean clone)
+	{
+		Calendar clonedCalendar = clone ? (Calendar) calendar.clone() : calendar;
+		clonedCalendar.set(Calendar.DAY_OF_MONTH, 0);
+		clonedCalendar.set(Calendar.HOUR_OF_DAY, 0);
+		clonedCalendar.set(Calendar.MINUTE, 0);
+		clonedCalendar.set(Calendar.SECOND, 0);
+		clonedCalendar.set(Calendar.MILLISECOND, 0);
+		return clonedCalendar;
 	}
 	
 	public static Calendar today()
@@ -157,6 +171,60 @@ public class CalendarUtil
 		clonedCalendar.set(Calendar.HOUR_OF_DAY, 0);
 		clonedCalendar.set(Calendar.MINUTE, 0);
 		clonedCalendar.set(Calendar.SECOND, 0);
+		clonedCalendar.set(Calendar.MILLISECOND, 0);
+		return clonedCalendar;
+	}
+	
+	public static Calendar hour()
+	{
+		return hour(now(), false);
+	}
+	
+	public static Calendar hour(Calendar calendar)
+	{
+		return hour(calendar, true);
+	}
+	
+	public static Calendar hour(Calendar calendar, boolean clone)
+	{
+		Calendar clonedCalendar = clone ? (Calendar) calendar.clone() : calendar;
+		clonedCalendar.set(Calendar.MINUTE, 0);
+		clonedCalendar.set(Calendar.SECOND, 0);
+		clonedCalendar.set(Calendar.MILLISECOND, 0);
+		return clonedCalendar;
+	}
+	
+	public static Calendar min()
+	{
+		return min(now(), false);
+	}
+	
+	public static Calendar min(Calendar calendar)
+	{
+		return min(calendar, true);
+	}
+	
+	public static Calendar min(Calendar calendar, boolean clone)
+	{
+		Calendar clonedCalendar = clone ? (Calendar) calendar.clone() : calendar;
+		clonedCalendar.set(Calendar.SECOND, 0);
+		clonedCalendar.set(Calendar.MILLISECOND, 0);
+		return clonedCalendar;
+	}
+	
+	public static Calendar sec()
+	{
+		return sec(now(), false);
+	}
+	
+	public static Calendar sec(Calendar calendar)
+	{
+		return sec(calendar, true);
+	}
+	
+	public static Calendar sec(Calendar calendar, boolean clone)
+	{
+		Calendar clonedCalendar = clone ? (Calendar) calendar.clone() : calendar;
 		clonedCalendar.set(Calendar.MILLISECOND, 0);
 		return clonedCalendar;
 	}
