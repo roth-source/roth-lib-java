@@ -2,17 +2,12 @@ package roth.lib.map.rdb;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 
+import roth.lib.Callback;
 import roth.lib.annotation.Property;
 import roth.lib.map.Mapper;
 import roth.lib.map.PropertyField;
@@ -197,50 +192,38 @@ public class RdbMapper extends Mapper
 		return null;
 	}
 	
+	public <T> void fromRdb(RdbResultSet resultSet, Rdb rdb, Callback<T> callback)
+	{
+		try
+		{
+			Class<T> klass = callback.getKlass();
+			ResultSetMetaData metaData = resultSet.getMetaData();
+			LinkedHashMap<String, PropertyField> propertyNameFieldMap = rdb.getMapper().getPropertyNameFieldMap(klass);
+			while(resultSet.next())
+			{
+				T model = fromRdb(resultSet, rdb, klass, metaData, propertyNameFieldMap);
+				if(model != null)
+				{
+					callback.call(model);
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			
+		}
+	}
+	
 	public <T> LinkedList<T> fromRdb(RdbResultSet resultSet, Rdb rdb, Class<T> klass)
 	{
 		LinkedList<T> models = new LinkedList<T>();
 		try
 		{
+			ResultSetMetaData metaData = resultSet.getMetaData();
+			LinkedHashMap<String, PropertyField> propertyNameFieldMap = rdb.getMapper().getPropertyNameFieldMap(klass);
 			while(resultSet.next())
 			{
-				T model = null;
-				try
-				{
-					Constructor<T> constructor = null;
-					try
-					{
-						constructor = klass.getDeclaredConstructor(Rdb.class);
-						constructor.setAccessible(true);
-						model = constructor.newInstance(rdb);
-					}
-					catch(NoSuchMethodException e)
-					{
-						constructor = klass.getDeclaredConstructor();
-						constructor.setAccessible(true);
-						model = constructor.newInstance();
-					}
-					if(model instanceof RdbModel)
-					{
-						((RdbModel) model).persisted();
-					}
-					LinkedHashMap<String, PropertyField> propertyNameFieldMap = rdb.getMapper().getPropertyNameFieldMap(klass);
-					ResultSetMetaData metaData = resultSet.getMetaData();
-					for(int i = 1; i <= metaData.getColumnCount(); i++)
-					{
-						String columnLabel = metaData.getColumnLabel(i);
-						PropertyField propertyField = propertyNameFieldMap.get(columnLabel);
-						if(propertyField != null)
-						{
-							Field field = propertyField.getField();
-							field.set(model, getValue(resultSet, columnLabel, field.getType()));
-						}
-					}
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
+				T model = fromRdb(resultSet, rdb, klass, metaData, propertyNameFieldMap);
 				if(model != null)
 				{
 					models.add(model);
@@ -249,9 +232,49 @@ public class RdbMapper extends Mapper
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			
 		}
 		return models;
+	}
+	
+	protected <T> T fromRdb(RdbResultSet resultSet, Rdb rdb, Class<T> klass, ResultSetMetaData metaData, LinkedHashMap<String, PropertyField> propertyNameFieldMap)
+	{
+		T model = null;
+		try
+		{
+			Constructor<T> constructor = null;
+			try
+			{
+				constructor = klass.getDeclaredConstructor(Rdb.class);
+				constructor.setAccessible(true);
+				model = constructor.newInstance(rdb);
+			}
+			catch(NoSuchMethodException e)
+			{
+				constructor = klass.getDeclaredConstructor();
+				constructor.setAccessible(true);
+				model = constructor.newInstance();
+			}
+			if(model instanceof RdbModel)
+			{
+				((RdbModel) model).persisted();
+			}
+			for(int i = 1; i <= metaData.getColumnCount(); i++)
+			{
+				String columnLabel = metaData.getColumnLabel(i);
+				PropertyField propertyField = propertyNameFieldMap.get(columnLabel);
+				if(propertyField != null)
+				{
+					Field field = propertyField.getField();
+					field.set(model, resultSet.getObject(columnLabel, field.getType()));
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			
+		}
+		return model;
 	}
 	
 	public LinkedList<LinkedHashMap<String, Object>> fromRdb(RdbResultSet resultSet)
@@ -273,7 +296,7 @@ public class RdbMapper extends Mapper
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+					
 				}
 				if(!dataMap.isEmpty())
 				{
@@ -283,75 +306,15 @@ public class RdbMapper extends Mapper
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			
 		}
 		return dataMaps;
 	}
-	
-	public Object getValue(RdbResultSet resultSet, String columnLabel, Class<?> klass) throws SQLException
+	/*
+	@Override
+	public LinkedHashMap<String, PropertyField> getPropertyNameFieldMap(Type type)
 	{
-		Object value = null;
-		if(String.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getString(columnLabel);
-		}
-		else if(Integer.class.isAssignableFrom(klass) || int.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getInt(columnLabel);
-		}
-		else if(Double.class.isAssignableFrom(klass) || double.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getDouble(columnLabel);
-		}
-		else if(Boolean.class.isAssignableFrom(klass) || boolean.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getBoolean(columnLabel);
-		}
-		else if(Calendar.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getCalendar(columnLabel);
-		}
-		else if(Enum.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getEnum(columnLabel, klass);
-		}
-		else if(Byte.class.isAssignableFrom(klass) || byte.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getByte(columnLabel);
-		}
-		else if(Short.class.isAssignableFrom(klass) || short.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getShort(columnLabel);
-		}
-		else if(Long.class.isAssignableFrom(klass) || long.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getLong(columnLabel);
-		}
-		else if(Float.class.isAssignableFrom(klass) || float.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getFloat(columnLabel);
-		}
-		else if(BigDecimal.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getBigDecimal(columnLabel);
-		}
-		else if(Timestamp.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getTimestamp(columnLabel);
-		}
-		else if(Time.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getTime(columnLabel);
-		}
-		else if(Date.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getDate(columnLabel);
-		}
-		else
-		{
-			value = resultSet.getObject(columnLabel, klass);
-		}
-		return value;
+		return new RdbHashMap<PropertyField>(super.getPropertyNameFieldMap(type));
 	}
-	
+	*/
 }

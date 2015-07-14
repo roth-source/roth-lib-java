@@ -13,6 +13,9 @@ public @interface Property
 	String name();
 	boolean entityName()		default false;
 	
+	boolean odb() 				default true;
+	String odbName()			default "";
+	
 	boolean rdb() 				default true;
 	String rdbName()			default "";
 	

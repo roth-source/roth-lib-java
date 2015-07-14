@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import roth.lib.Callback;
 import roth.lib.map.rdb.RdbConnection.CloseHandler;
 import roth.lib.map.rdb.sql.Delete;
 import roth.lib.map.rdb.sql.Insert;
@@ -372,6 +373,50 @@ public class Rdb implements DataSource
 				LinkedList<T> result = mapper.fromRdb(resultSet, this, klass);
 				connection.commit();
 				return result;
+			}
+		}
+	}
+	
+	public <T> void queryAll(Select select, Callback<T> callback)
+	{
+		queryAll(select.sql(), select.values(), callback);
+	}
+	
+	public <T> void queryAll(String sql, Callback<T> callback)
+	{
+		queryAll(sql, (Collection<Object>) null, callback);
+	}
+	
+	public <T> void queryAll(String sql, Collection<Object> values, Callback<T> callback)
+	{
+		try(RdbConnection connection = getConnection())
+		{
+			queryAll(sql, values, callback, connection); 
+		}
+		catch(SQLException e)
+		{
+			throw new RdbException(e);
+		}
+	}
+	
+	public <T> void queryAll(Select select, Callback<T> callback, RdbConnection connection) throws SQLException
+	{
+		queryAll(select.sql(), select.values(), callback, connection);
+	}
+	
+	public <T> void queryAll(String sql, Callback<T> callback, RdbConnection connection) throws SQLException
+	{
+		queryAll(sql, (Collection<Object>) null, callback, connection);
+	}
+	
+	public <T> void queryAll(String sql, Collection<Object> values, Callback<T> callback, RdbConnection connection) throws SQLException
+	{
+		try(RdbPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
+		{
+			try(RdbResultSet resultSet = preparedStatement.executeQuery())
+			{
+				mapper.fromRdb(resultSet, this, callback);
+				connection.commit();
 			}
 		}
 	}

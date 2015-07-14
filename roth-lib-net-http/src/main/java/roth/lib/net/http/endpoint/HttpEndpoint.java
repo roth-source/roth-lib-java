@@ -1,5 +1,6 @@
 package roth.lib.net.http.endpoint;
 
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -9,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +25,7 @@ import roth.lib.net.http.annotation.Ajax;
 import roth.lib.net.http.annotation.Api;
 import roth.lib.net.http.annotation.Delete;
 import roth.lib.net.http.annotation.Get;
+import roth.lib.net.http.annotation.Gzip;
 import roth.lib.net.http.annotation.Post;
 import roth.lib.net.http.annotation.Put;
 import roth.lib.net.http.header.type.MimeType;
@@ -83,9 +86,23 @@ public abstract class HttpEndpoint<RequestConfig extends Config, ResponseConfig 
 											Parameter[] parameters = method.getParameters();
 											if(parameters != null && parameters.length == 1)
 											{
-												Parameter parameter = parameters[0];
-												Type methodParameterType = parameter.getParameterizedType();
-												methodRequest = getRequestMapper(request, response).deserialize(request.getInputStream(), methodParameterType, getRequestConfig(request, response));
+												boolean gzipped = false;
+												Gzip gzip = ServiceUtil.getAnnotation(service, method, Gzip.class);
+												if(gzip != null)
+												{
+													if(gzip.optional())
+													{
+														String gzipHeader = request.getHeader(gzip.header());
+														gzipped = gzipHeader != null;
+													}
+													else
+													{
+														gzipped = true;
+													}
+												}
+												InputStream input = gzipped ? new GZIPInputStream(request.getInputStream()) : request.getInputStream();
+												Type methodParameterType = parameters[0].getParameterizedType();
+												methodRequest = getRequestMapper(request, response).deserialize(input, methodParameterType, getRequestConfig(request, response));
 											}
 											boolean validCsrf = !(ajaxAuthenticated && ajax.authenticated() && !service.isValidCsrfToken(methodRequest, dev));
 											if(validCsrf)

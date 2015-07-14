@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import roth.lib.Callback;
 import roth.lib.map.rdb.sql.Column;
 import roth.lib.map.rdb.sql.Columns;
 import roth.lib.map.rdb.sql.Delete;
@@ -180,6 +181,21 @@ public abstract class RdbTable<T extends RdbModel>
 	public LinkedList<T> findAllBy(String sql, Collection<Object> values)
 	{
 		return getRdb().queryAll(sql, values, klass);
+	}
+	
+	public void callback(Select select, Callback<T> callback)
+	{
+		getRdb().queryAll(select, callback.setKlass(klass));
+	}
+	
+	public void callback(String sql, Callback<T> callback)
+	{
+		getRdb().queryAll(sql, callback.setKlass(klass));
+	}
+	
+	public void callback(String sql, Collection<Object> values, Callback<T> callback)
+	{
+		getRdb().queryAll(sql, values, callback.setKlass(klass));
 	}
 	
 	public int executeInsert(Insert insert)
