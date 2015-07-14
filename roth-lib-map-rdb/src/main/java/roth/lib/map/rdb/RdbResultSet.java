@@ -1178,11 +1178,11 @@ public class RdbResultSet implements ResultSet
 	{
 		if(Calendar.class.isAssignableFrom(type))
 		{
-			return (T) getCalendar(resultSet.getObject(columnIndex, Timestamp.class));
+			return (T) getCalendar(columnIndex);
 		}
 		else if(Enum.class.isAssignableFrom(type))
 		{
-			return (T) EnumUtil.fromString(resultSet.getString(columnIndex), (Class<Enum<?>>) type);
+			return (T) getEnum(columnIndex, type);
 		}
 		else
 		{
@@ -1197,11 +1197,11 @@ public class RdbResultSet implements ResultSet
 	{
 		if(Calendar.class.isAssignableFrom(type))
 		{
-			return (T) getCalendar(resultSet.getObject(columnLabel, Timestamp.class));
+			return (T) getCalendar(columnLabel);
 		}
 		else if(Enum.class.isAssignableFrom(type))
 		{
-			return (T) EnumUtil.fromString(resultSet.getString(columnLabel), (Class<Enum<?>>) type);
+			return (T) getEnum(columnLabel, type);
 		}
 		else
 		{
@@ -1219,6 +1219,28 @@ public class RdbResultSet implements ResultSet
 			return calendar;
 		}
 		return null;
+	}
+	
+	public Calendar getCalendar(int columnIndex) throws SQLException
+	{
+		return getCalendar(resultSet.getTimestamp(columnIndex));
+	}
+	
+	public Calendar getCalendar(String columnLabel) throws SQLException
+	{
+		return getCalendar(resultSet.getTimestamp(columnLabel));
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getEnum(int columnIndex, Class<T> klass) throws SQLException
+	{
+		return (T) EnumUtil.fromString(resultSet.getString(columnIndex), (Class<Enum<?>>) klass);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getEnum(String columnLabel, Class<T> klass) throws SQLException
+	{
+		return (T) EnumUtil.fromString(resultSet.getString(columnLabel), (Class<Enum<?>>) klass);
 	}
 	
 }

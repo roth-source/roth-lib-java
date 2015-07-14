@@ -2,7 +2,13 @@ package roth.lib.map.rdb;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
@@ -227,13 +233,13 @@ public class RdbMapper extends Mapper
 						if(propertyField != null)
 						{
 							Field field = propertyField.getField();
-							field.set(model, resultSet.getObject(columnLabel, field.getType()));
+							field.set(model, getValue(resultSet, columnLabel, field.getType()));
 						}
 					}
 				}
 				catch(Exception e)
 				{
-					
+					e.printStackTrace();
 				}
 				if(model != null)
 				{
@@ -243,7 +249,7 @@ public class RdbMapper extends Mapper
 		}
 		catch(Exception e)
 		{
-			
+			e.printStackTrace();
 		}
 		return models;
 	}
@@ -267,7 +273,7 @@ public class RdbMapper extends Mapper
 				}
 				catch(Exception e)
 				{
-					
+					e.printStackTrace();
 				}
 				if(!dataMap.isEmpty())
 				{
@@ -277,15 +283,75 @@ public class RdbMapper extends Mapper
 		}
 		catch(Exception e)
 		{
-			
+			e.printStackTrace();
 		}
 		return dataMaps;
 	}
-	/*
-	@Override
-	public LinkedHashMap<String, PropertyField> getPropertyNameFieldMap(Type type)
+	
+	public Object getValue(RdbResultSet resultSet, String columnLabel, Class<?> klass) throws SQLException
 	{
-		return new RdbHashMap<PropertyField>(super.getPropertyNameFieldMap(type));
+		Object value = null;
+		if(String.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getString(columnLabel);
+		}
+		else if(Integer.class.isAssignableFrom(klass) || int.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getInt(columnLabel);
+		}
+		else if(Double.class.isAssignableFrom(klass) || double.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getDouble(columnLabel);
+		}
+		else if(Boolean.class.isAssignableFrom(klass) || boolean.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getBoolean(columnLabel);
+		}
+		else if(Calendar.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getCalendar(columnLabel);
+		}
+		else if(Enum.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getEnum(columnLabel, klass);
+		}
+		else if(Byte.class.isAssignableFrom(klass) || byte.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getByte(columnLabel);
+		}
+		else if(Short.class.isAssignableFrom(klass) || short.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getShort(columnLabel);
+		}
+		else if(Long.class.isAssignableFrom(klass) || long.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getLong(columnLabel);
+		}
+		else if(Float.class.isAssignableFrom(klass) || float.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getFloat(columnLabel);
+		}
+		else if(BigDecimal.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getBigDecimal(columnLabel);
+		}
+		else if(Timestamp.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getTimestamp(columnLabel);
+		}
+		else if(Time.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getTime(columnLabel);
+		}
+		else if(Date.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getDate(columnLabel);
+		}
+		else
+		{
+			value = resultSet.getObject(columnLabel, klass);
+		}
+		return value;
 	}
-	*/
+	
 }
