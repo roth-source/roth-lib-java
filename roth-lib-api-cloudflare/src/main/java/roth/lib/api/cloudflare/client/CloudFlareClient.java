@@ -82,7 +82,7 @@ public abstract class CloudFlareClient extends ApiClient<CloudFlareRequest, Clou
 	}
 	
 	@Override
-	protected <T extends CloudFlareResponse<?>> T connect(HttpUrl url, CloudFlareRequest cloudFlareRequest, Type type, HttpMethod method, HttpHeader... headers)
+	protected <T extends CloudFlareResponse<?>> T connect(HttpUrl url, CloudFlareRequest cloudFlareRequest, Type type, HttpMethod method, boolean gzip, HttpHeader... headers)
 	{
 		if(cloudFlareRequest != null)
 		{
@@ -93,7 +93,7 @@ public abstract class CloudFlareClient extends ApiClient<CloudFlareRequest, Clou
 		{
 			throw new CloudFlareException("request cannot be null");
 		}
-		return super.connect(url, cloudFlareRequest, type, method);
+		return super.connect(url, cloudFlareRequest, type, method, gzip);
 	}
 	
 	@Override

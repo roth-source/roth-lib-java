@@ -72,7 +72,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> T get(HttpUrl url, ApiRequest apiRequest, Type type, HttpHeader... headers)
 	{
-		return connect(url, apiRequest, type, HttpMethod.GET, headers);
+		return connect(url, apiRequest, type, HttpMethod.GET, false, headers);
 	}
 	
 	protected <T extends ApiResponse> T post(HttpUrl url, HttpHeader... headers)
@@ -102,7 +102,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> T post(HttpUrl url, ApiRequest apiRequest, Type type, HttpHeader... headers)
 	{
-		return connect(url, apiRequest, type, HttpMethod.POST, headers);
+		return connect(url, apiRequest, type, HttpMethod.POST, false, headers);
 	}
 	
 	protected <T extends ApiResponse> T put(HttpUrl url, HttpHeader... headers)
@@ -132,7 +132,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> T put(HttpUrl url, ApiRequest apiRequest, Type type, HttpHeader... headers)
 	{
-		return connect(url, apiRequest, type, HttpMethod.PUT, headers);
+		return connect(url, apiRequest, type, HttpMethod.PUT, false, headers);
 	}
 	
 	protected <T extends ApiResponse> T delete(HttpUrl url, HttpHeader... headers)
@@ -162,12 +162,102 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> T delete(HttpUrl url, ApiRequest apiRequest, Type type, HttpHeader... headers)
 	{
-		return connect(url, apiRequest, type, HttpMethod.DELETE, headers);
+		return connect(url, apiRequest, type, HttpMethod.DELETE, false, headers);
 	}
 	
-	protected <T extends ApiResponse> T connect(HttpUrl url, ApiRequest apiRequest, Type type, HttpMethod method, HttpHeader... headers)
+	protected <T extends ApiResponse> T postGzip(HttpUrl url, HttpHeader... headers)
 	{
-		HttpResponse<T> response = connectResponse(url, apiRequest, type, method, headers);
+		return postGzip(url, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> T postGzip(HttpUrl url, Generic<T> generic, HttpHeader... headers)
+	{
+		return postGzip(url, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> T postGzip(HttpUrl url, Type type, HttpHeader... headers)
+	{
+		return postGzip(url, null, type, headers);
+	}
+	
+	protected <T extends ApiResponse> T postGzip(HttpUrl url, ApiRequest apiRequest, HttpHeader... headers)
+	{
+		return postGzip(url, apiRequest, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> T postGzip(HttpUrl url, ApiRequest apiRequest, Generic<T> generic, HttpHeader... headers)
+	{
+		return postGzip(url, apiRequest, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> T postGzip(HttpUrl url, ApiRequest apiRequest, Type type, HttpHeader... headers)
+	{
+		return connect(url, apiRequest, type, HttpMethod.POST, true, headers);
+	}
+	
+	protected <T extends ApiResponse> T putGzip(HttpUrl url, HttpHeader... headers)
+	{
+		return putGzip(url, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> T putGzip(HttpUrl url, Generic<T> generic, HttpHeader... headers)
+	{
+		return putGzip(url, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> T putGzip(HttpUrl url, Type type, HttpHeader... headers)
+	{
+		return putGzip(url, null, type, headers);
+	}
+	
+	protected <T extends ApiResponse> T putGzip(HttpUrl url, ApiRequest apiRequest, HttpHeader... headers)
+	{
+		return putGzip(url, apiRequest, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> T putGzip(HttpUrl url, ApiRequest apiRequest, Generic<T> generic, HttpHeader... headers)
+	{
+		return putGzip(url, apiRequest, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> T putGzip(HttpUrl url, ApiRequest apiRequest, Type type, HttpHeader... headers)
+	{
+		return connect(url, apiRequest, type, HttpMethod.PUT, true, headers);
+	}
+	
+	protected <T extends ApiResponse> T deleteGzip(HttpUrl url, HttpHeader... headers)
+	{
+		return deleteGzip(url, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> T deleteGzip(HttpUrl url, Generic<T> generic, HttpHeader... headers)
+	{
+		return deleteGzip(url, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> T deleteGzip(HttpUrl url, Type type, HttpHeader... headers)
+	{
+		return deleteGzip(url, null, type, headers);
+	}
+	
+	protected <T extends ApiResponse> T deleteGzip(HttpUrl url, ApiRequest apiRequest, HttpHeader... headers)
+	{
+		return deleteGzip(url, apiRequest, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> T deleteGzip(HttpUrl url, ApiRequest apiRequest, Generic<T> generic, HttpHeader... headers)
+	{
+		return deleteGzip(url, apiRequest, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> T deleteGzip(HttpUrl url, ApiRequest apiRequest, Type type, HttpHeader... headers)
+	{
+		return connect(url, apiRequest, type, HttpMethod.DELETE, true, headers);
+	}
+	
+	protected <T extends ApiResponse> T connect(HttpUrl url, ApiRequest apiRequest, Type type, HttpMethod method, boolean gzip, HttpHeader... headers)
+	{
+		HttpResponse<T> response = connectResponse(url, apiRequest, type, method, gzip, headers);
 		return response.getEntity();
 	}
 	
@@ -198,9 +288,9 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> HttpResponse<T> getResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpHeader... headers)
 	{
-		return connectResponse(url, apiRequest, type, HttpMethod.GET, headers);
+		return connectResponse(url, apiRequest, type, HttpMethod.GET, false, headers);
 	}
-	
+
 	protected <T extends ApiResponse> HttpResponse<T> postResponse(HttpUrl url, HttpHeader... headers)
 	{
 		return postResponse(url, (Type) null, headers);
@@ -228,7 +318,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> HttpResponse<T> postResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpHeader... headers)
 	{
-		return connectResponse(url, apiRequest, type, HttpMethod.POST, headers);
+		return connectResponse(url, apiRequest, type, HttpMethod.POST, false, headers);
 	}
 	
 	protected <T extends ApiResponse> HttpResponse<T> putResponse(HttpUrl url, HttpHeader... headers)
@@ -258,7 +348,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> HttpResponse<T> putResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpHeader... headers)
 	{
-		return connectResponse(url, apiRequest, type, HttpMethod.PUT, headers);
+		return connectResponse(url, apiRequest, type, HttpMethod.PUT, false, headers);
 	}
 	
 	protected <T extends ApiResponse> HttpResponse<T> deleteResponse(HttpUrl url, HttpHeader... headers)
@@ -288,12 +378,102 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> HttpResponse<T> deleteResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpHeader... headers)
 	{
-		return connectResponse(url, apiRequest, type, HttpMethod.DELETE, headers);
+		return connectResponse(url, apiRequest, type, HttpMethod.DELETE, false, headers);
 	}
 	
-	protected <T extends ApiResponse> HttpResponse<T> connectResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpMethod method, HttpHeader... headers)
+	protected <T extends ApiResponse> HttpResponse<T> postGzipResponse(HttpUrl url, HttpHeader... headers)
 	{
-		return connectResponse(url, apiRequest, type, method, getRequestHeaders(url).setHeaders(headers));
+		return postGzipResponse(url, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> postGzipResponse(HttpUrl url, Generic<T> generic, HttpHeader... headers)
+	{
+		return postGzipResponse(url, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> postGzipResponse(HttpUrl url, Type type, HttpHeader... headers)
+	{
+		return postGzipResponse(url, null, type, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> postGzipResponse(HttpUrl url, ApiRequest apiRequest, HttpHeader... headers)
+	{
+		return postGzipResponse(url, apiRequest, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> postGzipResponse(HttpUrl url, ApiRequest apiRequest, Generic<T> generic, HttpHeader... headers)
+	{
+		return postGzipResponse(url, apiRequest, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> postGzipResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpHeader... headers)
+	{
+		return connectResponse(url, apiRequest, type, HttpMethod.POST, true, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> putGzipResponse(HttpUrl url, HttpHeader... headers)
+	{
+		return putGzipResponse(url, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> putGzipResponse(HttpUrl url, Generic<T> generic, HttpHeader... headers)
+	{
+		return putGzipResponse(url, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> putGzipResponse(HttpUrl url, Type type, HttpHeader... headers)
+	{
+		return putGzipResponse(url, null, type, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> putGzipResponse(HttpUrl url, ApiRequest apiRequest, HttpHeader... headers)
+	{
+		return putGzipResponse(url, apiRequest, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> putGzipResponse(HttpUrl url, ApiRequest apiRequest, Generic<T> generic, HttpHeader... headers)
+	{
+		return putGzipResponse(url, apiRequest, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> putGzipResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpHeader... headers)
+	{
+		return connectResponse(url, apiRequest, type, HttpMethod.PUT, true, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> deleteGzipResponse(HttpUrl url, HttpHeader... headers)
+	{
+		return deleteGzipResponse(url, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> deleteGzipResponse(HttpUrl url, Generic<T> generic, HttpHeader... headers)
+	{
+		return deleteGzipResponse(url, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> deleteGzipResponse(HttpUrl url, Type type, HttpHeader... headers)
+	{
+		return deleteGzipResponse(url, null, type, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> deleteGzipResponse(HttpUrl url, ApiRequest apiRequest, HttpHeader... headers)
+	{
+		return deleteGzipResponse(url, apiRequest, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> deleteGzipResponse(HttpUrl url, ApiRequest apiRequest, Generic<T> generic, HttpHeader... headers)
+	{
+		return deleteGzipResponse(url, apiRequest, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> deleteGzipResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpHeader... headers)
+	{
+		return connectResponse(url, apiRequest, type, HttpMethod.DELETE, true, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> connectResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpMethod method, boolean gzip, HttpHeader... headers)
+	{
+		return connectResponse(url, apiRequest, type, method, gzip, getRequestHeaders(url).setHeaders(headers));
 	}
 
 	protected <T extends ApiResponse> T get(HttpUrl url, HttpRequestHeaders headers)
@@ -323,7 +503,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> T get(HttpUrl url, ApiRequest apiRequest, Type type, HttpRequestHeaders headers)
 	{
-		return connect(url, apiRequest, type, HttpMethod.GET, headers);
+		return connect(url, apiRequest, type, HttpMethod.GET, false, headers);
 	}
 	
 	protected <T extends ApiResponse> T post(HttpUrl url, HttpRequestHeaders headers)
@@ -353,7 +533,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> T post(HttpUrl url, ApiRequest apiRequest, Type type, HttpRequestHeaders headers)
 	{
-		return connect(url, apiRequest, type, HttpMethod.POST, headers);
+		return connect(url, apiRequest, type, HttpMethod.POST, false, headers);
 	}
 	
 	protected <T extends ApiResponse> T put(HttpUrl url, HttpRequestHeaders headers)
@@ -383,7 +563,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> T put(HttpUrl url, ApiRequest apiRequest, Type type, HttpRequestHeaders headers)
 	{
-		return connect(url, apiRequest, type, HttpMethod.PUT, headers);
+		return connect(url, apiRequest, type, HttpMethod.PUT, false, headers);
 	}
 	
 	protected <T extends ApiResponse> T delete(HttpUrl url, HttpRequestHeaders headers)
@@ -413,12 +593,102 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> T delete(HttpUrl url, ApiRequest apiRequest, Type type, HttpRequestHeaders headers)
 	{
-		return connect(url, apiRequest, type, HttpMethod.DELETE, headers);
+		return connect(url, apiRequest, type, HttpMethod.DELETE, false, headers);
 	}
 	
-	protected <T extends ApiResponse> T connect(HttpUrl url, ApiRequest apiRequest, Type type, HttpMethod method, HttpRequestHeaders headers)
+	protected <T extends ApiResponse> T postGzip(HttpUrl url, HttpRequestHeaders headers)
 	{
-		HttpResponse<T> response = connectResponse(url, apiRequest, type, method, headers);
+		return postGzip(url, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> T postGzip(HttpUrl url, Generic<T> generic, HttpRequestHeaders headers)
+	{
+		return postGzip(url, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> T postGzip(HttpUrl url, Type type, HttpRequestHeaders headers)
+	{
+		return postGzip(url, null, type, headers);
+	}
+	
+	protected <T extends ApiResponse> T postGzip(HttpUrl url, ApiRequest apiRequest, HttpRequestHeaders headers)
+	{
+		return postGzip(url, apiRequest, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> T postGzip(HttpUrl url, ApiRequest apiRequest, Generic<T> generic, HttpRequestHeaders headers)
+	{
+		return postGzip(url, apiRequest, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> T postGzip(HttpUrl url, ApiRequest apiRequest, Type type, HttpRequestHeaders headers)
+	{
+		return connect(url, apiRequest, type, HttpMethod.POST, true, headers);
+	}
+	
+	protected <T extends ApiResponse> T putGzip(HttpUrl url, HttpRequestHeaders headers)
+	{
+		return putGzip(url, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> T putGzip(HttpUrl url, Generic<T> generic, HttpRequestHeaders headers)
+	{
+		return putGzip(url, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> T putGzip(HttpUrl url, Type type, HttpRequestHeaders headers)
+	{
+		return putGzip(url, null, type, headers);
+	}
+	
+	protected <T extends ApiResponse> T putGzip(HttpUrl url, ApiRequest apiRequest, HttpRequestHeaders headers)
+	{
+		return putGzip(url, apiRequest, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> T putGzip(HttpUrl url, ApiRequest apiRequest, Generic<T> generic, HttpRequestHeaders headers)
+	{
+		return putGzip(url, apiRequest, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> T putGzip(HttpUrl url, ApiRequest apiRequest, Type type, HttpRequestHeaders headers)
+	{
+		return connect(url, apiRequest, type, HttpMethod.PUT, true, headers);
+	}
+	
+	protected <T extends ApiResponse> T deleteGzip(HttpUrl url, HttpRequestHeaders headers)
+	{
+		return deleteGzip(url, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> T deleteGzip(HttpUrl url, Generic<T> generic, HttpRequestHeaders headers)
+	{
+		return deleteGzip(url, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> T deleteGzip(HttpUrl url, Type type, HttpRequestHeaders headers)
+	{
+		return deleteGzip(url, null, type, headers);
+	}
+	
+	protected <T extends ApiResponse> T deleteGzip(HttpUrl url, ApiRequest apiRequest, HttpRequestHeaders headers)
+	{
+		return deleteGzip(url, apiRequest, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> T deleteGzip(HttpUrl url, ApiRequest apiRequest, Generic<T> generic, HttpRequestHeaders headers)
+	{
+		return deleteGzip(url, apiRequest, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> T deleteGzip(HttpUrl url, ApiRequest apiRequest, Type type, HttpRequestHeaders headers)
+	{
+		return connect(url, apiRequest, type, HttpMethod.DELETE, true, headers);
+	}
+	
+	protected <T extends ApiResponse> T connect(HttpUrl url, ApiRequest apiRequest, Type type, HttpMethod method, boolean gzip, HttpRequestHeaders headers)
+	{
+		HttpResponse<T> response = connectResponse(url, apiRequest, type, method, gzip, headers);
 		return response.getEntity();
 	}
 	
@@ -449,7 +719,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> HttpResponse<T> getResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpRequestHeaders headers)
 	{
-		return connectResponse(url, apiRequest, type, HttpMethod.GET, headers);
+		return connectResponse(url, apiRequest, type, HttpMethod.GET, false, headers);
 	}
 	
 	protected <T extends ApiResponse> HttpResponse<T> postResponse(HttpUrl url, HttpRequestHeaders headers)
@@ -479,7 +749,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> HttpResponse<T> postResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpRequestHeaders headers)
 	{
-		return connectResponse(url, apiRequest, type, HttpMethod.POST, headers);
+		return connectResponse(url, apiRequest, type, HttpMethod.POST, false, headers);
 	}
 	
 	protected <T extends ApiResponse> HttpResponse<T> putResponse(HttpUrl url, HttpRequestHeaders headers)
@@ -509,7 +779,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> HttpResponse<T> putResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpRequestHeaders headers)
 	{
-		return connectResponse(url, apiRequest, type, HttpMethod.PUT, headers);
+		return connectResponse(url, apiRequest, type, HttpMethod.PUT, false, headers);
 	}
 	
 	protected <T extends ApiResponse> HttpResponse<T> deleteResponse(HttpUrl url, HttpRequestHeaders headers)
@@ -539,11 +809,101 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> HttpResponse<T> deleteResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpRequestHeaders headers)
 	{
-		return connectResponse(url, apiRequest, type, HttpMethod.DELETE, headers);
+		return connectResponse(url, apiRequest, type, HttpMethod.DELETE, false, headers);
+	}
+
+	protected <T extends ApiResponse> HttpResponse<T> postGzipResponse(HttpUrl url, HttpRequestHeaders headers)
+	{
+		return postGzipResponse(url, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> postGzipResponse(HttpUrl url, Generic<T> generic, HttpRequestHeaders headers)
+	{
+		return postGzipResponse(url, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> postGzipResponse(HttpUrl url, Type type, HttpRequestHeaders headers)
+	{
+		return postGzipResponse(url, null, type, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> postGzipResponse(HttpUrl url, ApiRequest apiRequest, HttpRequestHeaders headers)
+	{
+		return postGzipResponse(url, apiRequest, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> postGzipResponse(HttpUrl url, ApiRequest apiRequest, Generic<T> generic, HttpRequestHeaders headers)
+	{
+		return postGzipResponse(url, apiRequest, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> postGzipResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpRequestHeaders headers)
+	{
+		return connectResponse(url, apiRequest, type, HttpMethod.POST, true, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> putGzipResponse(HttpUrl url, HttpRequestHeaders headers)
+	{
+		return putGzipResponse(url, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> putGzipResponse(HttpUrl url, Generic<T> generic, HttpRequestHeaders headers)
+	{
+		return putGzipResponse(url, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> putGzipResponse(HttpUrl url, Type type, HttpRequestHeaders headers)
+	{
+		return putGzipResponse(url, null, type, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> putGzipResponse(HttpUrl url, ApiRequest apiRequest, HttpRequestHeaders headers)
+	{
+		return putGzipResponse(url, apiRequest, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> putGzipResponse(HttpUrl url, ApiRequest apiRequest, Generic<T> generic, HttpRequestHeaders headers)
+	{
+		return putGzipResponse(url, apiRequest, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> putGzipResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpRequestHeaders headers)
+	{
+		return connectResponse(url, apiRequest, type, HttpMethod.PUT, true, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> deleteGzipResponse(HttpUrl url, HttpRequestHeaders headers)
+	{
+		return deleteGzipResponse(url, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> deleteGzipResponse(HttpUrl url, Generic<T> generic, HttpRequestHeaders headers)
+	{
+		return deleteGzipResponse(url, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> deleteGzipResponse(HttpUrl url, Type type, HttpRequestHeaders headers)
+	{
+		return deleteGzipResponse(url, null, type, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> deleteGzipResponse(HttpUrl url, ApiRequest apiRequest, HttpRequestHeaders headers)
+	{
+		return deleteGzipResponse(url, apiRequest, (Type) null, headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> deleteGzipResponse(HttpUrl url, ApiRequest apiRequest, Generic<T> generic, HttpRequestHeaders headers)
+	{
+		return deleteGzipResponse(url, apiRequest, generic.getType(), headers);
+	}
+	
+	protected <T extends ApiResponse> HttpResponse<T> deleteGzipResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpRequestHeaders headers)
+	{
+		return connectResponse(url, apiRequest, type, HttpMethod.DELETE, true, headers);
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T extends ApiResponse> HttpResponse<T> connectResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpMethod method, HttpRequestHeaders headers)
+	protected <T extends ApiResponse> HttpResponse<T> connectResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpMethod method, boolean gzip, HttpRequestHeaders headers)
 	{
 		try
 		{
@@ -555,11 +915,11 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 			{
 				if(apiRequest instanceof Serializer)
 				{
-					request.setSerializer((Serializer<ApiRequest>) apiRequest);
+					request.setSerializer(((Serializer<ApiRequest>) apiRequest).setGzip(gzip));
 				}
 				else
 				{
-					request.setSerializer(getSerializer(apiRequest));
+					request.setSerializer(getSerializer(apiRequest).setGzip(gzip));
 				}
 			}
 			if(debug)

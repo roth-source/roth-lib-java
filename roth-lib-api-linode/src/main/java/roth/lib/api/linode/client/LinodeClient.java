@@ -142,7 +142,7 @@ public abstract class LinodeClient extends ApiClient<LinodeRequest, LinodeRespon
 		return JsonMapper.get().format(body);
 	}
 	
-	protected <T extends LinodeResponse<?>> T connect(HttpUrl url, LinodeRequest linodeRequest, Type type, HttpMethod method, HttpHeader... headers)
+	protected <T extends LinodeResponse<?>> T connect(HttpUrl url, LinodeRequest linodeRequest, Type type, HttpMethod method, boolean gzip, HttpHeader... headers)
 	{
 		if(linodeRequest != null)
 		{
@@ -152,7 +152,7 @@ public abstract class LinodeClient extends ApiClient<LinodeRequest, LinodeRespon
 		{
 			throw new LinodeException("request cannot be null");
 		}
-		return super.connect(url, linodeRequest, type, method, headers);
+		return super.connect(url, linodeRequest, type, method, gzip, headers);
 	}
 	
 	protected <T extends LinodeResponse<?>> void check(HttpResponse<T> response)
