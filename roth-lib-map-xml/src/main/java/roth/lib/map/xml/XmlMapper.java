@@ -330,6 +330,13 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 					}
 					writeCloseTag(writer, config, name);
 				}
+				else
+				{
+					if(!values.isEmpty())
+					{
+						writeArray(writer, config, name, values, tabs);
+					}
+				}
 			}
 			else if(isMap(value.getClass()))
 			{
@@ -556,6 +563,7 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 		return map;
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public <T> T readEntity(Reader reader, Type type, OpenTag openTag, XmlConfig config) throws Exception
 	{
 		LinkedHashMap<String, PropertyField> propertyNameFieldMap = getPropertyNameFieldMap(type);
@@ -600,8 +608,28 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 					}
 					else if(isCollection(fieldType))
 					{
-						Object value = readCollection(reader, fieldType, config);
-						field.set(model, value);
+						String xmlElementsName = getXmlElementsName(field);
+						if(xmlElementsName != null)
+						{
+							Object value = readCollection(reader, fieldType, config);
+							field.set(model, value);
+						}
+						else
+						{
+							Object value = readCollectionElement(reader, fieldOpenTag, fieldType, config);
+							if(value != null)
+							{
+								Collection collection = (Collection) field.get(model);
+								if(collection == null)
+								{
+									Constructor<?> fieldConstructor = MapperUtil.getClass(fieldType).getDeclaredConstructor();
+									fieldConstructor.setAccessible(true);
+									collection = (Collection) fieldConstructor.newInstance();
+									field.set(model, collection);
+								}
+								collection.add(value);
+							}
+						}
 					}
 					else if(isArray(fieldType))
 					{
@@ -831,6 +859,44 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 			readUntil(reader, LEFT_ANGLE_BRACKET);
 		}
 		return (T) collection;
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected <T, E> E readCollectionElement(Reader reader, OpenTag tag, Type type, XmlConfig config) throws Exception
+	{
+		E element = null;
+		Class<E> elementClass = (Class<E>) getElementClass(type);
+		if(isEntity(elementClass))
+		{
+			element = readEntity(reader, elementClass, tag, config);
+		}
+		else if(isCollection(elementClass))
+		{
+			element = readCollection(reader, elementClass, config);
+		}
+		else if(isArray(elementClass))
+		{
+			element = readArray(reader, elementClass, config);
+		}
+		else if(isMap(elementClass))
+		{
+			element = readMap(reader, elementClass, config);
+		}
+		else if(isSerializable(elementClass, config))
+		{
+			String value = readEscaped(reader, config, LEFT_ANGLE_BRACKET);
+			readTag(reader, config);
+			Deserializer<E> deserializer = (Deserializer<E>) config.getDeserializer(elementClass);
+			if(deserializer != null)
+			{
+				element = deserializer.deserialize(value, elementClass);
+			}
+		}
+		else
+		{
+			readUnmapped(reader, tag, config);
+		}
+		return element;
 	}
 	
 	protected Tag readTag(Reader reader, XmlConfig config) throws IOException
