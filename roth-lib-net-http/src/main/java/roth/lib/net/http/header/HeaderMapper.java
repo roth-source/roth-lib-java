@@ -17,7 +17,6 @@ import java.util.Map.Entry;
 
 import roth.lib.annotation.Property;
 import roth.lib.map.Deserializer;
-import roth.lib.map.Mapper;
 import roth.lib.map.PropertyField;
 import roth.lib.map.SerialMapper;
 import roth.lib.map.mapper.PropertyMapper;
@@ -327,7 +326,7 @@ public class HeaderMapper extends SerialMapper<HeaderConfig>
 				}
 			}
 		}
-		String value = new String(output.toByteArray(), Mapper.UTF_8);
+		String value = new String(output.toByteArray(), UTF_8);
 		Deserializer<?> deserializer = config.getDeserializer(klass);
 		if(value != null && deserializer != null)
 		{

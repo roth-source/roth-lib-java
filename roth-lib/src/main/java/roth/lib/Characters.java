@@ -1,7 +1,11 @@
 package roth.lib;
 
+import java.nio.charset.Charset;
+
 public interface Characters
 {
+	Charset UTF_8 				= Charset.forName("UTF-8");
+	
 	char NULL					= '\u0000';	// 000
 	char START_OF_HEADING		= '\u0001';	// 001
 	char START_OF_TEXT			= '\u0002';	// 002

@@ -5,7 +5,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -21,8 +20,6 @@ import roth.lib.map.util.MapperUtil;
 
 public abstract class Mapper
 {
-	public static Charset UTF_8 = Charset.forName("UTF-8");
-	
 	protected LinkedList<EntityMapper<? extends Annotation>> entityMappers = new LinkedList<EntityMapper<? extends Annotation>>();
 	protected LinkedList<PropertyMapper<? extends Annotation>> propertyMappers = new LinkedList<PropertyMapper<? extends Annotation>>();
 	protected LinkedList<IdMapper<? extends Annotation>> idMappers = new LinkedList<IdMapper<? extends Annotation>>();

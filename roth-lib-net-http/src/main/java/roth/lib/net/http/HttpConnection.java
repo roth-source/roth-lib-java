@@ -15,7 +15,6 @@ import java.util.zip.GZIPInputStream;
 
 import roth.lib.Characters;
 import roth.lib.map.Deserializer;
-import roth.lib.map.Mapper;
 import roth.lib.net.http.header.HeaderMapper;
 
 public class HttpConnection implements Characters
@@ -48,7 +47,7 @@ public class HttpConnection implements Characters
 	
 	public Writer getWriter() throws IOException
 	{
-		return new OutputStreamWriter(getOutputStream(), Mapper.UTF_8);
+		return new OutputStreamWriter(getOutputStream(), UTF_8);
 	}
 	
 	public BufferedWriter getBufferedWriter() throws IOException
@@ -98,12 +97,12 @@ public class HttpConnection implements Characters
 	
 	public Reader getReader() throws IOException
 	{
-		return new InputStreamReader(getInputStream(), Mapper.UTF_8);
+		return new InputStreamReader(getInputStream(), UTF_8);
 	}
 	
 	public Reader getGzipReader() throws IOException
 	{
-		return new InputStreamReader(getGzipInputStream(), Mapper.UTF_8);
+		return new InputStreamReader(getGzipInputStream(), UTF_8);
 	}
 	
 	public <T> HttpResponse<T> connect(HttpRequest<?> request, Deserializer<T> deserializer) throws IOException
@@ -128,7 +127,7 @@ public class HttpConnection implements Characters
 				if(debug)
 				{
 					ByteArrayOutputStream output = readAll(getInputStream());
-					response.setBody(new String(output.toByteArray(), Mapper.UTF_8));
+					response.setBody(new String(output.toByteArray(), UTF_8));
 					if(deserializer != null)
 					{
 						response.setEntity(deserializer.deserialize(new ByteArrayInputStream(output.toByteArray())));
@@ -193,7 +192,7 @@ public class HttpConnection implements Characters
 				}
 			}
 		}
-		return new String(output.toByteArray(), Mapper.UTF_8);
+		return new String(output.toByteArray(), UTF_8);
 	}
 	
 	protected ByteArrayOutputStream readAll(InputStream input) throws IOException

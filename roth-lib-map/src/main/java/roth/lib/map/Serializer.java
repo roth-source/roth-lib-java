@@ -7,6 +7,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.zip.GZIPOutputStream;
 
+import roth.lib.Characters;
+
 
 public abstract class Serializer<T>
 {
@@ -61,12 +63,12 @@ public abstract class Serializer<T>
 		if(gzip)
 		{
 			GZIPOutputStream gzipOutput = new GZIPOutputStream(output);
-			serialize(new OutputStreamWriter(gzipOutput, Mapper.UTF_8));
+			serialize(new OutputStreamWriter(gzipOutput, Characters.UTF_8));
 			gzipOutput.finish();
 		}
 		else
 		{
-			serialize(new OutputStreamWriter(output, Mapper.UTF_8));
+			serialize(new OutputStreamWriter(output, Characters.UTF_8));
 		}
 	}
 	

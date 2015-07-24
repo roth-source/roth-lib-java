@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import roth.lib.Characters;
+
 public abstract class Deserializer<T>
 {
 	
@@ -26,7 +28,7 @@ public abstract class Deserializer<T>
 	
 	public T deserialize(InputStream input) throws IOException
 	{
-		return deserialize(new InputStreamReader(input, Mapper.UTF_8));
+		return deserialize(new InputStreamReader(input, Characters.UTF_8));
 	}
 	
 	public T deserialize(Reader reader) throws IOException
