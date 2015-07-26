@@ -272,7 +272,16 @@ public class RdbMapper extends Mapper
 				if(propertyField != null)
 				{
 					Field field = propertyField.getField();
-					field.set(model, getValue(resultSet, columnLabel, field.getType()));
+					Object value = null;
+					try
+					{
+						value = resultSet.getObject(columnLabel, field.getType());
+					}
+					catch(Exception e)
+					{
+						value = getValue(resultSet, columnLabel, field.getType());
+					}
+					field.set(model, value);
 				}
 			}
 		}
