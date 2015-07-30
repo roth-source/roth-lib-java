@@ -19,6 +19,7 @@
 		<module>../roth-lib-api-linode</module>
 		<module>../roth-lib-api-rackspace</module>
 		<module>../roth-lib-api-vultr</module>
+		<module>../roth-lib-api-twilio</module>
 	</modules>
 	<dependencies>
 		<dependency>
