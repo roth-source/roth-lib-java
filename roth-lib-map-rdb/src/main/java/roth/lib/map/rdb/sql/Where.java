@@ -132,6 +132,16 @@ public class Where extends Condition
 		return new Where(tick(table) + DOT + tick(name) + Op.LIKE.get(), value);
 	}
 	
+	public static Where notLike(String name, Object value)
+	{
+		return new Where(tick(name) + Op.NOT_LIKE.get(), value);
+	}
+	
+	public static Where notLike(String table, String name, Object value)
+	{
+		return new Where(tick(table) + DOT + tick(name) + Op.NOT_LIKE.get(), value);
+	}
+	
 	public static Where between(String name, Object value1, Object value2)
 	{
 		return new Where(tick(name) + Op.BETWEEN.get(), Arrays.asList(value1, value2));

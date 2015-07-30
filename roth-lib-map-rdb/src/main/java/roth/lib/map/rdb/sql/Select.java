@@ -300,6 +300,16 @@ public class Select extends Sql
 		return where(Where.like(table, name, value));
 	}
 	
+	public Select whereNotLike(String name, Object value)
+	{
+		return where(Where.notLike(name, value));
+	}
+	
+	public Select whereNotLike(String table, String name, Object value)
+	{
+		return where(Where.notLike(table, name, value));
+	}
+	
 	public Select whereBetween(String name, Object value1, Object value2)
 	{
 		return where(Where.between(name, value1, value2));
@@ -449,6 +459,16 @@ public class Select extends Sql
 	public Select orWhereLike(String table, String name, Object value)
 	{
 		return orWhere(Where.like(table, name, value));
+	}
+	
+	public Select orWhereNotLike(String name, Object value)
+	{
+		return orWhere(Where.notLike(name, value));
+	}
+	
+	public Select orWhereNotLike(String table, String name, Object value)
+	{
+		return orWhere(Where.notLike(table, name, value));
 	}
 	
 	public Select orWhereBetween(String name, Object value1, Object value2)

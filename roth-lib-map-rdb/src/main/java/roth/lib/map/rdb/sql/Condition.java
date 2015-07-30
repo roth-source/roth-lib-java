@@ -24,6 +24,7 @@ public abstract class Condition extends Sql
 		IN			(" IN (%s)"),
 		NOT_IN		(" NOT IN (%s)"),
 		LIKE		(" LIKE ?"),
+		NOT_LIKE	(" NOT LIKE ?"),
 		BETWEEN		(" BETWEEN ? AND ?"),
 		IS_NULL		(" IS NULL"),
 		IS_NOT_NULL	(" IS NOT NULL"),
