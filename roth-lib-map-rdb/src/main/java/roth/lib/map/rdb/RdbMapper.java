@@ -83,7 +83,8 @@ public class RdbMapper extends Mapper
 			if(generatedIdPropertyField != null && resultSet.next())
 			{
 				Field field = generatedIdPropertyField.getField();
-				field.set(model, resultSet.getObject(1, field.getType()));
+				Object value = getValue(resultSet, 1, field.getType());
+				field.set(model, value);
 			}
 		}
 		catch(Exception e)
@@ -272,15 +273,7 @@ public class RdbMapper extends Mapper
 				if(propertyField != null)
 				{
 					Field field = propertyField.getField();
-					Object value = null;
-					try
-					{
-						value = resultSet.getObject(columnLabel, field.getType());
-					}
-					catch(Exception e)
-					{
-						value = getValue(resultSet, columnLabel, field.getType());
-					}
+					Object value = getValue(resultSet, columnLabel, field.getType());
 					field.set(model, value);
 				}
 			}
@@ -333,45 +326,13 @@ public class RdbMapper extends Mapper
 		{
 			value = resultSet.getString(columnLabel);
 		}
-		else if(Integer.class.isAssignableFrom(klass) || int.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getInt(columnLabel);
-		}
-		else if(Double.class.isAssignableFrom(klass) || double.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getDouble(columnLabel);
-		}
-		else if(Boolean.class.isAssignableFrom(klass) || boolean.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getBoolean(columnLabel);
-		}
-		else if(Calendar.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getCalendar(columnLabel);
-		}
 		else if(Enum.class.isAssignableFrom(klass))
 		{
 			value = resultSet.getEnum(columnLabel, klass);
 		}
-		else if(Byte.class.isAssignableFrom(klass) || byte.class.isAssignableFrom(klass))
+		else if(Calendar.class.isAssignableFrom(klass))
 		{
-			value = resultSet.getByte(columnLabel);
-		}
-		else if(Short.class.isAssignableFrom(klass) || short.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getShort(columnLabel);
-		}
-		else if(Long.class.isAssignableFrom(klass) || long.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getLong(columnLabel);
-		}
-		else if(Float.class.isAssignableFrom(klass) || float.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getFloat(columnLabel);
-		}
-		else if(BigDecimal.class.isAssignableFrom(klass))
-		{
-			value = resultSet.getBigDecimal(columnLabel);
+			value = resultSet.getCalendar(columnLabel);
 		}
 		else if(Timestamp.class.isAssignableFrom(klass))
 		{
@@ -385,9 +346,163 @@ public class RdbMapper extends Mapper
 		{
 			value = resultSet.getDate(columnLabel);
 		}
+		else if(Boolean.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getBooleanWrapper(columnLabel);
+		}
+		else if(Byte.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getByteWrapper(columnLabel);
+		}
+		else if(Short.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getShortWrapper(columnLabel);
+		}
+		else if(Integer.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getIntegerWrapper(columnLabel);
+		}
+		else if(Long.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getLongWrapper(columnLabel);
+		}
+		else if(Float.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getFloatWrapper(columnLabel);
+		}
+		else if(Double.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getDoubleWrapper(columnLabel);
+		}
+		else if(BigDecimal.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getBigDecimal(columnLabel);
+		}
+		else if(boolean.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getBoolean(columnLabel);
+		}
+		else if(byte.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getByte(columnLabel);
+		}
+		else if(short.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getShort(columnLabel);
+		}
+		else if(int.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getInt(columnLabel);
+		}
+		else if(long.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getLong(columnLabel);
+		}
+		else if(float.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getFloat(columnLabel);
+		}
+		else if(double.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getDouble(columnLabel);
+		}
 		else
 		{
 			value = resultSet.getObject(columnLabel, klass);
+		}
+		return value;
+	}
+	
+	public Object getValue(RdbResultSet resultSet, int columnIndex, Class<?> klass) throws SQLException
+	{
+		Object value = null;
+		if(String.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getString(columnIndex);
+		}
+		else if(Enum.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getEnum(columnIndex, klass);
+		}
+		else if(Calendar.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getCalendar(columnIndex);
+		}
+		else if(Timestamp.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getTimestamp(columnIndex);
+		}
+		else if(Time.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getTime(columnIndex);
+		}
+		else if(Date.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getDate(columnIndex);
+		}
+		else if(Boolean.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getBooleanWrapper(columnIndex);
+		}
+		else if(Byte.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getByteWrapper(columnIndex);
+		}
+		else if(Short.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getShortWrapper(columnIndex);
+		}
+		else if(Integer.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getIntegerWrapper(columnIndex);
+		}
+		else if(Long.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getLongWrapper(columnIndex);
+		}
+		else if(Float.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getFloatWrapper(columnIndex);
+		}
+		else if(Double.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getDoubleWrapper(columnIndex);
+		}
+		else if(BigDecimal.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getBigDecimal(columnIndex);
+		}
+		else if(boolean.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getBoolean(columnIndex);
+		}
+		else if(byte.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getByte(columnIndex);
+		}
+		else if(short.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getShort(columnIndex);
+		}
+		else if(int.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getInt(columnIndex);
+		}
+		else if(long.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getLong(columnIndex);
+		}
+		else if(float.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getFloat(columnIndex);
+		}
+		else if(double.class.isAssignableFrom(klass))
+		{
+			value = resultSet.getDouble(columnIndex);
+		}
+		else
+		{
+			value = resultSet.getObject(columnIndex, klass);
 		}
 		return value;
 	}

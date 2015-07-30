@@ -1243,4 +1243,144 @@ public class RdbResultSet implements ResultSet
 		return (T) EnumUtil.fromString(resultSet.getString(columnLabel), (Class<Enum<?>>) klass);
 	}
 	
+	public Boolean getBooleanWrapper(String columnLabel) throws SQLException
+	{
+		Boolean value = resultSet.getBoolean(columnLabel);
+		if(resultSet.wasNull())
+		{
+			value = null;
+		}
+		return value;
+	}
+	
+	public Byte getByteWrapper(String columnLabel) throws SQLException
+	{
+		Byte value = resultSet.getByte(columnLabel);
+		if(resultSet.wasNull())
+		{
+			value = null;
+		}
+		return value;
+	}
+	
+	public Short getShortWrapper(String columnLabel) throws SQLException
+	{
+		Short value = resultSet.getShort(columnLabel);
+		if(resultSet.wasNull())
+		{
+			value = null;
+		}
+		return value;
+	}
+	
+	public Integer getIntegerWrapper(String columnLabel) throws SQLException
+	{
+		Integer value = resultSet.getInt(columnLabel);
+		if(resultSet.wasNull())
+		{
+			value = null;
+		}
+		return value;
+	}
+	
+	public Long getLongWrapper(String columnLabel) throws SQLException
+	{
+		Long value = resultSet.getLong(columnLabel);
+		if(resultSet.wasNull())
+		{
+			value = null;
+		}
+		return value;
+	}
+	
+	public Float getFloatWrapper(String columnLabel) throws SQLException
+	{
+		Float value = resultSet.getFloat(columnLabel);
+		if(resultSet.wasNull())
+		{
+			value = null;
+		}
+		return value;
+	}
+	
+	public Double getDoubleWrapper(String columnLabel) throws SQLException
+	{
+		Double value = resultSet.getDouble(columnLabel);
+		if(resultSet.wasNull())
+		{
+			value = null;
+		}
+		return value;
+	}
+	
+	public Boolean getBooleanWrapper(int columnIndex) throws SQLException
+	{
+		Boolean value = resultSet.getBoolean(columnIndex);
+		if(resultSet.wasNull())
+		{
+			value = null;
+		}
+		return value;
+	}
+	
+	public Byte getByteWrapper(int columnIndex) throws SQLException
+	{
+		Byte value = resultSet.getByte(columnIndex);
+		if(resultSet.wasNull())
+		{
+			value = null;
+		}
+		return value;
+	}
+	
+	public Short getShortWrapper(int columnIndex) throws SQLException
+	{
+		Short value = resultSet.getShort(columnIndex);
+		if(resultSet.wasNull())
+		{
+			value = null;
+		}
+		return value;
+	}
+	
+	public Integer getIntegerWrapper(int columnIndex) throws SQLException
+	{
+		Integer value = resultSet.getInt(columnIndex);
+		if(resultSet.wasNull())
+		{
+			value = null;
+		}
+		return value;
+	}
+	
+	public Long getLongWrapper(int columnIndex) throws SQLException
+	{
+		Long value = resultSet.getLong(columnIndex);
+		if(resultSet.wasNull())
+		{
+			value = null;
+		}
+		return value;
+	}
+	
+	public Float getFloatWrapper(int columnIndex) throws SQLException
+	{
+		Float value = resultSet.getFloat(columnIndex);
+		if(resultSet.wasNull())
+		{
+			value = null;
+		}
+		return value;
+	}
+	
+	public Double getDoubleWrapper(int columnIndex) throws SQLException
+	{
+		Double value = resultSet.getDouble(columnIndex);
+		if(resultSet.wasNull())
+		{
+			value = null;
+		}
+		return value;
+	}
+	
 }
