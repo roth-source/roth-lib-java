@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>roth.lib</groupId>
+		<artifactId>roth-lib-pom</artifactId>
+		<relativePath>../roth-lib-pom</relativePath>
+		<version>0.2.2-SNAPSHOT</version>
+	</parent>
+	<artifactId>roth-lib-db-maria</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>roth.lib</groupId>
+			<artifactId>roth-lib-db</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client</artifactId>
+			<version>1.2.0</version>
+		</dependency>
+	</dependencies>
+</project>

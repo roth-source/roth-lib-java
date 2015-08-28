@@ -1,22 +1,12 @@
 package roth.lib.api.vultr.client;
 
-import java.lang.reflect.Type;
-
+import roth.lib.api.FormJsonApiClient;
 import roth.lib.api.vultr.request.VultrRequest;
-import roth.lib.map.Deserializer;
-import roth.lib.map.Serializer;
-import roth.lib.map.form.FormConfig;
-import roth.lib.map.form.FormMapper;
-import roth.lib.map.form.FormSerializer;
-import roth.lib.map.json.JsonConfig;
-import roth.lib.map.json.JsonDeserializer;
-import roth.lib.map.json.JsonMapper;
 import roth.lib.net.http.HttpProtocol;
 import roth.lib.net.http.HttpResponse;
 import roth.lib.net.http.HttpUrl;
-import roth.lib.net.http.api.ApiClient;
 
-public class VultrClient extends ApiClient<VultrRequest, Object>
+public class VultrClient extends FormJsonApiClient<VultrRequest, Object>
 {
 	protected static String HOST			= "api.vultr.com";
 	protected static String VERSION			= "/v1";
@@ -24,11 +14,7 @@ public class VultrClient extends ApiClient<VultrRequest, Object>
 	protected static String BANDWIDTH		= "/bandwidth";
 	protected static String API_KEY			= "api_key";
 	
-	protected static String TIME_FORMAT				= "yyyy-MM-dd HH:mm:ss.S";
-	protected static FormConfig FORM_CONFIG 		= new FormConfig().setTimeFormat(TIME_FORMAT);
-	protected static FormConfig FORM_CONFIG_DEBUG 	= new FormConfig().setTimeFormat(TIME_FORMAT).setPrettyPrinting(true);
-	protected static JsonConfig JSON_CONFIG 		= new JsonConfig().setTimeFormat(TIME_FORMAT);
-	protected static JsonConfig JSON_CONFIG_DEBUG 	= new JsonConfig().setTimeFormat(TIME_FORMAT).setPrettyPrinting(true);
+	protected static String TIME_FORMAT		= "yyyy-MM-dd HH:mm:ss.S";
 	
 	protected String apiKey;
 	
@@ -41,6 +27,7 @@ public class VultrClient extends ApiClient<VultrRequest, Object>
 	{
 		super(debug);
 		this.apiKey = apiKey;
+		setTimeFormat(TIME_FORMAT);
 	}
 	
 	@Override
@@ -56,41 +43,12 @@ public class VultrClient extends ApiClient<VultrRequest, Object>
 	
 	protected HttpUrl url(String service, VultrRequest vultrRequest)
 	{
-		return url(service).setParameters(FormMapper.get().convert(vultrRequest, FORM_CONFIG));
+		//return url(service).setParameters(FormMapper.get().convert(vultrRequest, FORM_CONFIG));
+		return url(service);
 	}
 	
 	@Override
-	protected Serializer<VultrRequest> getSerializer(VultrRequest apiRequest)
-	{
-		return new FormSerializer<VultrRequest>(apiRequest).setConfig(FORM_CONFIG);
-	}
-	
-	@Override
-	protected <T> Deserializer<T> getDeserializer(Type type)
-	{
-		return new JsonDeserializer<T>(type).setConfig(JSON_CONFIG);
-	}
-	
-	@Override
-	protected String debugRequest(VultrRequest apiRequest)
-	{
-		return FormMapper.get().serialize(apiRequest, FORM_CONFIG_DEBUG);
-	}
-	
-	@Override
-	protected String debugResponse(Object apiResponse)
-	{
-		return JsonMapper.get().serialize(apiResponse, JSON_CONFIG_DEBUG);
-	}
-	
-	@Override
-	protected String debugBody(String body)
-	{
-		return JsonMapper.get().format(body);
-	}
-	
-	@Override
-	protected <T> void check(HttpResponse<T> response)
+	protected <T> void checkResponse(HttpResponse<T> response)
 	{
 		
 	}

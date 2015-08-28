@@ -10,7 +10,7 @@ public class LongDeserializer extends PrimitiveDeserializer<Long>
 	}
 	
 	@Override
-	public Long deserialize(String value)
+	public Long deserialize(String value, String timeFormat)
 	{
 		Long object = isNullable() ? null : 0L;
 		try

@@ -2,6 +2,9 @@ package roth.lib.api.twilio;
 
 import java.util.LinkedHashMap;
 
+import roth.lib.api.twilio.call.CallClient;
+import roth.lib.api.twilio.message.MessageClient;
+
 public class TwilioClientFactory
 {
 	protected static LinkedHashMap<String, TwilioClientFactory> instanceMap = new LinkedHashMap<String, TwilioClientFactory>();

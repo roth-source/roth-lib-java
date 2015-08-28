@@ -16,7 +16,7 @@ public class HttpResponse<T> implements Characters
 	
 	protected HttpVersion version = HttpVersion.HTTP_1_1;
 	protected HttpStatus status;
-	protected HttpResponseHeaders headers;
+	protected HttpHeaders headers;
 	protected String body;
 	protected T entity;
 	protected InputStream input;
@@ -36,7 +36,7 @@ public class HttpResponse<T> implements Characters
 		return status;
 	}
 	
-	public HttpResponseHeaders getHeaders()
+	public HttpHeaders getHeaders()
 	{
 		return headers;
 	}
@@ -68,7 +68,7 @@ public class HttpResponse<T> implements Characters
 		return this;
 	}
 	
-	public HttpResponse<T> setHeaders(HttpResponseHeaders headers)
+	public HttpResponse<T> setHeaders(HttpHeaders headers)
 	{
 		this.headers = headers;
 		return this;

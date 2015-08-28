@@ -2,8 +2,8 @@ package roth.lib.api.rackspace.test;
 import java.io.File;
 import java.util.Properties;
 
-import roth.lib.api.rackspace.client.IdentityClient;
-import roth.lib.api.rackspace.client.RackspaceClientFactory;
+import roth.lib.api.rackspace.RackspaceClientFactory;
+import roth.lib.api.rackspace.identity.IdentityClient;
 import roth.lib.util.PropertiesUtil;
 
 public class Test
@@ -12,6 +12,11 @@ public class Test
 	protected static RackspaceClientFactory clientFactory = RackspaceClientFactory.get(new IdentityClient(test.getProperty("username"), test.getProperty("apiKey")), true);
 	
 	public static void main(String[] args)
+	{
+		test();
+	}
+	
+	public static void test()
 	{
 		
 	}

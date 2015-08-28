@@ -15,7 +15,7 @@ import roth.lib.net.http.annotation.Ajax;
 import roth.lib.net.http.annotation.Api;
 import roth.lib.net.http.endpoint.HttpError;
 import roth.lib.net.http.endpoint.HttpErrorType;
-import roth.lib.net.http.util.ServiceUtil;
+import roth.lib.util.ReflectionUtil;
 import roth.lib.util.IdUtil;
 
 public abstract class HttpService
@@ -187,7 +187,7 @@ public abstract class HttpService
 		LinkedList<HttpError> errors = new LinkedList<HttpError>();
 		if(request != null)
 		{
-			LinkedList<Field> fields = ServiceUtil.getFields(request.getClass());
+			LinkedList<Field> fields = ReflectionUtil.getFields(request.getClass());
 			for(Field field : fields)
 			{
 				filterField(field, request);

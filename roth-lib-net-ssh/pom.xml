@@ -4,13 +4,13 @@
 		<groupId>roth.lib</groupId>
 		<artifactId>roth-lib-pom</artifactId>
 		<relativePath>../roth-lib-pom</relativePath>
-		<version>0.2.1-SNAPSHOT</version>
+		<version>0.2.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>roth-lib-net-ssh</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>roth.lib</groupId>
-			<artifactId>roth-lib</artifactId>
+			<artifactId>roth-lib-net</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>

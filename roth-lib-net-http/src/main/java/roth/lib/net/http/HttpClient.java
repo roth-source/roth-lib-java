@@ -5,7 +5,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
-import roth.lib.map.Deserializer;
+import roth.lib.map.inputter.Inputter;
 
 public class HttpClient
 {
@@ -28,9 +28,9 @@ public class HttpClient
 		}
 	}
 	
-	public <T> HttpResponse<T> connect(HttpRequest<?> request, Deserializer<T> deserializer, boolean debug) throws IOException
+	public <T> HttpResponse<T> connect(HttpRequest<?> request, Inputter<T> inputter, boolean debug) throws IOException
 	{
-		return connection(request.getUrl(), debug).connect(request, deserializer);
+		return connection(request.getUrl(), debug).connect(request, inputter);
 	}
 	
 	public HttpResponse<?> connect(HttpRequest<?> request, boolean debug) throws IOException

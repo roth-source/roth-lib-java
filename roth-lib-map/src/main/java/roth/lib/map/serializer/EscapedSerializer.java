@@ -1,7 +1,5 @@
 package roth.lib.map.serializer;
 
-import roth.lib.map.Serializer;
-
 public class EscapedSerializer<T> extends Serializer<T>
 {
 	

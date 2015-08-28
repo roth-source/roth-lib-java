@@ -1,11 +1,11 @@
 package roth.lib.api.cloudflare.test;
 
-import roth.lib.api.cloudflare.data.request.CheckZonesRequest;
-import roth.lib.api.cloudflare.data.request.IpRequest;
-import roth.lib.api.cloudflare.data.request.RecordsRequest;
-import roth.lib.api.cloudflare.data.request.SettingsRequest;
-import roth.lib.api.cloudflare.data.request.StatsRequest;
-import roth.lib.api.cloudflare.data.type.IntervalType;
+import roth.lib.api.cloudflare.access.CheckZonesRequest;
+import roth.lib.api.cloudflare.access.GetIpRequest;
+import roth.lib.api.cloudflare.access.GetRecordsRequest;
+import roth.lib.api.cloudflare.access.GetSettingsRequest;
+import roth.lib.api.cloudflare.access.GetStatsRequest;
+import roth.lib.api.cloudflare.type.IntervalType;
 
 
 public class AccessTest extends Test
@@ -13,7 +13,7 @@ public class AccessTest extends Test
 	
 	public static void main(String[] args) throws Exception
 	{
-		//getStats();
+		getStats();
 		//getZones();
 		//getRecords();
 		//checkZones();
@@ -23,7 +23,7 @@ public class AccessTest extends Test
 	
 	public static void getStats()
 	{
-		clientFactory.getAccessClient().getStats(new StatsRequest(domain, IntervalType.PAST_7_DAYS));
+		clientFactory.getAccessClient().getStats(new GetStatsRequest(domain, IntervalType.PAST_7_DAYS));
 	}
 	
 	public static void getZones()
@@ -33,7 +33,7 @@ public class AccessTest extends Test
 	
 	public static void getRecords()
 	{
-		clientFactory.getAccessClient().getRecords(new RecordsRequest(domain));
+		clientFactory.getAccessClient().getRecords(new GetRecordsRequest(domain));
 	}
 	
 	public static void checkZones()
@@ -43,12 +43,12 @@ public class AccessTest extends Test
 	
 	public static void getIp()
 	{
-		clientFactory.getAccessClient().getIp(new IpRequest("173.245.57.134"));
+		clientFactory.getAccessClient().getIp(new GetIpRequest("173.245.57.134"));
 	}
 	
 	public static void getSettings()
 	{
-		clientFactory.getAccessClient().getSettings(new SettingsRequest(domain));
+		clientFactory.getAccessClient().getSettings(new GetSettingsRequest(domain));
 	}
 	
 }

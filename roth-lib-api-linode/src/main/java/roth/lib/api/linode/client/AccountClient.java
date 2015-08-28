@@ -1,5 +1,6 @@
 package roth.lib.api.linode.client;
 
+import roth.lib.Generic;
 import roth.lib.api.linode.data.request.LinodeRequest;
 import roth.lib.api.linode.data.request.get.GetApiKeyRequest;
 import roth.lib.api.linode.data.request.get.GetInvoiceEstimateRequest;
@@ -7,7 +8,6 @@ import roth.lib.api.linode.data.response.AccountResponse;
 import roth.lib.api.linode.data.response.ApiKeyResponse;
 import roth.lib.api.linode.data.response.InvoiceEstimateResponse;
 import roth.lib.api.linode.data.response.LinodeResponse;
-import roth.lib.map.Generic;
 
 public class AccountClient extends LinodeClient
 {

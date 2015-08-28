@@ -11,11 +11,12 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.HttpURLConnection;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
 
 import roth.lib.Characters;
-import roth.lib.map.Deserializer;
-import roth.lib.net.http.header.HeaderMapper;
+import roth.lib.map.inputter.Inputter;
 
 public class HttpConnection implements Characters
 {
@@ -105,37 +106,36 @@ public class HttpConnection implements Characters
 		return new InputStreamReader(getGzipInputStream(), UTF_8);
 	}
 	
-	public <T> HttpResponse<T> connect(HttpRequest<?> request, Deserializer<T> deserializer) throws IOException
+	public <T> HttpResponse<T> connect(HttpRequest<?> request, Inputter<T> inputter) throws IOException
 	{
 		connection.setDoInput(true);
 		connection.setRequestMethod(request.getMethod().toString());
-		HeaderMapper.get().request(request.getHeaders(), connection);
-		if(request.hasSerializer())
+		setRequestHeaders(request.getHeaders());
+		if(request.hasOutputter())
 		{
 			connection.setDoOutput(true);
-			request.getSerializer().serialize(getOutputStream());
+			request.getOutputter().output(getOutputStream());
 		}
 		connection.connect();
 		HttpResponse<T> response = new HttpResponse<T>();
 		response.parseStatus(connection);
-		HttpResponseHeaders headers = HeaderMapper.get().response(connection, HttpResponseHeaders.class);
-		response.setHeaders(headers);
+		response.setHeaders(getResponseHeaders());
 		if(response.isSuccess())
 		{
-			if(deserializer != null || debug)
+			if(inputter != null || debug)
 			{
 				if(debug)
 				{
 					ByteArrayOutputStream output = readAll(getInputStream());
 					response.setBody(new String(output.toByteArray(), UTF_8));
-					if(deserializer != null)
+					if(inputter != null)
 					{
-						response.setEntity(deserializer.deserialize(new ByteArrayInputStream(output.toByteArray())));
+						response.setEntity(inputter.input(new ByteArrayInputStream(output.toByteArray())));
 					}
 				}
 				else
 				{
-					response.setEntity(deserializer.deserialize(getInputStream()));
+					response.setEntity(inputter.input(getInputStream()));
 				}
 			}
 			else
@@ -154,19 +154,44 @@ public class HttpConnection implements Characters
 	{
 		connection.setDoInput(true);
 		connection.setRequestMethod(request.getMethod().toString());
-		HeaderMapper.get().request(request.getHeaders(), connection);
-		if(request.hasSerializer())
+		setRequestHeaders(request.getHeaders());
+		if(request.hasOutputter())
 		{
 			connection.setDoOutput(true);
-			request.getSerializer().serialize(getOutputStream());
+			request.getOutputter().output(getOutputStream());
 		}
 		connection.connect();
 		HttpResponse<?> response = new HttpResponse<>();
 		response.parseStatus(connection);
-		HttpResponseHeaders headers = HeaderMapper.get().response(connection, HttpResponseHeaders.class);
-		response.setHeaders(headers);
+		response.setHeaders(getResponseHeaders());
 		response.setInput(getAnyStream());
 		return response;
+	}
+	
+	protected void setRequestHeaders(HttpHeaders headers)
+	{
+		for(Entry<String, List<String>> headersEntry : headers.getHeadersMap().entrySet())
+		{
+			String name = headersEntry.getKey();
+			for(String value : headersEntry.getValue())
+			{
+				connection.addRequestProperty(name, value);
+			}
+		}
+	}
+	
+	protected HttpHeaders getResponseHeaders()
+	{
+		HttpHeaders headers = new HttpHeaders();
+		for(Entry<String, List<String>> headerEntry : connection.getHeaderFields().entrySet())
+		{
+			String name = headerEntry.getKey();
+			if(name != null)
+			{
+				headers.setHeader(name, headerEntry.getValue());
+			}
+		}
+		return headers;
 	}
 	
 	protected String readLine(InputStream input) throws IOException

@@ -2,8 +2,6 @@ package roth.lib.map.deserializer;
 
 import java.math.BigDecimal;
 
-import roth.lib.map.Deserializer;
-
 
 public class BigDecimalDeserializer extends Deserializer<BigDecimal>
 {
@@ -14,7 +12,7 @@ public class BigDecimalDeserializer extends Deserializer<BigDecimal>
 	}
 	
 	@Override
-	public BigDecimal deserialize(String value)
+	public BigDecimal deserialize(String value, String timeFormat)
 	{
 		BigDecimal object = null;
 		try

@@ -1,13 +1,12 @@
 package roth.lib;
 
+import java.lang.reflect.Type;
+
+import roth.lib.util.ReflectionUtil;
+
 public abstract class Callback<T>
 {
 	protected Class<T> klass;
-	
-	public Callback()
-	{
-		
-	}
 	
 	public Callback(Class<T> klass)
 	{
@@ -23,6 +22,12 @@ public abstract class Callback<T>
 	{
 		this.klass = klass;
 		return this;
+	}
+	
+	public boolean isType(Type type)
+	{
+		Class<?> klass = ReflectionUtil.getTypeClass(type);
+		return klass.isAssignableFrom(this.klass);
 	}
 	
 	public abstract void call(T model);

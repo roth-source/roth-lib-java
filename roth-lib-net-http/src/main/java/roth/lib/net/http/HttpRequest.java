@@ -1,15 +1,15 @@
 package roth.lib.net.http;
 
 import roth.lib.Characters;
-import roth.lib.map.Serializer;
+import roth.lib.map.outputter.Outputter;
 
 public class HttpRequest<T> implements Characters
 {
 	protected HttpMethod method = HttpMethod.GET;
 	protected HttpUrl url;
 	protected HttpVersion version = HttpVersion.HTTP_1_1;
-	protected HttpRequestHeaders headers;
-	protected Serializer<T> serializer;
+	protected HttpHeaders headers;
+	protected Outputter outputter;
 	
 	public HttpRequest()
 	{
@@ -37,19 +37,19 @@ public class HttpRequest<T> implements Characters
 		return version;
 	}
 	
-	public HttpRequestHeaders getHeaders()
+	public HttpHeaders getHeaders()
 	{
 		return headers;
 	}
 	
-	public Serializer<T> getSerializer()
+	public Outputter getOutputter()
 	{
-		return serializer;
+		return outputter;
 	}
 	
-	public boolean hasSerializer()
+	public boolean hasOutputter()
 	{
-		return serializer != null;
+		return outputter != null;
 	}
 	
 	public HttpRequest<T> setMethod(HttpMethod method)
@@ -70,15 +70,15 @@ public class HttpRequest<T> implements Characters
 		return this;
 	}
 	
-	public HttpRequest<T> setHeaders(HttpRequestHeaders headers)
+	public HttpRequest<T> setHeaders(HttpHeaders headers)
 	{
 		this.headers = headers;
 		return this;
 	}
 	
-	public HttpRequest<T> setSerializer(Serializer<T> serializer)
+	public HttpRequest<T> setOutputter(Outputter outputter)
 	{
-		this.serializer = serializer;
+		this.outputter = outputter;
 		return this;
 	}
 	

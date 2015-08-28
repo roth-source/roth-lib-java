@@ -2,7 +2,7 @@ package roth.lib.api.rackspace.test;
 
 import java.io.File;
 
-import roth.lib.net.http.header.type.MimeType;
+import roth.lib.net.http.type.MimeType;
 
 public class FileTest extends Test
 {
@@ -26,7 +26,7 @@ public class FileTest extends Test
 	
 	protected static void uploadFile()
 	{
-		clientFactory.getFileClient().uploadFile("test", "test.tit", MimeType.IMAGE_TIFF.getValue(), new File("/Users/User/Downloads/test.tif"));
+		clientFactory.getFileClient().uploadFile("test", "test.tit", MimeType.IMAGE_TIFF.toString(), new File("/Users/User/Downloads/test.tif"));
 	}
 	
 }

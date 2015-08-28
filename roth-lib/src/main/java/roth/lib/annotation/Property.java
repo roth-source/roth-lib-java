@@ -11,21 +11,16 @@ import java.lang.annotation.Target;
 public @interface Property
 {
 	String name();
-	boolean entityName()		default false;
-	
-	boolean odb() 				default true;
-	String odbName()			default "";
-	
-	boolean rdb() 				default true;
-	String rdbName()			default "";
-	
-	boolean xml() 				default true;
-	String xmlName()			default "";
-	
-	boolean json() 				default true;
-	String jsonName()			default "";
-	
-	boolean form() 				default true;
-	String formName()			default "";
+	boolean entityName() default false;
+	boolean form() default true;
+	String formName() default "";
+	boolean json() default true;
+	String jsonName() default "";
+	boolean xml() default true;
+	String xmlName() default "";
+	boolean db() default true;
+	String dbName() default "";
+	String timeFormat() default "";
+	String[] exclude() default {};
 	
 }

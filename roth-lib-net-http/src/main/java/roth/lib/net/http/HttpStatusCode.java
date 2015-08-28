@@ -104,12 +104,12 @@ public enum HttpStatusCode
 		return 500 <= code && code < 600;
 	}
 	
-	public static HttpStatusCode get(Integer value)
+	public static HttpStatusCode fromInteger(Integer value)
 	{
-		return get(String.valueOf(value));
+		return fromString(String.valueOf(value));
 	}
 	
-	public static HttpStatusCode get(String value)
+	public static HttpStatusCode fromString(String value)
 	{
 		HttpStatusCode code = null;
 		try

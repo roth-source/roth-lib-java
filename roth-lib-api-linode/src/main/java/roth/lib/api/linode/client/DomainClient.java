@@ -2,6 +2,7 @@ package roth.lib.api.linode.client;
 
 import java.util.LinkedList;
 
+import roth.lib.Generic;
 import roth.lib.api.linode.data.model.Domain;
 import roth.lib.api.linode.data.model.DomainResource;
 import roth.lib.api.linode.data.request.create.CreateDomainRequest;
@@ -15,7 +16,6 @@ import roth.lib.api.linode.data.request.update.UpdateDomainResourceRequest;
 import roth.lib.api.linode.data.response.DomainIdResponse;
 import roth.lib.api.linode.data.response.DomainResourceIdResponse;
 import roth.lib.api.linode.data.response.LinodeResponse;
-import roth.lib.map.Generic;
 
 public class DomainClient extends LinodeClient
 {

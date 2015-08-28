@@ -1,7 +1,5 @@
 package roth.lib.map.deserializer;
 
-import roth.lib.map.Deserializer;
-
 public abstract class PrimitiveDeserializer<T> extends Deserializer<T>
 {
 	protected boolean nullable;

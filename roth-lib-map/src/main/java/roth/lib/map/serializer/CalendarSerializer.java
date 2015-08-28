@@ -1,5 +1,6 @@
 package roth.lib.map.serializer;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class CalendarSerializer extends TemporalSerializer<Calendar>
@@ -12,6 +13,12 @@ public class CalendarSerializer extends TemporalSerializer<Calendar>
 	
 	@Override
 	public String serialize(Calendar calendar)
+	{
+		return serialize(calendar, simpleDateFormat);
+	}
+	
+	@Override
+	public String serialize(Calendar calendar, SimpleDateFormat simpleDateFormat)
 	{
 		if(calendar != null)
 		{

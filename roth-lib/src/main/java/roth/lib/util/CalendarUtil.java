@@ -194,17 +194,17 @@ public class CalendarUtil
 		return clonedCalendar;
 	}
 	
-	public static Calendar min()
+	public static Calendar minunte()
 	{
-		return min(now(), false);
+		return minunte(now(), false);
 	}
 	
-	public static Calendar min(Calendar calendar)
+	public static Calendar minunte(Calendar calendar)
 	{
-		return min(calendar, true);
+		return minunte(calendar, true);
 	}
 	
-	public static Calendar min(Calendar calendar, boolean clone)
+	public static Calendar minunte(Calendar calendar, boolean clone)
 	{
 		Calendar clonedCalendar = clone ? (Calendar) calendar.clone() : calendar;
 		clonedCalendar.set(Calendar.SECOND, 0);
@@ -212,17 +212,17 @@ public class CalendarUtil
 		return clonedCalendar;
 	}
 	
-	public static Calendar sec()
+	public static Calendar second()
 	{
-		return sec(now(), false);
+		return second(now(), false);
 	}
 	
-	public static Calendar sec(Calendar calendar)
+	public static Calendar second(Calendar calendar)
 	{
-		return sec(calendar, true);
+		return second(calendar, true);
 	}
 	
-	public static Calendar sec(Calendar calendar, boolean clone)
+	public static Calendar second(Calendar calendar, boolean clone)
 	{
 		Calendar clonedCalendar = clone ? (Calendar) calendar.clone() : calendar;
 		clonedCalendar.set(Calendar.MILLISECOND, 0);

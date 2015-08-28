@@ -181,9 +181,9 @@ public class HttpUrl
 		return hash;
 	}
 	
-	public HttpRequestHeaders getHeaders()
+	public HttpHeaders getHeaders()
 	{
-		return new HttpRequestHeaders(this);
+		return new HttpHeaders().setHeader("Host", getHost());
 	}
 	
 	public HttpUrl setProtocol(HttpProtocol protocol)

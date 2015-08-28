@@ -9,16 +9,18 @@ import java.util.LinkedList;
 
 import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
+import roth.lib.map.MapperConfig;
+import roth.lib.map.MapperReflector;
 import roth.lib.map.xml.annotation.XmlAttribute;
 import roth.lib.map.xml.annotation.XmlElements;
 
-@Entity("test")
+@Entity(name = "test")
 @SuppressWarnings("serial")
 public class XmlTestModel extends XmlModel
 {
 	
 	@XmlAttribute(name = "attribute")
-	private String attribute = "test";
+	private String attribute = "";
 	
 	@Property(name = "null-primitive-boolean")
 	private boolean nullPrimitiveBoolean;
@@ -117,9 +119,9 @@ public class XmlTestModel extends XmlModel
 	//private Date testDate = new Date();
 	private Date testDate;
 	
-	@Property(name = "test-calendar")
-	//private Calendar testCalendar = new GregorianCalendar();
-	private Calendar testCalendar;
+	@Property(name = "test-calendar", exclude = "test")
+	private Calendar testCalendar = new GregorianCalendar();
+	//private Calendar testCalendar;
 	
 	@Property(name = "test-model")
 	//private XmlSubModel testModel = new XmlSubModel();
@@ -203,9 +205,9 @@ public class XmlTestModel extends XmlModel
 	@Override
 	public String toString()
 	{
-		XmlConfig config = new XmlConfig().setPrettyPrinting(true).setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
-		XmlMapper mapper = new XmlMapper();
-		return mapper.serialize(this, config);
+		MapperReflector mapperReflector = new XmlReflector();
+		MapperConfig mapperConfig = new MapperConfig().setPrettyPrinting(true).setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
+		return mapperReflector.getMapper(mapperConfig).serialize(this);
 	}
 	
 }

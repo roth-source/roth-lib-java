@@ -10,7 +10,7 @@ public class IntegerDeserializer extends PrimitiveDeserializer<Integer>
 	}
 	
 	@Override
-	public Integer deserialize(String value)
+	public Integer deserialize(String value, String timeFormat)
 	{
 		Integer object = isNullable() ? null : 0;
 		try

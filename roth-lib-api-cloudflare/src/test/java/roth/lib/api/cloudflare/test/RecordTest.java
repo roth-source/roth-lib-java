@@ -1,9 +1,9 @@
 package roth.lib.api.cloudflare.test;
 
-import roth.lib.api.cloudflare.data.request.CreateRecordRequest;
-import roth.lib.api.cloudflare.data.request.DeleteRecordRequest;
-import roth.lib.api.cloudflare.data.request.UpdateRecordRequest;
-import roth.lib.api.cloudflare.data.type.RecordType;
+import roth.lib.api.cloudflare.record.CreateRecordRequest;
+import roth.lib.api.cloudflare.record.DeleteRecordRequest;
+import roth.lib.api.cloudflare.record.UpdateRecordRequest;
+import roth.lib.api.cloudflare.type.RecordType;
 
 
 public class RecordTest extends Test

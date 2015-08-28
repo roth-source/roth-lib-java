@@ -1,8 +1,8 @@
 package roth.lib.api.digitalocean.test;
 
-import roth.lib.api.digitalocean.data.request.DropletRequest;
-import roth.lib.api.digitalocean.data.type.RegionType;
-import roth.lib.api.digitalocean.data.type.SizeType;
+import roth.lib.api.digitalocean.droplet.CreateDropletRequest;
+import roth.lib.api.digitalocean.type.RegionType;
+import roth.lib.api.digitalocean.type.SizeType;
 
 public class DropletTest extends Test
 {
@@ -51,7 +51,7 @@ public class DropletTest extends Test
 	
 	public static void createDroplet()
 	{
-		clientFactory.getDropletClient().createDroplet(new DropletRequest("ubuntu-test2", RegionType.NEW_YORK_2, SizeType._512MB, "3240036"));
+		clientFactory.getDropletClient().createDroplet(new CreateDropletRequest("ubuntu-test2", RegionType.NEW_YORK_2, SizeType._512MB, "3240036"));
 	}
 	
 	public static void deleteDroplet()

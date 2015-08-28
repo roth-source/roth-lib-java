@@ -7,10 +7,10 @@ import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
-import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
+import roth.lib.map.MapperConfig;
+import roth.lib.map.MapperReflector;
 
-@Entity
 public class JsonModel
 {
 	
@@ -560,9 +560,9 @@ public class JsonModel
 	@Override
 	public String toString()
 	{
-		JsonConfig config = new JsonConfig().setPrettyPrinting(true).setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
-		JsonMapper mapper = new JsonMapper();
-		return mapper.serialize(this, config);
+		MapperReflector mapperReflector = new JsonReflector();
+		MapperConfig mapperConfig = new MapperConfig().setPrettyPrinting(true).setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
+		return mapperReflector.getMapper(mapperConfig).serialize(this);
 	}
 	
 }

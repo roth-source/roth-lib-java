@@ -3,10 +3,8 @@ package roth.lib.map.json;
 import java.util.Calendar;
 import java.util.Date;
 
-import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
-@Entity
 public class JsonSubModel
 {
 	

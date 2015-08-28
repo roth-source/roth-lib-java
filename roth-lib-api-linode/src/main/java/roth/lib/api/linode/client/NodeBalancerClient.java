@@ -2,6 +2,7 @@ package roth.lib.api.linode.client;
 
 import java.util.LinkedList;
 
+import roth.lib.Generic;
 import roth.lib.api.linode.data.model.NodeBalancer;
 import roth.lib.api.linode.data.model.NodeBalancerConfig;
 import roth.lib.api.linode.data.model.NodeBalancerNode;
@@ -21,7 +22,6 @@ import roth.lib.api.linode.data.response.LinodeResponse;
 import roth.lib.api.linode.data.response.NodeBalancerConfigIdResponse;
 import roth.lib.api.linode.data.response.NodeBalancerIdResponse;
 import roth.lib.api.linode.data.response.NodeBalancerNodeIdResponse;
-import roth.lib.map.Generic;
 
 public class NodeBalancerClient extends LinodeClient
 {

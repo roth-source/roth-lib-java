@@ -1,6 +1,6 @@
 package roth.lib.api.digitalocean.test;
 
-import roth.lib.api.digitalocean.data.type.SizeType;
+import roth.lib.api.digitalocean.type.SizeType;
 
 public class DropletActionTest extends Test
 {

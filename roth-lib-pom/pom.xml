@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>roth.lib</groupId>
 	<artifactId>roth-lib-pom</artifactId>
-	<version>0.2.1-SNAPSHOT</version>
+	<version>0.2.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,12 +17,28 @@
 		<module>../roth-lib-map</module>
 		<module>../roth-lib-map-form</module>
 		<module>../roth-lib-map-json</module>
-		<module>../roth-lib-map-rdb</module>
 		<module>../roth-lib-map-xml</module>
+		<module>../roth-lib-db</module>
+		<module>../roth-lib-db-maria</module>
+		<module>../roth-lib-db-orient</module>
+		<module>../roth-lib-net</module>
+		<module>../roth-lib-net-email</module>
+		<module>../roth-lib-net-ftp</module>
 		<module>../roth-lib-net-http</module>
 		<module>../roth-lib-net-ssh</module>
-		<module>../roth-lib-all</module>
-		<module>../roth-lib-api-pom</module>
+		<module>../roth-lib-template</module>
+		<module>../roth-lib-framework</module>
+		<module>../roth-lib-api</module>
+		<module>../roth-lib-api-amazon</module>
+		<module>../roth-lib-api-cloudflare</module>
+		<module>../roth-lib-api-digitalocean</module>
+		<module>../roth-lib-api-gandi</module>
+		<module>../roth-lib-api-google</module>
+		<module>../roth-lib-api-linode</module>
+		<module>../roth-lib-api-namecheap</module>
+		<module>../roth-lib-api-rackspace</module>
+		<module>../roth-lib-api-twilio</module>
+		<module>../roth-lib-api-vultr</module>
 	</modules>
 	<build>
 		<plugins>

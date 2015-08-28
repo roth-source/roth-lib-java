@@ -3,7 +3,7 @@ package roth.lib.api.cloudflare.test;
 import java.io.File;
 import java.util.Properties;
 
-import roth.lib.api.cloudflare.client.CloudFlareClientFactory;
+import roth.lib.api.cloudflare.CloudFlareClientFactory;
 import roth.lib.util.PropertiesUtil;
 
 

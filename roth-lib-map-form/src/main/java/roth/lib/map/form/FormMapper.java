@@ -1,118 +1,153 @@
 package roth.lib.map.form;
 
+import static roth.lib.util.ReflectionUtil.getFieldValue;
+import static roth.lib.util.ReflectionUtil.getTypeClass;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import roth.lib.annotation.Property;
-import roth.lib.map.Deserializer;
-import roth.lib.map.PropertyField;
-import roth.lib.map.SerialMapper;
-import roth.lib.map.Serializer;
-import roth.lib.map.mapper.PropertyMapper;
-import roth.lib.map.util.MapperUtil;
+import roth.lib.map.Mapper;
+import roth.lib.map.MapperConfig;
+import roth.lib.map.MapperReflector;
+import roth.lib.map.deserializer.Deserializer;
+import roth.lib.map.serializer.Serializer;
+import roth.lib.reflector.PropertyReflector;
+import roth.lib.util.IoUtil;
+import roth.lib.util.UrlUtil;
 
-public class FormMapper extends SerialMapper<FormConfig>
+public class FormMapper extends Mapper
 {
-	protected static FormMapper instance;
 	
 	public FormMapper()
 	{
-		super();
-		propertyMappers.add(new PropertyMapper<Property>(Property.class)
+		this(FormReflector.get());
+	}
+	
+	public FormMapper(MapperConfig mapperConfig)
+	{
+		this(FormReflector.get(), mapperConfig);
+	}
+	
+	public FormMapper(MapperReflector mapperReflector)
+	{
+		this(mapperReflector, null);
+	}
+	
+	public FormMapper(MapperReflector mapperReflector, MapperConfig mapperConfig)
+	{
+		super(mapperReflector, mapperConfig);
+	}
+	
+	@Override
+	public void serialize(Object value, OutputStream output)
+	{
+		if(value == null) throw new IllegalArgumentException("Value cannot be null");
+		if(!(value instanceof FormBoundary))
 		{
-			@Override
-			public String getPropertyName(Field field, Property property)
+			super.serialize(value, output);
+		}
+		else
+		{
+			try
 			{
-				if(property != null && property.form())
+				String boundary = ((FormBoundary) value).getBoundary();
+				MultiPartFormOutputStream formOutput = new MultiPartFormOutputStream(output, boundary);
+				for(PropertyReflector propertyReflector : getMapperReflector().getPropertyReflectors(value.getClass()))
 				{
-					if(isValid(property.formName()))
+					if(!hasContext() || !propertyReflector.getExcludes().contains(getContext()))
 					{
-						return property.formName();
-					}
-					else if(isValid(property.name()))
-					{
-						return property.name();
+						Class<?> propertyClass = propertyReflector.getFieldClass();
+						String propertyName = propertyReflector.getPropertyName();
+						if(propertyName != null)
+						{
+							Object fieldValue = getFieldValue(propertyReflector.getField(), value);
+							Serializer<?> serializer = getMapperConfig().getSerializer(propertyClass);
+							if(serializer != null)
+							{
+								String serializedValue = null;
+								if(fieldValue != null)
+								{
+									serializedValue = serializer.serialize(fieldValue, propertyReflector.getTimeFormat());
+								}
+								else if(getMapperConfig().isSerializeNulls())
+								{
+									serializedValue = BLANK;
+								}
+								if(serializedValue != null)
+								{
+									formOutput.writeField(propertyName, serializedValue);
+								}
+							}
+							else if(fieldValue instanceof FormData)
+							{
+								FormData formData = (FormData) fieldValue;
+								formOutput.writeFile(propertyName, formData.getContentType(), formData.getFilename(), formData.getOutput().toByteArray());
+							}
+							else if(fieldValue instanceof FormFile)
+							{
+								FormFile formFile = (FormFile) fieldValue;
+								formOutput.writeFile(propertyName, formFile.getContentType(), formFile.getFile());
+							}
+						}
 					}
 				}
-				return null;
+				formOutput.close();
 			}
-			
-			@Override
-			public boolean isEntityName(Field field, Property property)
+			catch(IOException e)
 			{
-				return property != null && property.entityName();
+				throw new FormException(e);
 			}
-		});
-	}
-	
-	public static FormMapper get()
-	{
-		if(instance == null)
-		{
-			instance = new FormMapper();
 		}
-		return instance;
-	}
-	
-	public static void set(FormMapper newInstance)
-	{
-		instance = newInstance;
 	}
 	
 	@Override
-	public FormConfig defaultConfig()
+	public void serialize(Object value, Writer writer)
 	{
-		return new FormConfig();
-	}
-	
-	@Override
-	public void serialize(Object object, Writer writer, FormConfig config)
-	{
-		if(object == null) throw new IllegalArgumentException("Object cannot be null");
+		if(value == null) throw new IllegalArgumentException("Value cannot be null");
 		try
 		{
 			String seperator = BLANK;
-			for(PropertyField propertyField : getPropertyFields(object.getClass()))
+			for(PropertyReflector propertyReflector : getMapperReflector().getPropertyReflectors(value.getClass()))
 			{
-				Class<?> propertyClass = propertyField.getFieldClass();
-				String propertyName = propertyField.getPropertyName();
-				if(propertyName != null)
+				if(!hasContext() || !propertyReflector.getExcludes().contains(getContext()))
 				{
-					Serializer<?> serializer = config.getSerializer(propertyClass);
-					if(serializer != null)
+					Class<?> propertyClass = propertyReflector.getFieldClass();
+					String propertyName = propertyReflector.getPropertyName();
+					if(propertyName != null)
 					{
-						String serializedObject = null;
-						Object propertyObject = getPropertyObject(propertyField.getField(), object);
-						if(propertyObject != null)
+						Serializer<?> serializer = getMapperConfig().getSerializer(propertyClass);
+						if(serializer != null)
 						{
-							serializedObject = serializer.serializeInternal(propertyObject);
-						}
-						else if(config.isSerializeNulls())
-						{
-							serializedObject = BLANK;
-						}
-						if(serializedObject != null)
-						{
-							writer.write(seperator);
-							writer.write(propertyName);
-							writer.write(EQUAL);
-							writer.write(URLEncoder.encode(serializedObject, UTF_8.name()));
-							if(BLANK.equals(seperator))
+							String serializedValue = null;
+							Object fieldValue = getFieldValue(propertyReflector.getField(), value);
+							if(fieldValue != null)
 							{
-								seperator += AMPERSAND;
-								if(config.isPrettyPrinting())
+								serializedValue = serializer.serialize(fieldValue, propertyReflector.getTimeFormat());
+							}
+							else if(getMapperConfig().isSerializeNulls())
+							{
+								serializedValue = BLANK;
+							}
+							if(serializedValue != null)
+							{
+								writer.write(seperator);
+								writer.write(propertyName);
+								writer.write(EQUAL);
+								writer.write(UrlUtil.encode(serializedValue));
+								if(BLANK.equals(seperator))
 								{
-									seperator += NEW_LINE;
+									seperator += AMPERSAND;
+									if(getMapperConfig().isPrettyPrinting())
+									{
+										seperator += NEW_LINE;
+									}
 								}
 							}
 						}
@@ -128,39 +163,39 @@ public class FormMapper extends SerialMapper<FormConfig>
 	}
 	
 	@Override
-	public void serialize(Map<String, ?> map, Writer writer, FormConfig config)
+	public void serialize(Map<String, ?> map, Writer writer)
 	{
-		if(map == null) throw new IllegalArgumentException("Object cannot be null");
+		if(map == null) throw new IllegalArgumentException("Map cannot be null");
 		try
 		{
 			String seperator = BLANK;
 			for(Entry<String, ?> entry : map.entrySet())
 			{
 				String propertyName = entry.getKey();
-				Object propertyObject = entry.getValue();
-				String serializedObject = null;
-				if(propertyObject != null)
+				Object fieldValue = entry.getValue();
+				String serializedValue = null;
+				if(fieldValue != null)
 				{
-					Serializer<?> serializer = config.getSerializer(propertyObject.getClass());
+					Serializer<?> serializer = getMapperConfig().getSerializer(fieldValue.getClass());
 					if(serializer != null)
 					{
-						serializedObject = serializer.serializeInternal(propertyObject);
+						serializedValue = serializer.serialize(fieldValue, null);
 					}
 				}
-				else if(config.isSerializeNulls())
+				else if(getMapperConfig().isSerializeNulls())
 				{
-					serializedObject = BLANK;
+					serializedValue = BLANK;
 				}
-				if(serializedObject != null)
+				if(serializedValue != null)
 				{
 					writer.write(seperator);
 					writer.write(propertyName);
 					writer.write(EQUAL);
-					writer.write(URLEncoder.encode(serializedObject, UTF_8.name()));
+					writer.write(UrlUtil.encode(serializedValue));
 					if(BLANK.equals(seperator))
 					{
 						seperator += AMPERSAND;
-						if(config.isPrettyPrinting())
+						if(getMapperConfig().isPrettyPrinting())
 						{
 							seperator += NEW_LINE;
 						}
@@ -174,169 +209,22 @@ public class FormMapper extends SerialMapper<FormConfig>
 			throw new FormException(e);
 		}
 	}
-
+	
 	@Override
-	public void serialize(Object object, OutputStream output, FormConfig config)
+	public <T> T deserialize(Reader reader, Type type)
 	{
-		if(object == null) throw new IllegalArgumentException("Object cannot be null");
-		if(!(object instanceof FormBoundary))
-		{
-			super.serialize(object, output, config);
-		}
-		else
-		{
-			try
-			{
-				String boundary = ((FormBoundary) object).getBoundary();
-				MultiPartFormOutputStream formOutput = new MultiPartFormOutputStream(output, boundary);
-				//BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output));
-				for(PropertyField propertyField : getPropertyFields(object.getClass()))
-				{
-					Class<?> propertyClass = propertyField.getFieldClass();
-					String propertyName = propertyField.getPropertyName();
-					if(propertyName != null)
-					{
-						Object propertyObject = getPropertyObject(propertyField.getField(), object);
-						Serializer<?> serializer = config.getSerializer(propertyClass);
-						if(serializer != null)
-						{
-							String serializedObject = null;
-							if(propertyObject != null)
-							{
-								serializedObject = serializer.serializeInternal(propertyObject);
-							}
-							else if(config.isSerializeNulls())
-							{
-								serializedObject = BLANK;
-							}
-							if(serializedObject != null)
-							{
-								//writeBoundary(dataOutput, boundary, config);
-								//writeString(dataOutput, propertyName, serializedObject, config);
-								formOutput.writeField(propertyName, serializedObject);
-							}
-						}
-						else if(propertyObject instanceof FormData)
-						{
-							//writeBoundary(dataOutput, boundary, config);
-							//writeFormData(dataOutput, propertyName, (FormData) propertyObject, config);
-						}
-						else if(propertyObject instanceof FormFile)
-						{
-							//writeBoundary(dataOutput, boundary, config);
-							//writeFormFile(dataOutput, propertyName, (FormFile) propertyObject, config);
-							FormFile formFile = (FormFile) propertyObject;
-							formOutput.writeFile(propertyName, formFile.getContentType(), formFile.getFile());
-						}
-					}
-				}
-				//output.write(("--" + boundary +"--").getBytes());
-				//writeNewLine(dataOutput, config);
-				//writeNewLine(dataOutput, config);
-				//output.flush();
-				formOutput.close();
-			}
-			catch(IOException e)
-			{
-				throw new FormException(e);
-			}
-		}
-	}
-	/*
-	protected void writeNewLine(DataOutputStream output, FormConfig config) throws IOException
-	{
-		output.write(CARRIAGE_RETURN);
-		output.write(NEW_LINE);
-	}
-	
-	protected void writeBoundary(DataOutputStream output, String boundary, FormConfig config) throws IOException
-	{
-		output.writeBytes("--" + boundary);
-		writeNewLine(output, config);
-	}
-	
-	protected void writeName(DataOutputStream output, String name, FormConfig config) throws IOException
-	{
-		output.writeBytes("Content-Disposition: form-data; ");
-		output.write(("name=\"" + name + "\"").getBytes());
-	}
-	
-	protected void writeString(DataOutputStream output, String name, String data, FormConfig config) throws IOException
-	{
-		writeName(output, name, config);
-		writeNewLine(output, config);
-		writeNewLine(output, config);
-		output.write(data.getBytes());
-		writeNewLine(output, config);
-	}
-	
-	protected void writeFilename(DataOutputStream output, String filename, FormConfig config) throws IOException
-	{
-		output.writeBytes("; filename=\"" + filename + "\"");
-	}
-	
-	protected void writeContentType(DataOutputStream output, String contentType, FormConfig config) throws IOException
-	{
-		output.writeBytes("Content-Type: " + contentType);
-	}
-	
-	protected void writeFormData(DataOutputStream output, String name, FormData formData, FormConfig config) throws IOException
-	{
-		writeName(output, name, config);
-		writeFilename(output, formData.getFilename(), config);
-		writeNewLine(output, config);
-		writeContentType(output, formData.getContentType(), config);
-		writeNewLine(output, config);
-		writeNewLine(output, config);
-		if(!config.isPrettyPrinting())
-		{
-			output.write(formData.getOutput().toByteArray());
-		}
-		writeNewLine(output, config);
-	}
-	
-	protected void writeFormFile(DataOutputStream output, String name, FormFile formFile, FormConfig config) throws IOException
-	{
-		writeName(output, name, config);
-		writeFilename(output, formFile.getFilename(), config);
-		writeNewLine(output, config);
-		writeContentType(output, formFile.getContentType(), config);
-		writeNewLine(output, config);
-		writeNewLine(output, config);
-		if(!config.isPrettyPrinting())
-		{
-			try(RandomAccessFile randomAccessFile = new RandomAccessFile(formFile.getFile(), "r");)
-			{
-				randomAccessFile.seek(formFile.getOffset());
-				long length = formFile.getLength();
-				int n = 0;
-				byte[] buffer = new byte[1024 * 4];
-				int bufferLength = buffer.length;
-				while((n = randomAccessFile.read(buffer, 0, bufferLength)) > 0)
-				{
-					output.write(buffer);
-					length -= n;
-					bufferLength = (int) Math.min(bufferLength, length);
-				}
-			}
-		}
-		writeNewLine(output, config);
-	}
-	*/
-	@Override
-	public <T> T deserialize(Reader reader, Type type, FormConfig config)
-	{
-		T model = null;
+		setCallbacks(callbacks);
+		T entity = null;
 		try
 		{
-			LinkedHashMap<String, PropertyField> propertyNameFieldMap = getPropertyNameFieldMap(type);
-			Class<T> klass = MapperUtil.getClass(type);
+			LinkedHashMap<String, PropertyReflector> namePropertyReflectorMap = getMapperReflector().getNamePropertyReflectorMap(type, true);
+			Class<T> klass = getTypeClass(type);
 			Constructor<T> constructor = klass.getDeclaredConstructor();
 			constructor.setAccessible(true);
-			model = constructor.newInstance();
+			entity = constructor.newInstance();
 			int b;
 			char c;
-			String name = null;
+			String name = BLANK;
 			StringBuilder builder = new StringBuilder();
 			while((b = reader.read()) > 0)
 			{
@@ -355,8 +243,8 @@ public class FormMapper extends SerialMapper<FormConfig>
 					}
 					case AMPERSAND:
 					{
-						setValue(config, model, propertyNameFieldMap.get(name), URLDecoder.decode(builder.toString(), UTF_8.name()));
-						name = null;
+						setValue(entity, namePropertyReflectorMap.get(name.toUpperCase()), UrlUtil.decode(builder.toString()));
+						name = BLANK;
 						builder.setLength(0);
 						break;
 					}
@@ -367,29 +255,29 @@ public class FormMapper extends SerialMapper<FormConfig>
 					}
 				}
 			}
-			setValue(config, model, propertyNameFieldMap.get(name), URLDecoder.decode(builder.toString(), UTF_8.name()));
+			setValue(entity, namePropertyReflectorMap.get(name.toUpperCase()), UrlUtil.decode(builder.toString()));
 		}
 		catch(Exception e)
 		{
 			throw new FormException(e);
 		}
-		return model;
+		return entity;
 	}
 	
-	protected void setValue(FormConfig config, Object model, PropertyField propertyField, String value) throws Exception
+	protected void setValue(Object model, PropertyReflector propertyReflector, String value) throws Exception
 	{
-		if(propertyField != null)
+		if(propertyReflector != null)
 		{
-			Deserializer<?> deserializer = config.getDeserializer(propertyField.getFieldClass());
+			Deserializer<?> deserializer = getMapperConfig().getDeserializer(propertyReflector.getFieldClass());
 			if(deserializer != null)
 			{
-				propertyField.getField().set(model, deserializer.deserialize(value, propertyField.getFieldClass()));
+				propertyReflector.getField().set(model, deserializer.deserialize(value, propertyReflector.getTimeFormat(), propertyReflector.getFieldClass()));
 			}
 		}
 	}
 	
 	@Override
-	public LinkedHashMap<String, Object> deserialize(Reader reader, FormConfig config)
+	public LinkedHashMap<String, Object> deserialize(Reader reader)
 	{
 		LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
 		try
@@ -415,7 +303,7 @@ public class FormMapper extends SerialMapper<FormConfig>
 					}
 					case AMPERSAND:
 					{
-						map.put(name, URLDecoder.decode(builder.toString(), UTF_8.name()));
+						map.put(name, UrlUtil.decode(builder.toString()));
 						name = null;
 						builder.setLength(0);
 						break;
@@ -427,7 +315,7 @@ public class FormMapper extends SerialMapper<FormConfig>
 					}
 				}
 			}
-			map.put(name, URLDecoder.decode(builder.toString(), UTF_8.name()));
+			map.put(name, UrlUtil.decode(builder.toString()));
 		}
 		catch(Exception e)
 		{
@@ -436,36 +324,53 @@ public class FormMapper extends SerialMapper<FormConfig>
 		return map;
 	}
 	
-	public LinkedHashMap<String, String> convert(Object object, FormConfig config)
+	public LinkedHashMap<String, String> convert(Object value)
 	{
 		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-		for(PropertyField propertyField : getPropertyFields(object.getClass()))
+		for(PropertyReflector propertyReflector : getMapperReflector().getPropertyReflectors(value.getClass()))
 		{
-			Class<?> propertyClass = propertyField.getFieldClass();
-			String propertyName = propertyField.getPropertyName();
-			if(propertyName != null)
+			if(!hasContext() || !propertyReflector.getExcludes().contains(getContext()))
 			{
-				Serializer<?> serializer = config.getSerializer(propertyClass);
-				if(serializer != null)
+				Class<?> propertyClass = propertyReflector.getFieldClass();
+				String propertyName = propertyReflector.getPropertyName();
+				if(propertyName != null)
 				{
-					String serializedObject = null;
-					Object propertyObject = getPropertyObject(propertyField.getField(), object);
-					if(propertyObject != null)
+					Serializer<?> serializer = getMapperConfig().getSerializer(propertyClass);
+					if(serializer != null)
 					{
-						serializedObject = serializer.serializeInternal(propertyObject);
-					}
-					else if(config.isSerializeNulls())
-					{
-						serializedObject = BLANK;
-					}
-					if(serializedObject != null)
-					{
-						map.put(propertyName, serializedObject);
+						String serializedValue = null;
+						Object fieldValue = getFieldValue(propertyReflector.getField(), value);
+						if(fieldValue != null)
+						{
+							serializedValue = serializer.serialize(fieldValue, propertyReflector.getTimeFormat());
+						}
+						else if(getMapperConfig().isSerializeNulls())
+						{
+							serializedValue = BLANK;
+						}
+						if(serializedValue != null)
+						{
+							map.put(propertyName, serializedValue);
+						}
 					}
 				}
 			}
 		}
 		return map;
+	}
+	
+	@Override
+	public String prettyPrint(Reader reader)
+	{
+		try
+		{
+			String form = IoUtil.toString(reader);
+			return form.replaceAll("&(?!\\r|\\n)", "&\n");
+		}
+		catch(Exception e)
+		{
+			return null;
+		}
 	}
 	
 }

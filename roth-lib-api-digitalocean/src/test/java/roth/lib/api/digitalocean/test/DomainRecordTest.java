@@ -1,7 +1,8 @@
 package roth.lib.api.digitalocean.test;
 
-import roth.lib.api.digitalocean.data.request.DomainRecordRequest;
-import roth.lib.api.digitalocean.data.type.DomainRecordType;
+import roth.lib.api.digitalocean.domainrecord.CreateDomainRecordRequest;
+import roth.lib.api.digitalocean.domainrecord.UpdateDomainRecordRequest;
+import roth.lib.api.digitalocean.type.DomainRecordType;
 
 public class DomainRecordTest extends Test
 {
@@ -27,12 +28,12 @@ public class DomainRecordTest extends Test
 	
 	public static void createDomainRecord()
 	{
-		clientFactory.getDomainRecordClient().createDomainRecord(domain, new DomainRecordRequest(DomainRecordType.A, "test", "162.243.219.71"));
+		clientFactory.getDomainRecordClient().createDomainRecord(domain, new CreateDomainRecordRequest(DomainRecordType.A, "test", "162.243.219.71"));
 	}
 	
 	public static void updateDomainRecord()
 	{
-		clientFactory.getDomainRecordClient().updateDomainRecord(domain, 5250987, new DomainRecordRequest(DomainRecordType.A, "test", "162.243.219.71"));
+		clientFactory.getDomainRecordClient().updateDomainRecord(domain, 5250987, new UpdateDomainRecordRequest(DomainRecordType.A, "test", "162.243.219.71"));
 	}
 	
 	public static void deleteDomainRecord()

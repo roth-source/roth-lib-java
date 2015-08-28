@@ -2,6 +2,7 @@ package roth.lib.api.linode.client;
 
 import java.util.LinkedList;
 
+import roth.lib.Generic;
 import roth.lib.api.linode.data.model.StackScript;
 import roth.lib.api.linode.data.request.create.CreateStackScriptRequest;
 import roth.lib.api.linode.data.request.delete.DeleteStackScriptRequest;
@@ -9,7 +10,6 @@ import roth.lib.api.linode.data.request.get.GetStackScriptRequest;
 import roth.lib.api.linode.data.request.update.UpdateStackScriptRequest;
 import roth.lib.api.linode.data.response.LinodeResponse;
 import roth.lib.api.linode.data.response.StackScriptIdResponse;
-import roth.lib.map.Generic;
 
 public class StackScriptClient extends LinodeClient
 {

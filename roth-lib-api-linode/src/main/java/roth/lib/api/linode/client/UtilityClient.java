@@ -3,6 +3,7 @@ package roth.lib.api.linode.client;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
+import roth.lib.Generic;
 import roth.lib.api.linode.data.model.Datacenter;
 import roth.lib.api.linode.data.model.Distribution;
 import roth.lib.api.linode.data.model.Kernel;
@@ -16,7 +17,6 @@ import roth.lib.api.linode.data.request.get.GetAvailPlanRequest;
 import roth.lib.api.linode.data.request.get.GetAvailStackScriptRequest;
 import roth.lib.api.linode.data.response.ApiSpecResponse;
 import roth.lib.api.linode.data.response.LinodeResponse;
-import roth.lib.map.Generic;
 
 public class UtilityClient extends LinodeClient
 {

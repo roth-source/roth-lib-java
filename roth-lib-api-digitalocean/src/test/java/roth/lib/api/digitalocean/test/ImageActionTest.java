@@ -1,6 +1,6 @@
 package roth.lib.api.digitalocean.test;
 
-import roth.lib.api.digitalocean.data.type.RegionType;
+import roth.lib.api.digitalocean.type.RegionType;
 
 public class ImageActionTest extends Test
 {

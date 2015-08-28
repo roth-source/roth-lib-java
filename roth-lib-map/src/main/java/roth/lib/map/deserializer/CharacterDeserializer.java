@@ -10,7 +10,7 @@ public class CharacterDeserializer extends PrimitiveDeserializer<Character>
 	}
 	
 	@Override
-	public Character deserialize(String value)
+	public Character deserialize(String value, String timeFormat)
 	{
 		Character object = isNullable() ? null : '\u0000';
 		try

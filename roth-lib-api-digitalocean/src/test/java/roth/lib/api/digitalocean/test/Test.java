@@ -3,7 +3,7 @@ package roth.lib.api.digitalocean.test;
 import java.io.File;
 import java.util.Properties;
 
-import roth.lib.api.digitalocean.client.DigitalOceanClientFactory;
+import roth.lib.api.digitalocean.DigitalOceanClientFactory;
 import roth.lib.util.PropertiesUtil;
 
 public class Test

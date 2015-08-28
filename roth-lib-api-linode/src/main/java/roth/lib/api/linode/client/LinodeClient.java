@@ -3,25 +3,17 @@ package roth.lib.api.linode.client;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import roth.lib.api.FormJsonApiClient;
 import roth.lib.api.linode.data.model.LinodeError;
 import roth.lib.api.linode.data.request.LinodeRequest;
 import roth.lib.api.linode.data.response.LinodeResponse;
-import roth.lib.map.Deserializer;
-import roth.lib.map.Serializer;
-import roth.lib.map.form.FormConfig;
-import roth.lib.map.form.FormMapper;
-import roth.lib.map.form.FormSerializer;
-import roth.lib.map.json.JsonConfig;
-import roth.lib.map.json.JsonDeserializer;
-import roth.lib.map.json.JsonMapper;
 import roth.lib.net.http.HttpHeader;
 import roth.lib.net.http.HttpMethod;
 import roth.lib.net.http.HttpProtocol;
 import roth.lib.net.http.HttpResponse;
 import roth.lib.net.http.HttpUrl;
-import roth.lib.net.http.api.ApiClient;
 
-public abstract class LinodeClient extends ApiClient<LinodeRequest, LinodeResponse<?>>
+public abstract class LinodeClient extends FormJsonApiClient<LinodeRequest, LinodeResponse<?>>
 {
 	protected static String GET_NODE						= "linode.list";
 	protected static String CREATE_NODE						= "linode.create";
@@ -87,11 +79,7 @@ public abstract class LinodeClient extends ApiClient<LinodeRequest, LinodeRespon
 	protected static String TEST_ECHO 						= "test.echo";
 	protected static String TEST_FAIL 						= "test.fail";
 	
-	protected static String TIME_FORMAT				= "yyyy-MM-dd HH:mm:ss.S";
-	protected static FormConfig FORM_CONFIG 		= new FormConfig().setTimeFormat(TIME_FORMAT);
-	protected static FormConfig FORM_CONFIG_DEBUG 	= new FormConfig().setTimeFormat(TIME_FORMAT).setPrettyPrinting(true);
-	protected static JsonConfig JSON_CONFIG 		= new JsonConfig().setTimeFormat(TIME_FORMAT);
-	protected static JsonConfig JSON_CONFIG_DEBUG 	= new JsonConfig().setTimeFormat(TIME_FORMAT).setPrettyPrinting(true);
+	protected static String TIME_FORMAT						= "yyyy-MM-dd HH:mm:ss.S";
 	
 	protected String apiKey;
 	
@@ -105,41 +93,12 @@ public abstract class LinodeClient extends ApiClient<LinodeRequest, LinodeRespon
 		super(debug);
 		this.apiKey = apiKey;
 		this.debug = debug;
+		setTimeFormat(TIME_FORMAT);
 	}
 	
 	protected HttpUrl url()
 	{
 		return new HttpUrl().setProtocol(HttpProtocol.HTTPS).setHost("api.linode.com");
-	}
-	
-	@Override
-	protected Serializer<LinodeRequest> getSerializer(LinodeRequest apiRequest)
-	{
-		return new FormSerializer<LinodeRequest>(apiRequest).setConfig(FORM_CONFIG);
-	}
-	
-	@Override
-	protected <T extends LinodeResponse<?>> Deserializer<T> getDeserializer(Type type)
-	{
-		return new JsonDeserializer<T>(type).setConfig(JSON_CONFIG);
-	}
-	
-	@Override
-	protected String debugRequest(LinodeRequest apiRequest)
-	{
-		return FormMapper.get().serialize(apiRequest, FORM_CONFIG_DEBUG);
-	}
-	
-	@Override
-	protected String debugResponse(LinodeResponse<?> apiResponse)
-	{
-		return JsonMapper.get().serialize(apiResponse, JSON_CONFIG_DEBUG);
-	}
-	
-	@Override
-	protected String debugBody(String body)
-	{
-		return JsonMapper.get().format(body);
 	}
 	
 	protected <T extends LinodeResponse<?>> T connect(HttpUrl url, LinodeRequest linodeRequest, Type type, HttpMethod method, boolean gzip, HttpHeader... headers)
@@ -155,7 +114,7 @@ public abstract class LinodeClient extends ApiClient<LinodeRequest, LinodeRespon
 		return super.connect(url, linodeRequest, type, method, gzip, headers);
 	}
 	
-	protected <T extends LinodeResponse<?>> void check(HttpResponse<T> response)
+	protected <T extends LinodeResponse<?>> void checkResponse(HttpResponse<T> response)
 	{
 		T linodeResponse = response.getEntity();
 		if(linodeResponse != null)

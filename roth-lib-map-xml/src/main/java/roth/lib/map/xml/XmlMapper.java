@@ -1,10 +1,18 @@
 package roth.lib.map.xml;
 
+import static roth.lib.util.ReflectionUtil.asCollection;
+import static roth.lib.util.ReflectionUtil.asMap;
+import static roth.lib.util.ReflectionUtil.getElementClass;
+import static roth.lib.util.ReflectionUtil.getFieldValue;
+import static roth.lib.util.ReflectionUtil.getTypeClass;
+import static roth.lib.util.ReflectionUtil.isArray;
+import static roth.lib.util.ReflectionUtil.isCollection;
+import static roth.lib.util.ReflectionUtil.isMap;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -15,21 +23,20 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import roth.lib.annotation.Property;
-import roth.lib.map.Deserializer;
-import roth.lib.map.PropertyField;
-import roth.lib.map.SerialMapper;
-import roth.lib.map.Serializer;
-import roth.lib.map.mapper.PropertyMapper;
-import roth.lib.map.util.MapperUtil;
-import roth.lib.map.xml.annotation.XmlAttribute;
-import roth.lib.map.xml.annotation.XmlAttributes;
-import roth.lib.map.xml.annotation.XmlElements;
-import roth.lib.map.xml.mapper.XmlAttributeMapper;
-import roth.lib.map.xml.mapper.XmlAttributesMapper;
-import roth.lib.map.xml.mapper.XmlElementsMapper;
+import roth.lib.map.Mapper;
+import roth.lib.map.MapperConfig;
+import roth.lib.map.MapperReflector;
+import roth.lib.map.deserializer.Deserializer;
+import roth.lib.map.serializer.Serializer;
+import roth.lib.map.xml.tag.CloseTag;
+import roth.lib.map.xml.tag.CommentTag;
+import roth.lib.map.xml.tag.DeclarationTag;
+import roth.lib.map.xml.tag.EmptyTag;
+import roth.lib.map.xml.tag.OpenTag;
+import roth.lib.map.xml.tag.Tag;
+import roth.lib.reflector.PropertyReflector;
 
-public class XmlMapper extends SerialMapper<XmlConfig>
+public class XmlMapper extends Mapper
 {
 	protected static final String XML_HEADER					= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	protected static final String ESCAPED_QUOTE					= "quot";
@@ -38,216 +45,45 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 	protected static final String ESCAPED_RIGHT_ANGLE_BRACKET	= "gt";
 	protected static final String ESCAPED_AMPERSAND				= "amp";
 	
-	protected static XmlMapper instance;
-	
-	protected LinkedList<XmlElementsMapper<? extends Annotation>> xmlElementsMappers = new LinkedList<XmlElementsMapper<? extends Annotation>>();
-	protected LinkedList<XmlAttributeMapper<? extends Annotation>> xmlAttributeMappers = new LinkedList<XmlAttributeMapper<? extends Annotation>>();
-	protected LinkedList<XmlAttributesMapper<? extends Annotation>> xmlAttributesMappers = new LinkedList<XmlAttributesMapper<? extends Annotation>>();
-	protected LinkedHashMap<Type, XmlAttributeFields> xmlAttributeFieldsMap = new LinkedHashMap<Type, XmlAttributeFields>();
-	
 	public XmlMapper()
 	{
-		super();
-		propertyMappers.add(new PropertyMapper<Property>(Property.class)
-		{
-			@Override
-			public String getPropertyName(Field field, Property property)
-			{
-				if(property != null && property.xml())
-				{
-					if(isValid(property.xmlName()))
-					{
-						return property.xmlName();
-					}
-					else if(isValid(property.name()))
-					{
-						return property.name();
-					}
-				}
-				return null;
-			}
-			
-			@Override
-			public boolean isEntityName(Field field, Property property)
-			{
-				return property != null && property.entityName();
-			}
-		});
-		xmlElementsMappers.add(new XmlElementsMapper<XmlElements>(XmlElements.class)
-		{
-			@Override
-			public String getXmlElementsName(Field field, XmlElements xmlElements)
-			{
-				if(xmlElements != null)
-				{
-					if(isValid(xmlElements.name()))
-					{
-						return xmlElements.name();
-					}
-				}
-				return null;
-			}
-		});
-		xmlAttributeMappers.add(new XmlAttributeMapper<XmlAttribute>(XmlAttribute.class)
-		{
-			@Override
-			public String getXmlAttributeName(Field field, XmlAttribute xmlAttribute)
-			{
-				if(xmlAttribute != null)
-				{
-					if(isValid(xmlAttribute.name()))
-					{
-						return xmlAttribute.name();
-					}
-				}
-				return null;
-			}
-		});
-		xmlAttributesMappers.add(new XmlAttributesMapper<XmlAttributes>(XmlAttributes.class){});
+		this(XmlReflector.get());
 	}
 	
-	public static XmlMapper get()
+	public XmlMapper(MapperConfig mapperConfig)
 	{
-		if(instance == null)
-		{
-			instance = new XmlMapper();
-		}
-		return instance;
+		this(XmlReflector.get(), mapperConfig);
 	}
 	
-	public static void set(XmlMapper newInstance)
+	public XmlMapper(MapperReflector mapperReflector)
 	{
-		instance = newInstance;
+		this(mapperReflector, null);
+	}
+	
+	public XmlMapper(MapperReflector mapperReflector, MapperConfig mapperConfig)
+	{
+		super(mapperReflector, mapperConfig);
 	}
 	
 	@Override
-	public XmlConfig defaultConfig()
+	public XmlReflector getMapperReflector()
 	{
-		return XmlConfig.get();
-	}
-	
-	public String getXmlElementsName(Field field)
-	{
-		for(XmlElementsMapper<? extends Annotation> xmlElementsMapper : xmlElementsMappers)
-		{
-			String xmlElementsName = xmlElementsMapper.getXmlElementsNameFromField(field);
-			if(xmlElementsName != null)
-			{
-				return xmlElementsName;
-			}
-		}
-		return null;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public LinkedHashMap<String, String> getXmlAttributeMap(Object object)
-	{
-		LinkedHashMap<String, String> xmlAttributeMap = new LinkedHashMap<String, String>();
-		if(object != null)
-		{
-			Class<?> klass = object.getClass();
-			XmlAttributeFields xmlAttributeFields = getXmlAttributeFields(klass);
-			if(xmlAttributeFields != null)
-			{
-				for(Entry<String, Field> xmlAttributeFieldEntry : xmlAttributeFields.getXmlAttributeFieldMap().entrySet())
-				{
-					String name = xmlAttributeFieldEntry.getKey();
-					Field field = xmlAttributeFieldEntry.getValue();
-					try
-					{
-						Object fieldObject = field.get(object);
-						if(fieldObject != null)
-						{
-							xmlAttributeMap.put(name, fieldObject.toString());
-						}
-					}
-					catch(Exception e)
-					{
-						
-					}
-				}
-				for(Field field : xmlAttributeFields.getXmlAttributesFields())
-				{
-					try
-					{
-						Object fieldObject = field.get(object);
-						if(fieldObject instanceof Map)
-						{
-							xmlAttributeMap.putAll((Map<String, String>) fieldObject);
-						}
-					}
-					catch(Exception e)
-					{
-						
-					}
-				}
-			}
-		}
-		return xmlAttributeMap;
-	}
-	
-	public XmlAttributeFields getXmlAttributeFields(Type type)
-	{
-		XmlAttributeFields xmlAttributeFields = null;
-		xmlAttributeFields = xmlAttributeFieldsMap.get(type);
-		if(xmlAttributeFields == null)
-		{
-			xmlAttributeFields = new XmlAttributeFields();
-			for(Field field : getFields(type))
-			{
-				String name = getXmlAttributeName(field);
-				if(name != null)
-				{
-					xmlAttributeFields.addXmlAttributeField(name, field);
-				}
-				else if(isXmlAttributes(field) && isMap(field.getType()))
-				{
-					xmlAttributeFields.addXmlAttributesField(field);
-				}
-			}
-			xmlAttributeFieldsMap.put(type, xmlAttributeFields);
-		}
-		return xmlAttributeFields;
-	}
-	
-	public String getXmlAttributeName(Field field)
-	{
-		for(XmlAttributeMapper<? extends Annotation> xmlAttributeMapper : xmlAttributeMappers)
-		{
-			String xmlAttributeName = xmlAttributeMapper.getXmlAttributeNameFromField(field);
-			if(xmlAttributeName != null)
-			{
-				return xmlAttributeName;
-			}
-		}
-		return null;
-	}
-	
-	public boolean isXmlAttributes(Field field)
-	{
-		for(XmlAttributesMapper<? extends Annotation> xmlAttributesMapper : xmlAttributesMappers)
-		{
-			if(xmlAttributesMapper.hasXmlAttributes(field))
-			{
-				return true;
-			}
-		}
-		return false;
+		return (XmlReflector) super.getMapperReflector();
 	}
 	
 	@Override
-	public void serialize(Object object, Writer writer, XmlConfig config)
+	public void serialize(Object value, Writer writer)
 	{
-		if(object == null) throw new IllegalArgumentException("Object cannot be null");
+		if(value == null) throw new IllegalArgumentException("Value cannot be null");
 		try
 		{
+			String rootName = getMapperReflector().getEntityName(value.getClass());
 			writer.write(XML_HEADER);
-			writeNewLine(writer, config, 0);
-			String rootName = getEntityName(object.getClass());
-			writeOpenTag(writer, config, rootName, getXmlAttributeMap(object));
-			writeEntity(writer, config, object, 1);
-			writeNewLine(writer, config, 0);
-			writeCloseTag(writer, config, rootName);
+			writeNewLine(writer);
+			writeOpenTag(writer, rootName, getMapperReflector().getXmlAttributeMap(value));
+			writeEntity(writer, value);
+			writeNewLine(writer);
+			writeCloseTag(writer, rootName);
 			writer.flush();
 		}
 		catch(IOException e)
@@ -257,22 +93,22 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 	}
 	
 	@Override
-	public void serialize(Map<String, ?> map, Writer writer, XmlConfig config)
+	public void serialize(Map<String, ?> map, Writer writer)
 	{
-		serialize(map, "root", writer, config);
+		serialize(map, "root", writer);
 	}
 	
-	public void serialize(Map<String, ?> map, String rootName, Writer writer, XmlConfig config)
+	public void serialize(Map<String, ?> map, String rootName, Writer writer)
 	{
-		if(map == null) throw new IllegalArgumentException("Object cannot be null");
+		if(map == null) throw new IllegalArgumentException("Map cannot be null");
 		try
 		{
 			writer.write(XML_HEADER);
-			writeNewLine(writer, config, 0);
-			writeOpenTag(writer, config, rootName);
-			writeMap(writer, config, map, 1);
-			writeNewLine(writer, config, 0);
-			writeCloseTag(writer, config, rootName);
+			writeNewLine(writer);
+			writeOpenTag(writer, rootName);
+			writeMap(writer, map);
+			writeNewLine(writer);
+			writeCloseTag(writer, rootName);
 			writer.flush();
 		}
 		catch(IOException e)
@@ -281,103 +117,105 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 		}
 	}
 	
-	protected void writeEntity(Writer writer, XmlConfig config, Object entity, final int tabs) throws IOException
+	protected void writeEntity(Writer writer, Object value) throws IOException
 	{
-		for(PropertyField propertyField : getPropertyFields(entity.getClass()))
+		for(PropertyReflector propertyFieldAccessor : getMapperReflector().getPropertyReflectors(value.getClass()))
 		{
-			Field field = propertyField.getField();
-			String name = propertyField.getPropertyName();
-			Object value = getPropertyObject(field, entity);
-			if(value != null && propertyField.isEntityName())
+			if(!hasContext() || !propertyFieldAccessor.getExcludes().contains(getContext()))
 			{
-				name = getEntityName(value.getClass());
+				setTimeFormat(propertyFieldAccessor.getTimeFormat());
+				Field field = propertyFieldAccessor.getField();
+				String propertyName = propertyFieldAccessor.getPropertyName();
+				Object fieldValue = getFieldValue(field, value);
+				writeProperty(writer, propertyName, fieldValue, field);
 			}
-			writeProperty(writer, config, name, value, field, tabs);
 		}
 	}
 	
-	protected void writeProperty(Writer writer, XmlConfig config, String name, Object value, Field field, final int tabs) throws IOException
+	protected void writeProperty(Writer writer, String name, Object value, Field field) throws IOException
 	{
-		if(name != null && (value != null || config.isSerializeNulls()))
+		if(name != null && (value != null || getMapperConfig().isSerializeNulls()))
 		{
+			incrementTabs();
 			if(value == null)
 			{
-				writeNewLine(writer, config, tabs);
-				writeOpenTag(writer, config, name);
+				writeNewLine(writer);
+				writeOpenTag(writer, name);
 				writer.write(BLANK);
-				writeCloseTag(writer, config, name);
+				writeCloseTag(writer, name);
 			}
-			else if(isEntity(value.getClass()))
+			else if(getMapperReflector().isEntity(value.getClass()))
 			{
-				writeNewLine(writer, config, tabs);
-				writeOpenTag(writer, config, name, getXmlAttributeMap(value));
-				writeEntity(writer, config, value, tabs + 1);
-				writeNewLine(writer, config, tabs);
-				writeCloseTag(writer, config, name);
+				writeNewLine(writer);
+				writeOpenTag(writer, name, getMapperReflector().getXmlAttributeMap(value));
+				writeEntity(writer, value);
+				writeNewLine(writer);
+				writeCloseTag(writer, name);
 			}
 			else if(isArray(value.getClass()) || isCollection(value.getClass()) && field != null)
 			{
 				LinkedList<?> values = asCollection(value);
-				String xmlElementsName = getXmlElementsName(field);
+				String xmlElementsName = getMapperReflector().getXmlElementsName(field);
 				if(xmlElementsName != null)
 				{
-					writeNewLine(writer, config, tabs);
-					writeOpenTag(writer, config, name);
+					writeNewLine(writer);
+					writeOpenTag(writer, name);
 					if(!values.isEmpty())
 					{
-						writeArray(writer, config, xmlElementsName, values, tabs + 1);
-						writeNewLine(writer, config, tabs);
+						writeArray(writer, xmlElementsName, values);
+						writeNewLine(writer);
 					}
-					writeCloseTag(writer, config, name);
+					writeCloseTag(writer, name);
 				}
 				else
 				{
 					if(!values.isEmpty())
 					{
-						writeArray(writer, config, name, values, tabs);
+						writeArray(writer, name, values);
 					}
 				}
 			}
 			else if(isMap(value.getClass()))
 			{
 				LinkedHashMap<String, ?> valueMap = asMap(value);
-				writeNewLine(writer, config, tabs);
-				writeOpenTag(writer, config, name);
+				writeNewLine(writer);
+				writeOpenTag(writer, name);
 				if(!valueMap.isEmpty())
 				{
-					writeMap(writer, config, valueMap, tabs + 1);
-					writeNewLine(writer, config, tabs);
+					writeMap(writer, valueMap);
+					writeNewLine(writer);
 				}
-				writeCloseTag(writer, config, name);
+				writeCloseTag(writer, name);
 			}
-			else if(isSerializable(value.getClass(), config))
+			else if(getMapperConfig().isSerializable(value.getClass()))
 			{
-				Serializer<?> serializer = config.getSerializer(value.getClass());
-				String serializedValue = serializer.serializeInternal(value);
+				Serializer<?> serializer = getMapperConfig().getSerializer(value.getClass());
+				String serializedValue = serializer.serialize(value, getTimeFormat());
 				if(serializedValue != null)
 				{
-					writeNewLine(writer, config, tabs);
-					writeOpenTag(writer, config, name);
-					writeValue(writer, config, serializedValue);
-					writeCloseTag(writer, config, name);
+					writeNewLine(writer);
+					writeOpenTag(writer, name);
+					writeValue(writer, serializedValue);
+					writeCloseTag(writer, name);
 				}
-				else if(config.isSerializeNulls())
+				else if(getMapperConfig().isSerializeNulls())
 				{
-					writeNewLine(writer, config, tabs);
-					writeOpenTag(writer, config, name);
+					writeNewLine(writer);
+					writeOpenTag(writer, name);
 					writer.write(BLANK);
-					writeCloseTag(writer, config, name);
+					writeCloseTag(writer, name);
 				}
 			}
+			decrementTabs();
 		}
 	}
 	
-	protected void writeOpenTag(Writer writer, XmlConfig config, String name) throws IOException
+	protected void writeOpenTag(Writer writer, String name) throws IOException
 	{
-		writeOpenTag(writer, config, name, null);
+		writeOpenTag(writer, name, null);
 	}
 	
-	protected void writeOpenTag(Writer writer, XmlConfig config, String name, Map<String, String> attributeMap) throws IOException
+	protected void writeOpenTag(Writer writer, String name, Map<String, String> attributeMap) throws IOException
 	{
 		writer.write(LEFT_ANGLE_BRACKET);
 		writer.write(name);
@@ -389,14 +227,14 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 				writer.write(attributeEntry.getKey());
 				writer.write(EQUAL);
 				writer.write(QUOTE);
-				writeValue(writer, config, attributeEntry.getValue());
+				writeValue(writer, attributeEntry.getValue());
 				writer.write(QUOTE);
 			}
 		}
 		writer.write(RIGHT_ANGLE_BRACKET);
 	}
 	
-	protected void writeCloseTag(Writer writer, XmlConfig config, String name) throws IOException
+	protected void writeCloseTag(Writer writer, String name) throws IOException
 	{
 		writer.write(LEFT_ANGLE_BRACKET);
 		writer.write(SLASH);
@@ -404,9 +242,9 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 		writer.write(RIGHT_ANGLE_BRACKET);
 	}
 	
-	protected void writeNewLine(Writer writer, XmlConfig config, int tabs) throws IOException
+	protected void writeNewLine(Writer writer) throws IOException
 	{
-		if(config.isPrettyPrinting())
+		if(getMapperConfig().isPrettyPrinting())
 		{
 			writer.write(NEW_LINE);
 			for(int i = 0; i < tabs; i++)
@@ -416,7 +254,23 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 		}
 	}
 	
-	protected void writeValue(Writer writer, XmlConfig config, String value) throws IOException
+	protected void writeArray(Writer writer, String name, Collection<?> values) throws IOException
+	{
+		for(Object value : values)
+		{
+			writeProperty(writer, name, value, null);
+		}
+	}
+	
+	protected void writeMap(Writer writer, Map<String, ?> valueMap) throws IOException
+	{
+		for(Entry<String, ?> valueEntry : valueMap.entrySet())
+		{
+			writeProperty(writer, valueEntry.getKey(), valueEntry.getValue(), null);
+		}
+	}
+	
+	protected void writeValue(Writer writer, String value) throws IOException
 	{
 		if(value != null)
 		{
@@ -473,31 +327,15 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 		}
 	}
 	
-	protected void writeArray(Writer writer, XmlConfig config, String name, Collection<?> values, final int tabs) throws IOException
-	{
-		for(Object value : values)
-		{
-			writeProperty(writer, config, name, value, null, tabs);
-		}
-	}
-	
-	protected void writeMap(Writer writer, XmlConfig config,  Map<String, ?> valueMap, final int tabs) throws IOException
-	{
-		for(Entry<String, ?> valueEntry : valueMap.entrySet())
-		{
-			writeProperty(writer, config, valueEntry.getKey(), valueEntry.getValue(), null, tabs);
-		}
-	}
-	
 	@Override
-	public <T> T deserialize(Reader reader, Type type, XmlConfig config)
+	public <T> T deserialize(Reader reader, Type type)
 	{
 		T model = null;
 		try
 		{
 			readUntil(reader, LEFT_ANGLE_BRACKET);
 			Tag tag = null;
-			while((tag = readTag(reader, config)) != null)
+			while((tag = readTag(reader)) != null)
 			{
 				if(tag instanceof DeclarationTag)
 				{
@@ -513,7 +351,7 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 				}
 				else if(tag instanceof OpenTag)
 				{
-					model = readEntity(reader, type, (OpenTag) tag, config);
+					model = readEntity(reader, (OpenTag) tag, type);
 					break;
 				}
 				readUntil(reader, LEFT_ANGLE_BRACKET);
@@ -527,14 +365,14 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 	}
 	
 	@Override
-	public LinkedHashMap<String, Object> deserialize(Reader reader, XmlConfig config)
+	public LinkedHashMap<String, Object> deserialize(Reader reader)
 	{
 		LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
 		try
 		{
 			readUntil(reader, LEFT_ANGLE_BRACKET);
 			Tag tag = null;
-			while((tag = readTag(reader, config)) != null)
+			while((tag = readTag(reader)) != null)
 			{
 				if(tag instanceof DeclarationTag)
 				{
@@ -550,7 +388,7 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 				}
 				else if(tag instanceof OpenTag)
 				{
-					map = readMap(reader, String.class, config);
+					map = readMap(reader, String.class);
 					break;
 				}
 				readUntil(reader, LEFT_ANGLE_BRACKET);
@@ -564,21 +402,17 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public <T> T readEntity(Reader reader, Type type, OpenTag openTag, XmlConfig config) throws Exception
+	public <T> T readEntity(Reader reader, OpenTag openTag, Type type) throws Exception
 	{
-		LinkedHashMap<String, PropertyField> propertyNameFieldMap = getPropertyNameFieldMap(type);
-		Class<T> klass = MapperUtil.getClass(type);
+		LinkedHashMap<String, PropertyReflector> namePropertyReflectorMap = getMapperReflector().getNamePropertyReflectorMap(type, true);
+		Class<T> klass = getTypeClass(type);
 		Constructor<T> constructor = klass.getDeclaredConstructor();
 		constructor.setAccessible(true);
 		T model = constructor.newInstance();
-		XmlAttributeFields xmlAttributeFields = getXmlAttributeFields(klass);
-		if(xmlAttributeFields != null)
-		{
-			xmlAttributeFields.setAttributes(model, openTag.getAttributeMap());
-		}
+		getMapperReflector().setAttributes(model, openTag.getAttributeMap());
 		readUntil(reader, LEFT_ANGLE_BRACKET);
 		Tag tag = null;
-		while((tag = readTag(reader, config)) != null)
+		while((tag = readTag(reader)) != null)
 		{
 			if(tag instanceof DeclarationTag)
 			{
@@ -595,34 +429,35 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 			else if(tag instanceof OpenTag)
 			{
 				OpenTag fieldOpenTag = (OpenTag) tag;
-				PropertyField propertyField = propertyNameFieldMap.get(fieldOpenTag.getName());
-				if(propertyField != null)
+				PropertyReflector propertyReflector = namePropertyReflectorMap.get(getMapperReflector().getFlexibleName(fieldOpenTag.getName()));
+				if(propertyReflector != null)
 				{
-					Field field = propertyField.getField();
-					Type fieldType = propertyField.getFieldType();
-					Class<?> fieldClass = propertyField.getFieldClass();
-					if(isEntity(fieldType))
+					setTimeFormat(propertyReflector.getTimeFormat());
+					Field field = propertyReflector.getField();
+					Type fieldType = propertyReflector.getFieldType();
+					Class<?> fieldClass = propertyReflector.getFieldClass();
+					if(getMapperReflector().isEntity(fieldType))
 					{
-						Object value = readEntity(reader, fieldType, fieldOpenTag, config);
+						Object value = readEntity(reader, fieldOpenTag, fieldType);
 						field.set(model, value);
 					}
 					else if(isCollection(fieldType))
 					{
-						String xmlElementsName = getXmlElementsName(field);
+						String xmlElementsName = getMapperReflector().getXmlElementsName(field);
 						if(xmlElementsName != null)
 						{
-							Object value = readCollection(reader, fieldType, config);
+							Object value = readCollection(reader, fieldType);
 							field.set(model, value);
 						}
 						else
 						{
-							Object value = readCollectionElement(reader, fieldOpenTag, fieldType, config);
+							Object value = readCollectionElement(reader, fieldOpenTag, fieldType);
 							if(value != null)
 							{
 								Collection collection = (Collection) field.get(model);
 								if(collection == null)
 								{
-									Constructor<?> fieldConstructor = MapperUtil.getClass(fieldType).getDeclaredConstructor();
+									Constructor<?> fieldConstructor = getTypeClass(fieldType).getDeclaredConstructor();
 									fieldConstructor.setAccessible(true);
 									collection = (Collection) fieldConstructor.newInstance();
 									field.set(model, collection);
@@ -633,32 +468,32 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 					}
 					else if(isArray(fieldType))
 					{
-						Object value = readArray(reader, fieldType, config);
+						Object value = readArray(reader, fieldType);
 						field.set(model, value);
 					}
 					else if(isMap(fieldType))
 					{
-						Object value = readMap(reader, fieldType, config);
+						Object value = readMap(reader, fieldType);
 						field.set(model, value);
 					}
-					else if(isSerializable(fieldType, config))
+					else if(getMapperConfig().isSerializable(getTypeClass(fieldType)))
 					{
-						String value = readEscaped(reader, config, LEFT_ANGLE_BRACKET);
-						readTag(reader, config);
-						Deserializer<?> deserializer = config.getDeserializer(fieldClass);
+						String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
+						readTag(reader);
+						Deserializer<?> deserializer = getMapperConfig().getDeserializer(fieldClass);
 						if(deserializer != null)
 						{
-							field.set(model, deserializer.deserialize(value, fieldClass));
+							field.set(model, deserializer.deserialize(value, getTimeFormat(), fieldClass));
 						}
 					}
 					else
 					{
-						readUnmapped(reader, fieldOpenTag, config);
+						readUnmapped(reader, fieldOpenTag);
 					}
 				}
 				else
 				{
-					readUnmapped(reader, fieldOpenTag, config);
+					readUnmapped(reader, fieldOpenTag);
 				}
 			}
 			readUntil(reader, LEFT_ANGLE_BRACKET);
@@ -667,10 +502,10 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T, E> T readMap(Reader reader, Type type, XmlConfig config) throws Exception
+	protected <T, E> T readMap(Reader reader, Type type) throws Exception
 	{
 		Map<String, E> map = null;
-		Class<T> klass = MapperUtil.getClass(type);
+		Class<T> klass = getTypeClass(type);
 		Class<E> elementClass = (Class<E>) getElementClass(type);
 		if(klass.isAssignableFrom(LinkedHashMap.class))
 		{
@@ -684,7 +519,7 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 		}
 		readUntil(reader, LEFT_ANGLE_BRACKET);
 		Tag tag = null;
-		while((tag = readTag(reader, config)) != null)
+		while((tag = readTag(reader)) != null)
 		{
 			if(tag instanceof DeclarationTag)
 			{
@@ -701,9 +536,9 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 			else if(tag instanceof OpenTag)
 			{
 				OpenTag fieldOpenTag = (OpenTag) tag;
-				if(isEntity(elementClass))
+				if(getMapperReflector().isEntity(elementClass))
 				{
-					E value = readEntity(reader, elementClass,  (OpenTag) tag, config);
+					E value = readEntity(reader, (OpenTag) tag, elementClass);
 					if(value != null)
 					{
 						map.put(fieldOpenTag.getName(), value);
@@ -711,7 +546,7 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 				}
 				else if(isCollection(elementClass))
 				{
-					E value = readCollection(reader, elementClass, config);
+					E value = readCollection(reader, elementClass);
 					if(value != null)
 					{
 						map.put(fieldOpenTag.getName(), value);
@@ -719,7 +554,7 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 				}
 				else if(isArray(elementClass))
 				{
-					E value = readArray(reader, elementClass, config);
+					E value = readArray(reader, elementClass);
 					if(value != null)
 					{
 						map.put(fieldOpenTag.getName(), value);
@@ -727,20 +562,20 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 				}
 				else if(isMap(elementClass))
 				{
-					E value = readMap(reader, elementClass, config);
+					E value = readMap(reader, elementClass);
 					if(value != null)
 					{
 						map.put(fieldOpenTag.getName(), value);
 					}
 				}
-				else if(isSerializable(elementClass, config))
+				else if(getMapperConfig().isSerializable(elementClass))
 				{
-					String value = readEscaped(reader, config, LEFT_ANGLE_BRACKET);
-					readTag(reader, config);
-					Deserializer<E> deserializer = (Deserializer<E>) config.getDeserializer(elementClass);
+					String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
+					readTag(reader);
+					Deserializer<E> deserializer = (Deserializer<E>) getMapperConfig().getDeserializer(elementClass);
 					if(deserializer != null)
 					{
-						E deserializedValue = deserializer.deserialize(value, elementClass);
+						E deserializedValue = deserializer.deserialize(value, getTimeFormat(), elementClass);
 						if(deserializedValue != null)
 						{
 							map.put(fieldOpenTag.getName(), deserializedValue);
@@ -749,7 +584,7 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 				}
 				else
 				{
-					readUnmapped(reader, fieldOpenTag, config);
+					readUnmapped(reader, fieldOpenTag);
 				}
 			}
 			readUntil(reader, LEFT_ANGLE_BRACKET);
@@ -758,10 +593,10 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T, E> T readArray(Reader reader, Type type, XmlConfig config) throws Exception
+	protected <T, E> T readArray(Reader reader, Type type) throws Exception
 	{
 		Class<E> elementClass = (Class<E>) getElementClass(type);
-		LinkedList<E> collection = readCollection(reader, type, config);
+		LinkedList<E> collection = readCollection(reader, type);
 		E[] array = (E[]) Array.newInstance(elementClass, collection.size());
 		for(int i = 0; i < collection.size(); i++)
 		{
@@ -771,10 +606,10 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T, E> T readCollection(Reader reader, Type type, XmlConfig config) throws Exception
+	protected <T, E> T readCollection(Reader reader, Type type) throws Exception
 	{
 		Collection<E> collection = null;
-		Class<T> klass = MapperUtil.getClass(type);
+		Class<T> klass = getTypeClass(type);
 		Class<E> elementClass = (Class<E>) getElementClass(type);
 		if(klass.isAssignableFrom(LinkedList.class) || isArray(klass))
 		{
@@ -788,7 +623,7 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 		}
 		readUntil(reader, LEFT_ANGLE_BRACKET);
 		Tag tag = null;
-		while((tag = readTag(reader, config)) != null)
+		while((tag = readTag(reader)) != null)
 		{
 			if(tag instanceof DeclarationTag)
 			{
@@ -805,9 +640,9 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 			else if(tag instanceof OpenTag)
 			{
 				OpenTag fieldOpenTag = (OpenTag) tag;
-				if(isEntity(elementClass))
+				if(getMapperReflector().isEntity(elementClass))
 				{
-					E value = readEntity(reader, elementClass, fieldOpenTag, config);
+					E value = readEntity(reader, fieldOpenTag, elementClass);
 					if(value != null)
 					{
 						collection.add(value);
@@ -815,7 +650,7 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 				}
 				else if(isCollection(elementClass))
 				{
-					E value = readCollection(reader, elementClass, config);
+					E value = readCollection(reader, elementClass);
 					if(value != null)
 					{
 						collection.add(value);
@@ -823,7 +658,7 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 				}
 				else if(isArray(elementClass))
 				{
-					E value = readArray(reader, elementClass, config);
+					E value = readArray(reader, elementClass);
 					if(value != null)
 					{
 						collection.add(value);
@@ -831,20 +666,20 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 				}
 				else if(isMap(elementClass))
 				{
-					E value = readMap(reader, elementClass, config);
+					E value = readMap(reader, elementClass);
 					if(value != null)
 					{
 						collection.add(value);
 					}
 				}
-				else if(isSerializable(elementClass, config))
+				else if(getMapperConfig().isSerializable(elementClass))
 				{
-					String value = readEscaped(reader, config, LEFT_ANGLE_BRACKET);
-					readTag(reader, config);
-					Deserializer<E> deserializer = (Deserializer<E>) config.getDeserializer(elementClass);
+					String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
+					readTag(reader);
+					Deserializer<E> deserializer = (Deserializer<E>) getMapperConfig().getDeserializer(elementClass);
 					if(deserializer != null)
 					{
-						E deserializedValue = deserializer.deserialize(value, elementClass);
+						E deserializedValue = deserializer.deserialize(value, getTimeFormat(), elementClass);
 						if(deserializedValue != null)
 						{
 							collection.add(deserializedValue);
@@ -853,7 +688,7 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 				}
 				else
 				{
-					readUnmapped(reader, fieldOpenTag, config);
+					readUnmapped(reader, fieldOpenTag);
 				}
 			}
 			readUntil(reader, LEFT_ANGLE_BRACKET);
@@ -862,44 +697,44 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T, E> E readCollectionElement(Reader reader, OpenTag tag, Type type, XmlConfig config) throws Exception
+	protected <T, E> E readCollectionElement(Reader reader, OpenTag tag, Type type) throws Exception
 	{
 		E element = null;
 		Class<E> elementClass = (Class<E>) getElementClass(type);
-		if(isEntity(elementClass))
+		if(getMapperReflector().isEntity(elementClass))
 		{
-			element = readEntity(reader, elementClass, tag, config);
+			element = readEntity(reader, tag, elementClass);
 		}
 		else if(isCollection(elementClass))
 		{
-			element = readCollection(reader, elementClass, config);
+			element = readCollection(reader, elementClass);
 		}
 		else if(isArray(elementClass))
 		{
-			element = readArray(reader, elementClass, config);
+			element = readArray(reader, elementClass);
 		}
 		else if(isMap(elementClass))
 		{
-			element = readMap(reader, elementClass, config);
+			element = readMap(reader, elementClass);
 		}
-		else if(isSerializable(elementClass, config))
+		else if(getMapperConfig().isSerializable(elementClass))
 		{
-			String value = readEscaped(reader, config, LEFT_ANGLE_BRACKET);
-			readTag(reader, config);
-			Deserializer<E> deserializer = (Deserializer<E>) config.getDeserializer(elementClass);
+			String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
+			readTag(reader);
+			Deserializer<E> deserializer = (Deserializer<E>) getMapperConfig().getDeserializer(elementClass);
 			if(deserializer != null)
 			{
-				element = deserializer.deserialize(value, elementClass);
+				element = deserializer.deserialize(value, getTimeFormat(), elementClass);
 			}
 		}
 		else
 		{
-			readUnmapped(reader, tag, config);
+			readUnmapped(reader, tag);
 		}
 		return element;
 	}
 	
-	protected Tag readTag(Reader reader, XmlConfig config) throws IOException
+	protected Tag readTag(Reader reader) throws IOException
 	{
 		Tag tag = null;
 		StringBuilder builder = null;
@@ -965,12 +800,12 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 						{
 							case QUOTE:
 							{
-								value = readEscaped(reader, config, QUOTE);
+								value = readEscaped(reader, QUOTE);
 								break;
 							}
 							case SINGLE_QUOTE:
 							{
-								value = readEscaped(reader, config, SINGLE_QUOTE);
+								value = readEscaped(reader, SINGLE_QUOTE);
 								break;
 							}
 						}
@@ -1010,7 +845,7 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 		return tag;
 	}
 	
-	protected String readEscaped(Reader reader, XmlConfig config, final char until) throws IOException
+	protected String readEscaped(Reader reader, final char until) throws IOException
 	{
 		StringBuilder builder = new StringBuilder();
 		int b;
@@ -1091,12 +926,12 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 		return builder.toString();
 	}
 	
-	protected void readUnmapped(Reader reader, OpenTag openTag, XmlConfig config) throws IOException
+	protected void readUnmapped(Reader reader, OpenTag openTag) throws IOException
 	{
 		int nested = 0;
 		readUntil(reader, LEFT_ANGLE_BRACKET);
 		Tag tag = null;
-		while((tag = readTag(reader, config)) != null)
+		while((tag = readTag(reader)) != null)
 		{
 			if(tag instanceof DeclarationTag)
 			{
@@ -1127,17 +962,16 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 	}
 	
 	@Override
-	public String format(Reader reader)
+	public String prettyPrint(Reader reader)
 	{
 		StringBuilder builder = new StringBuilder();
-		XmlConfig config = defaultConfig();
 		try
 		{
 			int tabs = 0;
 			readUntil(reader, LEFT_ANGLE_BRACKET);
 			Tag tag = null;
 			Tag lastTag = null;
-			while((tag = readTag(reader, config)) != null)
+			while((tag = readTag(reader)) != null)
 			{
 				if(lastTag == null)
 				{
@@ -1255,225 +1089,6 @@ public class XmlMapper extends SerialMapper<XmlConfig>
 		}
 		builder.append(NEW_LINE);
 		return builder.toString();
-	}
-
-	protected String tabs(int tabs)
-	{
-		StringBuilder builder = new StringBuilder();
-		for(int i = 0; i < tabs; i++)
-		{
-			builder.append(TAB);
-		}
-		return builder.toString();
-	}
-	/*
-	public static void main(String[] args)
-	{
-		String data = "<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><soap:Body><IsValidRoutingNumberResponse xmlns=\"https://secure.modpay.com/ws/\"><testBefore /><IsValidRoutingNumberResult>true</IsValidRoutingNumberResult><testAfter /></IsValidRoutingNumberResponse></soap:Body></soap:Envelope>";
-		//String data = "<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><soap:Body><GetCustomerInfoResponse xmlns=\"https://secure.modpay.com/ws/\"><GetCustomerInfoResult><returnCode>1</returnCode><account /><firstName>First</firstName><lastName>Last</lastName><address /><city /><state /><zip /><phone /><fax /><email /><cDate>02/04/2015</cDate></GetCustomerInfoResult></GetCustomerInfoResponse></soap:Body></soap:Envelope>";
-		System.out.println(get().format(data));
-	}
-	*/
-	protected static abstract class Tag
-	{
-		
-	}
-	
-	protected static class OpenTag extends Tag
-	{
-		protected String name;
-		protected LinkedHashMap<String, String> attributeMap = new LinkedHashMap<String, String>();
-		
-		public OpenTag(String name)
-		{
-			this.name = name;
-		}
-		
-		public String getName()
-		{
-			return name;
-		}
-		
-		public LinkedHashMap<String, String> getAttributeMap()
-		{
-			return attributeMap;
-		}
-		
-		public OpenTag setName(String name)
-		{
-			this.name = name;
-			return this;
-		}
-		
-		public OpenTag addAttribute(String name, String value)
-		{
-			attributeMap.put(name, value);
-			return this;
-		}
-		
-		@Override
-		public String toString()
-		{
-			StringBuilder builder = new StringBuilder();
-			builder.append(LEFT_ANGLE_BRACKET);
-			builder.append(name);
-			for(Entry<String, String> attributeEntry : attributeMap.entrySet())
-			{
-				builder.append(SPACE);
-				builder.append(attributeEntry.getKey());
-				builder.append(EQUAL);
-				builder.append(QUOTE);
-				builder.append(attributeEntry.getValue());
-				builder.append(QUOTE);
-			}
-			builder.append(RIGHT_ANGLE_BRACKET);
-			return builder.toString();
-		}
-		
-	}
-	protected static class EmptyTag extends Tag
-	{
-		protected String name;
-		protected LinkedHashMap<String, String> attributeMap = new LinkedHashMap<String, String>();
-
-		public EmptyTag(OpenTag openTag)
-		{
-			this.name = openTag.name;
-			this.attributeMap = openTag.attributeMap;
-		}
-		
-		public EmptyTag(String name)
-		{
-			this.name = name;
-		}
-		
-		public String getName()
-		{
-			return name;
-		}
-		
-		public LinkedHashMap<String, String> getAttributeMap()
-		{
-			return attributeMap;
-		}
-		
-		public EmptyTag setName(String name)
-		{
-			this.name = name;
-			return this;
-		}
-		
-		public EmptyTag addAttribute(String name, String value)
-		{
-			attributeMap.put(name, value);
-			return this;
-		}
-		
-		@Override
-		public String toString()
-		{
-			StringBuilder builder = new StringBuilder();
-			builder.append(LEFT_ANGLE_BRACKET);
-			builder.append(name);
-			for(Entry<String, String> attributeEntry : attributeMap.entrySet())
-			{
-				builder.append(SPACE);
-				builder.append(attributeEntry.getKey());
-				builder.append(EQUAL);
-				builder.append(QUOTE);
-				builder.append(attributeEntry.getValue());
-				builder.append(QUOTE);
-			}
-			builder.append(SPACE);
-			builder.append(SLASH);
-			builder.append(RIGHT_ANGLE_BRACKET);
-			return builder.toString();
-		}
-		
-	}
-	
-	protected static class CloseTag extends Tag
-	{
-		protected String name;
-		
-		public CloseTag(String name)
-		{
-			this.name = name;
-		}
-		
-		public String getName()
-		{
-			return name;
-		}
-		
-		public CloseTag setName(String name)
-		{
-			this.name = name;
-			return this;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return "</" + name + ">";
-		}
-		
-	}
-	
-	protected static class DeclarationTag extends Tag
-	{
-		protected String value;
-		
-		public DeclarationTag(String value)
-		{
-			this.value = value;
-		}
-		
-		public String getValue()
-		{
-			return value;
-		}
-		
-		public DeclarationTag setValue(String value)
-		{
-			this.value = value;
-			return this;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return "<?" + value + "?>";
-		}
-		
-	}
-	
-	protected static class CommentTag extends Tag
-	{
-		protected String value;
-		
-		public CommentTag(String value)
-		{
-			this.value = value;
-		}
-		
-		public String getValue()
-		{
-			return value;
-		}
-		
-		public CommentTag setValue(String value)
-		{
-			this.value = value;
-			return this;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return "<!-- " + value + " -->";
-		}
-		
 	}
 	
 }

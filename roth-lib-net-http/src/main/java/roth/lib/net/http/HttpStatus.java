@@ -54,14 +54,14 @@ public class HttpStatus implements Characters
 	
 	public HttpStatus parseCode(int code)
 	{
-		statusCode = HttpStatusCode.get(code);
+		statusCode = HttpStatusCode.fromInteger(code);
 		this.code = code;
 		return this;
 	}
 	
 	public HttpStatus parseCode(String code)
 	{
-		statusCode = HttpStatusCode.get(code);
+		statusCode = HttpStatusCode.fromString(code);
 		try
 		{
 			this.code = Integer.parseInt(code);

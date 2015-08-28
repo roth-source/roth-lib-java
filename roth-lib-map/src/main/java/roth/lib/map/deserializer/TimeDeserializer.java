@@ -1,6 +1,7 @@
 package roth.lib.map.deserializer;
 
 import java.sql.Time;
+import java.text.SimpleDateFormat;
 
 public class TimeDeserializer extends TemporalDeserializer<Time>
 {
@@ -11,10 +12,10 @@ public class TimeDeserializer extends TemporalDeserializer<Time>
 	}
 	
 	@Override
-	public Time deserialize(String value)
+	public Time deserialize(String value, SimpleDateFormat simpleDateFormat)
 	{
 		Time object = null;
-		Long time = getTime(value);
+		Long time = getTime(value, simpleDateFormat);
 		if(time != null)
 		{
 			object = new Time(time);

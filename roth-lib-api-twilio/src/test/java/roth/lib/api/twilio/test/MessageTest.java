@@ -1,6 +1,6 @@
 package roth.lib.api.twilio.test;
 
-import roth.lib.api.twilio.data.request.SendMessageRequest;
+import roth.lib.api.twilio.message.SendMessageRequest;
 
 public class MessageTest extends Test
 {

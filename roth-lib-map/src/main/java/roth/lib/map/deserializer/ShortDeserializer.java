@@ -10,7 +10,7 @@ public class ShortDeserializer extends PrimitiveDeserializer<Short>
 	}
 	
 	@Override
-	public Short deserialize(String value)
+	public Short deserialize(String value, String timeFormat)
 	{
 		Short object = isNullable() ? null : (short) 0;
 		try

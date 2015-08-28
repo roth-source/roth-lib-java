@@ -1,320 +1,318 @@
 package roth.lib.map;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
-import roth.lib.annotation.Entity;
-import roth.lib.annotation.Id;
-import roth.lib.map.mapper.EntityMapper;
-import roth.lib.map.mapper.IdMapper;
-import roth.lib.map.mapper.PropertyMapper;
-import roth.lib.map.util.MapperUtil;
+import roth.lib.Callback;
+import roth.lib.Characters;
+import roth.lib.Generic;
 
-public abstract class Mapper
+public abstract class Mapper implements Characters
 {
-	protected LinkedList<EntityMapper<? extends Annotation>> entityMappers = new LinkedList<EntityMapper<? extends Annotation>>();
-	protected LinkedList<PropertyMapper<? extends Annotation>> propertyMappers = new LinkedList<PropertyMapper<? extends Annotation>>();
-	protected LinkedList<IdMapper<? extends Annotation>> idMappers = new LinkedList<IdMapper<? extends Annotation>>();
-	protected LinkedHashMap<Type, LinkedList<PropertyField>> propertyFieldMap = new LinkedHashMap<Type, LinkedList<PropertyField>>();
+	protected MapperReflector mapperReflector;
+	protected MapperConfig mapperConfig;
+	protected String context;
+	protected LinkedList<Callback<?>> callbacks = new LinkedList<Callback<?>>();
+	protected String timeFormat;
+	protected int tabs;
 	
-	protected Mapper()
+	protected Mapper(MapperReflector mapperReflector, MapperConfig mapperConfig)
 	{
-		entityMappers.add(new EntityMapper<Entity>(Entity.class)
-		{
-			@Override
-			public String getEntityName(Entity entity)
-			{
-				if(entity != null)
-				{
-					if(isValid(entity.name()))
-					{
-						return entity.name();
-					}
-					else if(isValid(entity.value()))
-					{
-						return entity.value();
-					}
-				}
-				return null;
-			}
-		});
-		idMappers.add(new IdMapper<Id>(Id.class)
-		{
-			@Override
-			public boolean isGenerated(Id id)
-			{
-				if(id != null)
-				{
-					return id.generated();
-				}
-				return false;
-			}
-		});
+		this.mapperReflector = mapperReflector;
+		this.mapperConfig = mapperConfig != null ? mapperConfig : MapperConfig.get();
 	}
 	
-	public void addEntityMapper(EntityMapper<? extends Annotation> entityMapper)
+	public MapperReflector getMapperReflector()
 	{
-		entityMappers.addFirst(entityMapper);
+		return mapperReflector;
 	}
 	
-	public void addPropertyMapper(PropertyMapper<? extends Annotation> propertyMapper)
+	public MapperConfig getMapperConfig()
 	{
-		propertyMappers.addFirst(propertyMapper);
+		return mapperConfig;
 	}
 	
-	public void addIdMapper(IdMapper<? extends Annotation> idMapper)
+	public boolean hasContext()
 	{
-		idMappers.addFirst(idMapper);
+		return context != null;
 	}
 	
-	public String getEntityName(Type type)
+	public String getContext()
 	{
-		for(EntityMapper<? extends Annotation> entityMapper : entityMappers)
-		{
-			String entityName = entityMapper.getEntityNameFromClass(type);
-			if(entityName != null)
-			{
-				return entityName;
-			}
-		}
-		return null;
+		return context;
 	}
 	
-	public String getPropertyName(Field field)
+	public LinkedList<Callback<?>> getCallbacks()
 	{
-		for(PropertyMapper<? extends Annotation> propertyMapper : propertyMappers)
-		{
-			String propertyName = propertyMapper.getPropertyNameFromField(field);
-			if(propertyName != null)
-			{
-				return propertyName;
-			}
-		}
-		return null;
+		return callbacks;
 	}
 	
-	public boolean isId(Field field)
+	public String getTimeFormat()
 	{
-		for(IdMapper<? extends Annotation> idMapper : idMappers)
-		{
-			if(idMapper.hasId(field))
-			{
-				return true;
-			}
-		}
-		return false;
+		return timeFormat != null ? timeFormat : mapperConfig.getTimeFormat();
 	}
 	
-	public boolean isIdGenerated(Field field)
+	public int getTabs()
 	{
-		for(IdMapper<? extends Annotation> idMapper : idMappers)
-		{
-			boolean generated = idMapper.isGeneratedFromField(field);
-			if(generated)
-			{
-				return true;
-			}
-		}
-		return false;
+		return tabs;
 	}
 	
-	public boolean isEntityName(Field field)
+	public Mapper setMapperReflector(MapperReflector mapperReflector)
 	{
-		for(PropertyMapper<? extends Annotation> propertyMapper : propertyMappers)
-		{
-			Boolean entityName = propertyMapper.isEntityNameFromField(field);
-			if(entityName != null)
-			{
-				return entityName;
-			}
-		}
-		return false;
+		this.mapperReflector = mapperReflector;
+		return this;
 	}
 	
-	public LinkedHashMap<String, PropertyField> getPropertyNameFieldMap(Type type)
+	public Mapper setMapperConfig(MapperConfig mapperConfig)
 	{
-		LinkedHashMap<String, PropertyField> propertyNameFieldMap = new LinkedHashMap<String, PropertyField>();
-		for(PropertyField propertyField : getPropertyFields(type))
-		{
-			propertyNameFieldMap.put(propertyField.getPropertyName(), propertyField);
-		}
-		return propertyNameFieldMap;
+		this.mapperConfig = mapperConfig;
+		return this;
 	}
 	
-	public LinkedHashMap<String, PropertyField> getFieldNameFieldMap(Type type)
+	public Mapper setContext(String context)
 	{
-		LinkedHashMap<String, PropertyField> fieldNameFieldMap = new LinkedHashMap<String, PropertyField>();
-		for(PropertyField propertyField : getPropertyFields(type))
-		{
-			fieldNameFieldMap.put(propertyField.getFieldName(), propertyField);
-		}
-		return fieldNameFieldMap;
+		this.context = context;
+		return this;
 	}
 	
-	public LinkedList<PropertyField> getPropertyFields(Type type)
+	public Mapper setCallbacks(LinkedList<Callback<?>> callbacks)
 	{
-		LinkedList<PropertyField> propertyFields = propertyFieldMap.get(type);
-		if(propertyFields == null)
-		{
-			propertyFields = new LinkedList<PropertyField>();
-			for(Field field : getFields(type))
-			{
-				String propertyName = getPropertyName(field);
-				if(propertyName != null)
-				{
-					boolean entityName = isEntityName(field);
-					boolean id = false;
-					boolean generated = false;
-					if(isId(field))
-					{
-						id = true;
-						if(isIdGenerated(field))
-						{
-							generated = true;
-						}
-					}
-					field.setAccessible(true);
-					Type fieldType = MapperUtil.getGenericType(type, field.getGenericType());
-					if(entityName)
-					{
-						String propertyEntityName = getEntityName(fieldType);
-						if(propertyEntityName != null)
-						{
-							propertyName = propertyEntityName;
-						}
-					}
-					propertyFields.add(new PropertyField(propertyName, field, fieldType, entityName, id, generated));
-				}
-			}
-			propertyFieldMap.put(type, propertyFields);
-		}
-		return propertyFields;
+		this.callbacks = callbacks;
+		return this;
 	}
 	
-	public boolean hasPropertyFields(Type type)
+	public Mapper setCallbacks(Callback<?>... callbacks)
 	{
-		return !getPropertyFields(type).isEmpty();
+		this.callbacks = new LinkedList<Callback<?>>(Arrays.asList(callbacks));
+		return this;
 	}
 	
-	public LinkedList<Field> getFields(Type type)
+	public Mapper setTimeFormat(String timeFormat)
 	{
-		if(type == null)
-		{
-			return new LinkedList<Field>();
-		}
-		else
-		{
-			Class<?> klass = MapperUtil.getClass(type);
-			LinkedList<Field> fields = getFields(klass.getSuperclass());
-			for(Field field : Arrays.asList(klass.getDeclaredFields()))
-			{
-				if(!Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers()))
-				{
-					fields.add(field);
-				}
-			}
-			return fields;
-		}
+		this.timeFormat = timeFormat;
+		return this;
 	}
 	
-	public LinkedList<PropertyField> getIdPropertyFields(Type type)
+	public Mapper setTabs(int tabs)
 	{
-		LinkedList<PropertyField> idPropertyFields = new LinkedList<PropertyField>();
-		for(PropertyField propertyField : getPropertyFields(type))
-		{
-			if(propertyField.isId())
-			{
-				idPropertyFields.add(propertyField);
-			}
-		}
-		return idPropertyFields;
+		this.tabs = tabs;
+		return this;
 	}
 	
-	public Object getPropertyObject(Field field, Object object)
+	public Mapper incrementTabs()
 	{
-		Object propertyObject = null;
+		this.tabs += 1;
+		return this;
+	}
+	
+	public Mapper decrementTabs()
+	{
+		this.tabs -= 1;
+		return this;
+	}
+	
+	
+	
+	
+	// SERIALIZE FROM OBJECT OVERLOADING
+	
+	public String serialize(Object value)
+	{
+		Writer writer = new StringWriter();
+		serialize(value, writer);
+		return writer.toString();
+	}
+	
+	public void serialize(Object value, OutputStream output)
+	{
+		serialize(value, new OutputStreamWriter(output, UTF_8));
+	}
+	
+	public abstract void serialize(Object value, Writer writer);
+	
+	
+	
+	
+	// SERIALIZE FROM MAP OVERLOADING
+	
+	public String serialize(Map<String, ?> map)
+	{
+		Writer writer = new StringWriter();
+		serialize(map, writer);
+		return writer.toString();
+	}
+	
+	public void serialize(Map<String, ?> map, OutputStream output)
+	{
+		serialize(map, new OutputStreamWriter(output, UTF_8));
+	}
+	
+	public abstract void serialize(Map<String, ?> map, Writer writer);
+	
+	
+	
+	
+	// DESERIALIZE TO GENERIC OVERLOADING
+	
+	public <T> T deserialize(String data, Generic<T> generic)
+	{
+		return deserialize(new StringReader(data), generic);
+	}
+	
+	public <T> T deserialize(InputStream input, Generic<T> generic)
+	{
+		return deserialize(new InputStreamReader(input, UTF_8), generic);
+	}
+	
+	public <T> T deserialize(Reader reader, Generic<T> generic)
+	{
+		return deserialize(reader, generic.getType());
+	}
+	
+	
+	
+	
+	// DESERIALIZE TO CLASS OVERLOADING
+	
+	public <T> T deserialize(String data, Class<T> klass)
+	{
+		return deserialize(new StringReader(data), klass);
+	}
+	
+	public <T> T deserialize(InputStream input, Class<T> klass)
+	{
+		return deserialize(new InputStreamReader(input, UTF_8), klass);
+	}
+	
+	public <T> T deserialize(Reader reader, Class<T> klass)
+	{
+		return deserialize(reader, (Type) klass);
+	}
+	
+	
+	
+	
+	// DESERIALIZE TO TYPE OVERLOADING
+	
+	public <T> T deserialize(String data, Type type)
+	{
+		return deserialize(new StringReader(data), type);
+	}
+	
+	public <T> T deserialize(InputStream input, Type type)
+	{
+		return deserialize(new InputStreamReader(input, UTF_8), type);
+	}
+	
+	public abstract <T> T deserialize(Reader reader, Type type);
+	
+	
+	
+	
+	// DESERIALIZE TO MAP OVERLOADING
+	
+	public LinkedHashMap<String, Object> deserialize(String data)
+	{
+		return deserialize(new StringReader(data));
+	}
+	
+	public LinkedHashMap<String, Object> deserialize(InputStream input)
+	{
+		return deserialize(new InputStreamReader(input, UTF_8));
+	}
+	
+	public abstract LinkedHashMap<String, Object> deserialize(Reader reader);
+	
+	
+	
+	
+	// PRETTY PRINT OVERLOADING
+	
+	public String prettyPrint(String data)
+	{
+		return prettyPrint(new StringReader(data));
+	}
+	
+	public String prettyPrint(InputStream input)
+	{
+		return prettyPrint(new InputStreamReader(input, UTF_8));
+	}
+	
+	public abstract String prettyPrint(Reader reader);
+	
+	
+	
+	
+	
+	public static String readUntil(Reader reader, Character...untils)
+	{
+		StringBuilder builder = new StringBuilder();
 		try
 		{
-			propertyObject = field.get(object);
+			List<Character> untilList = Arrays.asList(untils);
+			int b;
+			char c;
+			while((b = reader.read()) > -1)
+			{
+				c = (char) b;
+				if(untilList.contains(c))
+				{
+					break;
+				}
+				builder.append(c);
+			}
 		}
-		catch(IllegalAccessException e)
+		catch(Exception e)
 		{
 			
 		}
-		return propertyObject;
+		return builder.toString();
 	}
 	
-	public boolean isEntity(Type type)
+	public static String readUntil(Reader reader, String until)
 	{
-		return hasPropertyFields(type);
-	}
-	
-	public boolean isArray(Type type)
-	{
-		Class<?> klass = MapperUtil.getClass(type);
-		return klass.isArray();
-	}
-	
-	public boolean isCollection(Type type)
-	{
-		Class<?> klass = MapperUtil.getClass(type);
-		return Collection.class.isAssignableFrom(klass);
-	}
-	
-	public boolean isMap(Type type)
-	{
-		Class<?> klass = MapperUtil.getClass(type);
-		return Map.class.isAssignableFrom(klass);
-	}
-	
-	public boolean isSerializable(Type type, Config config)
-	{
-		Class<?> klass = MapperUtil.getClass(type);
-		return config.hasSerializer(klass);
-	}
-	
-	public Class<?> getElementClass(Type type)
-	{
-		Class<?> elementClass = Object.class;
-		Class<?> klass = MapperUtil.getClass(type);
-		if(isArray(klass))
+		StringBuilder builder = new StringBuilder();
+		try
 		{
-			elementClass = klass.getComponentType();
-		}
-		else if(isCollection(klass))
-		{
-			if(type instanceof ParameterizedType)
+			int b;
+			char c;
+			while((b = reader.read()) > -1)
 			{
-				elementClass = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
+				c = (char) b;
+				builder.append(c);
+				if(builder.toString().endsWith(until))
+				{
+					break;
+				}
 			}
 		}
-		else if(isMap(klass))
+		catch(Exception e)
 		{
-			if(type instanceof ParameterizedType)
-			{
-				elementClass = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[1];
-			}
+			
 		}
-		return elementClass;
+		return builder.toString();
 	}
 	
-	public LinkedList<?> asCollection(Object value)
+	public static String tabs(int tabs)
 	{
-		return (value instanceof Collection) ? new LinkedList<Object>((Collection<?>) value) : new LinkedList<Object>(Arrays.asList((Object[]) value));
-	}
-	
-	@SuppressWarnings("unchecked")
-	public LinkedHashMap<String, ?> asMap(Object value)
-	{
-		return (value instanceof Map) ? new LinkedHashMap<String, Object>((Map<String, ?>) value) : new LinkedHashMap<String, Object>();
+		StringBuilder builder = new StringBuilder();
+		for(int i = 0; i < tabs; i++)
+		{
+			builder.append(TAB);
+		}
+		return builder.toString();
 	}
 	
 }

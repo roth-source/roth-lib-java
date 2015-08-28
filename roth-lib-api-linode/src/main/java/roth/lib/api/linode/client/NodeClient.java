@@ -2,6 +2,7 @@ package roth.lib.api.linode.client;
 
 import java.util.LinkedList;
 
+import roth.lib.Generic;
 import roth.lib.api.linode.data.model.Node;
 import roth.lib.api.linode.data.model.NodeConfig;
 import roth.lib.api.linode.data.model.NodeDisk;
@@ -41,7 +42,6 @@ import roth.lib.api.linode.data.response.NodeDiskJobIdResponse;
 import roth.lib.api.linode.data.response.NodeIdResponse;
 import roth.lib.api.linode.data.response.NodeIpResponse;
 import roth.lib.api.linode.data.response.NodeJobIdResponse;
-import roth.lib.map.Generic;
 
 public class NodeClient extends LinodeClient
 {

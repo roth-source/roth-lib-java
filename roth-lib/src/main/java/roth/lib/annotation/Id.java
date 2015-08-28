@@ -10,6 +10,5 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface Id
 {
-	boolean generated() default false;
 	
 }

@@ -6,6 +6,8 @@ import java.util.GregorianCalendar;
 
 import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
+import roth.lib.map.MapperConfig;
+import roth.lib.map.MapperReflector;
 
 @Entity(name = "model")
 public class FormModel
@@ -98,7 +100,7 @@ public class FormModel
 	@Property(name = "test_date")
 	private Date testDate = new Date();
 	
-	@Property(name = "test_calendar")
+	@Property(name = "test_calendar", exclude = "test")
 	private Calendar testCalendar = new GregorianCalendar();
 	
 	protected FormModel()
@@ -109,9 +111,9 @@ public class FormModel
 	@Override
 	public String toString()
 	{
-		FormConfig config = new FormConfig().setPrettyPrinting(true).setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
-		FormMapper mapper = new FormMapper();
-		return mapper.serialize(this, config);
+		MapperReflector mapperReflector = new FormReflector();
+		MapperConfig mapperConfig = new MapperConfig().setPrettyPrinting(true).setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
+		return mapperReflector.getMapper(mapperConfig).serialize(this);
 	}
 	
 }

@@ -17,9 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import roth.lib.map.Config;
-import roth.lib.map.SerialMapper;
-import roth.lib.net.http.HttpHeaders;
+import roth.lib.map.Mapper;
 import roth.lib.net.http.HttpMethod;
 import roth.lib.net.http.annotation.Ajax;
 import roth.lib.net.http.annotation.Api;
@@ -28,29 +26,41 @@ import roth.lib.net.http.annotation.Get;
 import roth.lib.net.http.annotation.Gzip;
 import roth.lib.net.http.annotation.Post;
 import roth.lib.net.http.annotation.Put;
-import roth.lib.net.http.header.type.MimeType;
 import roth.lib.net.http.service.HttpService;
+import roth.lib.net.http.service.HttpServiceMethod;
 import roth.lib.net.http.service.HttpServiceResponse;
 import roth.lib.net.http.service.HttpServiceType;
 import roth.lib.net.http.task.HttpTaskService;
-import roth.lib.net.http.util.ServiceUtil;
+import roth.lib.net.http.type.MimeType;
+import roth.lib.util.ReflectionUtil;
 
 @SuppressWarnings("serial")
-public abstract class HttpEndpoint<RequestConfig extends Config, ResponseConfig extends Config> extends HttpServlet implements HttpHeaders
+public abstract class HttpEndpoint extends HttpServlet
 {
-	protected static List<String> LOCALHOSTS 			= Arrays.asList("localhost", "127.0.0.1");
-	protected static String SERVICE 					= "service";
-	protected static String METHOD 						= "method";
-	protected static Pattern SERVICE_METHOD_PATTERN 	= Pattern.compile("(?:^|/)(?<" + SERVICE + ">\\w+)/(?<" + METHOD + ">\\w+)(?:/|$)");
-	protected static String ENDPOINT 					= "endpoint";
-	protected static String ALLOWED_METHODS 			= "GET, POST, PUT, DELETE";
+	protected static String ORIGIN 								= "Origin";
+	protected static String ANY_ORIGIN 							= "*";
+	protected static String ACCESS_CONTROL_ALLOW_ORIGIN 		= "Access-Control-Allow-Origin";
+	protected static String ACCESS_CONTROL_ALLOW_CREDENTIALS 	= "Access-Control-Allow-Credentials";
+	protected static String ACCESS_CONTROL_ALLOW_METHODS 		= "Access-Control-Allow-Methods";
+	protected static String ACCESS_CONTROL_ALLOW_METHOD 		= "Access-Control-Allow-Method";
+	protected static String ACCESS_CONTROL_ALLOW_HEADERS 		= "Access-Control-Allow-Headers";
+	protected static String ACCESS_CONTROL_EXPOSE_HEADERS 		= "Access-Control-Expose-Headers";
+	protected static String ACCESS_CONTROL_MAX_AGE 				= "Access-Control-Max-Age";
+	protected static String CONTENT_TYPE 						= "Content-Type";
+	protected static String ALLOWED_METHODS 					= "GET, POST, PUT, DELETE";
+	protected static List<String> LOCALHOSTS 					= Arrays.asList("localhost", "127.0.0.1");
+	protected static String ENDPOINT 							= "endpoint";
+	protected static String SERVICE 							= "service";
+	protected static String METHOD 								= "method";
+	protected static Pattern SERVICE_METHOD_PATTERN 			= Pattern.compile("(?:^|/)(?<" + SERVICE + ">\\w+)/(?<" + METHOD + ">\\w+)(?:/|$)");
 	
+	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response)
 	{
 		try
 		{
 			boolean dev = isDev(request, response);
-			ServiceMethod serviceMethod = getServiceMethod(request, response);
+			HttpServiceMethod serviceMethod = getServiceMethod(request, response);
 			if(serviceMethod != null)
 			{
 				HttpService service = getHttpService(request, response, serviceMethod.getServiceName());
@@ -67,15 +77,15 @@ public abstract class HttpEndpoint<RequestConfig extends Config, ResponseConfig 
 							Class<? extends Annotation> httpMethodAnnotationClass = getHttpMethodAnnotationClass(request, response, httpMethod);
 							if(httpMethodAnnotationClass != null)
 							{
-								if(ServiceUtil.hasAnnotation(service, method, httpMethodAnnotationClass))
+								if(ReflectionUtil.hasAnnotation(service.getClass(), method, httpMethodAnnotationClass))
 								{
 									if(isOriginAllowed(request, response))
 									{
-										response.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, !dev ? request.getHeader(ORIGIN) : "*");
+										response.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, !dev ? request.getHeader(ORIGIN) : ANY_ORIGIN);
 										response.setHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS, Boolean.TRUE.toString());
 										response.setHeader(ACCESS_CONTROL_ALLOW_METHODS, ALLOWED_METHODS);
-										Ajax ajax = ServiceUtil.getAnnotation(service, method, Ajax.class);
-										Api api = ServiceUtil.getAnnotation(service, method, Api.class);
+										Ajax ajax = ReflectionUtil.getAnnotation(service.getClass(), method, Ajax.class);
+										Api api = ReflectionUtil.getAnnotation(service.getClass(), method, Api.class);
 										boolean hasAjax = ajax != null;
 										boolean hasApi = api != null;
 										boolean ajaxAuthenticated = hasAjax && (!ajax.authenticated() || service.isAjaxAuthenticated(ajax));
@@ -87,7 +97,7 @@ public abstract class HttpEndpoint<RequestConfig extends Config, ResponseConfig 
 											if(parameters != null && parameters.length == 1)
 											{
 												boolean gzipped = false;
-												Gzip gzip = ServiceUtil.getAnnotation(service, method, Gzip.class);
+												Gzip gzip = ReflectionUtil.getAnnotation(service.getClass(), method, Gzip.class);
 												if(gzip != null)
 												{
 													if(gzip.optional())
@@ -102,7 +112,7 @@ public abstract class HttpEndpoint<RequestConfig extends Config, ResponseConfig 
 												}
 												InputStream input = gzipped ? new GZIPInputStream(request.getInputStream()) : request.getInputStream();
 												Type methodParameterType = parameters[0].getParameterizedType();
-												methodRequest = getRequestMapper(request, response).deserialize(input, methodParameterType, getRequestConfig(request, response));
+												methodRequest = getRequestMapper(request, response).deserialize(input, methodParameterType);
 											}
 											boolean validCsrf = !(ajaxAuthenticated && ajax.authenticated() && !service.isValidCsrfToken(methodRequest, dev));
 											if(validCsrf)
@@ -141,7 +151,7 @@ public abstract class HttpEndpoint<RequestConfig extends Config, ResponseConfig 
 																		}
 																	}
 																}
-																getResponseMapper(request, response).serialize(methodResponse, response.getOutputStream(), getResponseConfig(request, response));
+																getResponseMapper(request, response).serialize(methodResponse, response.getOutputStream());
 															}
 														}
 														catch(Exception e)
@@ -225,10 +235,8 @@ public abstract class HttpEndpoint<RequestConfig extends Config, ResponseConfig 
 	protected abstract void exception(HttpServletRequest request, HttpServletResponse response, Exception e);
 	protected abstract HttpService getService(HttpServletRequest request, HttpServletResponse response, String serviceName);
 	protected abstract boolean isOriginAllowed(HttpServletRequest request, HttpServletResponse response);
-	protected abstract SerialMapper<RequestConfig> getRequestMapper(HttpServletRequest request, HttpServletResponse response);
-	protected abstract RequestConfig getRequestConfig(HttpServletRequest request, HttpServletResponse response);
-	protected abstract SerialMapper<ResponseConfig> getResponseMapper(HttpServletRequest request, HttpServletResponse response);
-	protected abstract ResponseConfig getResponseConfig(HttpServletRequest request, HttpServletResponse response);
+	protected abstract Mapper getRequestMapper(HttpServletRequest request, HttpServletResponse response);
+	protected abstract Mapper getResponseMapper(HttpServletRequest request, HttpServletResponse response);
 	
 	protected boolean isDev(HttpServletRequest request, HttpServletResponse response)
 	{
@@ -247,13 +255,13 @@ public abstract class HttpEndpoint<RequestConfig extends Config, ResponseConfig 
 		errors(request, response, errors);
 	}
 	
-	protected ServiceMethod getServiceMethod(HttpServletRequest request, HttpServletResponse response)
+	protected HttpServiceMethod getServiceMethod(HttpServletRequest request, HttpServletResponse response)
 	{
-		ServiceMethod serviceMethod = null;
+		HttpServiceMethod serviceMethod = null;
 		Matcher matcher = SERVICE_METHOD_PATTERN.matcher(request.getPathInfo());
 		if(matcher.find())
 		{
-			serviceMethod = new ServiceMethod(matcher.group(SERVICE), matcher.group(METHOD));
+			serviceMethod = new HttpServiceMethod(matcher.group(SERVICE), matcher.group(METHOD));
 		}
 		return serviceMethod;
 	}
@@ -285,7 +293,7 @@ public abstract class HttpEndpoint<RequestConfig extends Config, ResponseConfig 
 	
 	protected Method getMethod(HttpServletRequest request, HttpServletResponse response, HttpService service, String methodName)
 	{
-		LinkedList<Method> methods = ServiceUtil.getMethods(service.getClass());
+		LinkedList<Method> methods = ReflectionUtil.getMethods(service.getClass(), HttpService.class);
 		for(Method method : methods)
 		{
 			if(method.getName().equalsIgnoreCase(methodName))
@@ -326,30 +334,7 @@ public abstract class HttpEndpoint<RequestConfig extends Config, ResponseConfig 
 	
 	protected String getResponseContentType(HttpServletRequest request, HttpServletResponse response)
 	{
-		return MimeType.APPLICATION_JSON.getValue();
-	}
-	
-	public static class ServiceMethod
-	{
-		protected String serviceName;
-		protected String methodName;
-		
-		public ServiceMethod(String serviceName, String methodName)
-		{
-			this.serviceName = serviceName;
-			this.methodName = methodName;
-		}
-		
-		public String getServiceName()
-		{
-			return serviceName;
-		}
-		
-		public String getMethodName()
-		{
-			return methodName;
-		}
-		
+		return MimeType.APPLICATION_JSON.toString();
 	}
 	
 }

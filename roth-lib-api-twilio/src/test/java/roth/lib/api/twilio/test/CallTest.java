@@ -2,7 +2,7 @@ package roth.lib.api.twilio.test;
 
 import java.net.URLEncoder;
 
-import roth.lib.api.twilio.data.request.MakeCallRequest;
+import roth.lib.api.twilio.call.MakeCallRequest;
 
 public class CallTest extends Test
 {

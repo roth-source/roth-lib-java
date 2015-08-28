@@ -10,7 +10,7 @@ public class DoubleDeserializer extends PrimitiveDeserializer<Double>
 	}
 	
 	@Override
-	public Double deserialize(String value)
+	public Double deserialize(String value, String timeFormat)
 	{
 		Double object = isNullable() ? null : 0d;
 		try
