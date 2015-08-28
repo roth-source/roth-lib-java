@@ -21,7 +21,6 @@ import roth.lib.map.xml.annotation.XmlAttributes;
 import roth.lib.map.xml.annotation.XmlElements;
 import roth.lib.map.xml.annotation.XmlProperty;
 import roth.lib.map.xml.reflector.XmlAttributeReflector;
-import roth.lib.reflector.PropertyReflector;
 import roth.lib.util.ReflectionUtil;
 
 public class XmlReflector extends MapperReflector
@@ -350,17 +349,6 @@ public class XmlReflector extends MapperReflector
 			name = name.substring(index + 1).toUpperCase();
 		}
 		return name;
-	}
-
-	@Override
-	protected PropertyReflector createPropertyReflector(Field field, Type fieldType, String propertyName, boolean id, boolean generated, String timeFormat, LinkedList<String> excludes)
-	{
-		String xmlPropertyName = getXmlPropertyName(fieldType);
-		if(xmlPropertyName != null)
-		{
-			propertyName = xmlPropertyName;
-		}
-		return super.createPropertyReflector(field, fieldType, propertyName, id, generated, timeFormat, excludes);
 	}
 	
 }

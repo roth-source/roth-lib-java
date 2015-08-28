@@ -9,7 +9,7 @@ public class SoapBody<T> extends XmlModel
 	@Property(name = "soap:Fault")
 	protected SoapFault fault;
 	
-	@Property(name = "entity", entityName = true)
+	@Property(name = "entity")
 	protected T entity;
 	
 	public SoapBody()

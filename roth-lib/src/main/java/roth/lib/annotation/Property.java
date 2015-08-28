@@ -11,7 +11,6 @@ import java.lang.annotation.Target;
 public @interface Property
 {
 	String name();
-	boolean entityName() default false;
 	boolean form() default true;
 	String formName() default "";
 	boolean json() default true;

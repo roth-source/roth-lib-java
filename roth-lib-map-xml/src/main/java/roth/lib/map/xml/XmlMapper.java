@@ -146,6 +146,11 @@ public class XmlMapper extends Mapper
 			}
 			else if(getMapperReflector().isEntity(value.getClass()))
 			{
+				String xmlPropertyName = getMapperReflector().getXmlPropertyName(field.getType());
+				if(xmlPropertyName != null)
+				{
+					name = xmlPropertyName;
+				}
 				writeNewLine(writer);
 				writeOpenTag(writer, name, getMapperReflector().getXmlAttributeMap(value));
 				writeEntity(writer, value);
