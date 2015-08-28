@@ -146,7 +146,7 @@ public class XmlMapper extends Mapper
 			}
 			else if(getMapperReflector().isEntity(value.getClass()))
 			{
-				String xmlPropertyName = getMapperReflector().getXmlPropertyName(field.getType());
+				String xmlPropertyName = getMapperReflector().getXmlPropertyName(value.getClass());
 				if(xmlPropertyName != null)
 				{
 					name = xmlPropertyName;
@@ -434,7 +434,8 @@ public class XmlMapper extends Mapper
 			else if(tag instanceof OpenTag)
 			{
 				OpenTag fieldOpenTag = (OpenTag) tag;
-				PropertyReflector propertyReflector = namePropertyReflectorMap.get(getMapperReflector().getFlexibleName(fieldOpenTag.getName()));
+				String name = getMapperReflector().getFlexibleName(fieldOpenTag.getName());
+				PropertyReflector propertyReflector = namePropertyReflectorMap.get(name);
 				if(propertyReflector != null)
 				{
 					setTimeFormat(propertyReflector.getTimeFormat());
