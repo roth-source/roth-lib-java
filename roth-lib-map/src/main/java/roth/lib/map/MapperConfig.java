@@ -60,7 +60,6 @@ public class MapperConfig
 		if(debug)
 		{
 			this.prettyPrinting = true;
-			this.serializeNulls = true;
 		}
 		initSerializers();
 		initDeserializers();

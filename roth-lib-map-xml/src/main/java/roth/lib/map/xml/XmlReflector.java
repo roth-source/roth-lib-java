@@ -304,7 +304,7 @@ public class XmlReflector extends MapperReflector
 			for(Entry<String, String> xmlAttributeEntry : xmlAttributeMap.entrySet())
 			{
 				String xmlAttributeName = xmlAttributeEntry.getKey();
-				String xmlAttributeValue = xmlAttributeEntry.getKey();
+				String xmlAttributeValue = xmlAttributeEntry.getValue();
 				XmlAttributeReflector xmlAttributeReflector = nameXmlAttributeReflectorMap.get(xmlAttributeName);
 				if(xmlAttributeReflector != null)
 				{
