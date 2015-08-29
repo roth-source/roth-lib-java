@@ -36,7 +36,7 @@
 		</dependency>
 		<dependency>
 			<groupId>roth.lib</groupId>
-			<artifactId>roth-lib-jdb</artifactId>
+			<artifactId>roth-lib-db</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
