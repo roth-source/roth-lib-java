@@ -19,7 +19,7 @@ public abstract class DbDriver implements Driver, DbWrapper
 	@Override
 	public DbConnection connect(String url, Properties info) throws SQLException
 	{
-		return wrap(driver.connect(url, info), null);
+		return wrap(driver.connect(url, info));
 	}
 	
 	@Override

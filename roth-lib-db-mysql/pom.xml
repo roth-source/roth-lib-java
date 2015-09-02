@@ -6,24 +6,17 @@
 		<relativePath>../roth-lib-pom</relativePath>
 		<version>0.2.2-SNAPSHOT</version>
 	</parent>
-	<artifactId>roth-lib-net-http</artifactId>
+	<artifactId>roth-lib-db-mysql</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>roth.lib</groupId>
-			<artifactId>roth-lib-net</artifactId>
+			<artifactId>roth-lib-db</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>roth.lib</groupId>
-			<artifactId>roth-lib-map</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty.aggregate</groupId>
-			<artifactId>jetty-all</artifactId>
-			<version>9.3.2.v20150730</version>
-			<scope>provided</scope>
-			<type>pom</type>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.36</version>
 		</dependency>
 	</dependencies>
 </project>

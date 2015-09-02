@@ -57,6 +57,12 @@ public class Update extends Sql
 		return this;
 	}
 	
+	public Update set(String sql)
+	{
+		sets.add(sql);
+		return this;
+	}
+	
 	public Update wheres(Wheres wheres)
 	{
 		this.wheres = wheres;

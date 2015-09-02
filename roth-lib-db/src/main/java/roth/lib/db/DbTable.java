@@ -26,11 +26,21 @@ public abstract class DbTable<T>
 		this.klass = klass;
 	}
 	
-	public abstract DbDataSource getRdb();
+	public abstract DbDataSource getDb();
+	
+	public String tableName()
+	{
+		return getDb().getReflector().getEntityName(klass);
+	}
 	
 	public Select select()
 	{
 		return new Select(tableName());
+	}
+	
+	public Select select(Column... columns)
+	{
+		return select(new Columns(columns));
 	}
 	
 	public Select select(Columns columns)
@@ -73,14 +83,9 @@ public abstract class DbTable<T>
 		return new Delete(tableName());
 	}
 	
-	public String tableName()
+	public T findBy(Where... wheres)
 	{
-		return getRdb().getReflector().getEntityName(klass);
-	}
-	
-	public T findBy(Where where)
-	{
-		return findBy(new Wheres().and(where));
+		return findBy(new Wheres(wheres));
 	}
 	
 	public T findBy(Wheres wheres)
@@ -100,17 +105,17 @@ public abstract class DbTable<T>
 	
 	public T findBy(Select select)
 	{
-		return getRdb().query(select, klass);
+		return getDb().query(select, klass);
 	}
 	
 	public T findBy(String sql)
 	{
-		return getRdb().query(sql, klass);
+		return getDb().query(sql, klass);
 	}
 	
 	public T findBy(String sql, Collection<Object> values)
 	{
-		return getRdb().query(sql, values, klass);
+		return getDb().query(sql, values, klass);
 	}
 	
 	public LinkedList<T> findAll()
@@ -123,9 +128,9 @@ public abstract class DbTable<T>
 		return findAllBy(select().order(order));
 	}
 	
-	public LinkedList<T> findAllBy(Where where)
+	public LinkedList<T> findAllBy(Where... wheres)
 	{
-		return findAllBy(new Wheres().and(where));
+		return findAllBy(new Wheres(wheres));
 	}
 	
 	public LinkedList<T> findAllBy(Wheres wheres)
@@ -170,129 +175,129 @@ public abstract class DbTable<T>
 	
 	public LinkedList<T> findAllBy(Select select)
 	{
-		return getRdb().queryAll(select, klass);
+		return getDb().queryAll(select, klass);
 	}
 	
 	public LinkedList<T> findAllBy(String sql)
 	{
-		return getRdb().queryAll(sql, klass);
+		return getDb().queryAll(sql, klass);
 	}
 	
 	public LinkedList<T> findAllBy(String sql, Collection<Object> values)
 	{
-		return getRdb().queryAll(sql, values, klass);
+		return getDb().queryAll(sql, values, klass);
 	}
 	
 	public void callback(Select select, Callback<T> callback)
 	{
-		getRdb().queryAll(select, callback.setKlass(klass));
+		getDb().queryAll(select, callback.setKlass(klass));
 	}
 	
 	public void callback(String sql, Callback<T> callback)
 	{
-		getRdb().queryAll(sql, callback.setKlass(klass));
+		getDb().queryAll(sql, callback.setKlass(klass));
 	}
 	
 	public void callback(String sql, Collection<Object> values, Callback<T> callback)
 	{
-		getRdb().queryAll(sql, values, callback.setKlass(klass));
+		getDb().queryAll(sql, values, callback.setKlass(klass));
 	}
 	
 	public int executeInsert(Insert insert)
 	{
-		return getRdb().executeInsert(insert);
+		return getDb().executeInsert(insert);
 	}
 	
 	public int executeInsert(String sql)
 	{
-		return getRdb().executeInsert(sql);
+		return getDb().executeInsert(sql);
 	}
 	
 	public int executeInsert(String sql, Collection<Object> values)
 	{
-		return getRdb().executeInsert(sql, values);
+		return getDb().executeInsert(sql, values);
 	}
 	
 	public int executeInsert(Insert insert, DbConnection connection) throws SQLException
 	{
-		return getRdb().executeInsert(insert, connection);
+		return getDb().executeInsert(insert, connection);
 	}
 	
 	public int executeInsert(String sql, DbConnection connection) throws SQLException
 	{
-		return getRdb().executeInsert(sql, connection);
+		return getDb().executeInsert(sql, connection);
 	}
 	
 	public int executeInsert(String sql, Collection<Object> values, DbConnection connection) throws SQLException
 	{
-		return getRdb().executeInsert(sql, values, connection);
+		return getDb().executeInsert(sql, values, connection);
 	}
 	
 	public int executeUpdate(Update update)
 	{
-		return getRdb().executeUpdate(update);
+		return getDb().executeUpdate(update);
 	}
 	
 	public int executeUpdate(String sql)
 	{
-		return getRdb().executeUpdate(sql);
+		return getDb().executeUpdate(sql);
 	}
 	
 	public int executeUpdate(String sql, Collection<Object> values)
 	{
-		return getRdb().executeUpdate(sql, values);
+		return getDb().executeUpdate(sql, values);
 	}
 	
 	public int executeUpdate(Update update, DbConnection connection) throws SQLException
 	{
-		return getRdb().executeUpdate(update, connection);
+		return getDb().executeUpdate(update, connection);
 	}
 	
 	public int executeUpdate(String sql, DbConnection connection) throws SQLException
 	{
-		return getRdb().executeUpdate(sql, connection);
+		return getDb().executeUpdate(sql, connection);
 	}
 	
 	public int executeUpdate(String sql, Collection<Object> values, DbConnection connection) throws SQLException
 	{
-		return getRdb().executeUpdate(sql, values, connection);
+		return getDb().executeUpdate(sql, values, connection);
 	}
 	
 	public int executeDelete(Delete delete)
 	{
-		return getRdb().executeDelete(delete);
+		return getDb().executeDelete(delete);
 	}
 	
 	public int executeDelete(String sql)
 	{
-		return getRdb().executeDelete(sql);
+		return getDb().executeDelete(sql);
 	}
 	
 	public int executeDelete(String sql, Collection<Object> values)
 	{
-		return getRdb().executeDelete(sql, values);
+		return getDb().executeDelete(sql, values);
 	}
 	
 	public int executeDelete(Delete delete, DbConnection connection) throws SQLException
 	{
-		return getRdb().executeDelete(delete, connection);
+		return getDb().executeDelete(delete, connection);
 	}
 	
 	public int executeDelete(String sql, DbConnection connection) throws SQLException
 	{
-		return getRdb().executeDelete(sql, connection);
+		return getDb().executeDelete(sql, connection);
 	}
 	
 	public int executeDelete(String sql, Collection<Object> values, DbConnection connection) throws SQLException
 	{
-		return getRdb().executeDelete(sql, values, connection);
+		return getDb().executeDelete(sql, values, connection);
 	}
 	
 	public int count(Select select)
 	{
 		int count = 0;
 		select.columns(new Columns().add(Column.sqlAs("count(*)", "count")));
-		LinkedHashMap<String, Object> results = getRdb().query(select);
+		LinkedHashMap<String, Object> results = getDb().query(select);
 		Object object = results.get("count");
 		if(object instanceof Number)
 		{

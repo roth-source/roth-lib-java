@@ -242,16 +242,20 @@ public class JsonMapper extends Mapper
 					LinkedList<?> arrayValues = asCollection(value);
 					if(!arrayValues.isEmpty())
 					{
+						incrementTabs();
 						seperator = writeSeperator(writer, seperator);
 						writeNewLine(writer);
 						writeArray(writer, arrayValues);
+						decrementTabs();
 					}
 					else if(getMapperConfig().isSerializeEmptyArray())
 					{
+						incrementTabs();
 						seperator = writeSeperator(writer, seperator);
 						writeNewLine(writer);
 						writer.write(LEFT_BRACKET);
 						writer.write(RIGHT_BRACKET);
+						decrementTabs();
 					}
 				}
 				else if(isMap(value.getClass()))
@@ -259,16 +263,20 @@ public class JsonMapper extends Mapper
 					LinkedHashMap<String, ?> valueMap = asMap(value);
 					if(!valueMap.isEmpty())
 					{
+						incrementTabs();
 						seperator = writeSeperator(writer, seperator);
 						writeNewLine(writer);
 						writeMap(writer, valueMap);
+						decrementTabs();
 					}
 					else if(getMapperConfig().isSerializeEmptyMap())
 					{
+						incrementTabs();
 						seperator = writeSeperator(writer, seperator);
 						writeNewLine(writer);
 						writer.write(LEFT_BRACE);
 						writer.write(RIGHT_BRACE);
+						decrementTabs();
 					}
 				}
 				else if(getMapperConfig().isSerializable(value.getClass()))

@@ -19,7 +19,7 @@
 		<module>../roth-lib-map-json</module>
 		<module>../roth-lib-map-xml</module>
 		<module>../roth-lib-db</module>
-		<module>../roth-lib-db-maria</module>
+		<module>../roth-lib-db-mysql</module>
 		<module>../roth-lib-db-orient</module>
 		<module>../roth-lib-net</module>
 		<module>../roth-lib-net-email</module>

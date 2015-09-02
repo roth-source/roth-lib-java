@@ -197,7 +197,7 @@ public abstract class DbStatement implements Statement, DbWrapper
 	@Override
 	public DbConnection getConnection() throws SQLException
 	{
-		return wrap(statement.getConnection(), null);
+		return wrap(statement.getConnection());
 	}
 	
 	@Override
@@ -283,41 +283,14 @@ public abstract class DbStatement implements Statement, DbWrapper
 	{
 		try
 		{
-			return getSql(statement);
-		}
-		catch (SQLException e)
-		{
-			return "";
-		}
-	}
-	
-	public static String getSql(Statement statement) throws SQLException
-	{
-		try
-		{
-			/*
-			Class<?> mariaClass = Class.forName("org.mariadb.jdbc.MySQLStatement");
-			if(mariaClass.isAssignableFrom(statement.getClass()))
-			{
-				return statement.toString();
-			}
-			*/
-			Class<?> mysqlClass = Class.forName("com.mysql.jdbc.Statement");
-			if(mysqlClass.isAssignableFrom(statement.getClass()))
-			{
-				Method method = mysqlClass.getMethod("asSql");
-				Object sql = method.invoke(statement);
-				if(sql instanceof String)
-				{
-					return (String) sql;
-				}
-			}
+			Method method = statement.getClass().getMethod("asSql");
+			Object sql = method.invoke(statement);
+			return (String) sql;
 		}
 		catch(Exception e)
 		{
-			
+			return statement.toString();
 		}
-		return statement.toString();
 	}
 	
 }

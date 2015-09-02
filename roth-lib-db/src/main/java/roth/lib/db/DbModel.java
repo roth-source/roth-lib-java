@@ -2,12 +2,14 @@ package roth.lib.db;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 
 @SuppressWarnings({"serial","unchecked"})
 public abstract class DbModel implements Serializable
 {
+	protected transient LinkedHashMap<String, Object> dirtyIdMap = new LinkedHashMap<String, Object>();
 	protected transient LinkedHashSet<String> dirtyNames = new LinkedHashSet<String>();
 	protected transient State state = State.NEW;
 	
@@ -17,8 +19,7 @@ public abstract class DbModel implements Serializable
 	}
 	
 	public abstract DbDataSource getDb();
-	public abstract void setDb(DbDataSource db);
-	public abstract boolean isGenerated();
+	public abstract DbModel setDb(DbDataSource db);
 	
 	public boolean isNew()
 	{
@@ -165,6 +166,21 @@ public abstract class DbModel implements Serializable
 		return dirtyNames;
 	}
 	
+	public LinkedHashMap<String, Object> getDirtyIdMap()
+	{
+		return dirtyIdMap;
+	}
+	
+	public <T> T setDirtyId(String name, T oldValue, T value)
+	{
+		if(isPersisted() && !Objects.equals(oldValue, value))
+		{
+			dirtyNames.add(name);
+			dirtyIdMap.put(name, oldValue);
+		}
+		return value;
+	}
+	
 	public <T> T setDirty(String name, T oldValue, T value)
 	{
 		if(isPersisted() && !Objects.equals(oldValue, value))
@@ -177,6 +193,7 @@ public abstract class DbModel implements Serializable
 	public void resetDirty()
 	{
 		dirtyNames.clear();
+		dirtyIdMap.clear();
 	}
 	
 	protected static enum State

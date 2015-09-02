@@ -1,13 +1,21 @@
 package roth.lib.db.sql;
 
+import java.util.Arrays;
 
 @SuppressWarnings("serial")
 public class Wheres extends Conditions
 {
 	public static final String WHERE	= "  WHERE ";
 	
+	public Wheres()
+	{
+		
+	}
 	
-	public Wheres() {}
+	public Wheres(Where... wheres)
+	{
+		this.conditions.addAll(Arrays.asList(wheres));
+	}
 	
 	public Wheres and(Where where)
 	{

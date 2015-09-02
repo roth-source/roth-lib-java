@@ -13,6 +13,7 @@ public class CalendarUtil
 	public static String TIMEZONE_FORMAT = "yyyy-MM-dd HH:mm:ss z";
 	public static String DISPLAY_FORMAT = "d MMM yyyy HH:mm:ss z";
 	public static String DAY_FORMAT = "yyyy-MM-dd";
+	public static String MINUTE_FORMAT = "yyyy-MM-dd HH:mm";
 	
 	public static LinkedList<Calendar> HOLIDAYS = new LinkedList<Calendar>();
 	
@@ -194,17 +195,17 @@ public class CalendarUtil
 		return clonedCalendar;
 	}
 	
-	public static Calendar minunte()
+	public static Calendar minute()
 	{
-		return minunte(now(), false);
+		return minute(now(), false);
 	}
 	
-	public static Calendar minunte(Calendar calendar)
+	public static Calendar minute(Calendar calendar)
 	{
-		return minunte(calendar, true);
+		return minute(calendar, true);
 	}
 	
-	public static Calendar minunte(Calendar calendar, boolean clone)
+	public static Calendar minute(Calendar calendar, boolean clone)
 	{
 		Calendar clonedCalendar = clone ? (Calendar) calendar.clone() : calendar;
 		clonedCalendar.set(Calendar.SECOND, 0);
@@ -415,6 +416,11 @@ public class CalendarUtil
 	public static Calendar parseDay(String value)
 	{
 		return parse(value, DAY_FORMAT);
+	}
+	
+	public static Calendar parseMinute(String value)
+	{
+		return parse(value, MINUTE_FORMAT);
 	}
 	
 	public static Calendar parse(String value, String pattern)

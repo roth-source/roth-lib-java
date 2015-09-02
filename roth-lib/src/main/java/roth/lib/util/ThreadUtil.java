@@ -39,7 +39,7 @@ public class ThreadUtil
 	
 	public static void waitUntil(long millis)
 	{
-		waitMillis(System.currentTimeMillis() - millis);
+		waitMillis(millis - System.currentTimeMillis());
 	}
 	
 }

@@ -16,13 +16,13 @@ public abstract class DbConnection implements Connection, DbWrapper
 	
 	public DbConnection(Connection connection)
 	{
-		this(connection, null);
+		this.connection = connection;
 	}
 	
-	public DbConnection(Connection connection, DbCloseHandler closeHandler)
+	public DbConnection setCloseHandler(DbCloseHandler closeHandler)
 	{
-		this.connection = connection;
 		this.closeHandler = closeHandler;
+		return this;
 	}
 	
 	@Override

@@ -2,6 +2,7 @@ package roth.lib.db;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -52,33 +53,45 @@ public abstract class DbReflector extends EntityReflector
 		});
 	}
 	
-	public PropertyReflector getGeneratedIdPropertyReflector(Class<?> klass)
+	public boolean hasGeneratedColumns(Type type)
 	{
-		for(PropertyReflector propertyReflector : getPropertyReflectors(klass))
+		return hasGeneratedPropertyReflectors(type);
+	}
+	
+	public LinkedList<String> getGeneratedColumns(Type type)
+	{
+		LinkedList<String> generatedColumns = new LinkedList<String>();
+		for(PropertyReflector propertyReflector : getGeneratedPropertyReflectors(type))
 		{
-			if(propertyReflector.isId() && propertyReflector.isGenerated())
-			{
-				return propertyReflector;
-			}
+			generatedColumns.add(propertyReflector.getPropertyName());
 		}
-		return null;
+		return generatedColumns;
 	}
 	
-	public boolean isGenerated(Class<?> klass)
-	{
-		return getGeneratedIdPropertyReflector(klass) != null;
-	}
-	
-	public void setGeneratedIds(DbResultSet resultSet, DbModel model)
+	public void setGeneratedFields(DbResultSet resultSet, LinkedList<String> generatedColumns, DbModel model)
 	{
 		try
 		{
-			PropertyReflector generatedIdPropertyReflector = getGeneratedIdPropertyReflector(model.getClass());
-			if(generatedIdPropertyReflector != null && resultSet.next())
+			if(resultSet.next())
 			{
-				Field field = generatedIdPropertyReflector.getField();
-				Object value = getValue(resultSet, 1, field.getType());
-				field.set(model, value);
+				LinkedHashMap<String, PropertyReflector> namePropertyReflectorMap = getNamePropertyReflectorMap(model.getClass(), true);
+				for(String name : generatedColumns)
+				{
+					PropertyReflector propertyReflector =namePropertyReflectorMap.get(name.toUpperCase());
+					if(propertyReflector != null)
+					{
+						try
+						{
+							Field field = propertyReflector.getField();
+							Object value = getValue(resultSet, 1, field.getType());
+							field.set(model, value);
+						}
+						catch(Exception e)
+						{
+							
+						}
+					}
+				}
 			}
 		}
 		catch(Exception e)
@@ -95,12 +108,21 @@ public abstract class DbReflector extends EntityReflector
 		{
 			try
 			{
-				String name = idPropertyFieldReflector.getPropertyName();
+				String propertyName = idPropertyFieldReflector.getPropertyName();
+				String fieldName = idPropertyFieldReflector.getFieldName();
 				Field field = idPropertyFieldReflector.getField();
-				Object value = field.get(model);
+				Object value = null;
+				if(model.getDirtyIdMap().containsKey(fieldName))
+				{
+					value = model.getDirtyIdMap().get(fieldName);
+				}
+				else
+				{
+					value = field.get(model);
+				}
 				if(value != null)
 				{
-					wheres.and(Where.equals(name, value));
+					wheres.and(Where.equals(propertyName, value));
 				}
 			}
 			catch(Exception e)
@@ -129,8 +151,8 @@ public abstract class DbReflector extends EntityReflector
 		for(Entry<String, PropertyReflector> propertyReflectorEntry : getNamePropertyReflectorMap(model.getClass(), false).entrySet())
 		{
 			String column = propertyReflectorEntry.getKey();
-			PropertyReflector propertyField = propertyReflectorEntry.getValue();
-			Field field = propertyField.getField();
+			PropertyReflector propertyReflector = propertyReflectorEntry.getValue();
+			Field field = propertyReflector.getField();
 			try
 			{
 				Object value = field.get(model);
@@ -157,11 +179,11 @@ public abstract class DbReflector extends EntityReflector
 		{
 			for(String name : model.getDirtyNames())
 			{
-				PropertyReflector propertyField = fieldPropertyReflectors.get(name);
-				if(propertyField != null)
+				PropertyReflector propertyReflector = fieldPropertyReflectors.get(name);
+				if(propertyReflector != null)
 				{
-					String column = propertyField.getPropertyName();
-					Field field = propertyField.getField();
+					String column = propertyReflector.getPropertyName();
+					Field field = propertyReflector.getField();
 					try
 					{
 						Object value = field.get(model);
@@ -244,21 +266,12 @@ public abstract class DbReflector extends EntityReflector
 		try
 		{
 			Constructor<T> constructor = null;
-			try
-			{
-				constructor = klass.getDeclaredConstructor(DbDataSource.class);
-				constructor.setAccessible(true);
-				model = constructor.newInstance(db);
-			}
-			catch(NoSuchMethodException e)
-			{
-				constructor = klass.getDeclaredConstructor();
-				constructor.setAccessible(true);
-				model = constructor.newInstance();
-			}
+			constructor = klass.getDeclaredConstructor();
+			constructor.setAccessible(true);
+			model = constructor.newInstance();
 			if(model instanceof DbModel)
 			{
-				((DbModel) model).persisted();
+				((DbModel) model).setDb(db).persisted();
 			}
 			for(int i = 1; i <= metaData.getColumnCount(); i++)
 			{

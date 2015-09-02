@@ -1,3 +1,4 @@
+
 package roth.lib.db;
 
 import java.sql.Array;
@@ -31,7 +32,6 @@ public interface DbWrapper
 	DbCallableStatement wrap(CallableStatement callableStatement);
 	DbClob wrap(Clob clob);
 	DbConnection wrap(Connection connection);
-	DbConnection wrap(Connection connection, DbCloseHandler closeHandler);
 	DbDatabaseMetaData wrap(DatabaseMetaData databaseMetaData);
 	DbDriver wrap(Driver driver);
 	DbDriverAction wrap(DriverAction driverAction);

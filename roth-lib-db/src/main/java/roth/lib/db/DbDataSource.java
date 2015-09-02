@@ -4,7 +4,6 @@ import java.io.PrintWriter;
 import java.sql.Driver;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
-import java.sql.Statement;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -207,7 +206,8 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		{
 			properties.put("password", password);
 		}
-		DbConnection connection = wrap(driver.connect(url, properties), closeHandler);
+		DbConnection connection = wrap(driver.connect(url, properties));
+		connection.setCloseHandler(closeHandler);
 		connection.setAutoCommit(false);
 		usedConnections.add(connection);
 		return connection;
@@ -260,21 +260,21 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		return prepareStatement(connection, sql.sql(), sql.values());
 	}
 	
-	public DbPreparedStatement prepareStatement(DbConnection connection, Sql sql, boolean generated) throws SQLException
+	public DbPreparedStatement prepareStatement(DbConnection connection, Sql sql,  LinkedList<String> generated) throws SQLException
 	{
 		return prepareStatement(connection, sql.sql(), sql.values(), generated);
 	}
 	
 	public DbPreparedStatement prepareStatement(DbConnection connection, String sql, Collection<Object> values) throws SQLException
 	{
-		return prepareStatement(connection, sql, values, false);
+		return prepareStatement(connection, sql, values, null);
 	}
 	
-	public DbPreparedStatement prepareStatement(DbConnection connection, String sql, Collection<Object> values, boolean generated) throws SQLException
+	public DbPreparedStatement prepareStatement(DbConnection connection, String sql, Collection<Object> values, LinkedList<String> generatedColumns) throws SQLException
 	{
-		if(generated)
+		if(generatedColumns != null && !generatedColumns.isEmpty())
 		{
-			return setValues(connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS), values);
+			return setValues(connection.prepareStatement(sql, generatedColumns.toArray(new String[]{})), values);
 		}
 		else
 		{
@@ -568,23 +568,23 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	protected int executeInsert(String sql, Collection<Object> values, DbModel model, DbConnection connection) throws SQLException
 	{
 		int result = 0;
-		boolean generated = false;
+		LinkedList<String> generatedColumns = new LinkedList<String>();
 		if(model != null)
 		{
-			generated = getReflector().isGenerated(model.getClass());
+			generatedColumns = getReflector().getGeneratedColumns(model.getClass());
 		}
-		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values, generated))
+		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values, generatedColumns))
 		{
 			result = preparedStatement.executeUpdate();
 			if(model != null)
 			{
 				model.persisted();
 				model.resetDirty();
-				if(generated)
+				if(!generatedColumns.isEmpty())
 				{
 					try(DbResultSet resultSet = preparedStatement.getGeneratedKeys())
 					{
-						getReflector().setGeneratedIds(resultSet, model);
+						getReflector().setGeneratedFields(resultSet, generatedColumns, model);
 					}
 				}
 			}

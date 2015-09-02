@@ -288,6 +288,18 @@ public abstract class EntityReflector
 		return generatedPropertyReflectors;
 	}
 	
+	public boolean hasGeneratedPropertyReflectors(Type type)
+	{
+		for(PropertyReflector propertyReflector : getPropertyReflectors(type))
+		{
+			if(propertyReflector.isGenerated())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public boolean isEntity(Type type)
 	{
 		return !getPropertyReflectors(type).isEmpty();
