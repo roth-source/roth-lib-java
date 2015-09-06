@@ -10,9 +10,9 @@ public class CallClient extends TwilioClient
 		super(accountSid, authToken, debug);
 	}
 	
-	public void makeCall(MakeCallRequest request)
+	public MakeCallResponse makeCall(MakeCallRequest request)
 	{
-		post(url(CALLS), request);
+		return post(url(CALLS), request, MakeCallResponse.class);
 	}
 	
 }

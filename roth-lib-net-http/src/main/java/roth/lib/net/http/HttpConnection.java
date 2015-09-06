@@ -16,7 +16,7 @@ import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
 
 import roth.lib.Characters;
-import roth.lib.map.inputter.Inputter;
+import roth.lib.inputter.Inputter;
 
 public class HttpConnection implements Characters
 {

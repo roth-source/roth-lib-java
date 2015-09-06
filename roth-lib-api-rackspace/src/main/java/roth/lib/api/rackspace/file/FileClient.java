@@ -10,12 +10,12 @@ import roth.lib.api.rackspace.RackspaceClient;
 import roth.lib.api.rackspace.RackspaceException;
 import roth.lib.api.rackspace.identity.IdentityClient;
 import roth.lib.api.rackspace.type.ServiceType;
-import roth.lib.map.outputter.BytesOutputter;
-import roth.lib.map.outputter.FileOutputter;
 import roth.lib.net.http.HttpHeader;
 import roth.lib.net.http.HttpHeaders;
 import roth.lib.net.http.HttpUrl;
 import roth.lib.net.http.type.MimeType;
+import roth.lib.outputter.BytesOutputter;
+import roth.lib.outputter.FileOutputter;
 import roth.lib.util.IoUtil;
 
 public class FileClient extends RackspaceClient

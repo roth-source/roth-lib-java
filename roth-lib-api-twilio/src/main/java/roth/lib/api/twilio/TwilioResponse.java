@@ -13,6 +13,12 @@ public class TwilioResponse implements Serializable
 	@Property(name = "api_version")
 	protected String apiVersion;
 	
+	@Property(name = "error_code")
+	protected String errorCode;
+	
+	@Property(name = "error_message")
+	protected String errorMessage;
+	
 	public TwilioResponse()
 	{
 		
@@ -28,6 +34,16 @@ public class TwilioResponse implements Serializable
 		return apiVersion;
 	}
 	
+	public String getErrorCode()
+	{
+		return errorCode;
+	}
+	
+	public String getErrorMessage()
+	{
+		return errorMessage;
+	}
+	
 	public TwilioResponse setAccountSid(String accountSid)
 	{
 		this.accountSid = accountSid;
@@ -37,6 +53,18 @@ public class TwilioResponse implements Serializable
 	public TwilioResponse setApiVersion(String apiVersion)
 	{
 		this.apiVersion = apiVersion;
+		return this;
+	}
+	
+	public TwilioResponse setErrorCode(String errorCode)
+	{
+		this.errorCode = errorCode;
+		return this;
+	}
+	
+	public TwilioResponse setErrorMessage(String errorMessage)
+	{
+		this.errorMessage = errorMessage;
 		return this;
 	}
 	

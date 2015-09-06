@@ -5,7 +5,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
-import roth.lib.map.inputter.Inputter;
+import roth.lib.inputter.Inputter;
 
 public class HttpClient
 {

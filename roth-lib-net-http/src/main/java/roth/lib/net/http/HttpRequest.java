@@ -1,7 +1,7 @@
 package roth.lib.net.http;
 
 import roth.lib.Characters;
-import roth.lib.map.outputter.Outputter;
+import roth.lib.outputter.Outputter;
 
 public class HttpRequest<T> implements Characters
 {

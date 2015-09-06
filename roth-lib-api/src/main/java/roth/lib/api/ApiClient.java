@@ -4,12 +4,11 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 
 import roth.lib.Generic;
+import roth.lib.inputter.Inputter;
 import roth.lib.map.MapperConfig;
+import roth.lib.map.MapperInputter;
+import roth.lib.map.MapperOutputter;
 import roth.lib.map.MapperReflector;
-import roth.lib.map.inputter.Inputter;
-import roth.lib.map.inputter.MapperInputter;
-import roth.lib.map.outputter.MapperOutputter;
-import roth.lib.map.outputter.Outputter;
 import roth.lib.map.serializer.Serializer;
 import roth.lib.net.http.HttpClient;
 import roth.lib.net.http.HttpHeader;
@@ -18,6 +17,7 @@ import roth.lib.net.http.HttpMethod;
 import roth.lib.net.http.HttpRequest;
 import roth.lib.net.http.HttpResponse;
 import roth.lib.net.http.HttpUrl;
+import roth.lib.outputter.Outputter;
 
 public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 {

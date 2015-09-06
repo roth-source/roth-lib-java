@@ -1,4 +1,4 @@
-package roth.lib.api.twilio.message;
+package roth.lib.api.twilio.call;
 
 import java.util.Calendar;
 
@@ -6,10 +6,16 @@ import roth.lib.annotation.Property;
 import roth.lib.api.twilio.TwilioResponse;
 
 @SuppressWarnings("serial")
-public class SendMessageResponse extends TwilioResponse
+public class MakeCallResponse extends TwilioResponse
 {
 	@Property(name = "sid")
 	protected String sid;
+	
+	@Property(name = "parent_call_sid")
+	protected String parentCallSid;
+	
+	@Property(name = "phone_number_sid")
+	protected String phoneNumberSid;
 	
 	@Property(name = "date_created")
 	protected Calendar dateCreated;
@@ -50,7 +56,7 @@ public class SendMessageResponse extends TwilioResponse
 	@Property(name = "uri")
 	protected String uri;
 	
-	public SendMessageResponse()
+	public MakeCallResponse()
 	{
 		
 	}
@@ -58,6 +64,16 @@ public class SendMessageResponse extends TwilioResponse
 	public String getSid()
 	{
 		return sid;
+	}
+	
+	public String getParentCallSid()
+	{
+		return parentCallSid;
+	}
+	
+	public String getPhoneNumberSid()
+	{
+		return phoneNumberSid;
 	}
 	
 	public Calendar getDateCreated()
@@ -125,85 +141,97 @@ public class SendMessageResponse extends TwilioResponse
 		return uri;
 	}
 	
-	public SendMessageResponse setSid(String sid)
+	public MakeCallResponse setSid(String sid)
 	{
 		this.sid = sid;
 		return this;
 	}
 	
-	public SendMessageResponse setDateCreated(Calendar dateCreated)
+	public MakeCallResponse setParentCallSid(String parentCallSid)
+	{
+		this.parentCallSid = parentCallSid;
+		return this;
+	}
+	
+	public MakeCallResponse setPhoneNumberSid(String phoneNumberSid)
+	{
+		this.phoneNumberSid = phoneNumberSid;
+		return this;
+	}
+	
+	public MakeCallResponse setDateCreated(Calendar dateCreated)
 	{
 		this.dateCreated = dateCreated;
 		return this;
 	}
 	
-	public SendMessageResponse setDateUpdated(Calendar dateUpdated)
+	public MakeCallResponse setDateUpdated(Calendar dateUpdated)
 	{
 		this.dateUpdated = dateUpdated;
 		return this;
 	}
 	
-	public SendMessageResponse setDateSent(Calendar dateSent)
+	public MakeCallResponse setDateSent(Calendar dateSent)
 	{
 		this.dateSent = dateSent;
 		return this;
 	}
 	
-	public SendMessageResponse setTo(String to)
+	public MakeCallResponse setTo(String to)
 	{
 		this.to = to;
 		return this;
 	}
 	
-	public SendMessageResponse setFrom(String from)
+	public MakeCallResponse setFrom(String from)
 	{
 		this.from = from;
 		return this;
 	}
 	
-	public SendMessageResponse setBody(String body)
+	public MakeCallResponse setBody(String body)
 	{
 		this.body = body;
 		return this;
 	}
 	
-	public SendMessageResponse setStatus(String status)
+	public MakeCallResponse setStatus(String status)
 	{
 		this.status = status;
 		return this;
 	}
 	
-	public SendMessageResponse setNumSegments(Integer numSegments)
+	public MakeCallResponse setNumSegments(Integer numSegments)
 	{
 		this.numSegments = numSegments;
 		return this;
 	}
 	
-	public SendMessageResponse setNumMedia(Integer numMedia)
+	public MakeCallResponse setNumMedia(Integer numMedia)
 	{
 		this.numMedia = numMedia;
 		return this;
 	}
 	
-	public SendMessageResponse setDirection(String direction)
+	public MakeCallResponse setDirection(String direction)
 	{
 		this.direction = direction;
 		return this;
 	}
 	
-	public SendMessageResponse setPrice(String price)
+	public MakeCallResponse setPrice(String price)
 	{
 		this.price = price;
 		return this;
 	}
 	
-	public SendMessageResponse setPriceUnit(String priceUnit)
+	public MakeCallResponse setPriceUnit(String priceUnit)
 	{
 		this.priceUnit = priceUnit;
 		return this;
 	}
 	
-	public SendMessageResponse setUri(String uri)
+	public MakeCallResponse setUri(String uri)
 	{
 		this.uri = uri;
 		return this;

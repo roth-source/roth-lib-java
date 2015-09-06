@@ -66,6 +66,11 @@
 		</dependency>
 		<dependency>
 			<groupId>roth.lib</groupId>
+			<artifactId>roth-lib-service</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>roth.lib</groupId>
 			<artifactId>roth-lib-template</artifactId>
 			<version>${project.version}</version>
 		</dependency>

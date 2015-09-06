@@ -6,7 +6,7 @@
 		<relativePath>../roth-lib-pom</relativePath>
 		<version>0.2.2-SNAPSHOT</version>
 	</parent>
-	<artifactId>roth-lib-api</artifactId>
+	<artifactId>roth-lib-service</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>roth.lib</groupId>
@@ -27,6 +27,13 @@
 			<groupId>roth.lib</groupId>
 			<artifactId>roth-lib-map-xml</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.aggregate</groupId>
+			<artifactId>jetty-all</artifactId>
+			<version>9.3.2.v20150730</version>
+			<scope>provided</scope>
+			<type>pom</type>
 		</dependency>
 	</dependencies>
 </project>

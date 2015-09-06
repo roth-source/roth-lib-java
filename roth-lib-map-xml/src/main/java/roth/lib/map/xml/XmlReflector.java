@@ -363,4 +363,15 @@ public class XmlReflector extends MapperReflector
 		return super.createPropertyReflector(field, fieldType, propertyName, id, generated, timeFormat, excludes);
 	}
 	
+	@Override
+	public boolean isEntity(Type type)
+	{
+		boolean entity = super.isEntity(type);
+		if(!entity)
+		{
+			entity = !getXmlAttributeReflectors(type).isEmpty();
+		}
+		return entity;
+	}
+	
 }
