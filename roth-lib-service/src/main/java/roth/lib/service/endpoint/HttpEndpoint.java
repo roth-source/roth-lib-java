@@ -1,28 +1,18 @@
 package roth.lib.service.endpoint;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
+import java.io.File;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import roth.lib.map.Mapper;
-import roth.lib.net.http.HttpMethod;
-import roth.lib.net.http.type.MimeType;
-import roth.lib.service.HttpService;
-import roth.lib.service.HttpServiceMethod;
-import roth.lib.service.HttpServiceType;
-import roth.lib.service.task.HttpTaskService;
-import roth.lib.util.ReflectionUtil;
-
 @SuppressWarnings("serial")
-public abstract class HttpEndpoint extends HttpServlet
+public class HttpEndpoint extends HttpServlet
 {
 	protected static String ORIGIN 								= "Origin";
 	protected static String ANY_ORIGIN 							= "*";
@@ -40,6 +30,17 @@ public abstract class HttpEndpoint extends HttpServlet
 	protected static String SERVICE 							= "service";
 	protected static String METHOD 								= "method";
 	protected static Pattern SERVICE_METHOD_PATTERN 			= Pattern.compile("(?:^|/)(?<" + SERVICE + ">\\w+)/(?<" + METHOD + ">\\w+)(?:/|$)");
+	
+	
+	
+	@Override
+	public void init(ServletConfig config) throws ServletException
+	{
+		File file = new File(config.getServletContext().getRealPath("WEB-INF/classes"));
+		
+	}
+	
+	
 	
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response)
@@ -220,6 +221,7 @@ public abstract class HttpEndpoint extends HttpServlet
 		*/
 	}
 	
+	/*
 	protected abstract void errors(HttpServletRequest request, HttpServletResponse response, LinkedList<HttpError> errors);
 	protected abstract void exception(HttpServletRequest request, HttpServletResponse response, Exception e);
 	protected abstract HttpService getService(HttpServletRequest request, HttpServletResponse response, String serviceName);
@@ -296,31 +298,7 @@ public abstract class HttpEndpoint extends HttpServlet
 	
 	protected Class<? extends Annotation> getHttpMethodAnnotationClass(HttpServletRequest request, HttpServletResponse response, HttpMethod httpMethod)
 	{
-		/*
-		switch(httpMethod)
-		{
-			case GET: 
-			{
-				return Get.class;
-			}
-			case POST: 
-			{
-				return Post.class;
-			}
-			case PUT: 
-			{
-				return Put.class;
-			}
-			case DELETE: 
-			{
-				return Delete.class;
-			}
-			default:
-			{
-				return null;
-			}
-		}
-		*/
+		
 		return null;
 	}
 	
@@ -328,5 +306,5 @@ public abstract class HttpEndpoint extends HttpServlet
 	{
 		return MimeType.APPLICATION_JSON.toString();
 	}
-	
+	*/
 }
