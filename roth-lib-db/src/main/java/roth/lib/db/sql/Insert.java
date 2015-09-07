@@ -15,13 +15,13 @@ public class Insert extends Sql
 	protected LinkedList<String> names;
 	protected LinkedList<Object> values;
 	
-	public Insert(String table, Collection<Object> values)
+	public Insert(String table, Collection<?> values)
 	{
 		this.table = table;
 		this.values = new LinkedList<Object>(values);
 	}
 	
-	public Insert(String table, Collection<String> names, Collection<Object> values)
+	public Insert(String table, Collection<String> names, Collection<?> values)
 	{
 		if(names.size() != values.size()) throw new IllegalArgumentException("names is different size than values");
 		this.table = table;

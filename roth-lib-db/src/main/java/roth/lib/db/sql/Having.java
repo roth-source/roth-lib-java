@@ -21,7 +21,7 @@ public class Having extends Condition
 		values.add(value);
 	}
 	
-	protected Having(String sql, Collection<Object> values)
+	protected Having(String sql, Collection<?> values)
 	{
 		this.sql = sql;
 		this.values.addAll(values);
@@ -37,7 +37,7 @@ public class Having extends Condition
 		return new Having(sql, value);
 	}
 	
-	public static Having sql(String sql, Collection<Object> values)
+	public static Having sql(String sql, Collection<?> values)
 	{
 		return new Having(sql, values);
 	}
@@ -102,12 +102,12 @@ public class Having extends Condition
 		return new Having(tick(table) + DOT + tick(name) + Op.GE.get(), value);
 	}
 	
-	public static Having in(String name, Collection<Object> values)
+	public static Having in(String name, Collection<?> values)
 	{
 		return new Having(tick(name) + String.format(Op.IN.get(), param(values.size())), values);
 	}
 	
-	public static Having in(String table, String name, Collection<Object> values)
+	public static Having in(String table, String name, Collection<?> values)
 	{
 		return new Having(tick(table) + DOT + tick(name) + String.format(Op.IN.get(), param(values.size())), values);
 	}

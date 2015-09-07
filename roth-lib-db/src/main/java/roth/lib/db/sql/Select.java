@@ -205,7 +205,7 @@ public class Select extends Sql
 		return where(Where.sql(sql, value));
 	}
 	
-	public Select where(String sql, Collection<Object> values)
+	public Select where(String sql, Collection<?> values)
 	{
 		return where(Where.sql(sql, values));
 	}
@@ -270,22 +270,22 @@ public class Select extends Sql
 		return where(Where.greaterThanOrEquals(table, name, value));
 	}
 	
-	public Select whereIn(String name, Collection<Object> values)
+	public Select whereIn(String name, Collection<?> values)
 	{
 		return where(Where.in(name, values));
 	}
 	
-	public Select whereIn(String table, String name, Collection<Object> values)
+	public Select whereIn(String table, String name, Collection<?> values)
 	{
 		return where(Where.in(table, name, values));
 	}
 	
-	public Select whereNotIn(String name, Collection<Object> values)
+	public Select whereNotIn(String name, Collection<?> values)
 	{
 		return where(Where.notIn(name, values));
 	}
 	
-	public Select whereNotIn(String table, String name, Collection<Object> values)
+	public Select whereNotIn(String table, String name, Collection<?> values)
 	{
 		return where(Where.notIn(table, name, values));
 	}
@@ -376,7 +376,7 @@ public class Select extends Sql
 		return orWhere(Where.sql(sql, value));
 	}
 	
-	public Select orWhere(String sql, Collection<Object> values)
+	public Select orWhere(String sql, Collection<?> values)
 	{
 		return orWhere(Where.sql(sql, values));
 	}
@@ -441,12 +441,12 @@ public class Select extends Sql
 		return orWhere(Where.greaterThanOrEquals(table, name, value));
 	}
 	
-	public Select orWhereIn(String name, Collection<Object> values)
+	public Select orWhereIn(String name, Collection<?> values)
 	{
 		return orWhere(Where.in(name, values));
 	}
 	
-	public Select orWhereIn(String table, String name, Collection<Object> values)
+	public Select orWhereIn(String table, String name, Collection<?> values)
 	{
 		return orWhere(Where.in(table, name, values));
 	}
@@ -577,7 +577,7 @@ public class Select extends Sql
 		return having(Having.sql(sql, value));
 	}
 	
-	public Select having(String sql, Collection<Object> values)
+	public Select having(String sql, Collection<?> values)
 	{
 		return having(Having.sql(sql, values));
 	}
@@ -642,12 +642,12 @@ public class Select extends Sql
 		return having(Having.greaterThanOrEquals(table, name, value));
 	}
 	
-	public Select havingIn(String name, Collection<Object> values)
+	public Select havingIn(String name, Collection<?> values)
 	{
 		return having(Having.in(name, values));
 	}
 	
-	public Select havingIn(String table, String name, Collection<Object> values)
+	public Select havingIn(String table, String name, Collection<?> values)
 	{
 		return having(Having.in(table, name, values));
 	}
@@ -728,7 +728,7 @@ public class Select extends Sql
 		return orHaving(Having.sql(sql, value));
 	}
 	
-	public Select orHaving(String sql, Collection<Object> values)
+	public Select orHaving(String sql, Collection<?> values)
 	{
 		return orHaving(Having.sql(sql, values));
 	}
@@ -793,12 +793,12 @@ public class Select extends Sql
 		return orHaving(Having.greaterThanOrEquals(table, name, value));
 	}
 	
-	public Select orHavingIn(String name, Collection<Object> values)
+	public Select orHavingIn(String name, Collection<?> values)
 	{
 		return orHaving(Having.in(name, values));
 	}
 	
-	public Select orHavingIn(String table, String name, Collection<Object> values)
+	public Select orHavingIn(String table, String name, Collection<?> values)
 	{
 		return orHaving(Having.in(table, name, values));
 	}

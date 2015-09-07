@@ -33,7 +33,7 @@ public class Update extends Sql
 		}
 	}
 	
-	public Update(String table, Collection<String> names, Collection<Object> values)
+	public Update(String table, Collection<String> names, Collection<?> values)
 	{
 		if(names.size() != values.size()) throw new IllegalArgumentException("names is different size than values");
 		this.table = table;
@@ -116,7 +116,7 @@ public class Update extends Sql
 		return where(Where.sql(sql, value));
 	}
 	
-	public Update where(String sql, Collection<Object> values)
+	public Update where(String sql, Collection<?> values)
 	{
 		return where(Where.sql(sql, values));
 	}
@@ -156,7 +156,7 @@ public class Update extends Sql
 		return where(Where.greaterThanOrEquals(name, value));
 	}
 	
-	public Update whereIn(String name, Collection<Object> values)
+	public Update whereIn(String name, Collection<?> values)
 	{
 		return where(Where.in(name, values));
 	}
@@ -217,7 +217,7 @@ public class Update extends Sql
 		return orWhere(Where.sql(sql, value));
 	}
 	
-	public Update orWhere(String sql, Collection<Object> values)
+	public Update orWhere(String sql, Collection<?> values)
 	{
 		return orWhere(Where.sql(sql, values));
 	}
@@ -252,7 +252,7 @@ public class Update extends Sql
 		return orWhere(Where.greaterThanOrEquals(name, value));
 	}
 	
-	public Update orWhereIn(String name, Collection<Object> values)
+	public Update orWhereIn(String name, Collection<?> values)
 	{
 		return orWhere(Where.in(name, values));
 	}

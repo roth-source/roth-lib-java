@@ -71,7 +71,7 @@ public class Delete extends Sql
 		return where(Where.sql(sql, value));
 	}
 	
-	public Delete where(String sql, Collection<Object> values)
+	public Delete where(String sql, Collection<?> values)
 	{
 		return where(Where.sql(sql, values));
 	}
@@ -111,7 +111,7 @@ public class Delete extends Sql
 		return where(Where.greaterThanOrEquals(name, value));
 	}
 	
-	public Delete whereIn(String name, Collection<Object> values)
+	public Delete whereIn(String name, Collection<?> values)
 	{
 		return where(Where.in(name, values));
 	}
@@ -172,7 +172,7 @@ public class Delete extends Sql
 		return orWhere(Where.sql(sql, value));
 	}
 	
-	public Delete orWhere(String sql, Collection<Object> values)
+	public Delete orWhere(String sql, Collection<?> values)
 	{
 		return orWhere(Where.sql(sql, values));
 	}
@@ -207,7 +207,7 @@ public class Delete extends Sql
 		return orWhere(Where.greaterThanOrEquals(name, value));
 	}
 	
-	public Delete orWhereIn(String name, Collection<Object> values)
+	public Delete orWhereIn(String name, Collection<?> values)
 	{
 		return orWhere(Where.in(name, values));
 	}

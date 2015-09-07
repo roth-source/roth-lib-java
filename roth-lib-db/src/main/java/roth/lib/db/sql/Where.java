@@ -21,7 +21,7 @@ public class Where extends Condition
 		values.add(value);
 	}
 	
-	protected Where(String sql, Collection<Object> values)
+	protected Where(String sql, Collection<?> values)
 	{
 		this.sql = sql;
 		this.values.addAll(values);
@@ -37,7 +37,7 @@ public class Where extends Condition
 		return new Where(sql, value);
 	}
 	
-	public static Where sql(String sql, Collection<Object> values)
+	public static Where sql(String sql, Collection<?> values)
 	{
 		return new Where(sql, values);
 	}
@@ -102,22 +102,22 @@ public class Where extends Condition
 		return new Where(tick(table) + DOT + tick(name) + Op.GE.get(), value);
 	}
 	
-	public static Where in(String name, Collection<Object> values)
+	public static Where in(String name, Collection<?> values)
 	{
 		return new Where(tick(name) + String.format(Op.IN.get(), param(values.size())), values);
 	}
 	
-	public static Where in(String table, String name, Collection<Object> values)
+	public static Where in(String table, String name, Collection<?> values)
 	{
 		return new Where(tick(table) + DOT + tick(name) + String.format(Op.IN.get(), param(values.size())), values);
 	}
 	
-	public static Where notIn(String name, Collection<Object> values)
+	public static Where notIn(String name, Collection<?> values)
 	{
 		return new Where(tick(name) + String.format(Op.NOT_IN.get(), param(values.size())), values);
 	}
 	
-	public static Where notIn(String table, String name, Collection<Object> values)
+	public static Where notIn(String table, String name, Collection<?> values)
 	{
 		return new Where(tick(table) + DOT + tick(name) + String.format(Op.NOT_IN.get(), param(values.size())), values);
 	}
