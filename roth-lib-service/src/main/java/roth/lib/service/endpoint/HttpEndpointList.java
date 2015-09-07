@@ -3,8 +3,10 @@ package roth.lib.service.endpoint;
 import java.util.Arrays;
 import java.util.LinkedList;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 public class HttpEndpointList
 {
 	@Property(name = "endpoints")

@@ -1,8 +1,10 @@
 package roth.lib.api.linode.data.request.action;
 
 import roth.lib.api.linode.data.request.NodeIdRequest;
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 @SuppressWarnings("serial")
 public class RebootNodeRequest extends NodeIdRequest
 {

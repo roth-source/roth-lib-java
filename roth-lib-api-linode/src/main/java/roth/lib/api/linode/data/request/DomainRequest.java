@@ -2,8 +2,10 @@ package roth.lib.api.linode.data.request;
 
 import roth.lib.api.linode.data.type.DomainType;
 import roth.lib.api.linode.data.type.StatusType;
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 @SuppressWarnings("serial")
 public abstract class DomainRequest extends LinodeRequest
 {

@@ -2,9 +2,11 @@ package roth.lib.api.digitalocean.imageaction;
 
 import java.io.Serializable;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 import roth.lib.api.digitalocean.type.RegionType;
 
+@Entity
 @SuppressWarnings("serial")
 public class ImageActionRequest implements Serializable
 {

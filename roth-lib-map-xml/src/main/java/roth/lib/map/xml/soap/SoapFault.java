@@ -1,8 +1,10 @@
 package roth.lib.map.xml.soap;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 import roth.lib.map.xml.XmlModel;
 
+@Entity
 @SuppressWarnings("serial")
 public class SoapFault extends XmlModel
 {

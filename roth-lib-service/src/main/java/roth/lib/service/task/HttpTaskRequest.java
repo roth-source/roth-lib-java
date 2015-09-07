@@ -1,8 +1,10 @@
 package roth.lib.service.task;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 import roth.lib.service.HttpServiceRequest;
 
+@Entity
 @SuppressWarnings("serial")
 public class HttpTaskRequest extends HttpServiceRequest
 {

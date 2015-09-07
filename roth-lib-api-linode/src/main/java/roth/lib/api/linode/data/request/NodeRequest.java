@@ -1,8 +1,10 @@
 package roth.lib.api.linode.data.request;
 
 import roth.lib.api.linode.data.type.PaymentTermType;
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 @SuppressWarnings("serial")
 public abstract class NodeRequest extends LinodeRequest
 {

@@ -2,9 +2,11 @@ package roth.lib.api.digitalocean.domain;
 
 import java.io.Serializable;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 import roth.lib.api.digitalocean.model.Domain;
 
+@Entity
 @SuppressWarnings("serial")
 public class GetDomainResponse implements Serializable
 {

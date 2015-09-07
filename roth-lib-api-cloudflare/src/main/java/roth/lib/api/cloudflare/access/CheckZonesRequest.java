@@ -1,9 +1,11 @@
 package roth.lib.api.cloudflare.access;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 import roth.lib.api.cloudflare.CloudFlareRequest;
 import roth.lib.util.StringUtil;
 
+@Entity
 @SuppressWarnings("serial")
 public class CheckZonesRequest extends CloudFlareRequest
 {

@@ -4,8 +4,10 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 
 import roth.lib.api.linode.data.model.Method;
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 @SuppressWarnings("serial")
 public class ApiSpecResponse implements Serializable
 {

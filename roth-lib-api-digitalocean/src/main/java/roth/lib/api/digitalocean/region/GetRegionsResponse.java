@@ -3,9 +3,11 @@ package roth.lib.api.digitalocean.region;
 import java.io.Serializable;
 import java.util.LinkedList;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 import roth.lib.api.digitalocean.model.Region;
 
+@Entity
 @SuppressWarnings("serial")
 public class GetRegionsResponse implements Serializable
 {

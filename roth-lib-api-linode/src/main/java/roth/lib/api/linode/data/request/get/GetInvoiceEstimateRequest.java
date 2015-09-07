@@ -2,8 +2,10 @@ package roth.lib.api.linode.data.request.get;
 
 import roth.lib.api.linode.data.request.LinodeRequest;
 import roth.lib.api.linode.data.type.ModeType;
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 @SuppressWarnings("serial")
 public class GetInvoiceEstimateRequest extends LinodeRequest
 {

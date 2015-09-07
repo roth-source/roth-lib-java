@@ -3,10 +3,12 @@ package roth.lib.api.digitalocean.key;
 import java.io.Serializable;
 import java.util.LinkedList;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 import roth.lib.api.digitalocean.model.Key;
 import roth.lib.api.digitalocean.model.Meta;
 
+@Entity
 @SuppressWarnings("serial")
 public class GetKeysResponse implements Serializable
 {

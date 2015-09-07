@@ -3,10 +3,12 @@ package roth.lib.api.digitalocean.droplet;
 import java.io.Serializable;
 import java.util.LinkedList;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 import roth.lib.api.digitalocean.type.RegionType;
 import roth.lib.api.digitalocean.type.SizeType;
 
+@Entity
 @SuppressWarnings("serial")
 public class CreateDropletRequest implements Serializable
 {

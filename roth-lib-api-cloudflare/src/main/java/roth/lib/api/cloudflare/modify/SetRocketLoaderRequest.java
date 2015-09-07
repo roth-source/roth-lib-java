@@ -1,9 +1,11 @@
 package roth.lib.api.cloudflare.modify;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 import roth.lib.api.cloudflare.DomainRequest;
 import roth.lib.api.cloudflare.type.RocketLoaderType;
 
+@Entity
 @SuppressWarnings("serial")
 public class SetRocketLoaderRequest extends DomainRequest
 {

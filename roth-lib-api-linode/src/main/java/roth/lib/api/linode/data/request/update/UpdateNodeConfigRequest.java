@@ -1,8 +1,10 @@
 package roth.lib.api.linode.data.request.update;
 
 import roth.lib.api.linode.data.request.NodeConfigRequest;
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 @SuppressWarnings("serial")
 public class UpdateNodeConfigRequest extends NodeConfigRequest
 {

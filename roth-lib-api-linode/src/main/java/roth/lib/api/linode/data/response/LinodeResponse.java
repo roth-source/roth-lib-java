@@ -4,8 +4,10 @@ import java.io.Serializable;
 import java.util.LinkedList;
 
 import roth.lib.api.linode.data.model.LinodeError;
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 @SuppressWarnings("serial")
 public class LinodeResponse<T> implements Serializable
 {

@@ -2,8 +2,10 @@ package roth.lib.api.twilio.call;
 
 import java.io.Serializable;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 @SuppressWarnings("serial")
 public class MakeCallRequest implements Serializable
 {

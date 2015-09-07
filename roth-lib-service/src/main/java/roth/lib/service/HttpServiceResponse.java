@@ -2,8 +2,10 @@ package roth.lib.service;
 
 import java.io.Serializable;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 @SuppressWarnings("serial")
 public class HttpServiceResponse implements Serializable
 {

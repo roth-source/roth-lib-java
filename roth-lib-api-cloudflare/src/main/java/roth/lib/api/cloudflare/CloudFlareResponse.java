@@ -3,8 +3,10 @@ package roth.lib.api.cloudflare;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 @SuppressWarnings("serial")
 public class CloudFlareResponse<T> implements Serializable
 {

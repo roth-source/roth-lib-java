@@ -1,9 +1,11 @@
 package roth.lib.api.cloudflare.modify;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 import roth.lib.api.cloudflare.DomainRequest;
 import roth.lib.api.cloudflare.type.SecurityLevelType;
 
+@Entity
 @SuppressWarnings("serial")
 public class SetSecurityLevelRequest extends DomainRequest
 {

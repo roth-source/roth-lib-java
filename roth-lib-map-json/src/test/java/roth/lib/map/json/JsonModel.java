@@ -7,10 +7,12 @@ import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 import roth.lib.map.MapperConfig;
 import roth.lib.map.MapperReflector;
 
+@Entity
 public class JsonModel
 {
 	

@@ -1,8 +1,10 @@
 package roth.lib.api.linode.data.request.action;
 
 import roth.lib.api.linode.data.request.LinodeRequest;
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 @SuppressWarnings("serial")
 public class SetRdnsNodeIpRequest extends LinodeRequest
 {

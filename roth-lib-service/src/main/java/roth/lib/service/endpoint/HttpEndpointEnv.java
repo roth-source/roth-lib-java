@@ -1,7 +1,9 @@
 package roth.lib.service.endpoint;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 public class HttpEndpointEnv
 {
 	@Property(name = "env")

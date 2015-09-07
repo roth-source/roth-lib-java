@@ -4,9 +4,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 import roth.lib.map.xml.annotation.XmlProperty;
 
+@Entity
 @XmlProperty(name = "test-sub")
 public class XmlSubModel
 {

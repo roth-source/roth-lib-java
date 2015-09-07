@@ -2,8 +2,10 @@ package roth.lib.api.cloudflare.access;
 
 import roth.lib.api.cloudflare.DomainRequest;
 import roth.lib.api.cloudflare.type.IntervalType;
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 @SuppressWarnings("serial")
 public class GetStatsRequest extends DomainRequest
 {

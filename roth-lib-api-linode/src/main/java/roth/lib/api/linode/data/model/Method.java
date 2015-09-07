@@ -3,8 +3,10 @@ package roth.lib.api.linode.data.model;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 @SuppressWarnings("serial")
 public class Method implements Serializable
 {

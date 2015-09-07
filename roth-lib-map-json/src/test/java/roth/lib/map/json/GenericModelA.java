@@ -1,7 +1,9 @@
 package roth.lib.map.json;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 public class GenericModelA
 {
 	@Property(name = "value")

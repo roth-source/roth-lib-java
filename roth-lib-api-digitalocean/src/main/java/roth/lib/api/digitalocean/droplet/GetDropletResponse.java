@@ -2,10 +2,12 @@ package roth.lib.api.digitalocean.droplet;
 
 import java.io.Serializable;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 import roth.lib.api.digitalocean.model.Droplet;
 import roth.lib.api.digitalocean.model.Links;
 
+@Entity
 @SuppressWarnings("serial")
 public class GetDropletResponse implements Serializable
 {

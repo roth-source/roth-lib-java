@@ -1,8 +1,10 @@
 package roth.lib.api.linode.data.request.delete;
 
 import roth.lib.api.linode.data.request.NodeIdRequest;
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 @SuppressWarnings("serial")
 public class DeleteNodeRequest extends NodeIdRequest
 {

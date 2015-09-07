@@ -1,10 +1,12 @@
 package roth.lib.api.cloudflare.record;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 import roth.lib.api.cloudflare.DomainRequest;
 import roth.lib.api.cloudflare.type.ProtocolType;
 import roth.lib.api.cloudflare.type.RecordType;
 
+@Entity
 @SuppressWarnings("serial")
 public abstract class RecordRequest extends DomainRequest
 {

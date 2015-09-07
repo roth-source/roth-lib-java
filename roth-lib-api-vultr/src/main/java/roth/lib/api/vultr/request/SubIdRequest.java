@@ -1,7 +1,9 @@
 package roth.lib.api.vultr.request;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 
+@Entity
 @SuppressWarnings("serial")
 public class SubIdRequest extends VultrRequest
 {

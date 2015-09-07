@@ -2,9 +2,11 @@ package roth.lib.api.twilio.message;
 
 import java.util.Calendar;
 
+import roth.lib.annotation.Entity;
 import roth.lib.annotation.Property;
 import roth.lib.api.twilio.TwilioResponse;
 
+@Entity
 @SuppressWarnings("serial")
 public class SendMessageResponse extends TwilioResponse
 {
