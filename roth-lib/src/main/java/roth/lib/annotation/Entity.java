@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface Entity
 {
-	String name();
+	String name() default "";
 	
 }

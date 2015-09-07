@@ -10,6 +10,7 @@ import roth.lib.accessor.GetEntityNameAccessor;
 import roth.lib.accessor.GetExcludesAccessor;
 import roth.lib.accessor.GetPropertyNameAccessor;
 import roth.lib.accessor.GetTimeFormatAccessor;
+import roth.lib.accessor.IsEntityAccessor;
 import roth.lib.accessor.IsGeneratedAccessor;
 import roth.lib.accessor.IsIdAccessor;
 import roth.lib.annotation.Entity;
@@ -20,6 +21,7 @@ import roth.lib.util.ReflectionUtil;
 
 public abstract class EntityReflector
 {
+	protected LinkedList<IsEntityAccessor<? extends Annotation>> isEntityAccessors = new LinkedList<IsEntityAccessor<? extends Annotation>>();
 	protected LinkedList<GetEntityNameAccessor<? extends Annotation>> getEntityNameAccessors = new LinkedList<GetEntityNameAccessor<? extends Annotation>>();
 	protected LinkedList<GetPropertyNameAccessor<? extends Annotation>> getPropertyNameAccessors = new LinkedList<GetPropertyNameAccessor<? extends Annotation>>();
 	protected LinkedList<IsIdAccessor<? extends Annotation>> isIdAccessors = new LinkedList<IsIdAccessor<? extends Annotation>>();
@@ -31,6 +33,7 @@ public abstract class EntityReflector
 	
 	protected EntityReflector()
 	{
+		addIsEntityAccessor(new IsEntityAccessor<Entity>(Entity.class){});
 		addGetEntityNameAccessor(new GetEntityNameAccessor<Entity>(Entity.class)
 		{
 			@Override
@@ -57,6 +60,12 @@ public abstract class EntityReflector
 				return property.exclude();
 			}
 		});
+	}
+	
+	public EntityReflector addIsEntityAccessor(IsEntityAccessor<? extends Annotation> isEntityAccessor)
+	{
+		isEntityAccessors.addFirst(isEntityAccessor);
+		return this;
 	}
 	
 	public EntityReflector addGetEntityNameAccessor(GetEntityNameAccessor<? extends Annotation> getEntityNameAccessor)
@@ -95,6 +104,11 @@ public abstract class EntityReflector
 		return this;
 	}
 	
+	public LinkedList<IsEntityAccessor<? extends Annotation>> getIsEntityAccessors()
+	{
+		return isEntityAccessors;
+	}
+	
 	public LinkedList<GetEntityNameAccessor<? extends Annotation>> getGetEntityNameAccessors()
 	{
 		return getEntityNameAccessors;
@@ -128,6 +142,18 @@ public abstract class EntityReflector
 	public LinkedHashMap<Type, LinkedList<PropertyReflector>> getPropertyReflectorsMap()
 	{
 		return propertyReflectorsMap;
+	}
+	
+	public boolean isEntity(Type type)
+	{
+		for(IsEntityAccessor<? extends Annotation> isEntityAccessor : getIsEntityAccessors())
+		{
+			if(isEntityAccessor.isEntity(type))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public String getEntityName(Type type)
@@ -298,11 +324,6 @@ public abstract class EntityReflector
 			}
 		}
 		return false;
-	}
-	
-	public boolean isEntity(Type type)
-	{
-		return !getPropertyReflectors(type).isEmpty();
 	}
 	
 }
