@@ -115,11 +115,14 @@ public enum MimeType
 	
 	public static MimeType fromString(String value)
 	{
-		for(MimeType mimeType : values())
+		if(value != null)
 		{
-			if(mimeType.value.equalsIgnoreCase(value))
+			for(MimeType mimeType : values())
 			{
-				return mimeType;
+				if(mimeType.value.equalsIgnoreCase(value))
+				{
+					return mimeType;
+				}
 			}
 		}
 		return null;

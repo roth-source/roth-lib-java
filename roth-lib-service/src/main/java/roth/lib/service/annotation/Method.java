@@ -10,14 +10,15 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface Method
 {
-	String name();
-	boolean ajax();
-	boolean api();
-	boolean authenticated();
-	boolean post() default true;
-	boolean get() default false;
-	boolean put() default false;
-	boolean delete() default false;
-	boolean gzippedInput() default false;
+	String name() 				default "";
+	String context() 			default "";
+	boolean ajax() 				default true;
+	boolean api() 				default false;
+	boolean authenticated() 	default true;
+	boolean post() 				default true;
+	boolean get() 				default false;
+	boolean put() 				default false;
+	boolean delete() 			default false;
+	boolean gzippedInput() 		default false;
 	
 }

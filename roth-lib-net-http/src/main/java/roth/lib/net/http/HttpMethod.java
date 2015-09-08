@@ -10,7 +10,7 @@ public enum HttpMethod
 	DELETE,
 	;
 	
-	public static HttpMethod get(String value)
+	public static HttpMethod fromString(String value)
 	{
 		HttpMethod httpMethod = null;
 		try

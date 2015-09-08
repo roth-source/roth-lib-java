@@ -7,7 +7,7 @@ public enum HttpServiceType
 	NOT_FOUND,
 	;
 	
-	public static HttpServiceType get(String serviceName)
+	public static HttpServiceType fromString(String serviceName)
 	{
 		HttpServiceType serviceType = NOT_FOUND;
 		try

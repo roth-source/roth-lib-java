@@ -10,7 +10,7 @@ import roth.lib.service.util.TaskUtil;
 public class HttpTaskService extends HttpService
 {
 	
-	@Method(name = "getProgress", ajax = true, api = false, authenticated = false)
+	@Method(authenticated = false)
 	public HttpTaskProgress getProgress(HttpTaskRequest request)
 	{
 		HttpTaskProgress response = new HttpTaskProgress();
@@ -18,16 +18,29 @@ public class HttpTaskService extends HttpService
 		return response;
 	}
 	
-	@Method(name = "getResponse", ajax = true, api = false, authenticated = false)
+	@Method(authenticated = false)
 	public HttpServiceResponse getResponse(HttpTaskRequest request)
 	{
 		return TaskUtil.getResponse(httpServletRequest.getSession(), request.getTaskId());
 	}
 	
 	@Override
-	public boolean isAuthorized(Object request)
+	public boolean isAjaxAuthenticated(String context)
 	{
 		return true;
 	}
+	
+	@Override
+	public boolean isApiAuthenticated(String context)
+	{
+		return true;
+	}
+	
+	@Override
+	public boolean isAuthorized(String context, Object request)
+	{
+		return true;
+	}
+	
 	
 }

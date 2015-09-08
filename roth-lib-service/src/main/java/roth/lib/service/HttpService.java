@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -80,6 +81,7 @@ public abstract class HttpService
 		fieldValidators.put(EMAIL, emailValidator);
 	}
 	
+	protected ServletContext servletContext;
 	protected HttpServletRequest httpServletRequest;
 	protected HttpServletResponse httpServletResponse;
 	protected String service;
@@ -90,9 +92,14 @@ public abstract class HttpService
 		
 	}
 	
-	//public abstract boolean isAjaxAuthenticated(Ajax ajax);
-	//public abstract boolean isApiAuthenticated(Api api);
-	public abstract boolean isAuthorized(Object request);
+	public abstract boolean isAjaxAuthenticated(String context);
+	public abstract boolean isApiAuthenticated(String context);
+	public abstract boolean isAuthorized(String context, Object request);
+	
+	public ServletContext getServletContext()
+	{
+		return servletContext;
+	}
 	
 	public HttpServletRequest getHttpServletRequest()
 	{
@@ -112,6 +119,12 @@ public abstract class HttpService
 	public String getMethod()
 	{
 		return method;
+	}
+	
+	public HttpService setServletContext(ServletContext servletContext)
+	{
+		this.servletContext = servletContext;
+		return this;
 	}
 	
 	public HttpService setHttpServletRequest(HttpServletRequest httpServletRequest)
