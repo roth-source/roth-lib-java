@@ -120,7 +120,7 @@ public class MethodReflector
 	{
 		Parameter parameter = null;
 		Parameter[] parameters = method.getParameters();
-		if(parameters != null)
+		if(parameters != null && parameters.length > 0)
 		{
 			parameter = parameters[0];
 		}
@@ -190,7 +190,6 @@ public class MethodReflector
 	public MethodReflector setMethod(Method method)
 	{
 		this.method = method;
-		method.setAccessible(true);
 		return this;
 	}
 	

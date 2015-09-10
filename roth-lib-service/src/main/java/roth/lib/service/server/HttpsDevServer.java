@@ -56,7 +56,7 @@ public class HttpsDevServer
 		port = 8443;
 		server = new Server();
 		sslContextFactory = new SslContextFactory();
-		sslContextFactory.setKeyStorePath(getClass().getResource("localhost.jks").toExternalForm());
+		sslContextFactory.setKeyStorePath(getClass().getClassLoader().getResource("localhost.jks").toExternalForm());
 		sslContextFactory.setKeyStorePassword("localhost");
 		sslContextFactory.setKeyManagerPassword("localhost");
 		httpsConfig = new HttpConfiguration();

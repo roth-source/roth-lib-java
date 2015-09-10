@@ -99,6 +99,7 @@ public class HttpEndpoint extends HttpServlet
 							{
 								service.setHttpServletRequest(request).setHttpServletResponse(response);
 								service.setService(serviceMethod.getServiceName()).setMethod(serviceMethod.getMethodName());
+								service.initDev();
 								MethodReflector methodReflector = getMethodReflector(request, response, service.getClass(), serviceMethod.getServiceName(), serviceMethod.getMethodName());
 								if(methodReflector != null)
 								{
@@ -136,7 +137,6 @@ public class HttpEndpoint extends HttpServlet
 															Object methodResponse = methodReflector.invoke(service, methodRequest);
 															if(methodResponse != null)
 															{
-																
 																response.setHeader(CONTENT_TYPE, getResponseContentType(request, response).toString());
 																if(dev && methodResponse instanceof HttpServiceResponse)
 																{

@@ -7,7 +7,7 @@ import roth.lib.service.util.InitialContextUtil;
 public class HttpEndpointService extends HttpService
 {
 	
-	@Method(authenticated = false)
+	@Method(authenticated = false, get = true)
 	public HttpEndpointEnv env()
 	{
 		HttpEndpointEnv endpointEnv = new HttpEndpointEnv();
@@ -23,7 +23,7 @@ public class HttpEndpointService extends HttpService
 		return endpointEnv;
 	}
 	
-	@Method(authenticated = false)
+	@Method(authenticated = false, get = true)
 	public HttpEndpointList list()
 	{
 		HttpEndpointList endpointList = new HttpEndpointList();
@@ -39,7 +39,7 @@ public class HttpEndpointService extends HttpService
 		return endpointList;
 	}
 	
-	@Method(authenticated = false)
+	@Method(authenticated = false, get = true)
 	protected String getEndpoint()
 	{
 		StringBuilder builder = new StringBuilder();

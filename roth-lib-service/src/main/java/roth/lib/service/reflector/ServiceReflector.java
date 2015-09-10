@@ -31,6 +31,7 @@ public class ServiceReflector
 			Method methodAnnotation = ReflectionUtil.getAnnotation(serviceClass, method, Method.class);
 			if(methodAnnotation != null)
 			{
+				method.setAccessible(true);
 				MethodReflector methodReflector = new MethodReflector();
 				String methodName = methodAnnotation.name();
 				if(methodName == null || methodName.isEmpty())
@@ -49,6 +50,7 @@ public class ServiceReflector
 				methodReflector.setDelete(methodAnnotation.delete());
 				methodReflector.setGzippedInput(methodAnnotation.gzippedInput());
 				methodReflector.setMethod(method);
+				methodReflectors.add(methodReflector);
 			}
 		}
 		return methodReflectors;
