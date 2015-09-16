@@ -441,7 +441,7 @@ public class JsonMapper extends Mapper
 		try
 		{
 			readUntil(reader, LEFT_BRACE);
-			map = (LinkedHashMap<String, Object>) readEntity(reader, LinkedHashMap.class);
+			map = (LinkedHashMap<String, Object>) readMap(reader, LinkedHashMap.class);
 		}
 		catch(Exception e)
 		{
