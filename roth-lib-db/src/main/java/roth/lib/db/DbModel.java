@@ -1,13 +1,16 @@
 package roth.lib.db;
 
-import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 
+import roth.lib.Model;
+import roth.lib.reflector.PropertyReflector;
+
 @SuppressWarnings({"serial","unchecked"})
-public abstract class DbModel implements Serializable
+public abstract class DbModel extends Model
 {
 	protected transient LinkedHashMap<String, Object> dirtyIdMap = new LinkedHashMap<String, Object>();
 	protected transient LinkedHashSet<String> dirtyNames = new LinkedHashSet<String>();
@@ -156,6 +159,35 @@ public abstract class DbModel implements Serializable
 		return (T) this;
 	}
 	
+	public <T extends DbModel> T sync(DbDataSource db)
+	{
+		setDb(db);
+		T presistedModel = (T) db.query(this);
+		if(presistedModel != null)
+		{
+			persisted();
+			LinkedHashMap<String, PropertyReflector> fieldPropertyReflectorMap = db.getReflector().getFieldPropertyReflectorMap(getClass());
+			for(String deserializedName : getDeserializedNames())
+			{
+				try
+				{
+					PropertyReflector propertyReflector = fieldPropertyReflectorMap.get(deserializedName);
+					if(propertyReflector != null)
+					{
+						Field field = propertyReflector.getField();
+						setDirty(deserializedName, field.get(presistedModel), field.get(this));
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			resetDeserializedNames();
+		}
+		return (T) save();
+	}
+	
 	public boolean isDirty()
 	{
 		return !dirtyNames.isEmpty();
@@ -173,7 +205,7 @@ public abstract class DbModel implements Serializable
 	
 	public <T> T setDirtyId(String name, T oldValue, T value)
 	{
-		if(isPersisted() && !Objects.equals(oldValue, value))
+		if(!Objects.equals(oldValue, value))
 		{
 			dirtyNames.add(name);
 			dirtyIdMap.put(name, oldValue);
@@ -183,7 +215,7 @@ public abstract class DbModel implements Serializable
 	
 	public <T> T setDirty(String name, T oldValue, T value)
 	{
-		if(isPersisted() && !Objects.equals(oldValue, value))
+		if(!Objects.equals(oldValue, value))
 		{
 			dirtyNames.add(name);
 		}

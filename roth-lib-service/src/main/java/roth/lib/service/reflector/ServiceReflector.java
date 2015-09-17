@@ -4,56 +4,56 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 import roth.lib.service.HttpService;
-import roth.lib.service.annotation.Method;
+import roth.lib.service.annotation.ServiceMethod;
 import roth.lib.util.ReflectionUtil;
 
 public class ServiceReflector
 {
 	protected Class<?> serviceClass;
 	protected String serviceName;
-	protected LinkedHashMap<String, MethodReflector> methodReflectorMap = new LinkedHashMap<String, MethodReflector>();
+	protected LinkedHashMap<String, ServiceMethodReflector> serviceMethodReflectorMap = new LinkedHashMap<String, ServiceMethodReflector>();
 	
 	public ServiceReflector(Class<?> serviceClass, String serviceName)
 	{
 		this.serviceClass = serviceClass;
 		this.serviceName = serviceName;
-		for(MethodReflector methodReflector : getMethodReflectors(serviceClass))
+		for(ServiceMethodReflector methodReflector : getServiceMethodReflectors(serviceClass))
 		{
-			methodReflectorMap.put(methodReflector.getName(), methodReflector);
+			serviceMethodReflectorMap.put(methodReflector.getName(), methodReflector);
 		}
 	}
 	
-	protected static LinkedList<MethodReflector> getMethodReflectors(Class<?> serviceClass)
+	protected static LinkedList<ServiceMethodReflector> getServiceMethodReflectors(Class<?> serviceClass)
 	{
-		LinkedList<MethodReflector> methodReflectors = new LinkedList<MethodReflector>();
+		LinkedList<ServiceMethodReflector> serviceMethodReflectors = new LinkedList<ServiceMethodReflector>();
 		for(java.lang.reflect.Method method : ReflectionUtil.getMethods(serviceClass, HttpService.class))
 		{
-			Method methodAnnotation = ReflectionUtil.getAnnotation(serviceClass, method, Method.class);
-			if(methodAnnotation != null)
+			ServiceMethod serviceMethod = ReflectionUtil.getAnnotation(serviceClass, method, ServiceMethod.class);
+			if(serviceMethod != null)
 			{
 				method.setAccessible(true);
-				MethodReflector methodReflector = new MethodReflector();
-				String methodName = methodAnnotation.name();
+				ServiceMethodReflector serviceMethodReflector = new ServiceMethodReflector();
+				String methodName = serviceMethod.name();
 				if(methodName == null || methodName.isEmpty())
 				{
 					methodName = method.getName();
 				}
-				methodReflector.setName(methodName);
-				String context = methodAnnotation.context();
-				methodReflector.setContext(context != null && !context.isEmpty() ? context : null);
-				methodReflector.setAjax(methodAnnotation.ajax());
-				methodReflector.setApi(methodAnnotation.api());
-				methodReflector.setAuthenticated(methodAnnotation.authenticated());
-				methodReflector.setPost(methodAnnotation.post());
-				methodReflector.setGet(methodAnnotation.get());
-				methodReflector.setPut(methodAnnotation.put());
-				methodReflector.setDelete(methodAnnotation.delete());
-				methodReflector.setGzippedInput(methodAnnotation.gzippedInput());
-				methodReflector.setMethod(method);
-				methodReflectors.add(methodReflector);
+				serviceMethodReflector.setName(methodName);
+				String context = serviceMethod.context();
+				serviceMethodReflector.setContext(context != null && !context.isEmpty() ? context : null);
+				serviceMethodReflector.setAjax(serviceMethod.ajax());
+				serviceMethodReflector.setApi(serviceMethod.api());
+				serviceMethodReflector.setAuthenticated(serviceMethod.authenticated());
+				serviceMethodReflector.setPost(serviceMethod.post());
+				serviceMethodReflector.setGet(serviceMethod.get());
+				serviceMethodReflector.setPut(serviceMethod.put());
+				serviceMethodReflector.setDelete(serviceMethod.delete());
+				serviceMethodReflector.setGzippedInput(serviceMethod.gzippedInput());
+				serviceMethodReflector.setMethod(method);
+				serviceMethodReflectors.add(serviceMethodReflector);
 			}
 		}
-		return methodReflectors;
+		return serviceMethodReflectors;
 	}
 	
 	public Class<?> getServiceClass()
@@ -66,9 +66,9 @@ public class ServiceReflector
 		return serviceName;
 	}
 	
-	public LinkedHashMap<String, MethodReflector> getMethodReflectorMap()
+	public LinkedHashMap<String, ServiceMethodReflector> getServiceMethodReflectorMap()
 	{
-		return methodReflectorMap;
+		return serviceMethodReflectorMap;
 	}
 	
 	public ServiceReflector setServiceClass(Class<?> serviceClass)
@@ -83,9 +83,9 @@ public class ServiceReflector
 		return this;
 	}
 	
-	public ServiceReflector setMethodReflectorMap(LinkedHashMap<String, MethodReflector> methodReflectorMap)
+	public ServiceReflector setMethodReflectorMap(LinkedHashMap<String, ServiceMethodReflector> serviceMethodReflectorMap)
 	{
-		this.methodReflectorMap = methodReflectorMap;
+		this.serviceMethodReflectorMap = serviceMethodReflectorMap;
 		return this;
 	}
 	

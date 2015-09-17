@@ -2,7 +2,7 @@ package roth.lib.service.task;
 
 import roth.lib.service.HttpService;
 import roth.lib.service.HttpServiceResponse;
-import roth.lib.service.annotation.Method;
+import roth.lib.service.annotation.ServiceMethod;
 import roth.lib.service.annotation.Service;
 import roth.lib.service.util.TaskUtil;
 
@@ -10,7 +10,7 @@ import roth.lib.service.util.TaskUtil;
 public class HttpTaskService extends HttpService
 {
 	
-	@Method(authenticated = false)
+	@ServiceMethod(authenticated = false)
 	public HttpTaskProgress getProgress(HttpTaskRequest request)
 	{
 		HttpTaskProgress response = new HttpTaskProgress();
@@ -18,7 +18,7 @@ public class HttpTaskService extends HttpService
 		return response;
 	}
 	
-	@Method(authenticated = false)
+	@ServiceMethod(authenticated = false)
 	public HttpServiceResponse getResponse(HttpTaskRequest request)
 	{
 		return TaskUtil.getResponse(httpServletRequest.getSession(), request.getTaskId());

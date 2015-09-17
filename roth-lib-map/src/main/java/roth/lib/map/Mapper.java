@@ -18,6 +18,7 @@ import java.util.Map;
 import roth.lib.Callback;
 import roth.lib.Characters;
 import roth.lib.Generic;
+import roth.lib.Model;
 
 public abstract class Mapper implements Characters
 {
@@ -313,6 +314,14 @@ public abstract class Mapper implements Characters
 			builder.append(TAB);
 		}
 		return builder.toString();
+	}
+	
+	protected void setDeserializedName(Object model, String name)
+	{
+		if(model instanceof Model)
+		{
+			((Model) model).setDeserializedName(name);
+		}
 	}
 	
 }

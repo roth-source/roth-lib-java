@@ -27,6 +27,7 @@
 		<module>../roth-lib-net-http</module>
 		<module>../roth-lib-net-ssh</module>
 		<module>../roth-lib-service</module>
+		<module>../roth-lib-static</module>
 		<module>../roth-lib-template</module>
 		<module>../roth-lib-framework</module>
 		<module>../roth-lib-api</module>

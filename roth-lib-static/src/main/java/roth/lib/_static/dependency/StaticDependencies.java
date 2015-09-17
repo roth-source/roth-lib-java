@@ -1,4 +1,4 @@
-package roth.lib.service.dependency;
+package roth.lib._static.dependency;
 
 import java.io.File;
 import java.io.FileOutputStream;

@@ -495,6 +495,7 @@ public class JsonMapper extends Mapper
 							{
 								setTimeFormat(propertyReflector.getTimeFormat());
 								field.set(model, deserializer.deserialize(value, getTimeFormat(), fieldClass));
+								setDeserializedName(model, propertyReflector.getFieldName());
 							}
 						}
 						name = null;
@@ -538,11 +539,13 @@ public class JsonMapper extends Mapper
 								{
 									setTimeFormat(propertyReflector.getTimeFormat());
 									field.set(model, deserializer.deserialize(value, getTimeFormat(), fieldClass));
+									setDeserializedName(model, propertyReflector.getFieldName());
 								}
 							}
 							else
 							{
 								field.set(model, null);
+								setDeserializedName(model, propertyReflector.getFieldName());
 							}
 						}
 						name = null;
@@ -571,11 +574,13 @@ public class JsonMapper extends Mapper
 							{
 								Object value = readEntity(reader, fieldType);
 								field.set(model, value);
+								setDeserializedName(model, propertyReflector.getFieldName());
 							}
 							else
 							{
 								Object value = readMap(reader, fieldType);
 								field.set(model, value);
+								setDeserializedName(model, propertyReflector.getFieldName());
 							}
 						}
 						else
@@ -599,6 +604,7 @@ public class JsonMapper extends Mapper
 							Type fieldType = propertyReflector.getFieldType();
 							Object value = readArray(reader, fieldType);
 							field.set(model, value);
+							setDeserializedName(model, propertyReflector.getFieldName());
 						}
 						else
 						{

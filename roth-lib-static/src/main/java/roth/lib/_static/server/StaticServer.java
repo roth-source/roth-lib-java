@@ -1,17 +1,23 @@
-package roth.lib.service.server;
+package roth.lib._static.server;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.util.Scanner;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
 
-public class HttpDevServer
+public class StaticServer
 {
 	protected static String USER_DIR		= "user.dir";
 	protected static String WEB_APP			= "src/main/webapp/";
@@ -28,6 +34,8 @@ public class HttpDevServer
 	protected File webInfDir;
 	protected int port;
 	protected Server server;
+	protected SslContextFactory sslContextFactory;
+	protected HttpConfiguration httpsConfig;
 	protected ServerConnector serverConnector;
 	protected WebAppContext webAppContext;
 	protected String contextPath;
@@ -35,7 +43,7 @@ public class HttpDevServer
 	protected int scanInterval;
 	protected Scanner.Listener scanListener;
 	
-	public HttpDevServer()
+	public StaticServer()
 	{
 		init();
 	}
@@ -45,9 +53,16 @@ public class HttpDevServer
 		projectDir = new File(System.getProperty(USER_DIR));
 		webAppDir = new File(projectDir, WEB_APP);
 		webInfDir = new File(webAppDir, WEB_INF);
-		port = 8080;
+		port = 8443;
 		server = new Server();
-		serverConnector = new ServerConnector(server);
+		sslContextFactory = new SslContextFactory();
+		sslContextFactory.setKeyStorePath(getClass().getClassLoader().getResource("localhost.jks").toExternalForm());
+		sslContextFactory.setKeyStorePassword("localhost");
+		sslContextFactory.setKeyManagerPassword("localhost");
+		httpsConfig = new HttpConfiguration();
+		httpsConfig.setSecureScheme("https");
+		httpsConfig.addCustomizer(new SecureRequestCustomizer());
+		serverConnector = new ServerConnector(server, new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()), new HttpConnectionFactory(httpsConfig));
 		webAppContext = new WebAppContext();
 		contextPath = "/";
 		scanner = new Scanner();
@@ -121,7 +136,7 @@ public class HttpDevServer
 		return scanListener;
 	}
 	
-	public HttpDevServer setProjectDir(File projectDir)
+	public StaticServer setProjectDir(File projectDir)
 	{
 		this.projectDir = projectDir;
 		this.webAppDir = new File(projectDir, WEB_APP);
@@ -129,62 +144,62 @@ public class HttpDevServer
 		return this;
 	}
 	
-	public HttpDevServer setWebAppDir(File webAppDir)
+	public StaticServer setWebAppDir(File webAppDir)
 	{
 		this.webAppDir = webAppDir;
 		this.webInfDir = new File(webAppDir, WEB_INF);
 		return this;
 	}
 	
-	public HttpDevServer setWebInfDir(File webInfDir)
+	public StaticServer setWebInfDir(File webInfDir)
 	{
 		this.webInfDir = webInfDir;
 		return this;
 	}
 	
-	public HttpDevServer setPort(int port)
+	public StaticServer setPort(int port)
 	{
 		this.port = port;
 		return this;
 	}
 	
-	public HttpDevServer setServer(Server server)
+	public StaticServer setServer(Server server)
 	{
 		this.server = server;
 		return this;
 	}
 	
-	public HttpDevServer setServerConnector(ServerConnector serverConnector)
+	public StaticServer setServerConnector(ServerConnector serverConnector)
 	{
 		this.serverConnector = serverConnector;
 		return this;
 	}
 	
-	public HttpDevServer setWebAppContext(WebAppContext webAppContext)
+	public StaticServer setWebAppContext(WebAppContext webAppContext)
 	{
 		this.webAppContext = webAppContext;
 		return this;
 	}
 	
-	public HttpDevServer setContextPath(String contextPath)
+	public StaticServer setContextPath(String contextPath)
 	{
 		this.contextPath = contextPath;
 		return this;
 	}
 	
-	public HttpDevServer setScanner(Scanner scanner)
+	public StaticServer setScanner(Scanner scanner)
 	{
 		this.scanner = scanner;
 		return this;
 	}
 	
-	public HttpDevServer setScanInterval(int scanInterval)
+	public StaticServer setScanInterval(int scanInterval)
 	{
 		this.scanInterval = scanInterval;
 		return this;
 	}
 	
-	public HttpDevServer setScanListener(Scanner.Listener scanListener)
+	public StaticServer setScanListener(Scanner.Listener scanListener)
 	{
 		this.scanListener = scanListener;
 		return this;
@@ -195,6 +210,7 @@ public class HttpDevServer
 		try
 		{
 			serverConnector.setPort(port);
+			httpsConfig.setSecurePort(port);
 			server.setConnectors(new Connector[]{serverConnector});
 			webAppContext.setWar(webAppDir.getAbsolutePath());
 			webAppContext.setContextPath(contextPath);
@@ -214,7 +230,7 @@ public class HttpDevServer
 	
 	public static void main(String[] args)
 	{
-		HttpDevServer devServer = new HttpDevServer();
+		StaticServer devServer = new StaticServer();
 		LinkedHashMap<String, String> argMap = parseArgMap(args);
 		if(argMap.containsKey(PORT))
 		{

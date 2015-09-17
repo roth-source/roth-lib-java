@@ -17,7 +17,7 @@ import org.eclipse.jetty.util.Scanner;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
 
-public class HttpsDevServer
+public class ServiceServer
 {
 	protected static String USER_DIR		= "user.dir";
 	protected static String WEB_APP			= "src/main/webapp/";
@@ -43,7 +43,7 @@ public class HttpsDevServer
 	protected int scanInterval;
 	protected Scanner.Listener scanListener;
 	
-	public HttpsDevServer()
+	public ServiceServer()
 	{
 		init();
 	}
@@ -136,7 +136,7 @@ public class HttpsDevServer
 		return scanListener;
 	}
 	
-	public HttpsDevServer setProjectDir(File projectDir)
+	public ServiceServer setProjectDir(File projectDir)
 	{
 		this.projectDir = projectDir;
 		this.webAppDir = new File(projectDir, WEB_APP);
@@ -144,62 +144,62 @@ public class HttpsDevServer
 		return this;
 	}
 	
-	public HttpsDevServer setWebAppDir(File webAppDir)
+	public ServiceServer setWebAppDir(File webAppDir)
 	{
 		this.webAppDir = webAppDir;
 		this.webInfDir = new File(webAppDir, WEB_INF);
 		return this;
 	}
 	
-	public HttpsDevServer setWebInfDir(File webInfDir)
+	public ServiceServer setWebInfDir(File webInfDir)
 	{
 		this.webInfDir = webInfDir;
 		return this;
 	}
 	
-	public HttpsDevServer setPort(int port)
+	public ServiceServer setPort(int port)
 	{
 		this.port = port;
 		return this;
 	}
 	
-	public HttpsDevServer setServer(Server server)
+	public ServiceServer setServer(Server server)
 	{
 		this.server = server;
 		return this;
 	}
 	
-	public HttpsDevServer setServerConnector(ServerConnector serverConnector)
+	public ServiceServer setServerConnector(ServerConnector serverConnector)
 	{
 		this.serverConnector = serverConnector;
 		return this;
 	}
 	
-	public HttpsDevServer setWebAppContext(WebAppContext webAppContext)
+	public ServiceServer setWebAppContext(WebAppContext webAppContext)
 	{
 		this.webAppContext = webAppContext;
 		return this;
 	}
 	
-	public HttpsDevServer setContextPath(String contextPath)
+	public ServiceServer setContextPath(String contextPath)
 	{
 		this.contextPath = contextPath;
 		return this;
 	}
 	
-	public HttpsDevServer setScanner(Scanner scanner)
+	public ServiceServer setScanner(Scanner scanner)
 	{
 		this.scanner = scanner;
 		return this;
 	}
 	
-	public HttpsDevServer setScanInterval(int scanInterval)
+	public ServiceServer setScanInterval(int scanInterval)
 	{
 		this.scanInterval = scanInterval;
 		return this;
 	}
 	
-	public HttpsDevServer setScanListener(Scanner.Listener scanListener)
+	public ServiceServer setScanListener(Scanner.Listener scanListener)
 	{
 		this.scanListener = scanListener;
 		return this;
@@ -230,7 +230,7 @@ public class HttpsDevServer
 	
 	public static void main(String[] args)
 	{
-		HttpsDevServer devServer = new HttpsDevServer();
+		ServiceServer devServer = new ServiceServer();
 		LinkedHashMap<String, String> argMap = parseArgMap(args);
 		if(argMap.containsKey(PORT))
 		{

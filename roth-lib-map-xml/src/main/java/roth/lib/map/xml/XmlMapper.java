@@ -446,6 +446,7 @@ public class XmlMapper extends Mapper
 					{
 						Object value = readEntity(reader, fieldOpenTag, fieldType);
 						field.set(model, value);
+						setDeserializedName(model, propertyReflector.getFieldName());
 					}
 					else if(isCollection(fieldType))
 					{
@@ -454,6 +455,7 @@ public class XmlMapper extends Mapper
 						{
 							Object value = readCollection(reader, fieldType);
 							field.set(model, value);
+							setDeserializedName(model, propertyReflector.getFieldName());
 						}
 						else
 						{
@@ -467,6 +469,7 @@ public class XmlMapper extends Mapper
 									fieldConstructor.setAccessible(true);
 									collection = (Collection) fieldConstructor.newInstance();
 									field.set(model, collection);
+									setDeserializedName(model, propertyReflector.getFieldName());
 								}
 								collection.add(value);
 							}
@@ -476,11 +479,13 @@ public class XmlMapper extends Mapper
 					{
 						Object value = readArray(reader, fieldType);
 						field.set(model, value);
+						setDeserializedName(model, propertyReflector.getFieldName());
 					}
 					else if(isMap(fieldType))
 					{
 						Object value = readMap(reader, fieldType);
 						field.set(model, value);
+						setDeserializedName(model, propertyReflector.getFieldName());
 					}
 					else if(getMapperConfig().isSerializable(getTypeClass(fieldType)))
 					{
@@ -490,6 +495,7 @@ public class XmlMapper extends Mapper
 						if(deserializer != null)
 						{
 							field.set(model, deserializer.deserialize(value, getTimeFormat(), fieldClass));
+							setDeserializedName(model, propertyReflector.getFieldName());
 						}
 					}
 					else

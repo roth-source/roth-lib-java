@@ -30,7 +30,7 @@ import roth.lib.service.HttpService;
 import roth.lib.service.HttpServiceMethod;
 import roth.lib.service.HttpServiceResponse;
 import roth.lib.service.HttpServiceType;
-import roth.lib.service.reflector.MethodReflector;
+import roth.lib.service.reflector.ServiceMethodReflector;
 import roth.lib.service.reflector.ServiceReflector;
 import roth.lib.service.task.HttpTaskService;
 
@@ -100,7 +100,7 @@ public class HttpEndpoint extends HttpServlet
 								service.setHttpServletRequest(request).setHttpServletResponse(response);
 								service.setService(serviceMethod.getServiceName()).setMethod(serviceMethod.getMethodName());
 								service.initDev();
-								MethodReflector methodReflector = getMethodReflector(request, response, service.getClass(), serviceMethod.getServiceName(), serviceMethod.getMethodName());
+								ServiceMethodReflector methodReflector = getMethodReflector(request, response, service.getClass(), serviceMethod.getServiceName(), serviceMethod.getMethodName());
 								if(methodReflector != null)
 								{
 									if(methodReflector.isHttpMethodImplemented(httpMethod))
@@ -328,13 +328,13 @@ public class HttpEndpoint extends HttpServlet
 		return serviceReflector;
 	}
 	
-	protected MethodReflector getMethodReflector(HttpServletRequest request, HttpServletResponse response, Class<?> serviceClass, String serviceName, String methodName)
+	protected ServiceMethodReflector getMethodReflector(HttpServletRequest request, HttpServletResponse response, Class<?> serviceClass, String serviceName, String methodName)
 	{
-		MethodReflector methodReflector = null;
+		ServiceMethodReflector methodReflector = null;
 		ServiceReflector serviceReflector = getServiceReflector(request, response, serviceClass, serviceName);
 		if(serviceReflector != null)
 		{
-			methodReflector = serviceReflector.getMethodReflectorMap().get(methodName);
+			methodReflector = serviceReflector.getServiceMethodReflectorMap().get(methodName);
 		}
 		return methodReflector;
 	}

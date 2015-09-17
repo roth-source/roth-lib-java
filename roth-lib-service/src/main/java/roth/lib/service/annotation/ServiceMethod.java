@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 @Target(METHOD)
 @Retention(RUNTIME)
-public @interface Method
+public @interface ServiceMethod
 {
 	String name() 				default "";
 	String context() 			default "";
