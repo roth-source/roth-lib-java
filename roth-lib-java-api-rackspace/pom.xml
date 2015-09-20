@@ -1,0 +1,17 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>roth.lib.java</groupId>
+		<artifactId>roth-lib-java-pom</artifactId>
+		<relativePath>../roth-lib-java-pom</relativePath>
+		<version>0.2.3-SNAPSHOT</version>
+	</parent>
+	<artifactId>roth-lib-java-api-rackspace</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>roth.lib.java</groupId>
+			<artifactId>roth-lib-java-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+</project>
