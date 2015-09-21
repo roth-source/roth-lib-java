@@ -22,13 +22,15 @@ import roth.lib.java.util.ResourceUtil;
 
 public class StaticDependencies
 {
-	protected static String USER_DIR		= "user.dir";
-	protected static String WEB_APP			= "src/main/webapp/";
-	protected static String ENV				= "script/env.js";
-	protected static String PROJECT_DIR		= "projectDir";
-	protected static String WEB_APP_DIR		= "webAppDir";
-	protected static String ENV_FILE		= "envFile";
-	protected static String ENGINE			= "nashorn";
+	protected static String ROTH_LIB_JS_ENV		= "roth-lib-js-env.js";
+	protected static String GET_DEPENDENCIES	= "getDependencies";
+	protected static String USER_DIR			= "user.dir";
+	protected static String WEB_APP				= "src/main/webapp/";
+	protected static String ENV					= "script/env.js";
+	protected static String PROJECT_DIR			= "projectDir";
+	protected static String WEB_APP_DIR			= "webAppDir";
+	protected static String ENV_FILE			= "envFile";
+	protected static String ENGINE				= "nashorn";
 	
 	protected File projectDir;
 	protected File webAppDir;
@@ -83,9 +85,9 @@ public class StaticDependencies
 		if(envFile.exists())
 		{
 			JsonMapper mapper = new JsonMapper(new MapperConfig(true));
-			engine.eval(ResourceUtil.toString("dependency.js"));
+			engine.eval(ResourceUtil.toString(ROTH_LIB_JS_ENV));
 			engine.eval(FileUtil.toString(envFile));
-			String json = (String) ((Invocable) engine).invokeFunction("getDependencies");
+			String json = (String) ((Invocable) engine).invokeFunction(GET_DEPENDENCIES);
 			LinkedList<Dependency> dependencies = mapper.deserialize(json, new Generic<LinkedList<Dependency>>(){});
 			download(dependencies);
 		}
