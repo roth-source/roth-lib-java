@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import roth.lib.java.annotation.Filter;
 import roth.lib.java.annotation.Required;
 import roth.lib.java.annotation.Validate;
+import roth.lib.java.map.Mapper;
 import roth.lib.java.service.endpoint.HttpError;
 import roth.lib.java.service.endpoint.HttpErrorType;
 import roth.lib.java.util.IdUtil;
@@ -84,6 +85,8 @@ public abstract class HttpService
 	protected ServletContext servletContext;
 	protected HttpServletRequest httpServletRequest;
 	protected HttpServletResponse httpServletResponse;
+	protected Mapper requestMapper;
+	protected Mapper responseMapper;
 	protected String service;
 	protected String method;
 	
@@ -109,6 +112,16 @@ public abstract class HttpService
 	public HttpServletResponse getHttpServletResponse()
 	{
 		return httpServletResponse;
+	}
+	
+	public Mapper getRequestMapper()
+	{
+		return requestMapper;
+	}
+	
+	public Mapper getResponseMapper()
+	{
+		return responseMapper;
 	}
 	
 	public String getService()
@@ -137,6 +150,16 @@ public abstract class HttpService
 	{
 		this.httpServletResponse = httpServletResponse;
 		return this;
+	}
+	
+	public void setRequestMapper(Mapper requestMapper)
+	{
+		this.requestMapper = requestMapper;
+	}
+	
+	public void setResponseMapper(Mapper responseMapper)
+	{
+		this.responseMapper = responseMapper;
 	}
 	
 	public HttpService setService(String service)

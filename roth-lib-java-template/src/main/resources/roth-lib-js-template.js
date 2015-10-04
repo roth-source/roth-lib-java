@@ -2,7 +2,7 @@ var roth = roth || {};
 roth.lib = roth.lib || {};
 roth.lib.js = roth.lib.js || {};
 roth.lib.js.template = roth.lib.js.template || {};
-roth.lib.js.template.version = "0.1.4-SNAPSHOT";
+roth.lib.js.template.version = "0.1.5-SNAPSHOT";
 
 roth.lib.js.template.Template = roth.lib.js.template.Template || function(config)
 {
@@ -40,8 +40,11 @@ roth.lib.js.template.Template = roth.lib.js.template.Template || function(config
 			}
 		}
 		var builder = "";
+		builder += "\\\\r\\\\n|";
+		builder += "\\\\n|";
 		builder += "\\r\\n|";
 		builder += "\\n|";
+		builder += "\\\\\"|";
 		builder += "\\\"|";
 		builder += escapeRegExp(config.openUnescapedExpression) + "|";
 		builder += escapeRegExp(config.openEscapedExpression) + "|";
@@ -72,10 +75,21 @@ roth.lib.js.template.Template = roth.lib.js.template.Template || function(config
 			var replacement = "";
 			switch(match)
 			{
+				case "\\r\\n":
+				case "\\n":
+				{
+					replacement = escape ? "\\\\n" : "\\n";
+					break;
+				}
 				case "\r\n":
 				case "\n":
 				{
 					replacement = escape ? "\\n" : "\n";
+					break;
+				}
+				case "\\\"":
+				{
+					replacement = escape ? "\\\\\\\"" : "\\\"";
 					break;
 				}
 				case "\"":
@@ -145,5 +159,6 @@ roth.lib.js.template.Template = roth.lib.js.template.Template || function(config
 	};
 	
 };
+
 
 

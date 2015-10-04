@@ -31,16 +31,6 @@
 		<module>../roth-lib-java-template</module>
 		<module>../roth-lib-java-framework</module>
 		<module>../roth-lib-java-api</module>
-		<module>../roth-lib-java-api-amazon</module>
-		<module>../roth-lib-java-api-cloudflare</module>
-		<module>../roth-lib-java-api-digitalocean</module>
-		<module>../roth-lib-java-api-gandi</module>
-		<module>../roth-lib-java-api-google</module>
-		<module>../roth-lib-java-api-linode</module>
-		<module>../roth-lib-java-api-namecheap</module>
-		<module>../roth-lib-java-api-rackspace</module>
-		<module>../roth-lib-java-api-twilio</module>
-		<module>../roth-lib-java-api-vultr</module>
 	</modules>
 	<build>
 		<plugins>
@@ -86,7 +76,7 @@
 	<distributionManagement>
 		<repository>
 			<id>roth-dist</id>
-			<url>scp://root@dist-deploy.roth.cm/opt/nginx/base/apps/dist/</url>
+			<url>scp://root@dist.roth.cm/opt/nginx/base/apps/dist/</url>
 		</repository>
 	</distributionManagement>
 </project>

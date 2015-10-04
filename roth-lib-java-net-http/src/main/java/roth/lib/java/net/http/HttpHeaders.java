@@ -13,8 +13,8 @@ import java.util.Map.Entry;
 import roth.lib.java.Characters;
 import roth.lib.java.net.http.type.AuthorizationType;
 import roth.lib.java.net.http.type.EncodingType;
-import roth.lib.java.net.http.type.MimeType;
 import roth.lib.java.net.http.util.HeaderUtil;
+import roth.lib.java.type.MimeType;
 
 public class HttpHeaders implements Characters
 {

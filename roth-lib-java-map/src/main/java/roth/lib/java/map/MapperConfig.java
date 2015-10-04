@@ -10,12 +10,14 @@ import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+import roth.lib.java.DataUrl;
 import roth.lib.java.map.deserializer.BigDecimalDeserializer;
 import roth.lib.java.map.deserializer.BigIntegerDeserializer;
 import roth.lib.java.map.deserializer.BooleanDeserializer;
 import roth.lib.java.map.deserializer.ByteDeserializer;
 import roth.lib.java.map.deserializer.CalendarDeserializer;
 import roth.lib.java.map.deserializer.CharacterDeserializer;
+import roth.lib.java.map.deserializer.DataUrlDeserializer;
 import roth.lib.java.map.deserializer.DateDeserializer;
 import roth.lib.java.map.deserializer.Deserializer;
 import roth.lib.java.map.deserializer.DoubleDeserializer;
@@ -97,6 +99,7 @@ public class MapperConfig
 		serializerMap.put(Date.class, dateSerializer);
 		serializerMap.put(GregorianCalendar.class, calendarSerializer);
 		serializerMap.put(Calendar.class, calendarSerializer);
+		serializerMap.put(DataUrl.class, escapedSerializer);
 	}
 	
 	protected void initDeserializers()
@@ -127,6 +130,7 @@ public class MapperConfig
 		deserializerMap.put(Date.class, new DateDeserializer());
 		deserializerMap.put(GregorianCalendar.class, new CalendarDeserializer());
 		deserializerMap.put(Calendar.class, new CalendarDeserializer());
+		deserializerMap.put(DataUrl.class, new DataUrlDeserializer());
 	}
 	
 	public static MapperConfig get()

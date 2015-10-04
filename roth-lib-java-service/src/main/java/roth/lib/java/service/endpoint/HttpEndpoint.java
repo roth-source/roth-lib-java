@@ -26,7 +26,6 @@ import roth.lib.java.map.form.FormReflector;
 import roth.lib.java.map.json.JsonReflector;
 import roth.lib.java.map.xml.XmlReflector;
 import roth.lib.java.net.http.HttpMethod;
-import roth.lib.java.net.http.type.MimeType;
 import roth.lib.java.service.HttpService;
 import roth.lib.java.service.HttpServiceMethod;
 import roth.lib.java.service.HttpServiceResponse;
@@ -34,6 +33,7 @@ import roth.lib.java.service.HttpServiceType;
 import roth.lib.java.service.reflector.ServiceMethodReflector;
 import roth.lib.java.service.reflector.ServiceReflector;
 import roth.lib.java.service.task.HttpTaskService;
+import roth.lib.java.type.MimeType;
 
 @SuppressWarnings("serial")
 public class HttpEndpoint extends HttpServlet
@@ -122,7 +122,9 @@ public class HttpEndpoint extends HttpServlet
 												boolean gzipped = false;
 												InputStream input = gzipped ? new GZIPInputStream(request.getInputStream()) : request.getInputStream();
 												Type methodParameterType = parameter.getParameterizedType();
-												methodRequest = getRequestMapper(request, response).setContext(methodReflector.getContext()).deserialize(input, methodParameterType);
+												Mapper requestMapper = getRequestMapper(request, response);
+												service.setRequestMapper(requestMapper);
+												methodRequest = requestMapper.setContext(methodReflector.getContext()).deserialize(input, methodParameterType);
 											}
 											if(dev)
 											{
@@ -139,6 +141,8 @@ public class HttpEndpoint extends HttpServlet
 													{
 														try
 														{
+															Mapper responseMapper = getResponseMapper(request, response);
+															service.setResponseMapper(responseMapper);
 															Object methodResponse = methodReflector.invoke(service, methodRequest);
 															if(methodResponse != null)
 															{
@@ -157,7 +161,7 @@ public class HttpEndpoint extends HttpServlet
 																		}
 																	}
 																}
-																getResponseMapper(request, response).setContext(methodReflector.getContext()).serialize(methodResponse, response.getOutputStream());
+																responseMapper.setContext(methodReflector.getContext()).serialize(methodResponse, response.getOutputStream());
 															}
 															if(dev)
 															{
@@ -166,7 +170,7 @@ public class HttpEndpoint extends HttpServlet
 														}
 														catch(Exception e)
 														{
-															exception(request, response, e);
+															exception(request, response, e, dev);
 														}
 													}
 													else
@@ -237,11 +241,7 @@ public class HttpEndpoint extends HttpServlet
 		}
 		catch(Exception e)
 		{
-			if(dev)
-			{
-				e.printStackTrace();
-			}
-			exception(request, response, e);
+			exception(request, response, e, dev);
 		}
 	}
 	
@@ -275,9 +275,12 @@ public class HttpEndpoint extends HttpServlet
 		
 	}
 	
-	protected void exception(HttpServletRequest request, HttpServletResponse response, Exception e)
+	protected void exception(HttpServletRequest request, HttpServletResponse response, Exception e, boolean dev)
 	{
-		
+		if(dev)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	protected HttpServiceMethod getServiceMethod(HttpServletRequest request, HttpServletResponse response)
