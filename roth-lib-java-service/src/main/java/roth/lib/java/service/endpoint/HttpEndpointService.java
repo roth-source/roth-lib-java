@@ -2,6 +2,7 @@ package roth.lib.java.service.endpoint;
 
 import roth.lib.java.service.HttpService;
 import roth.lib.java.service.annotation.ServiceMethod;
+import roth.lib.java.service.reflector.MethodReflector;
 import roth.lib.java.service.util.InitialContextUtil;
 
 public class HttpEndpointService extends HttpService
@@ -55,19 +56,19 @@ public class HttpEndpointService extends HttpService
 	}
 	
 	@Override
-	public boolean isAjaxAuthenticated(String context)
+	public boolean isAjaxAuthenticated(MethodReflector methodReflector)
 	{
 		return true;
 	}
 	
 	@Override
-	public boolean isApiAuthenticated(String context)
+	public boolean isApiAuthenticated(MethodReflector methodReflector)
 	{
 		return true;
 	}
 	
 	@Override
-	public boolean isAuthorized(String context, Object request)
+	public boolean isAuthorized(MethodReflector methodReflector, Object request)
 	{
 		return true;
 	}

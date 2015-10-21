@@ -18,6 +18,7 @@ import roth.lib.java.net.http.HttpRequest;
 import roth.lib.java.net.http.HttpResponse;
 import roth.lib.java.net.http.HttpUrl;
 import roth.lib.java.outputter.Outputter;
+import roth.lib.java.type.MimeType;
 
 public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 {
@@ -153,9 +154,19 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 		return getResponseMapperReflector().getMapper(getResponseDebugMapperConfig()).prettyPrint(body);
 	}
 	
-	protected HttpHeaders setHeaders(HttpHeaders headers)
+	protected MimeType getRequestContentType()
 	{
-		return headers;
+		return null;
+	}
+	
+	protected MimeType getResponseContentType()
+	{
+		return null;
+	}
+	
+	protected void setHeaders(HttpHeaders headers)
+	{
+		
 	}
 	
 	protected <T extends ApiResponse> T get(HttpUrl url, HttpHeader... headers)
@@ -591,7 +602,19 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 			HttpRequest<ApiRequest> request = new HttpRequest<ApiRequest>();
 			request.setMethod(method);
 			request.setUrl(url);
-			request.setHeaders(setHeaders(url.getHeaders()).setHeaders(headers));
+			HttpHeaders httpHeaders = url.getHeaders().setHeaders(headers);
+			MimeType requestContentType = getRequestContentType();
+			if(requestContentType != null)
+			{
+				httpHeaders.setContentType(requestContentType);
+			}
+			MimeType responseContentType = getResponseContentType();
+			if(requestContentType != null)
+			{
+				httpHeaders.setAccept(responseContentType);
+			}
+			setHeaders(httpHeaders);
+			request.setHeaders(httpHeaders);
 			if(apiRequest != null)
 			{
 				if(apiRequest instanceof Outputter)

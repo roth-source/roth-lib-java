@@ -1,7 +1,6 @@
 package roth.lib.java.service;
 
 import java.lang.reflect.Field;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 import javax.servlet.ServletContext;
@@ -9,19 +8,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import roth.lib.java.annotation.Filter;
 import roth.lib.java.annotation.Required;
-import roth.lib.java.annotation.Validate;
 import roth.lib.java.map.Mapper;
 import roth.lib.java.service.endpoint.HttpError;
-import roth.lib.java.service.endpoint.HttpErrorType;
+import roth.lib.java.service.reflector.MethodReflector;
+import roth.lib.java.type.MimeType;
 import roth.lib.java.util.IdUtil;
-import roth.lib.java.util.ReflectionUtil;
 
 public abstract class HttpService
 {
 	public static String X_CSRF_TOKEN			= "X-Csrf-Token";
 	public static String CSRF_TOKEN				= "csrfToken";
+	
+	/*
 	public static String NUMBER 				= "number";
 	public static String PHONE 					= "phone";
 	public static String EMAIL 					= "email";
@@ -81,10 +80,13 @@ public abstract class HttpService
 		fieldValidators.put(PHONE, phoneValidator);
 		fieldValidators.put(EMAIL, emailValidator);
 	}
+	*/
 	
 	protected ServletContext servletContext;
 	protected HttpServletRequest httpServletRequest;
 	protected HttpServletResponse httpServletResponse;
+	protected MimeType requestContentType;
+	protected MimeType responseContentType;
 	protected Mapper requestMapper;
 	protected Mapper responseMapper;
 	protected String service;
@@ -95,9 +97,9 @@ public abstract class HttpService
 		
 	}
 	
-	public abstract boolean isAjaxAuthenticated(String context);
-	public abstract boolean isApiAuthenticated(String context);
-	public abstract boolean isAuthorized(String context, Object request);
+	public abstract boolean isAjaxAuthenticated(MethodReflector methodReflector);
+	public abstract boolean isApiAuthenticated(MethodReflector methodReflector);
+	public abstract boolean isAuthorized(MethodReflector methodReflector, Object request);
 	
 	public ServletContext getServletContext()
 	{
@@ -112,6 +114,16 @@ public abstract class HttpService
 	public HttpServletResponse getHttpServletResponse()
 	{
 		return httpServletResponse;
+	}
+	
+	public MimeType getRequestContentType()
+	{
+		return requestContentType;
+	}
+	
+	public MimeType getResponseContentType()
+	{
+		return responseContentType;
 	}
 	
 	public Mapper getRequestMapper()
@@ -152,14 +164,28 @@ public abstract class HttpService
 		return this;
 	}
 	
-	public void setRequestMapper(Mapper requestMapper)
+	public HttpService setRequestContentType(MimeType requestContentType)
 	{
-		this.requestMapper = requestMapper;
+		this.requestContentType = requestContentType;
+		return this;
 	}
 	
-	public void setResponseMapper(Mapper responseMapper)
+	public HttpService setResponseContentType(MimeType responseContentType)
+	{
+		this.responseContentType = responseContentType;
+		return this;
+	}
+	
+	public HttpService setRequestMapper(Mapper requestMapper)
+	{
+		this.requestMapper = requestMapper;
+		return this;
+	}
+	
+	public HttpService setResponseMapper(Mapper responseMapper)
 	{
 		this.responseMapper = responseMapper;
+		return this;
 	}
 	
 	public HttpService setService(String service)
@@ -224,6 +250,7 @@ public abstract class HttpService
 	public LinkedList<HttpError> validate(Object request)
 	{
 		LinkedList<HttpError> errors = new LinkedList<HttpError>();
+		/*
 		if(request != null)
 		{
 			LinkedList<Field> fields = ReflectionUtil.getFields(request.getClass());
@@ -244,9 +271,11 @@ public abstract class HttpService
 				}
 			}
 		}
+		*/
 		return errors;
 	}
 	
+	/*
 	public void filterField(Field field, Object request)
 	{
 		Filter filter = field.getDeclaredAnnotation(Filter.class);
@@ -272,7 +301,7 @@ public abstract class HttpService
 			}
 		}
 	}
-	
+	*/
 	public Boolean requiredField(Field field, Object request)
 	{
 		Boolean valid = null;
@@ -296,7 +325,7 @@ public abstract class HttpService
 		}
 		return valid;
 	}
-	
+	/*
 	public boolean validateField(Field field, Object request)
 	{
 		boolean valid = true;
@@ -328,7 +357,7 @@ public abstract class HttpService
 		}
 		return valid;
 	}
-	
+	*/
 	public static String readableName(String name)
 	{
 		StringBuilder builder = new StringBuilder();

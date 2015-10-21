@@ -12,12 +12,9 @@ import java.util.Random;
 public class IdUtil
 {
 	protected static final int DEFAULT_LENGTH 		= 14;
-	protected static final int PREFIX_MIN_LENGTH 	= 1;
-	protected static final int PREFIX_MAX_LENGTH 	= 3;
 	protected static final int TIME_LENGTH 			= 7;
 	protected static final int RANDOM_MIN_LENGTH 	= 1;
 	protected static final int RANDOM_MAX_LENGTH 	= 10;
-	protected static final Random RANDOM = new Random();
 	protected static final LinkedHashMap<Integer, BigDecimal> MAX_VALUES = new LinkedHashMap<Integer, BigDecimal>();
 	
 	static
@@ -60,66 +57,61 @@ public class IdUtil
 	
 	protected static BigInteger randomNumber(int length)
 	{
-		return MAX_VALUES.get(length).multiply(BigDecimal.valueOf(RANDOM.nextDouble())).toBigInteger();
-		//return MAX_VALUES.get(length).multiply(BigDecimal.valueOf(new Random().nextDouble())).toBigInteger();
+		return MAX_VALUES.get(length).multiply(BigDecimal.valueOf(new Random().nextDouble())).toBigInteger();
 	}
 	
-	public static String uuid(String prefix)
+	public static String uuid(char prefix)
 	{
 		return uuid(prefix, now());
 	}
 	
-	public static String uuid(String prefix, int length)
+	public static String uuid(char prefix, int length)
 	{
 		return uuid(prefix, now(), length);
 	}
 	
-	public static String uuid(String prefix, long time)
+	public static String uuid(char prefix, long time)
 	{
 		return uuid(prefix, time(time));
 	}
 	
-	public static String uuid(String prefix, Date date)
+	public static String uuid(char prefix, Date date)
 	{
 		return uuid(prefix, date(date));
 	}
 	
-	public static String uuid(String prefix, Calendar calendar)
+	public static String uuid(char prefix, Calendar calendar)
 	{
 		return uuid(prefix, calendar(calendar));
 	}
 	
-	public static String uuid(String prefix, String time)
+	public static String uuid(char prefix, String time)
 	{
 		return uuid(prefix, time, DEFAULT_LENGTH);
 	}
 	
-	public static String uuid(String prefix, long time, int length)
+	public static String uuid(char prefix, long time, int length)
 	{
 		return uuid(prefix, time(time), length);
 	}
 	
-	public static String uuid(String prefix, Date date, int length)
+	public static String uuid(char prefix, Date date, int length)
 	{
 		return uuid(prefix, date(date), length);
 	}
 	
-	public static String uuid(String prefix, Calendar calendar, int length)
+	public static String uuid(char prefix, Calendar calendar, int length)
 	{
 		return uuid(prefix, calendar(calendar), length);
 	}
 	
-	public static String uuid(String prefix, String time, int length)
+	public static String uuid(char prefix, String time, int length)
 	{
-		if(prefix == null || prefix.length() < PREFIX_MIN_LENGTH || prefix.length() > PREFIX_MAX_LENGTH)
-		{
-			throw new IllegalArgumentException(String.format("prefix must be between %d and %d characters in length", PREFIX_MIN_LENGTH, PREFIX_MAX_LENGTH));
-		}
 		if(time.length() != TIME_LENGTH)
 		{
 			throw new IllegalArgumentException(String.format("time must be %d characters in length", TIME_LENGTH));
 		}
-		int staticLength = prefix.length() + TIME_LENGTH;
+		int staticLength = 1 + TIME_LENGTH;
 		int randomLength = length - staticLength;
 		if(randomLength < RANDOM_MIN_LENGTH || randomLength > RANDOM_MAX_LENGTH)
 		{
@@ -132,41 +124,37 @@ public class IdUtil
 		return builder.toString();
 	}
 	
-	public static long uuidTime(String uuid, int prefixLength)
+	public static long uuidTime(String uuid)
 	{
-		if(prefixLength < PREFIX_MIN_LENGTH || prefixLength > PREFIX_MAX_LENGTH)
-		{
-			throw new IllegalArgumentException("prefix must be between " + PREFIX_MIN_LENGTH + " and " + PREFIX_MAX_LENGTH + " characters in length");
-		}
-		return BaseUtil.decodeBase62(uuid.substring(prefixLength, prefixLength + TIME_LENGTH)).longValue();
+		return BaseUtil.decodeBase62(uuid.substring(1, 1 + TIME_LENGTH)).longValue();
 	}
 	
-	public static Date uuidDate(String uuid, int prefixLength)
+	public static Date uuidDate(String uuid)
 	{
-		return new Date(uuidTime(uuid, prefixLength));
+		return new Date(uuidTime(uuid));
 	}
 	
-	public static Calendar uuidCalendar(String uuid, int prefixLength)
+	public static Calendar uuidCalendar(String uuid)
 	{
 		Calendar calendar = new GregorianCalendar();
-		calendar.setTimeInMillis(uuidTime(uuid, prefixLength));
+		calendar.setTimeInMillis(uuidTime(uuid));
 		return calendar;
 	}
 	
 	public static void main(String[] args)
 	{
-		System.out.println(System.nanoTime());
+		System.out.println(CalendarUtil.format());
 		LinkedHashSet<String> set = new LinkedHashSet<String>();
 		int count = 0;
-		for(int i = 0; i < 1000000; i++)
+		for(int i = 0; i < 10000000; i++)
 		{
-			String uuid = uuid("0", now(), 14);
+			String uuid = uuid('0', now(), 14);
 			if(!set.add(uuid))
 			{
 				System.err.println(++count + ":" + uuid);
 			}
 		}
-		System.out.println(System.nanoTime());
+		System.out.println(CalendarUtil.format());
 	}
 	
 }

@@ -1,10 +1,11 @@
 package roth.lib.java.service.endpoint;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -30,7 +31,7 @@ import roth.lib.java.service.HttpService;
 import roth.lib.java.service.HttpServiceMethod;
 import roth.lib.java.service.HttpServiceResponse;
 import roth.lib.java.service.HttpServiceType;
-import roth.lib.java.service.reflector.ServiceMethodReflector;
+import roth.lib.java.service.reflector.MethodReflector;
 import roth.lib.java.service.reflector.ServiceReflector;
 import roth.lib.java.service.task.HttpTaskService;
 import roth.lib.java.type.MimeType;
@@ -82,6 +83,12 @@ public class HttpEndpoint extends HttpServlet
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response)
 	{
+		Object methodResponse = null;
+		LinkedList<HttpError> errors = new LinkedList<HttpError>();
+		MimeType requestContentType = getRequestContentType(request, response);
+		MimeType responseContentType = getResponseContentType(request, response);
+		Mapper responseMapper = getResponseMapper(request, response, responseContentType);
+		response.setHeader(CONTENT_TYPE, responseContentType.toString());
 		boolean dev = isDev(request, response);
 		try
 		{
@@ -103,146 +110,159 @@ public class HttpEndpoint extends HttpServlet
 							{
 								service.setHttpServletRequest(request).setHttpServletResponse(response);
 								service.setService(serviceMethod.getServiceName()).setMethod(serviceMethod.getMethodName());
-								service.initDev();
-								ServiceMethodReflector methodReflector = getMethodReflector(request, response, service.getClass(), serviceMethod.getServiceName(), serviceMethod.getMethodName());
+								if(dev)
+								{
+									service.initDev();
+								}
+								MethodReflector methodReflector = getMethodReflector(request, response, service.getClass(), serviceMethod.getServiceName(), serviceMethod.getMethodName());
 								if(methodReflector != null)
 								{
+									responseMapper.setContext(methodReflector.getContext());
 									if(methodReflector.isHttpMethodImplemented(httpMethod))
 									{
 										boolean hasAjax = methodReflector.isAjax();
 										boolean hasApi = methodReflector.isApi();
-										boolean ajaxAuthenticated = hasAjax && (!methodReflector.isAuthenticated() || service.isAjaxAuthenticated(methodReflector.getContext()));
-										boolean apiAuthenticated = hasApi && (!methodReflector.isAuthenticated() || service.isApiAuthenticated(methodReflector.getContext()));
+										boolean ajaxAuthenticated = hasAjax && (!methodReflector.isAuthenticated() || service.isAjaxAuthenticated(methodReflector));
+										boolean apiAuthenticated = hasApi && (!methodReflector.isAuthenticated() || service.isApiAuthenticated(methodReflector));
 										if(ajaxAuthenticated || apiAuthenticated)
 										{
 											Object methodRequest = null;
 											Parameter parameter = methodReflector.getParameter();
 											if(parameter != null)
 											{
-												boolean gzipped = false;
-												InputStream input = gzipped ? new GZIPInputStream(request.getInputStream()) : request.getInputStream();
+												InputStream input = methodReflector.isGzippedInput() ? new GZIPInputStream(request.getInputStream()) : request.getInputStream();
 												Type methodParameterType = parameter.getParameterizedType();
-												Mapper requestMapper = getRequestMapper(request, response);
+												service.setRequestContentType(requestContentType);
+												Mapper requestMapper = getRequestMapper(request, response, requestContentType);
 												service.setRequestMapper(requestMapper);
 												methodRequest = requestMapper.setContext(methodReflector.getContext()).deserialize(input, methodParameterType);
 											}
 											if(dev)
 											{
-												printRequest(request, methodRequest);
+												debugRequest(request, methodRequest);
 											}
 											boolean validCsrf = !(ajaxAuthenticated && methodReflector.isAuthenticated() && !service.isValidCsrfToken(methodRequest, dev));
 											if(validCsrf)
 											{
-												boolean authorized = service.isAuthorized(methodReflector.getContext(), methodRequest);
+												boolean authorized = service.isAuthorized(methodReflector, methodRequest);
 												if(authorized)
 												{
-													LinkedList<HttpError> serviceErrors = service.validate(methodRequest);
-													if(serviceErrors.isEmpty())
+													//errors.addAll(service.validate(methodRequest));
+													if(errors.isEmpty())
 													{
-														try
-														{
-															Mapper responseMapper = getResponseMapper(request, response);
-															service.setResponseMapper(responseMapper);
-															Object methodResponse = methodReflector.invoke(service, methodRequest);
-															if(methodResponse != null)
-															{
-																response.setHeader(CONTENT_TYPE, getResponseContentType(request, response).toString());
-																if(dev && methodResponse instanceof HttpServiceResponse)
-																{
-																	HttpServiceResponse serviceResponse = (HttpServiceResponse) methodResponse;
-																	HttpSession session = request.getSession(false);
-																	if(session != null)
-																	{
-																		serviceResponse.setJsessionId(session.getId());
-																		Object csrfTokenObject = session.getAttribute(HttpService.CSRF_TOKEN);
-																		if(csrfTokenObject != null && csrfTokenObject instanceof String)
-																		{
-																			serviceResponse.setCsrfToken((String) csrfTokenObject);
-																		}
-																	}
-																}
-																responseMapper.setContext(methodReflector.getContext()).serialize(methodResponse, response.getOutputStream());
-															}
-															if(dev)
-															{
-																printResponse(response, methodResponse);
-															}
-														}
-														catch(Exception e)
-														{
-															exception(request, response, e, dev);
-														}
-													}
-													else
-													{
-														errors(request, response, serviceErrors);
+														service.setResponseContentType(responseContentType);
+														service.setResponseMapper(responseMapper);
+														methodResponse = methodReflector.invoke(service, methodRequest);
 													}
 												}
 												else
 												{
-													error(request, response, HttpErrorType.SERVICE_NOT_AUTHORIZED);
+													errors.add(HttpErrorType.SERVICE_NOT_AUTHORIZED.error());
 												}
 											}
 											else
 											{
-												error(request, response, HttpErrorType.SERVICE_CSRF_TOKEN_INVALID);
+												errors.add(HttpErrorType.SERVICE_CSRF_TOKEN_INVALID.error());
 											}
 										}
 										else
 										{
 											if(hasAjax && !ajaxAuthenticated)
 											{
-												error(request, response, HttpErrorType.SERVICE_AJAX_NOT_AUTHENTICATED);
+												errors.add(HttpErrorType.SERVICE_AJAX_NOT_AUTHENTICATED.error());
 											}
 											else if(hasApi && !apiAuthenticated)
 											{
-												error(request, response, HttpErrorType.SERVICE_API_NOT_AUTHENTICATED);
+												errors.add(HttpErrorType.SERVICE_API_NOT_AUTHENTICATED.error());
 											}
 											else
 											{
-												error(request, response, HttpErrorType.SERVICE_CHANNEL_NOT_IMPLEMENTED);
+												errors.add(HttpErrorType.SERVICE_CHANNEL_NOT_IMPLEMENTED.error());
 											}
 										}
 									}
 									else
 									{
-										error(request, response, HttpErrorType.HTTP_METHOD_NOT_IMPLEMENTED);
+										errors.add(HttpErrorType.HTTP_METHOD_NOT_IMPLEMENTED.error());
 									}
 								}
 								else
 								{
-									error(request, response, HttpErrorType.SERVICE_METHOD_MISSING);
+									errors.add(HttpErrorType.SERVICE_METHOD_MISSING.error());
 								}
 							}
 							else
 							{
-								error(request, response, HttpErrorType.SERVICE_NOT_IMPLEMENTED);
+								errors.add(HttpErrorType.SERVICE_NOT_IMPLEMENTED.error());
 							}
 						}
 						else
 						{
-							error(request, response, HttpErrorType.SERVICE_METHOD_NAME_MISSING);
+							errors.add(HttpErrorType.SERVICE_METHOD_NAME_MISSING.error());
 						}
 					}
 					else
 					{
-						error(request, response, HttpErrorType.HTTP_METHOD_NOT_SUPPORTED);
+						errors.add(HttpErrorType.HTTP_METHOD_NOT_SUPPORTED.error());
 					}
 				}	
 				else
 				{
-					error(request, response, HttpErrorType.HTTP_METHOD_MISSING);
+					errors.add(HttpErrorType.HTTP_METHOD_MISSING.error());
 				}
 			}
 			else
 			{
-				error(request, response, HttpErrorType.HTTP_ORIGIN_UNSUPPORTED);
+				errors.add(HttpErrorType.HTTP_ORIGIN_UNSUPPORTED.error());
 			}
 		}
 		catch(Exception e)
 		{
-			exception(request, response, e, dev);
+			if(dev)
+			{
+				e.printStackTrace();
+			}
+			errors.add(exception(request, response, e));
 		}
+		
+		if(!errors.isEmpty())
+		{
+			if(methodResponse == null)
+			{
+				methodResponse = new HttpServiceResponse().setErrors(errors);
+			}
+			else if(methodResponse instanceof HttpServiceResponse)
+			{
+				((HttpServiceResponse) methodResponse).setErrors(errors);
+			}
+		}
+		
+		if(methodResponse != null)
+		{
+			if(dev && methodResponse instanceof HttpServiceResponse)
+			{
+				HttpServiceResponse serviceResponse = (HttpServiceResponse) methodResponse;
+				HttpSession session = request.getSession(false);
+				if(session != null)
+				{
+					serviceResponse.setJsessionId(session.getId());
+					Object csrfTokenObject = session.getAttribute(HttpService.CSRF_TOKEN);
+					if(csrfTokenObject != null && csrfTokenObject instanceof String)
+					{
+						serviceResponse.setCsrfToken((String) csrfTokenObject);
+					}
+				}
+			}
+			try(OutputStream output = response.getOutputStream())
+			{
+				responseMapper.serialize(methodResponse, output);
+			}
+			catch(IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		debugResponse(response, methodResponse);
 	}
 	
 	protected boolean isDev(HttpServletRequest request, HttpServletResponse response)
@@ -258,29 +278,6 @@ public class HttpEndpoint extends HttpServlet
 	protected boolean isOriginAllowed(HttpServletRequest request, HttpServletResponse response)
 	{
 		return true;
-	}
-	
-	protected void error(HttpServletRequest request, HttpServletResponse response, HttpErrorType error)
-	{
-		errors(request, response, new HttpError(error));
-	}
-	
-	protected void errors(HttpServletRequest request, HttpServletResponse response, HttpError... errors)
-	{
-		errors(request, response, Arrays.asList(errors));
-	}
-	
-	protected void errors(HttpServletRequest request, HttpServletResponse response, Collection<HttpError> errors)
-	{
-		
-	}
-	
-	protected void exception(HttpServletRequest request, HttpServletResponse response, Exception e, boolean dev)
-	{
-		if(dev)
-		{
-			e.printStackTrace();
-		}
 	}
 	
 	protected HttpServiceMethod getServiceMethod(HttpServletRequest request, HttpServletResponse response)
@@ -344,9 +341,9 @@ public class HttpEndpoint extends HttpServlet
 		return serviceReflector;
 	}
 	
-	protected ServiceMethodReflector getMethodReflector(HttpServletRequest request, HttpServletResponse response, Class<?> serviceClass, String serviceName, String methodName)
+	protected MethodReflector getMethodReflector(HttpServletRequest request, HttpServletResponse response, Class<?> serviceClass, String serviceName, String methodName)
 	{
-		ServiceMethodReflector methodReflector = null;
+		MethodReflector methodReflector = null;
 		ServiceReflector serviceReflector = getServiceReflector(request, response, serviceClass, serviceName);
 		if(serviceReflector != null)
 		{
@@ -357,21 +354,32 @@ public class HttpEndpoint extends HttpServlet
 	
 	protected MimeType getRequestContentType(HttpServletRequest request, HttpServletResponse response)
 	{
-		MimeType contentType = MimeType.fromString(request.getHeader(CONTENT_TYPE));
-		if(contentType != null)
+		MimeType contentType = null;
+		String contentTypeHeader = request.getHeader(CONTENT_TYPE);
+		if(contentTypeHeader != null)
 		{
-			switch(contentType)
+			int index = contentTypeHeader.indexOf(";");
+			if(index > -1)
 			{
-				case APPLICATION_JSON:
-				case APPLICATION_XML:
-				case APPLICATION_X_WWW_FORM_URLENCODED:
+				contentTypeHeader = contentTypeHeader.substring(0, index);
+			}
+			contentType = MimeType.fromString(contentTypeHeader);
+			if(contentType != null)
+			{
+				switch(contentType)
 				{
-					break;
-				}
-				default:
-				{
-					contentType = null;
-					break;
+					case APPLICATION_JSON:
+					case APPLICATION_XML:
+					case APPLICATION_X_WWW_FORM_URLENCODED:
+					{
+						break;
+					}
+					case TEXT_PLAIN:
+					default:
+					{
+						contentType = null;
+						break;
+					}
 				}
 			}
 		}
@@ -380,30 +388,43 @@ public class HttpEndpoint extends HttpServlet
 	
 	protected MimeType getResponseContentType(HttpServletRequest request, HttpServletResponse response)
 	{
-		MimeType contentType = MimeType.fromString(request.getHeader(ACCEPT));
-		if(contentType != null)
+		MimeType contentType = null;
+		String acceptHeader = request.getHeader(ACCEPT);
+		if(acceptHeader != null)
 		{
-			switch(contentType)
+			int index = acceptHeader.indexOf(";");
+			if(index > -1)
 			{
-				case APPLICATION_JSON:
-				case APPLICATION_XML:
+				acceptHeader = acceptHeader.substring(0, index);
+			}
+			List<String> acceptTypes = Arrays.asList(acceptHeader.split(","));
+			accepts: for(String acceptType : acceptTypes)
+			{
+				contentType = MimeType.fromString(acceptType);
+				if(contentType != null)
 				{
-					break;
-				}
-				default:
-				{
-					contentType = null;
-					break;
+					switch(contentType)
+					{
+						case APPLICATION_JSON:
+						case APPLICATION_XML:
+						{
+							break accepts;
+						}
+						default:
+						{
+							contentType = null;
+							break;
+						}
+					}
 				}
 			}
 		}
 		return contentType != null ? contentType : MimeType.APPLICATION_JSON;
 	}
 	
-	protected Mapper getRequestMapper(HttpServletRequest request, HttpServletResponse response)
+	protected Mapper getRequestMapper(HttpServletRequest request, HttpServletResponse response, MimeType contentType)
 	{
 		Mapper mapper = null;
-		MimeType contentType = getRequestContentType(request, response);
 		switch(contentType)
 		{
 			case APPLICATION_XML:
@@ -425,10 +446,9 @@ public class HttpEndpoint extends HttpServlet
 		return mapper;
 	}
 	
-	protected Mapper getResponseMapper(HttpServletRequest request, HttpServletResponse response)
+	protected Mapper getResponseMapper(HttpServletRequest request, HttpServletResponse response, MimeType contentType)
 	{
 		Mapper mapper = null;
-		MimeType contentType = getResponseContentType(request, response);
 		switch(contentType)
 		{
 			case APPLICATION_XML:
@@ -495,7 +515,12 @@ public class HttpEndpoint extends HttpServlet
 		return responseXmlConfig;
 	}
 	
-	protected void printRequest(HttpServletRequest request, Object methodRequest)
+	protected HttpError exception(HttpServletRequest request, HttpServletResponse response, Exception e)
+	{
+		return new HttpError(HttpErrorType.SERVICE_EXCEPTION).setContext(e.getClass().getSimpleName()).setMessage(e.getMessage());
+	}
+	
+	protected void debugRequest(HttpServletRequest request, Object methodRequest)
 	{
 		System.out.println();
 		System.out.println();
@@ -517,7 +542,7 @@ public class HttpEndpoint extends HttpServlet
 		}
 	}
 	
-	protected void printResponse(HttpServletResponse response, Object methodResponse)
+	protected void debugResponse(HttpServletResponse response, Object methodResponse)
 	{
 		System.out.println();
 		System.out.println();

@@ -11,28 +11,28 @@ public class ServiceReflector
 {
 	protected Class<?> serviceClass;
 	protected String serviceName;
-	protected LinkedHashMap<String, ServiceMethodReflector> serviceMethodReflectorMap = new LinkedHashMap<String, ServiceMethodReflector>();
+	protected LinkedHashMap<String, MethodReflector> serviceMethodReflectorMap = new LinkedHashMap<String, MethodReflector>();
 	
 	public ServiceReflector(Class<?> serviceClass, String serviceName)
 	{
 		this.serviceClass = serviceClass;
 		this.serviceName = serviceName;
-		for(ServiceMethodReflector methodReflector : getServiceMethodReflectors(serviceClass))
+		for(MethodReflector methodReflector : getServiceMethodReflectors(serviceClass))
 		{
 			serviceMethodReflectorMap.put(methodReflector.getName(), methodReflector);
 		}
 	}
 	
-	protected static LinkedList<ServiceMethodReflector> getServiceMethodReflectors(Class<?> serviceClass)
+	protected static LinkedList<MethodReflector> getServiceMethodReflectors(Class<?> serviceClass)
 	{
-		LinkedList<ServiceMethodReflector> serviceMethodReflectors = new LinkedList<ServiceMethodReflector>();
+		LinkedList<MethodReflector> serviceMethodReflectors = new LinkedList<MethodReflector>();
 		for(java.lang.reflect.Method method : ReflectionUtil.getMethods(serviceClass, HttpService.class))
 		{
 			ServiceMethod serviceMethod = ReflectionUtil.getAnnotation(serviceClass, method, ServiceMethod.class);
 			if(serviceMethod != null)
 			{
 				method.setAccessible(true);
-				ServiceMethodReflector serviceMethodReflector = new ServiceMethodReflector();
+				MethodReflector serviceMethodReflector = new MethodReflector();
 				String methodName = serviceMethod.name();
 				if(methodName == null || methodName.isEmpty())
 				{
@@ -66,7 +66,7 @@ public class ServiceReflector
 		return serviceName;
 	}
 	
-	public LinkedHashMap<String, ServiceMethodReflector> getServiceMethodReflectorMap()
+	public LinkedHashMap<String, MethodReflector> getServiceMethodReflectorMap()
 	{
 		return serviceMethodReflectorMap;
 	}
@@ -83,7 +83,7 @@ public class ServiceReflector
 		return this;
 	}
 	
-	public ServiceReflector setMethodReflectorMap(LinkedHashMap<String, ServiceMethodReflector> serviceMethodReflectorMap)
+	public ServiceReflector setMethodReflectorMap(LinkedHashMap<String, MethodReflector> serviceMethodReflectorMap)
 	{
 		this.serviceMethodReflectorMap = serviceMethodReflectorMap;
 		return this;

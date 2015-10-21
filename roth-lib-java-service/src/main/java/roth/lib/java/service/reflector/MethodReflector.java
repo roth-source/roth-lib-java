@@ -7,7 +7,7 @@ import java.lang.reflect.Parameter;
 import roth.lib.java.net.http.HttpMethod;
 import roth.lib.java.service.HttpService;
 
-public class ServiceMethodReflector
+public class MethodReflector
 {
 	protected String name;
 	protected String context;
@@ -21,7 +21,7 @@ public class ServiceMethodReflector
 	protected boolean gzippedInput;
 	protected Method method;
 	
-	public ServiceMethodReflector()
+	public MethodReflector()
 	{
 		
 	}
@@ -127,67 +127,67 @@ public class ServiceMethodReflector
 		return parameter;
 	}
 	
-	public ServiceMethodReflector setName(String name)
+	public MethodReflector setName(String name)
 	{
 		this.name = name;
 		return this;
 	}
 	
-	public ServiceMethodReflector setContext(String context)
+	public MethodReflector setContext(String context)
 	{
 		this.context = context;
 		return this;
 	}
 	
-	public ServiceMethodReflector setAjax(boolean ajax)
+	public MethodReflector setAjax(boolean ajax)
 	{
 		this.ajax = ajax;
 		return this;
 	}
 	
-	public ServiceMethodReflector setApi(boolean api)
+	public MethodReflector setApi(boolean api)
 	{
 		this.api = api;
 		return this;
 	}
 	
-	public ServiceMethodReflector setAuthenticated(boolean authenticated)
+	public MethodReflector setAuthenticated(boolean authenticated)
 	{
 		this.authenticated = authenticated;
 		return this;
 	}
 	
-	public ServiceMethodReflector setPost(boolean post)
+	public MethodReflector setPost(boolean post)
 	{
 		this.post = post;
 		return this;
 	}
 	
-	public ServiceMethodReflector setGet(boolean get)
+	public MethodReflector setGet(boolean get)
 	{
 		this.get = get;
 		return this;
 	}
 	
-	public ServiceMethodReflector setPut(boolean put)
+	public MethodReflector setPut(boolean put)
 	{
 		this.put = put;
 		return this;
 	}
 	
-	public ServiceMethodReflector setDelete(boolean delete)
+	public MethodReflector setDelete(boolean delete)
 	{
 		this.delete = delete;
 		return this;
 	}
 	
-	public ServiceMethodReflector setGzippedInput(boolean gzippedInput)
+	public MethodReflector setGzippedInput(boolean gzippedInput)
 	{
 		this.gzippedInput = gzippedInput;
 		return this;
 	}
 	
-	public ServiceMethodReflector setMethod(Method method)
+	public MethodReflector setMethod(Method method)
 	{
 		this.method = method;
 		return this;
