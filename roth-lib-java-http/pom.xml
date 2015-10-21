@@ -6,7 +6,7 @@
 		<relativePath>../roth-lib-java-pom</relativePath>
 		<version>0.2.4-SNAPSHOT</version>
 	</parent>
-	<artifactId>roth-lib-java-db</artifactId>
+	<artifactId>roth-lib-java-http</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>roth.lib.java</groupId>

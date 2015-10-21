@@ -4,7 +4,7 @@
 		<groupId>roth.lib.java</groupId>
 		<artifactId>roth-lib-java-pom</artifactId>
 		<relativePath>../roth-lib-java-pom</relativePath>
-		<version>0.2.3-SNAPSHOT</version>
+		<version>0.2.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>roth-lib-java-framework</artifactId>
 	<packaging>pom</packaging>
@@ -16,52 +16,27 @@
 		</dependency>
 		<dependency>
 			<groupId>roth.lib.java</groupId>
-			<artifactId>roth-lib-java-map</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>roth.lib.java</groupId>
-			<artifactId>roth-lib-java-map-form</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>roth.lib.java</groupId>
-			<artifactId>roth-lib-java-map-json</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>roth.lib.java</groupId>
-			<artifactId>roth-lib-java-map-xml</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>roth.lib.java</groupId>
 			<artifactId>roth-lib-java-db</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>roth.lib.java</groupId>
-			<artifactId>roth-lib-java-net</artifactId>
+			<artifactId>roth-lib-java-email</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>roth.lib.java</groupId>
-			<artifactId>roth-lib-java-net-email</artifactId>
+			<artifactId>roth-lib-java-ftp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>roth.lib.java</groupId>
-			<artifactId>roth-lib-java-net-ftp</artifactId>
+			<artifactId>roth-lib-java-http</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>roth.lib.java</groupId>
-			<artifactId>roth-lib-java-net-http</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>roth.lib.java</groupId>
-			<artifactId>roth-lib-java-net-ssh</artifactId>
+			<artifactId>roth-lib-java-ssh</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

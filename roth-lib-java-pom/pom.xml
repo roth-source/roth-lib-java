@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>roth.lib.java</groupId>
 	<artifactId>roth-lib-java-pom</artifactId>
-	<version>0.2.3-SNAPSHOT</version>
+	<version>0.2.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -14,18 +14,13 @@
 	</scm>
 	<modules>
 		<module>../roth-lib-java</module>
-		<module>../roth-lib-java-map</module>
-		<module>../roth-lib-java-map-form</module>
-		<module>../roth-lib-java-map-json</module>
-		<module>../roth-lib-java-map-xml</module>
 		<module>../roth-lib-java-db</module>
 		<module>../roth-lib-java-db-mysql</module>
 		<module>../roth-lib-java-db-orient</module>
-		<module>../roth-lib-java-net</module>
-		<module>../roth-lib-java-net-email</module>
-		<module>../roth-lib-java-net-ftp</module>
-		<module>../roth-lib-java-net-http</module>
-		<module>../roth-lib-java-net-ssh</module>
+		<module>../roth-lib-java-email</module>
+		<module>../roth-lib-java-ftp</module>
+		<module>../roth-lib-java-http</module>
+		<module>../roth-lib-java-ssh</module>
 		<module>../roth-lib-java-service</module>
 		<module>../roth-lib-java-static</module>
 		<module>../roth-lib-java-template</module>

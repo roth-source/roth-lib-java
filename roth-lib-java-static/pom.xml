@@ -4,13 +4,13 @@
 		<groupId>roth.lib.java</groupId>
 		<artifactId>roth-lib-java-pom</artifactId>
 		<relativePath>../roth-lib-java-pom</relativePath>
-		<version>0.2.3-SNAPSHOT</version>
+		<version>0.2.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>roth-lib-java-static</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>roth.lib.java</groupId>
-			<artifactId>roth-lib-java-map-json</artifactId>
+			<artifactId>roth-lib-java</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
