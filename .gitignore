@@ -1,5 +1,5 @@
 /RemoteSystemsTempFiles/
 .DS_Store
 Thumbs.db
-.metadata
-.recommenders/
+/.metadata/
+/.recommenders/

@@ -182,7 +182,7 @@ public class XmlMapper extends Mapper
 			}
 			else if(isMap(value.getClass()))
 			{
-				LinkedHashMap<String, ?> valueMap = asMap(value);
+				LinkedHashMap<?, ?> valueMap = asMap(value);
 				writeNewLine(writer);
 				writeOpenTag(writer, name);
 				if(!valueMap.isEmpty())
@@ -267,11 +267,28 @@ public class XmlMapper extends Mapper
 		}
 	}
 	
-	protected void writeMap(Writer writer, Map<String, ?> valueMap) throws IOException
+	protected void writeMap(Writer writer, Map<?, ?> valueMap) throws IOException
 	{
-		for(Entry<String, ?> valueEntry : valueMap.entrySet())
+		for(Entry<?, ?> valueEntry : valueMap.entrySet())
 		{
-			writeProperty(writer, valueEntry.getKey(), valueEntry.getValue(), null);
+			String name = null;
+			Object nameValue = valueEntry.getKey();
+			if(nameValue instanceof String)
+			{
+				name = (String) nameValue;
+			}
+			else
+			{
+				Serializer<?> serializer = getMapperConfig().getSerializer(nameValue.getClass());
+				if(serializer != null)
+				{
+					name = serializer.serialize(nameValue, getTimeFormat());
+				}
+			}
+			if(name != null)
+			{
+				writeProperty(writer, name, valueEntry.getValue(), null);
+			}
 		}
 	}
 	

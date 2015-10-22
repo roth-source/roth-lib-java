@@ -159,7 +159,7 @@ public class JsonMapper extends Mapper
 			}
 			else if(isMap(value.getClass()))
 			{
-				LinkedHashMap<String, ?> valueMap = asMap(value);
+				LinkedHashMap<?, ?> valueMap = asMap(value);
 				if(!valueMap.isEmpty())
 				{
 					seperator = writeSeperator(writer, seperator);
@@ -260,7 +260,7 @@ public class JsonMapper extends Mapper
 				}
 				else if(isMap(value.getClass()))
 				{
-					LinkedHashMap<String, ?> valueMap = asMap(value);
+					LinkedHashMap<?, ?> valueMap = asMap(value);
 					if(!valueMap.isEmpty())
 					{
 						incrementTabs();
@@ -306,13 +306,30 @@ public class JsonMapper extends Mapper
 		writer.write(RIGHT_BRACKET);
 	}
 	
-	protected void writeMap(Writer writer, Map<String, ?> valueMap) throws IOException
+	protected void writeMap(Writer writer, Map<?, ?> valueMap) throws IOException
 	{
 		writer.write(LEFT_BRACE);
 		String seperator = BLANK;
-		for(Entry<String, ?> valueEntry : valueMap.entrySet())
+		for(Entry<?, ?> valueEntry : valueMap.entrySet())
 		{
-			seperator = writeProperty(writer, valueEntry.getKey(), valueEntry.getValue(), seperator);
+			String name = null;
+			Object nameValue = valueEntry.getKey();
+			if(nameValue instanceof String)
+			{
+				name = (String) nameValue;
+			}
+			else
+			{
+				Serializer<?> serializer = getMapperConfig().getSerializer(nameValue.getClass());
+				if(serializer != null)
+				{
+					name = serializer.serialize(nameValue, getTimeFormat());
+				}
+			}
+			if(name != null)
+			{
+				seperator = writeProperty(writer, name, valueEntry.getValue(), seperator);
+			}
 		}
 		writeNewLine(writer);
 		writer.write(RIGHT_BRACE);
@@ -628,6 +645,7 @@ public class JsonMapper extends Mapper
 	@SuppressWarnings("unchecked")
 	protected <T, E> T readMap(Reader reader, Type type) throws Exception
 	{
+		// TODO : don't assume key type is String. It could be enum
 		Map<String, E> map = null;
 		Class<T> klass = getTypeClass(type);
 		Class<E> elementClass = (Class<E>) getElementClass(type);

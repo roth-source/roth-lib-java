@@ -197,10 +197,9 @@ public class ReflectionUtil
 		return (value instanceof Collection) ? new LinkedList<Object>((Collection<?>) value) : new LinkedList<Object>(Arrays.asList((Object[]) value));
 	}
 	
-	@SuppressWarnings("unchecked")
-	public static LinkedHashMap<String, ?> asMap(Object value)
+	public static LinkedHashMap<?, ?> asMap(Object value)
 	{
-		return (value instanceof Map) ? new LinkedHashMap<String, Object>((Map<String, ?>) value) : new LinkedHashMap<String, Object>();
+		return (value instanceof Map) ? new LinkedHashMap<Object, Object>((Map<?, ?>) value) : new LinkedHashMap<Object, Object>();
 	}
 	
 	public static <T extends Annotation> boolean hasAnnotation(Class<?> klass, Method method, Class<T> annotationClass)
