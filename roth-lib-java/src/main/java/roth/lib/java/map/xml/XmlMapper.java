@@ -2,8 +2,9 @@ package roth.lib.java.map.xml;
 
 import static roth.lib.java.util.ReflectionUtil.asCollection;
 import static roth.lib.java.util.ReflectionUtil.asMap;
-import static roth.lib.java.util.ReflectionUtil.getElementClass;
+import static roth.lib.java.util.ReflectionUtil.getElementType;
 import static roth.lib.java.util.ReflectionUtil.getFieldValue;
+import static roth.lib.java.util.ReflectionUtil.getKeyType;
 import static roth.lib.java.util.ReflectionUtil.getTypeClass;
 import static roth.lib.java.util.ReflectionUtil.isArray;
 import static roth.lib.java.util.ReflectionUtil.isCollection;
@@ -272,17 +273,17 @@ public class XmlMapper extends Mapper
 		for(Entry<?, ?> valueEntry : valueMap.entrySet())
 		{
 			String name = null;
-			Object nameValue = valueEntry.getKey();
-			if(nameValue instanceof String)
+			Object key = valueEntry.getKey();
+			if(key instanceof String)
 			{
-				name = (String) nameValue;
+				name = (String) key;
 			}
 			else
 			{
-				Serializer<?> serializer = getMapperConfig().getSerializer(nameValue.getClass());
+				Serializer<?> serializer = getMapperConfig().getSerializer(key.getClass());
 				if(serializer != null)
 				{
-					name = serializer.serialize(nameValue, getTimeFormat());
+					name = serializer.serialize(key, getTimeFormat());
 				}
 			}
 			if(name != null)
@@ -531,20 +532,23 @@ public class XmlMapper extends Mapper
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T, E> T readMap(Reader reader, Type type) throws Exception
+	protected <T, K, E> T readMap(Reader reader, Type type) throws Exception
 	{
-		Map<String, E> map = null;
+		Map<K, E> map = null;
 		Class<T> klass = getTypeClass(type);
-		Class<E> elementClass = (Class<E>) getElementClass(type);
+		Type keyType = getKeyType(type);
+		Class<K> keyClass = getTypeClass(keyType);
+		Type elementType = getElementType(type);
+		Class<E> elementClass = getTypeClass(elementType);
 		if(klass.isAssignableFrom(LinkedHashMap.class))
 		{
-			map = new LinkedHashMap<String, E>();
+			map = new LinkedHashMap<K, E>();
 		}
 		else
 		{
 			Constructor<T> constructor = klass.getDeclaredConstructor();
 			constructor.setAccessible(true);
-			map = (Map<String, E>) constructor.newInstance();
+			map = (Map<K, E>) constructor.newInstance();
 		}
 		readUntil(reader, LEFT_ANGLE_BRACKET);
 		Tag tag = null;
@@ -565,36 +569,42 @@ public class XmlMapper extends Mapper
 			else if(tag instanceof OpenTag)
 			{
 				OpenTag fieldOpenTag = (OpenTag) tag;
-				if(getMapperReflector().isEntity(elementClass))
+				K key = null;
+				Deserializer<?> keyDeserializer = getMapperConfig().getDeserializer(keyClass);
+				if(keyDeserializer != null)
 				{
-					E value = readEntity(reader, (OpenTag) tag, elementClass);
+					key = (K) keyDeserializer.deserialize(fieldOpenTag.getName(), getTimeFormat());
+				}
+				if(getMapperReflector().isEntity(elementType))
+				{
+					E value = readEntity(reader, (OpenTag) tag, elementType);
 					if(value != null)
 					{
-						map.put(fieldOpenTag.getName(), value);
+						map.put(key, value);
 					}
 				}
-				else if(isCollection(elementClass))
+				else if(isCollection(elementType))
 				{
-					E value = readCollection(reader, elementClass);
+					E value = readCollection(reader, elementType);
 					if(value != null)
 					{
-						map.put(fieldOpenTag.getName(), value);
+						map.put(key, value);
 					}
 				}
-				else if(isArray(elementClass))
+				else if(isArray(elementType))
 				{
-					E value = readArray(reader, elementClass);
+					E value = readArray(reader, elementType);
 					if(value != null)
 					{
-						map.put(fieldOpenTag.getName(), value);
+						map.put(key, value);
 					}
 				}
-				else if(isMap(elementClass))
+				else if(isMap(elementType))
 				{
-					E value = readMap(reader, elementClass);
+					E value = readMap(reader, elementType);
 					if(value != null)
 					{
-						map.put(fieldOpenTag.getName(), value);
+						map.put(key, value);
 					}
 				}
 				else if(getMapperConfig().isSerializable(elementClass))
@@ -607,7 +617,7 @@ public class XmlMapper extends Mapper
 						E deserializedValue = deserializer.deserialize(value, getTimeFormat(), elementClass);
 						if(deserializedValue != null)
 						{
-							map.put(fieldOpenTag.getName(), deserializedValue);
+							map.put(key, deserializedValue);
 						}
 					}
 				}
@@ -624,7 +634,8 @@ public class XmlMapper extends Mapper
 	@SuppressWarnings("unchecked")
 	protected <T, E> T readArray(Reader reader, Type type) throws Exception
 	{
-		Class<E> elementClass = (Class<E>) getElementClass(type);
+		Type elementType = getElementType(type);
+		Class<E> elementClass = getTypeClass(elementType);
 		LinkedList<E> collection = readCollection(reader, type);
 		E[] array = (E[]) Array.newInstance(elementClass, collection.size());
 		for(int i = 0; i < collection.size(); i++)
@@ -639,7 +650,8 @@ public class XmlMapper extends Mapper
 	{
 		Collection<E> collection = null;
 		Class<T> klass = getTypeClass(type);
-		Class<E> elementClass = (Class<E>) getElementClass(type);
+		Type elementType = getElementType(type);
+		Class<E> elementClass = getTypeClass(elementType);
 		if(klass.isAssignableFrom(LinkedList.class) || isArray(klass))
 		{
 			collection = new LinkedList<E>();
@@ -669,33 +681,33 @@ public class XmlMapper extends Mapper
 			else if(tag instanceof OpenTag)
 			{
 				OpenTag fieldOpenTag = (OpenTag) tag;
-				if(getMapperReflector().isEntity(elementClass))
+				if(getMapperReflector().isEntity(elementType))
 				{
-					E value = readEntity(reader, fieldOpenTag, elementClass);
+					E value = readEntity(reader, fieldOpenTag, elementType);
 					if(value != null)
 					{
 						collection.add(value);
 					}
 				}
-				else if(isCollection(elementClass))
+				else if(isCollection(elementType))
 				{
-					E value = readCollection(reader, elementClass);
+					E value = readCollection(reader, elementType);
 					if(value != null)
 					{
 						collection.add(value);
 					}
 				}
-				else if(isArray(elementClass))
+				else if(isArray(elementType))
 				{
-					E value = readArray(reader, elementClass);
+					E value = readArray(reader, elementType);
 					if(value != null)
 					{
 						collection.add(value);
 					}
 				}
-				else if(isMap(elementClass))
+				else if(isMap(elementType))
 				{
-					E value = readMap(reader, elementClass);
+					E value = readMap(reader, elementType);
 					if(value != null)
 					{
 						collection.add(value);
@@ -729,22 +741,23 @@ public class XmlMapper extends Mapper
 	protected <T, E> E readCollectionElement(Reader reader, OpenTag tag, Type type) throws Exception
 	{
 		E element = null;
-		Class<E> elementClass = (Class<E>) getElementClass(type);
-		if(getMapperReflector().isEntity(elementClass))
+		Type elementType = getElementType(type);
+		Class<E> elementClass = getTypeClass(elementType);
+		if(getMapperReflector().isEntity(elementType))
 		{
-			element = readEntity(reader, tag, elementClass);
+			element = readEntity(reader, tag, elementType);
 		}
-		else if(isCollection(elementClass))
+		else if(isCollection(elementType))
 		{
-			element = readCollection(reader, elementClass);
+			element = readCollection(reader, elementType);
 		}
-		else if(isArray(elementClass))
+		else if(isArray(elementType))
 		{
-			element = readArray(reader, elementClass);
+			element = readArray(reader, elementType);
 		}
-		else if(isMap(elementClass))
+		else if(isMap(elementType))
 		{
-			element = readMap(reader, elementClass);
+			element = readMap(reader, elementType);
 		}
 		else if(getMapperConfig().isSerializable(elementClass))
 		{

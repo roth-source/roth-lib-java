@@ -2,8 +2,9 @@ package roth.lib.java.map.json;
 
 import static roth.lib.java.util.ReflectionUtil.asCollection;
 import static roth.lib.java.util.ReflectionUtil.asMap;
-import static roth.lib.java.util.ReflectionUtil.getElementClass;
+import static roth.lib.java.util.ReflectionUtil.getElementType;
 import static roth.lib.java.util.ReflectionUtil.getFieldValue;
+import static roth.lib.java.util.ReflectionUtil.getKeyType;
 import static roth.lib.java.util.ReflectionUtil.getTypeClass;
 import static roth.lib.java.util.ReflectionUtil.isArray;
 import static roth.lib.java.util.ReflectionUtil.isCollection;
@@ -313,17 +314,17 @@ public class JsonMapper extends Mapper
 		for(Entry<?, ?> valueEntry : valueMap.entrySet())
 		{
 			String name = null;
-			Object nameValue = valueEntry.getKey();
-			if(nameValue instanceof String)
+			Object key = valueEntry.getKey();
+			if(key instanceof String)
 			{
-				name = (String) nameValue;
+				name = (String) key;
 			}
 			else
 			{
-				Serializer<?> serializer = getMapperConfig().getSerializer(nameValue.getClass());
+				Serializer<?> serializer = getMapperConfig().getSerializer(key.getClass());
 				if(serializer != null)
 				{
-					name = serializer.serialize(nameValue, getTimeFormat());
+					name = serializer.serialize(key, getTimeFormat());
 				}
 			}
 			if(name != null)
@@ -643,25 +644,28 @@ public class JsonMapper extends Mapper
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T, E> T readMap(Reader reader, Type type) throws Exception
+	protected <T, K, E> T readMap(Reader reader, Type type) throws Exception
 	{
-		// TODO : don't assume key type is String. It could be enum
-		Map<String, E> map = null;
+		Map<K, E> map = null;
 		Class<T> klass = getTypeClass(type);
-		Class<E> elementClass = (Class<E>) getElementClass(type);
+		Type keyType = getKeyType(type);
+		Class<K> keyClass = getTypeClass(keyType);
+		Type elementType = getElementType(type);
+		//Class<E> elementClass = getTypeClass(elementType);
 		if(klass.isAssignableFrom(LinkedHashMap.class))
 		{
-			map = new LinkedHashMap<String, E>();
+			map = new LinkedHashMap<K, E>();
 		}
 		else
 		{
 			Constructor<T> constructor = klass.getDeclaredConstructor();
 			constructor.setAccessible(true);
-			map = (Map<String, E>) constructor.newInstance();
+			map = (Map<K, E>) constructor.newInstance();
 		}
 		int b;
 		char c;
 		String name = null;
+		K key = null;
 		StringBuilder builder = new StringBuilder();
 		read: while((b = reader.read()) > -1)
 		{
@@ -683,11 +687,17 @@ public class JsonMapper extends Mapper
 					if(name == null)
 					{
 						name = readEscaped(reader, c);
+						Deserializer<?> deserializer = getMapperConfig().getDeserializer(keyClass);
+						if(deserializer != null)
+						{
+							key = (K) deserializer.deserialize(name, getTimeFormat());
+						}
 					}
 					else
 					{
 						String value = readEscaped(reader, c);
-						map.put(name, (E) value);
+						map.put(key, (E) value);
+						key = null;
 						name = null;
 					}
 					builder.setLength(0);
@@ -706,11 +716,11 @@ public class JsonMapper extends Mapper
 						String value = builder.toString();
 						if(NULL.equalsIgnoreCase(value))
 						{
-							map.put(name, null);
+							map.put(key, null);
 						}
 						else if(TRUE.equalsIgnoreCase(value) || FALSE.equalsIgnoreCase(value))
 						{
-							map.put(name, (E) new Boolean(value));
+							map.put(key, (E) new Boolean(value));
 						}
 						else
 						{
@@ -723,9 +733,10 @@ public class JsonMapper extends Mapper
 							{
 								
 							}
-							map.put(name, number);
+							map.put(key, number);
 						}
 						builder.setLength(0);
+						key = null;
 						name = null;
 					}
 					builder.setLength(0);
@@ -742,16 +753,17 @@ public class JsonMapper extends Mapper
 				{
 					if(name != null)
 					{
-						if(getMapperReflector().isEntity(elementClass))
+						if(getMapperReflector().isEntity(elementType))
 						{
-							E value = readEntity(reader, elementClass);
-							map.put(name, value);
+							E value = readEntity(reader, elementType);
+							map.put(key, value);
 						}
 						else
 						{
-							E value = readMap(reader, elementClass);
-							map.put(name, value);
+							E value = readMap(reader, elementType);
+							map.put(key, value);
 						}
+						key = null;
 						name = null;
 					}
 					builder.setLength(0);
@@ -761,8 +773,9 @@ public class JsonMapper extends Mapper
 				{
 					if(name != null)
 					{
-						LinkedList<Object> value = readArray(reader, LinkedList.class);
-						map.put(name, (E) value);
+						E value = readArray(reader, elementType);
+						map.put(key, value);
+						key = null;
 						name = null;
 					}
 					builder.setLength(0);
@@ -787,9 +800,9 @@ public class JsonMapper extends Mapper
 		}
 		else if(isArray(type))
 		{
-			Class<E> elementClass = (Class<E>) getElementClass(type);
+			Type elementType = getElementType(type);
 			LinkedList<E> collection = readCollection(reader, type);
-			E[] array = (E[]) Array.newInstance(elementClass, collection.size());
+			E[] array = (E[]) Array.newInstance(getTypeClass(elementType), collection.size());
 			for(int i = 0; i < collection.size(); i++)
 			{
 				array[i] = collection.get(i);
@@ -804,7 +817,8 @@ public class JsonMapper extends Mapper
 	{
 		Collection<E> collection = null;
 		Class<T> klass = getTypeClass(type);
-		Class<E> elementClass = (Class<E>) getElementClass(type);
+		Type elementType = getElementType(type);
+		Class<E> elementClass = getTypeClass(elementType);
 		if(klass.isAssignableFrom(LinkedList.class) || isArray(klass))
 		{
 			collection = new LinkedList<E>();
@@ -880,7 +894,15 @@ public class JsonMapper extends Mapper
 				}
 				case LEFT_BRACE:
 				{
-					Object value = readEntity(reader, elementClass);
+					Object value = null;
+					if(getMapperReflector().isEntity(elementType))
+					{
+						value = readEntity(reader, elementClass);;
+					}
+					else if(isMap(elementType))
+					{
+						value = readMap(reader, elementClass);;
+					}
 					if(value != null && elementClass.isAssignableFrom(value.getClass()))
 					{
 						collection.add((E) value);
@@ -890,7 +912,6 @@ public class JsonMapper extends Mapper
 				}
 				case LEFT_BRACKET:
 				{
-					
 					builder.setLength(0);
 					break;
 				}

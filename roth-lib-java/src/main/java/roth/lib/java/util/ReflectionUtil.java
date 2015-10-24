@@ -167,29 +167,41 @@ public class ReflectionUtil
 		return Map.class.isAssignableFrom(klass);
 	}
 	
-	public static Class<?> getElementClass(Type type)
+	public static Type getKeyType(Type type)
 	{
-		Class<?> elementClass = Object.class;
-		Class<?> klass = getTypeClass(type);
-		if(isArray(klass))
-		{
-			elementClass = klass.getComponentType();
-		}
-		else if(isCollection(klass))
+		Type keyType = String.class;
+		if(isMap(type))
 		{
 			if(type instanceof ParameterizedType)
 			{
-				elementClass = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
+				keyType = ((ParameterizedType) type).getActualTypeArguments()[0];
 			}
 		}
-		else if(isMap(klass))
+		return keyType;
+	}
+	
+	public static Type getElementType(Type type)
+	{
+		Type elementType = Object.class;
+		if(isArray(type))
+		{
+			elementType = getTypeClass(type).getComponentType();
+		}
+		else if(isCollection(type))
 		{
 			if(type instanceof ParameterizedType)
 			{
-				elementClass = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[1];
+				elementType = ((ParameterizedType) type).getActualTypeArguments()[0];
 			}
 		}
-		return elementClass;
+		else if(isMap(type))
+		{
+			if(type instanceof ParameterizedType)
+			{
+				elementType = ((ParameterizedType) type).getActualTypeArguments()[1];
+			}
+		}
+		return elementType;
 	}
 	
 	public static LinkedList<?> asCollection(Object value)

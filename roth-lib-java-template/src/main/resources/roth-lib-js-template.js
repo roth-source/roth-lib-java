@@ -52,7 +52,7 @@ roth.lib.js.template.Template = roth.lib.js.template.Template || function(config
 		builder += escapeRegExp(config.closeUnescapedExpression) + "|";
 		builder += escapeRegExp(config.closeEscapedExpression) + "|";
 		builder += escapeRegExp(config.closeStatement) + "|";
-		builder += "defined\\((.+?)\\)";
+		//builder += "defined\\((.+?)\\)";
 		return new RegExp(builder, "g");
 	})();
 	
@@ -135,10 +135,12 @@ roth.lib.js.template.Template = roth.lib.js.template.Template || function(config
 				}
 				default:
 				{
+					/*
 					if(match.indexOf("defined") == 0)
 					{
 						replacement = "typeof " + capture + " !== " + "\"undefined\"";
 					}
+					*/
 					break;
 				}
 			}
@@ -155,7 +157,7 @@ roth.lib.js.template.Template = roth.lib.js.template.Template || function(config
 	
 	this.render = function(source, data)
 	{
-		return this.renderParsed(this.parse(source, data), data);
+		return self.renderParsed(self.parse(source, data), data);
 	};
 	
 };

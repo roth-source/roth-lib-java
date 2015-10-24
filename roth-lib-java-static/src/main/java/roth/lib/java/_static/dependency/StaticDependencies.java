@@ -24,9 +24,9 @@ public class StaticDependencies
 {
 	protected static String ROTH_LIB_JS_ENV		= "roth-lib-js-env.js";
 	protected static String GET_DEPENDENCIES	= "getDependencies";
-	protected static String USER_DIR			= "user.dir";
-	protected static String WEB_APP				= "src/main/webapp/";
-	protected static String ENV					= "script/env.js";
+	protected static String USER_DIR_DEFAULT	= "user.dir";
+	protected static String WEB_APP_DEFAULT		= "src/main/webapp/";
+	protected static String ENV_DEFAULT			= "script/env.js";
 	protected static String PROJECT_DIR			= "projectDir";
 	protected static String WEB_APP_DIR			= "webAppDir";
 	protected static String ENV_FILE			= "envFile";
@@ -44,9 +44,9 @@ public class StaticDependencies
 	
 	protected void init()
 	{
-		projectDir = new File(System.getProperty(USER_DIR));
-		webAppDir = new File(projectDir, WEB_APP);
-		envFile = new File(webAppDir, ENV);
+		projectDir = new File(System.getProperty(USER_DIR_DEFAULT));
+		webAppDir = new File(projectDir, WEB_APP_DEFAULT);
+		envFile = new File(webAppDir, ENV_DEFAULT);
 		engine = new ScriptEngineManager().getEngineByName(ENGINE);
 	}
 	
