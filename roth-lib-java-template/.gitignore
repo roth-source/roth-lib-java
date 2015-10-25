@@ -1,6 +1,7 @@
 # FOLDERS
 bin/
 target/
+dev/
 .settings/
 
 # EXTENSIONS
