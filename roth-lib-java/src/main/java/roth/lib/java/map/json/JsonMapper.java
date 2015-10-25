@@ -27,6 +27,7 @@ import roth.lib.java.map.Mapper;
 import roth.lib.java.map.MapperConfig;
 import roth.lib.java.map.deserializer.Deserializer;
 import roth.lib.java.map.serializer.Serializer;
+import roth.lib.java.map.serializer.TemporalSerializer;
 import roth.lib.java.reflector.PropertyReflector;
 
 public class JsonMapper extends Mapper
@@ -181,13 +182,18 @@ public class JsonMapper extends Mapper
 			else if(getMapperConfig().isSerializable(value.getClass()))
 			{
 				Serializer<?> serializer = getMapperConfig().getSerializer(value.getClass());
+				boolean escapable = serializer.isEscapable();
+				if(!escapable && serializer instanceof TemporalSerializer && getTimeFormat() != null)
+				{
+					escapable = true;
+				}
 				String serializedValue = serializer.serialize(value, getTimeFormat());
 				if(serializedValue != null)
 				{
 					seperator = writeSeperator(writer, seperator);
 					writeNewLine(writer);
 					writePropertyName(writer, name);
-					writeValue(writer, serializedValue, serializer.isEscapable());
+					writeValue(writer, serializedValue, escapable);
 				}
 				else if(getMapperConfig().isSerializeNulls())
 				{
@@ -283,13 +289,18 @@ public class JsonMapper extends Mapper
 				else if(getMapperConfig().isSerializable(value.getClass()))
 				{
 					Serializer<?> serializer = getMapperConfig().getSerializer(value.getClass());
+					boolean escapable = serializer.isEscapable();
+					if(!escapable && serializer instanceof TemporalSerializer && getTimeFormat() != null)
+					{
+						escapable = true;
+					}
 					String serializedValue = serializer.serialize(value, getTimeFormat());
 					if(serializedValue != null)
 					{
 						incrementTabs();
 						seperator = writeSeperator(writer, seperator);
 						writeNewLine(writer);
-						writeValue(writer, serializedValue, serializer.isEscapable());
+						writeValue(writer, serializedValue, escapable);
 						decrementTabs();
 					}
 					else if(getMapperConfig().isSerializeNulls())

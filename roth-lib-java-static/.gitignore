@@ -1,10 +1,14 @@
-/target/
-/dev/
-/.settings/
-.classpath
+# FOLDERS
+bin/
+target/
+.settings/
+
+# EXTENSIONS
 *.prefs
 *.class
-.DS_Store
-Thumbs.db
 *.versionsBackup
 *.releaseBackup
+
+# SYSTEM
+.DS_Store
+Thumbs.db

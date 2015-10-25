@@ -1,16 +1,18 @@
 package roth.lib.java._static.config;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import roth.lib.java.map.MapperConfig;
 import roth.lib.java.map.json.JsonMapper;
-import roth.lib.java.util.FileUtil;
 
 public class StaticConfig
 {
@@ -30,6 +32,8 @@ public class StaticConfig
 	protected static String SERVICE_DIR				= "serviceDir";
 	protected static String CONFIG_FILE				= "configFile";
 	protected static String DEV_FILE				= "devFile";
+	protected static String LOCAL_ENV				= "local";
+	protected static String LOCAL_DEFAULT			= "https://localhost:8443/";
 	protected static Pattern TEXT_PATTERN			= Pattern.compile("^(\\S+_([A-Za-z]{2}))\\.");
 	protected static Pattern VIEW_PATTERN			= Pattern.compile("^(\\S+)\\.");
 	protected static Pattern REQUEST_PATTERN		= Pattern.compile("-request-(\\w+?)\\.");
@@ -144,144 +148,241 @@ public class StaticConfig
 	
 	public void sync() throws Exception
 	{
-		Config currentConfig = mapper.deserialize(FileUtil.toString(configFile), Config.class);
-		Config config = new Config();
-		config.setEndpointMap(currentConfig.getEndpointMap());
-		if(textDir.exists() && textDir.isDirectory())
 		{
-			for(File file : textDir.listFiles())
+			Config config = new Config();
+			if(configFile.exists())
 			{
-				if(file.isFile() && !file.isHidden())
+				try(FileInputStream input = new FileInputStream(configFile))
 				{
-					Matcher textMatcher = TEXT_PATTERN.matcher(file.getName());
-					if(textMatcher.find())
-					{
-						String name = textMatcher.group(1);
-						String lang = textMatcher.group(2).toLowerCase();
-						LinkedHashSet<String> texts = config.getTextMap().get(lang);
-						if(texts == null)
-						{
-							texts = new LinkedHashSet<String>();
-							config.getTextMap().put(lang, texts);
-						}
-						texts.add(name);
-					}
+					config = mapper.deserialize(input, Config.class);
 				}
 			}
-		}
-		if(layoutDir.exists() && layoutDir.isDirectory())
-		{
-			for(File file : layoutDir.listFiles())
+			LinkedHashMap<String, LinkedHashSet<String>> endpointMap = config.getEndpointMap();
+			if(endpointMap == null)
 			{
-				if(file.isFile() && !file.isHidden())
-				{
-					Matcher viewMatcher = VIEW_PATTERN.matcher(file.getName());
-					if(viewMatcher.find())
-					{
-						String name = viewMatcher.group(1);
-						Layout layout = currentConfig.getLayoutMap().get(name);
-						if(layout == null)
-						{
-							layout = new Layout();
-						}
-						config.getLayoutMap().put(name, layout);
-					}
-				}
+				endpointMap = new LinkedHashMap<String, LinkedHashSet<String>>();
 			}
-		}
-		if(pageDir.exists() && pageDir.isDirectory())
-		{
-			for(File dir : pageDir.listFiles())
+			LinkedHashSet<String> localEndpoints = endpointMap.get(LOCAL_ENV);
+			if(localEndpoints == null || !localEndpoints.isEmpty())
 			{
-				if(dir.isDirectory() && !dir.isHidden())
+				localEndpoints = new LinkedHashSet<String>();
+				localEndpoints.add(LOCAL_DEFAULT);
+				endpointMap.put(LOCAL_ENV, localEndpoints);
+			}
+			config.setEndpointMap(endpointMap);
+			if(textDir.exists() && textDir.isDirectory())
+			{
+				for(File file : textDir.listFiles())
 				{
-					LinkedHashMap<String, Page> currentPageMap = new LinkedHashMap<String, Page>();
-					Module module = config.getModuleMap().get(dir.getName());
-					if(module == null)
+					if(file.isFile() && !file.isHidden())
 					{
-						Module currentModule = currentConfig.getModuleMap().get(dir.getName());
-						if(currentModule != null)
+						Matcher textMatcher = TEXT_PATTERN.matcher(file.getName());
+						if(textMatcher.find())
 						{
-							currentPageMap.putAll(currentModule.getPageMap());
-							currentModule.getPageMap().clear();
-							module = currentModule;
-						}
-						else
-						{
-							module = new Module();
-						}
-						config.getModuleMap().put(dir.getName(), module);
-					}
-					for(File file : dir.listFiles())
-					{
-						if(file.isFile() && !file.isHidden())
-						{
-							Matcher viewMatcher = VIEW_PATTERN.matcher(file.getName());
-							if(viewMatcher.find())
+							String text = textMatcher.group(1);
+							String lang = textMatcher.group(2).toLowerCase();
+							LinkedHashSet<String> texts = config.getTextMap().get(lang);
+							if(texts == null)
 							{
-								String name = viewMatcher.group(1);
-								Page page = currentPageMap.get(name);
-								if(page == null)
+								texts = new LinkedHashSet<String>();
+								config.getTextMap().put(lang, texts);
+							}
+							texts.add(text);
+						}
+					}
+				}
+			}
+			if(layoutDir.exists() && layoutDir.isDirectory())
+			{
+				LinkedHashSet<String> layouts = new LinkedHashSet<String>();
+				for(File file : layoutDir.listFiles())
+				{
+					if(file.isFile() && !file.isHidden())
+					{
+						Matcher viewMatcher = VIEW_PATTERN.matcher(file.getName());
+						if(viewMatcher.find())
+						{
+							String layoutName = viewMatcher.group(1);
+							layouts.add(layoutName);
+							Layout layout = config.getLayoutMap().get(layoutName);
+							if(layout == null)
+							{
+								layout = new Layout();
+							}
+							config.getLayoutMap().put(layoutName, layout);
+						}
+					}
+				}
+				Iterator<Entry<String, Layout>> iterator = config.getLayoutMap().entrySet().iterator();
+				while(iterator.hasNext())
+				{
+					if(!layouts.contains(iterator.next().getKey()))
+					{
+						iterator.remove();
+					}
+				}
+			}
+			if(pageDir.exists() && pageDir.isDirectory())
+			{
+				LinkedHashSet<String> modules = new LinkedHashSet<String>();
+				for(File dir : pageDir.listFiles())
+				{
+					if(dir.isDirectory() && !dir.isHidden())
+					{
+						String moduleName = dir.getName();
+						Module module = config.getModuleMap().get(moduleName);
+						LinkedHashSet<String> pages = new LinkedHashSet<String>();
+						for(File file : dir.listFiles())
+						{
+							if(file.isFile() && !file.isHidden())
+							{
+								modules.add(moduleName);
+								if(module == null)
 								{
-									page = new Page();
+									module = new Module();
+									config.getModuleMap().put(moduleName, module);
 								}
-								module.getPageMap().put(name, page);
+								Matcher viewMatcher = VIEW_PATTERN.matcher(file.getName());
+								if(viewMatcher.find())
+								{
+									String pageName = viewMatcher.group(1);
+									pages.add(pageName);
+									Page page = module.getPageMap().get(pageName);
+									if(page == null)
+									{
+										page = new Page();
+									}
+									module.getPageMap().put(pageName, page);
+								}
+							}
+						}
+						if(module != null)
+						{
+							Iterator<Entry<String, Page>> iterator = module.getPageMap().entrySet().iterator();
+							while(iterator.hasNext())
+							{
+								if(!pages.contains(iterator.next().getKey()))
+								{
+									iterator.remove();
+								}
 							}
 						}
 					}
 				}
+				Iterator<Entry<String, Module>> iterator = config.getModuleMap().entrySet().iterator();
+				while(iterator.hasNext())
+				{
+					if(!modules.contains(iterator.next().getKey()))
+					{
+						iterator.remove();
+					}
+				}
 			}
-		}
-		try(FileOutputStream output = new FileOutputStream(configFile))
-		{
-			mapper.serialize(config, output);
+			try(FileOutputStream output = new FileOutputStream(configFile))
+			{
+				mapper.serialize(config, output);
+			}
 		}
 		
 		if(serviceDir.exists() && serviceDir.isDirectory())
 		{
 			Dev dev = new Dev();
+			if(devFile.exists())
+			{
+				try(FileInputStream input = new FileInputStream(devFile))
+				{
+					dev = mapper.deserialize(input, Dev.class);
+				}
+			}
+			LinkedHashSet<String> services = new LinkedHashSet<String>();
 			for(File methodsDir : serviceDir.listFiles())
 			{
 				if(methodsDir.isDirectory() && !methodsDir.isHidden())
 				{
 					String service = methodsDir.getName();
+					services.add(service);
+					LinkedHashMap<String, Scenario> methodMap = dev.getServiceMap().get(service);
+					LinkedHashSet<String> methods = new LinkedHashSet<String>();
 					for(File scenariosDir : methodsDir.listFiles())
 					{
 						if(scenariosDir.isDirectory() && !scenariosDir.isHidden())
 						{
-							String method = scenariosDir.getName();
-							LinkedHashMap<String, Scenario> methodMap = dev.getServiceMap().get(service);
 							if(methodMap == null)
 							{
 								methodMap = new LinkedHashMap<String, Scenario>();
 								dev.getServiceMap().put(service, methodMap);
 							}
+							String method = scenariosDir.getName();
+							methods.add(method);
 							Scenario scenario = methodMap.get(method);
 							if(scenario == null)
 							{
 								scenario = new Scenario();
 								methodMap.put(method, scenario);
 							}
+							LinkedHashSet<String> requests = new LinkedHashSet<String>();
+							LinkedHashSet<String> responses = new LinkedHashSet<String>();
 							for(File file : scenariosDir.listFiles())
 							{
 								if(file.isFile() && !file.isHidden())
 								{
-									Matcher requestMatcher = REQUEST_PATTERN.matcher(file.getName());
-									Matcher responseMatcher = RESPONSE_PATTERN.matcher(file.getName());
-									if(requestMatcher.find())
+									if(file.getName().startsWith(method))
 									{
-										String request = requestMatcher.group(1);
-										scenario.getRequests().add(request);
+										Matcher requestMatcher = REQUEST_PATTERN.matcher(file.getName());
+										Matcher responseMatcher = RESPONSE_PATTERN.matcher(file.getName());
+										if(requestMatcher.find())
+										{
+											String request = requestMatcher.group(1);
+											scenario.getRequests().add(request);
+											requests.add(request);
+										}
+										else if(responseMatcher.find())
+										{
+											String response = responseMatcher.group(1);
+											scenario.getResponses().add(response);
+											responses.add(response);
+										}
 									}
-									else if(responseMatcher.find())
-									{
-										String response = responseMatcher.group(1);
-										scenario.getResponses().add(response);
-									}
+								}
+							}
+							Iterator<String> iterator = null;
+							iterator = scenario.getRequests().iterator();
+							while(iterator.hasNext())
+							{
+								if(!requests.contains(iterator.next()))
+								{
+									iterator.remove();
+								}
+							}
+							iterator = scenario.getResponses().iterator();
+							while(iterator.hasNext())
+							{
+								if(!responses.contains(iterator.next()))
+								{
+									iterator.remove();
 								}
 							}
 						}
 					}
+					if(methodMap != null)
+					{
+						Iterator<Entry<String, Scenario>> iterator = methodMap.entrySet().iterator();
+						while(iterator.hasNext())
+						{
+							if(!methods.contains(iterator.next().getKey()))
+							{
+								iterator.remove();
+							}
+						}
+					}
+				}
+			}
+			Iterator<Entry<String, LinkedHashMap<String, Scenario>>> iterator = dev.getServiceMap().entrySet().iterator();
+			while(iterator.hasNext())
+			{
+				if(!services.contains(iterator.next().getKey()))
+				{
+					iterator.remove();
 				}
 			}
 			try(FileOutputStream output = new FileOutputStream(devFile))

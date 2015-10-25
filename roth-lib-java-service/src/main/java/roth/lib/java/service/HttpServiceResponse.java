@@ -31,8 +31,18 @@ public class HttpServiceResponse implements Serializable
 		return dev;
 	}
 	
+	public HttpServiceResponse addError(HttpError error)
+	{
+		getErrors().add(error);
+		return this;
+	}
+	
 	public LinkedList<HttpError> getErrors()
 	{
+		if(errors == null)
+		{
+			errors = new LinkedList<HttpError>();
+		}
 		return errors;
 	}
 	
@@ -56,7 +66,7 @@ public class HttpServiceResponse implements Serializable
 	
 	public HttpServiceResponse setErrors(LinkedList<HttpError> errors)
 	{
-		this.errors = errors;
+		getErrors().addAll(errors);
 		return this;
 	}
 	
