@@ -506,7 +506,11 @@ var DateUtil = DateUtil || (function()
 					case "zz":
 					case "z":
 					{
-						replacement = /\((\w*)\)/.exec(date.toString())[1];
+						var matcher = /\((\w*)\)/.exec(date.toString());
+						if(!isNull(matcher))
+						{
+							replacement = matcher[1];
+						}
 						break;
 					}
 					case "Z":
@@ -885,6 +889,36 @@ var IdUtil = IdUtil || (function()
 
 
 
+var NumberUtil = NumberUtil || (function()
+{
+	
+	return {
+		
+		formatInt : function(value)
+		{
+			var parsedValue = parseInt(value);
+			return !isNaN(parsedValue) ? parsedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
+		},
+		
+		formatDecimal : function(value)
+		{
+			var parsedValue = parseFloat(value);
+			return !isNaN(parsedValue) ? parsedValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
+		},
+		
+		formatPercent : function(value, decimal)
+		{
+			var parsedValue = parseFloat(value);
+			return !isNaN(parsedValue) ? (parsedValue * 100).toFixed(decimal) : "";
+		}
+		
+	}
+	
+})();
+
+
+
+
 var ObjectUtil = ObjectUtil || (function()
 {
 	
@@ -969,6 +1003,16 @@ var StringUtil = StringUtil || (function()
 			{
 				return value;
 			}
+		},
+		
+		repeat : function(value, length)
+		{
+			var repeated = "";
+			for(var i = 0; i < length; i++)
+			{
+				repeated += value;
+			}
+			return repeated;
 		},
 		
 		equals : function(value1, value2, caseInsensitive)
