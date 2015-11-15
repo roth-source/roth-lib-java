@@ -665,6 +665,9 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 		}
 	}
 	
-	protected abstract <T extends ApiResponse> void checkResponse(HttpResponse<T> response);
+	protected <T extends ApiResponse> void checkResponse(HttpResponse<T> response)
+	{
+		
+	}
 	
 }
