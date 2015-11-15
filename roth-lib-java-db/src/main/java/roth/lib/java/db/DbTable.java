@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import roth.lib.java.Callback;
 import roth.lib.java.db.sql.Column;
 import roth.lib.java.db.sql.Columns;
 import roth.lib.java.db.sql.Delete;
@@ -17,16 +16,13 @@ import roth.lib.java.db.sql.Update;
 import roth.lib.java.db.sql.Where;
 import roth.lib.java.db.sql.Wheres;
 
-public abstract class DbTable<T>
+public abstract class DbTable<T> extends DbAccessor<T>
 {
-	protected Class<T> klass;
 	
 	protected DbTable(Class<T> klass)
 	{
-		this.klass = klass;
+		super(klass);
 	}
-	
-	public abstract DbDataSource getDb();
 	
 	public String tableName()
 	{
@@ -83,14 +79,14 @@ public abstract class DbTable<T>
 		return new Delete(tableName());
 	}
 	
-	public T findBy(Where... wheres)
-	{
-		return findBy(new Wheres(wheres));
-	}
-	
 	public T findBy(Wheres wheres)
 	{
 		return findBy(select().wheres(wheres));
+	}
+	
+	public T findBy(Where... wheres)
+	{
+		return findBy(new Wheres(wheres));
 	}
 	
 	public T findBy(Where where, Columns columns)
@@ -101,26 +97,6 @@ public abstract class DbTable<T>
 	public T findBy(Wheres wheres, Columns columns)
 	{
 		return findBy(select(columns).wheres(wheres));
-	}
-	
-	public T findBy(Select select)
-	{
-		return getDb().query(select, klass);
-	}
-	
-	public T findBy(String sql)
-	{
-		return getDb().query(sql, klass);
-	}
-	
-	public T findBy(String sql, Collection<Object> values)
-	{
-		return getDb().query(sql, values, klass);
-	}
-	
-	public T findBy(String sql, Map<String, Object> valueMap)
-	{
-		return getDb().query(sql, valueMap, klass);
 	}
 	
 	public LinkedList<T> findAll()
@@ -143,11 +119,6 @@ public abstract class DbTable<T>
 		return findAllBy(select().wheres(wheres));
 	}
 	
-	public LinkedList<T> findAllBy(Where where, Order order)
-	{
-		return findAllBy(new Wheres().and(where), order);
-	}
-	
 	public LinkedList<T> findAllBy(Wheres wheres, Order order)
 	{
 		return findAllBy(select().wheres(wheres).order(order));
@@ -168,6 +139,11 @@ public abstract class DbTable<T>
 		return findAllBy(select(columns).wheres(wheres));
 	}
 	
+	public LinkedList<T> findAllBy(Where where, Order order)
+	{
+		return findAllBy(new Wheres().and(where), order);
+	}
+	
 	public LinkedList<T> findAllBy(Where where, Columns columns, Order order)
 	{
 		return findAllBy(new Wheres().and(where), columns, order);
@@ -176,46 +152,6 @@ public abstract class DbTable<T>
 	public LinkedList<T> findAllBy(Wheres wheres, Columns columns, Order order)
 	{
 		return findAllBy(select(columns).wheres(wheres).order(order));
-	}
-	
-	public LinkedList<T> findAllBy(Select select)
-	{
-		return getDb().queryAll(select, klass);
-	}
-	
-	public LinkedList<T> findAllBy(String sql)
-	{
-		return getDb().queryAll(sql, klass);
-	}
-	
-	public LinkedList<T> findAllBy(String sql, Collection<Object> values)
-	{
-		return getDb().queryAll(sql, values, klass);
-	}
-	
-	public LinkedList<T> findAllBy(String sql, Map<String, Object> valueMap)
-	{
-		return getDb().queryAll(sql, valueMap, klass);
-	}
-	
-	public void callback(Select select, Callback<T> callback)
-	{
-		getDb().queryAll(select, callback.setKlass(klass));
-	}
-	
-	public void callback(String sql, Callback<T> callback)
-	{
-		getDb().queryAll(sql, callback.setKlass(klass));
-	}
-	
-	public void callback(String sql, Collection<Object> values, Callback<T> callback)
-	{
-		getDb().queryAll(sql, values, callback.setKlass(klass));
-	}
-	
-	public void callback(String sql, Map<String, Object> valueMap, Callback<T> callback)
-	{
-		getDb().queryAll(sql, valueMap, callback.setKlass(klass));
 	}
 	
 	public int executeInsert(Insert insert)
