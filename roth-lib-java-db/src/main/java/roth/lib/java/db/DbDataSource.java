@@ -7,6 +7,7 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.logging.Logger;
@@ -326,6 +327,12 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		return query(sql, (Collection<Object>) null, klass);
 	}
 	
+	public <T> T query(String sql, Map<String, Object> valueMap, Class<T> klass)
+	{
+		LinkedList<T> models = queryAll(sql, valueMap, klass);
+		return !models.isEmpty() ? models.get(0) : null;
+	}
+	
 	public <T> T query(String sql, Collection<Object> values, Class<T> klass)
 	{
 		LinkedList<T> models = queryAll(sql, values, klass);
@@ -340,6 +347,20 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	public <T> LinkedList<T> queryAll(String sql, Class<T> klass)
 	{
 		return queryAll(sql, (Collection<Object>) null, klass);
+	}
+	
+	public <T> LinkedList<T> queryAll(String sql, Map<String, Object> valueMap, Class<T> klass)
+	{
+		LinkedList<T> models = new LinkedList<T>();
+		try(DbConnection connection = getConnection())
+		{
+			models = queryAll(sql, valueMap, klass, connection); 
+		}
+		catch(SQLException e)
+		{
+			throw new DbException(e);
+		}
+		return models;
 	}
 	
 	public <T> LinkedList<T> queryAll(String sql, Collection<Object> values, Class<T> klass)
@@ -366,6 +387,12 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		return queryAll(sql, (Collection<Object>) null, klass, connection);
 	}
 	
+	public <T> LinkedList<T> queryAll(String sql, Map<String, Object> valueMap, Class<T> klass, DbConnection connection) throws SQLException
+	{
+		DbNamedQuery namedQuery = namedQuery(sql, valueMap);
+		return queryAll(namedQuery.getSql(), namedQuery.getValues(), klass, connection);
+	}
+	
 	public <T> LinkedList<T> queryAll(String sql, Collection<Object> values, Class<T> klass, DbConnection connection) throws SQLException
 	{
 		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
@@ -389,6 +416,18 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		queryAll(sql, (Collection<Object>) null, callback);
 	}
 	
+	public <T> void queryAll(String sql, Map<String, Object> valueMap, Callback<T> callback)
+	{
+		try(DbConnection connection = getConnection())
+		{
+			queryAll(sql, valueMap, callback, connection); 
+		}
+		catch(SQLException e)
+		{
+			throw new DbException(e);
+		}
+	}
+	
 	public <T> void queryAll(String sql, Collection<Object> values, Callback<T> callback)
 	{
 		try(DbConnection connection = getConnection())
@@ -409,6 +448,12 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	public <T> void queryAll(String sql, Callback<T> callback, DbConnection connection) throws SQLException
 	{
 		queryAll(sql, (Collection<Object>) null, callback, connection);
+	}
+	
+	public <T> void queryAll(String sql, Map<String, Object> valueMap, Callback<T> callback, DbConnection connection) throws SQLException
+	{
+		DbNamedQuery namedQuery = namedQuery(sql, valueMap);
+		queryAll(namedQuery.getSql(), namedQuery.getValues(), callback, connection);
 	}
 	
 	public <T> void queryAll(String sql, Collection<Object> values, Callback<T> callback, DbConnection connection) throws SQLException
@@ -434,6 +479,12 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		return query(sql, (Collection<Object>) null);
 	}
 	
+	public LinkedHashMap<String, Object> query(String sql, Map<String, Object> valueMap)
+	{
+		LinkedList<LinkedHashMap<String, Object>> maps = queryAll(sql, valueMap);
+		return !maps.isEmpty() ? maps.get(0) : null;
+	}
+	
 	public LinkedHashMap<String, Object> query(String sql, Collection<Object> values)
 	{
 		LinkedList<LinkedHashMap<String, Object>> maps = queryAll(sql, values);
@@ -443,6 +494,20 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	public LinkedList<LinkedHashMap<String, Object>> queryAll(Select select)
 	{
 		return queryAll(select.sql(), select.values());
+	}
+	
+	public LinkedList<LinkedHashMap<String, Object>> queryAll(String sql, Map<String, Object> valueMap)
+	{
+		LinkedList<LinkedHashMap<String, Object>> maps = new LinkedList<LinkedHashMap<String, Object>>();
+		try(DbConnection connection = getConnection())
+		{
+			maps = queryAll(sql, valueMap, connection); 
+		}
+		catch(SQLException e)
+		{
+			throw new DbException(e);
+		}
+		return maps;
 	}
 	
 	public LinkedList<LinkedHashMap<String, Object>> queryAll(String sql, Collection<Object> values)
@@ -467,6 +532,12 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	public LinkedList<LinkedHashMap<String, Object>> queryAll(String sql, DbConnection connection) throws SQLException
 	{
 		return queryAll(sql, (Collection<Object>) null, connection);
+	}
+	
+	public LinkedList<LinkedHashMap<String, Object>> queryAll(String sql, Map<String, Object> valueMap, DbConnection connection) throws SQLException
+	{
+		DbNamedQuery namedQuery = namedQuery(sql, valueMap);
+		return queryAll(namedQuery.getSql(), namedQuery.getValues(), connection);
 	}
 	
 	public LinkedList<LinkedHashMap<String, Object>> queryAll(String sql, Collection<Object> values, DbConnection connection) throws SQLException
@@ -812,6 +883,11 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 				
 			}
 		}
+	}
+	
+	public DbNamedQuery namedQuery(String sql, Map<String, Object> valueMap)
+	{
+		return new DbNamedQuery(sql, valueMap);
 	}
 	
 }

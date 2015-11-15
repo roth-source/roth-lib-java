@@ -118,6 +118,11 @@ public abstract class DbTable<T>
 		return getDb().query(sql, values, klass);
 	}
 	
+	public T findBy(String sql, Map<String, Object> valueMap)
+	{
+		return getDb().query(sql, valueMap, klass);
+	}
+	
 	public LinkedList<T> findAll()
 	{
 		return findAllBy(select());
@@ -188,6 +193,11 @@ public abstract class DbTable<T>
 		return getDb().queryAll(sql, values, klass);
 	}
 	
+	public LinkedList<T> findAllBy(String sql, Map<String, Object> valueMap)
+	{
+		return getDb().queryAll(sql, valueMap, klass);
+	}
+	
 	public void callback(Select select, Callback<T> callback)
 	{
 		getDb().queryAll(select, callback.setKlass(klass));
@@ -201,6 +211,11 @@ public abstract class DbTable<T>
 	public void callback(String sql, Collection<Object> values, Callback<T> callback)
 	{
 		getDb().queryAll(sql, values, callback.setKlass(klass));
+	}
+	
+	public void callback(String sql, Map<String, Object> valueMap, Callback<T> callback)
+	{
+		getDb().queryAll(sql, valueMap, callback.setKlass(klass));
 	}
 	
 	public int executeInsert(Insert insert)
