@@ -1,5 +1,6 @@
 package roth.lib.java.db;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
@@ -7,7 +8,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import roth.lib.java.Characters;
-import roth.lib.java.db.sql.Sql;
 
 public class DbNamedQuery implements Characters
 {
@@ -26,26 +26,37 @@ public class DbNamedQuery implements Characters
 			builder.append(sql.substring(start, namedMatcher.start()));
 			String name = namedMatcher.group(1);
 			Object value = valueMap.get(name);
-			values.add(value);
-			if(value instanceof Collection)
+			if(value instanceof Collection || value instanceof Object[])
 			{
-				int length = ((Collection<?>) value).size();
-				if(length > 0)
+				Collection<?> collection = null;
+				if(value instanceof Collection)
 				{
-					builder.append(Sql.param(length));
+					collection = (Collection<?>) value;
 				}
-			}
-			else if(value instanceof Object[])
-			{
-				int length = ((Object[]) value).length;
-				if(length > 0)
+				else if(value instanceof Object[])
 				{
-					builder.append(Sql.param(length));
+					collection = Arrays.asList((Object[]) value);
+				}
+				if(collection != null)
+				{
+					int length = collection.size();
+					if(length > 0)
+					{
+						String seperator = "";
+						for(int i = 0; i < length; i++)
+						{
+							builder.append(seperator);
+							builder.append(QUESTION);
+							seperator = String.valueOf(COMMA);
+						}
+						values.addAll(collection);
+					}
 				}
 			}
 			else
 			{
 				builder.append(QUESTION);
+				values.add(value);
 			}
 			start = namedMatcher.end() + 1;
 		}
