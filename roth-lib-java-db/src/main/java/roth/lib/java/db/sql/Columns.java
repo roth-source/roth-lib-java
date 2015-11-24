@@ -7,6 +7,7 @@ import java.util.LinkedList;
 public class Columns extends Sql
 {
 	protected static final String SELECT = " SELECT ";
+	protected static final String COLUMN = COMMA + LF + "        ";
 	
 	protected LinkedList<Column> columns = new LinkedList<Column>();
 	
@@ -34,7 +35,15 @@ public class Columns extends Sql
 	@Override
 	public String toString()
 	{
-		return SELECT + list(columns);
+		StringBuilder builder = new StringBuilder();
+		String seperator = SELECT;
+		for(Column column : columns)
+		{
+			builder.append(seperator);
+			builder.append(column.toString());
+			seperator = COLUMN;
+		}
+		return builder.toString();
 	}
 	
 }

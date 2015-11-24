@@ -3,6 +3,7 @@ package roth.lib.java.service.endpoint;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -152,7 +153,17 @@ public class HttpEndpoint extends HttpServlet
 													{
 														service.setResponseContentType(responseContentType);
 														service.setResponseMapper(responseMapper);
-														methodResponse = methodReflector.invoke(service, methodRequest);
+														try
+														{
+															methodResponse = methodReflector.invoke(service, methodRequest);
+														}
+														catch(InvocationTargetException e)
+														{
+															if(e.getCause() != null)
+															{
+																throw e.getCause();
+															}
+														}
 													}
 												}
 												else
@@ -216,7 +227,7 @@ public class HttpEndpoint extends HttpServlet
 				errors.add(HttpErrorType.HTTP_ORIGIN_UNSUPPORTED.error());
 			}
 		}
-		catch(Exception e)
+		catch(Throwable e)
 		{
 			if(dev)
 			{
@@ -515,7 +526,7 @@ public class HttpEndpoint extends HttpServlet
 		return responseXmlConfig;
 	}
 	
-	protected HttpError exception(HttpServletRequest request, HttpServletResponse response, Exception e)
+	protected HttpError exception(HttpServletRequest request, HttpServletResponse response, Throwable e)
 	{
 		return new HttpError(HttpErrorType.SERVICE_EXCEPTION).setContext(e.getClass().getSimpleName()).setMessage(e.getMessage());
 	}

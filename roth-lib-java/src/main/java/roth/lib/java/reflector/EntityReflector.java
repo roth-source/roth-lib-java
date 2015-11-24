@@ -49,7 +49,7 @@ public abstract class EntityReflector
 			@Override
 			public String getTimeFormat(Property property)
 			{
-				return property.timeFormat();
+				return isValid(property.timeFormat()) ? property.timeFormat() : null;
 			}
 		});
 		addGetExcludesAccessor(new GetExcludesAccessor<Property>(Property.class)

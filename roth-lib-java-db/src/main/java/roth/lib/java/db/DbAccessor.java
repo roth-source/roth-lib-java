@@ -7,73 +7,72 @@ import java.util.Map;
 import roth.lib.java.Callback;
 import roth.lib.java.db.sql.Select;
 
-public abstract class DbAccessor<T>
+public abstract class DbAccessor
 {
-	protected Class<T> klass;
 	
-	public DbAccessor(Class<T> klass)
+	public DbAccessor()
 	{
-		this.klass = klass;
+		
 	}
 	
 	public abstract DbDataSource getDb();
 	
-	public T findBy(Select select)
+	public <T> T findBy(Select select, Class<T> klass)
 	{
 		return getDb().query(select, klass);
 	}
 	
-	public T findBy(String sql)
+	public <T> T findBy(String sql, Class<T> klass)
 	{
 		return getDb().query(sql, klass);
 	}
 	
-	public T findBy(String sql, Collection<Object> values)
+	public <T> T findBy(String sql, Collection<Object> values, Class<T> klass)
 	{
 		return getDb().query(sql, values, klass);
 	}
 	
-	public T findBy(String sql, Map<String, Object> valueMap)
+	public <T> T findBy(String sql, Map<String, Object> valueMap, Class<T> klass)
 	{
 		return getDb().query(sql, valueMap, klass);
 	}
 	
-	public LinkedList<T> findAllBy(Select select)
+	public <T> LinkedList<T> findAllBy(Select select, Class<T> klass)
 	{
 		return getDb().queryAll(select, klass);
 	}
 	
-	public LinkedList<T> findAllBy(String sql)
+	public <T> LinkedList<T> findAllBy(String sql, Class<T> klass)
 	{
 		return getDb().queryAll(sql, klass);
 	}
 	
-	public LinkedList<T> findAllBy(String sql, Collection<Object> values)
+	public <T> LinkedList<T> findAllBy(String sql, Collection<Object> values, Class<T> klass)
 	{
 		return getDb().queryAll(sql, values, klass);
 	}
 	
-	public LinkedList<T> findAllBy(String sql, Map<String, Object> valueMap)
+	public <T> LinkedList<T> findAllBy(String sql, Map<String, Object> valueMap, Class<T> klass)
 	{
 		return getDb().queryAll(sql, valueMap, klass);
 	}
 	
-	public void callback(Select select, Callback<T> callback)
+	public <T> void callback(Select select, Callback<T> callback, Class<T> klass)
 	{
 		getDb().queryAll(select, callback.setKlass(klass));
 	}
 	
-	public void callback(String sql, Callback<T> callback)
+	public <T> void callback(String sql, Callback<T> callback, Class<T> klass)
 	{
 		getDb().queryAll(sql, callback.setKlass(klass));
 	}
 	
-	public void callback(String sql, Collection<Object> values, Callback<T> callback)
+	public <T> void callback(String sql, Collection<Object> values, Callback<T> callback, Class<T> klass)
 	{
 		getDb().queryAll(sql, values, callback.setKlass(klass));
 	}
 	
-	public void callback(String sql, Map<String, Object> valueMap, Callback<T> callback)
+	public <T> void callback(String sql, Map<String, Object> valueMap, Callback<T> callback, Class<T> klass)
 	{
 		getDb().queryAll(sql, valueMap, callback.setKlass(klass));
 	}
