@@ -15,6 +15,17 @@ public class Joins extends Sql
 	}
 	
 	@Override
+	public LinkedList<Object> values()
+	{
+		LinkedList<Object> values = new LinkedList<Object>();
+		for(Join join : joins)
+		{
+			values.addAll(join.values());
+		}
+		return values;
+	}
+	
+	@Override
 	public String toString()
 	{
 		return !joins.isEmpty() ? LF + list(joins, LF) : "";

@@ -1,4 +1,4 @@
-package roth.lib.java.service.endpoint;
+package roth.lib.java.service;
 
 public enum HttpErrorType
 {

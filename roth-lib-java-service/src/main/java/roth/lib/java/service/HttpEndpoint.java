@@ -1,4 +1,4 @@
-package roth.lib.java.service.endpoint;
+package roth.lib.java.service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,13 +28,8 @@ import roth.lib.java.map.form.FormReflector;
 import roth.lib.java.map.json.JsonReflector;
 import roth.lib.java.map.xml.XmlReflector;
 import roth.lib.java.net.http.HttpMethod;
-import roth.lib.java.service.HttpService;
-import roth.lib.java.service.HttpServiceMethod;
-import roth.lib.java.service.HttpServiceResponse;
-import roth.lib.java.service.HttpServiceType;
 import roth.lib.java.service.reflector.MethodReflector;
 import roth.lib.java.service.reflector.ServiceReflector;
-import roth.lib.java.service.task.HttpTaskService;
 import roth.lib.java.type.MimeType;
 
 @SuppressWarnings("serial")
@@ -106,10 +101,10 @@ public class HttpEndpoint extends HttpServlet
 						HttpServiceMethod serviceMethod = getServiceMethod(request, response);
 						if(serviceMethod != null)
 						{
-							HttpService service = this.getHttpService(request, response, serviceMethod.getServiceName());
+							HttpService service = getService(request, response, serviceMethod.getServiceName());
 							if(service != null)
 							{
-								service.setHttpServletRequest(request).setHttpServletResponse(response);
+								service.setServletContext(request.getServletContext()).setHttpServletRequest(request).setHttpServletResponse(response);
 								service.setService(serviceMethod.getServiceName()).setMethod(serviceMethod.getMethodName());
 								if(dev)
 								{
@@ -300,35 +295,6 @@ public class HttpEndpoint extends HttpServlet
 			serviceMethod = new HttpServiceMethod(matcher.group(SERVICE), matcher.group(METHOD));
 		}
 		return serviceMethod;
-	}
-	
-	private HttpService getHttpService(HttpServletRequest request, HttpServletResponse response, String serviceName)
-	{
-		HttpService service = null;
-		HttpServiceType serviceType = HttpServiceType.fromString(serviceName);
-		switch(serviceType)
-		{
-			case ENDPOINT:
-			{
-				service = new HttpEndpointService();
-				break;
-			}
-			case TASK:
-			{
-				service = new HttpTaskService();
-				break;
-			}
-			case NOT_FOUND:
-			{
-				service = getAnnotatedService(request, response, serviceName);
-				if(service == null)
-				{
-					service = getService(request, response, serviceName);
-				}
-				break;
-			}
-		}
-		return service;
 	}
 	
 	protected HttpService getAnnotatedService(HttpServletRequest request, HttpServletResponse response, String serviceName)

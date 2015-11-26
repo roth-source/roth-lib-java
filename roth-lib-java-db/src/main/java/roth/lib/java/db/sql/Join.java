@@ -10,10 +10,17 @@ public class Join extends Sql
 	protected static final String AND = " AND ";
 	
 	protected String sql;
+	protected LinkedList<Object> values = new LinkedList<Object>();
 	
 	protected Join(String sql)
 	{
 		this.sql = sql;
+	}
+	
+	protected Join(String sql, LinkedList<Object> values)
+	{
+		this.sql = sql;
+		this.values = values;
 	}
 	
 	protected static Join join(JoinType joinType, String name, String alias, On...ons)
@@ -24,6 +31,22 @@ public class Join extends Sql
 	protected static Join join(JoinType joinType, String name, String alias, String...ons)
 	{
 		return new Join(joinType.get() + tick(name) + (alias != null ? AS + tick(alias) : "") + ON + list(Arrays.asList(ons), AND));
+	}
+	
+	protected static Join join(JoinType joinType, Select select, String alias, String...ons)
+	{
+		StringBuilder builder = new StringBuilder();
+		builder.append(joinType.get());
+		builder.append("(");
+		builder.append(LF);
+		builder.append(select.toString(false));
+		builder.append(LF);
+		builder.append("        ) ");
+		builder.append(AS);
+		builder.append(tick(alias));
+		builder.append(ON);
+		builder.append(list(Arrays.asList(ons), AND));
+		return new Join(builder.toString(), select.values());
 	}
 	
 	public static Join join(String table, On...ons)
@@ -46,6 +69,11 @@ public class Join extends Sql
 		return join(JoinType.JOIN, table, alias, ons);
 	}
 	
+	public static Join joinAs(Select select, String alias, String...ons)
+	{
+		return join(JoinType.JOIN, select, alias, ons);
+	}
+	
 	public static Join inner(String table, On...ons)
 	{
 		return join(JoinType.INNER_JOIN, table, null, ons);
@@ -64,6 +92,11 @@ public class Join extends Sql
 	public static Join innerAs(String table, String alias, String...ons)
 	{
 		return join(JoinType.INNER_JOIN, table, alias, ons);
+	}
+	
+	public static Join innerAs(Select select, String alias, String...ons)
+	{
+		return join(JoinType.INNER_JOIN, select, alias, ons);
 	}
 	
 	public static Join left(String table, On...ons)
@@ -86,6 +119,11 @@ public class Join extends Sql
 		return join(JoinType.LEFT_JOIN, table, alias, ons);
 	}
 	
+	public static Join leftAs(Select select, String alias, String...ons)
+	{
+		return join(JoinType.LEFT_JOIN, select, alias, ons);
+	}
+	
 	public static Join right(String table, On...ons)
 	{
 		return join(JoinType.RIGHT_JOIN, table, null, ons);
@@ -104,6 +142,11 @@ public class Join extends Sql
 	public static Join rightAs(String table, String alias, String...ons)
 	{
 		return join(JoinType.RIGHT_JOIN, table, alias, ons);
+	}
+	
+	public static Join rightAs(Select select, String alias, String...ons)
+	{
+		return join(JoinType.RIGHT_JOIN, select, alias, ons);
 	}
 	
 	public static Join outer(String table, On...ons)
@@ -126,6 +169,11 @@ public class Join extends Sql
 		return join(JoinType.OUTER_JOIN, table, alias, ons);
 	}
 	
+	public static Join outerAs(Select select, String alias, String...ons)
+	{
+		return join(JoinType.OUTER_JOIN, select, alias, ons);
+	}
+	
 	public static Join sql(String sql)
 	{
 		return new Join(sql);
@@ -145,6 +193,11 @@ public class Join extends Sql
 			values.add(on.toString());
 		}
 		return values.toArray(new String[0]);
+	}
+	
+	public LinkedList<Object> values()
+	{
+		return values;
 	}
 	
 	@Override

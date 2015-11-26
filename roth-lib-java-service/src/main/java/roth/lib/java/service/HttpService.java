@@ -10,7 +10,6 @@ import javax.servlet.http.HttpSession;
 
 import roth.lib.java.annotation.Required;
 import roth.lib.java.map.Mapper;
-import roth.lib.java.service.endpoint.HttpError;
 import roth.lib.java.service.reflector.MethodReflector;
 import roth.lib.java.type.MimeType;
 import roth.lib.java.util.IdUtil;
@@ -19,68 +18,6 @@ public abstract class HttpService
 {
 	public static String X_CSRF_TOKEN			= "X-Csrf-Token";
 	public static String CSRF_TOKEN				= "csrfToken";
-	
-	/*
-	public static String NUMBER 				= "number";
-	public static String PHONE 					= "phone";
-	public static String EMAIL 					= "email";
-	
-	protected static String NUMBER_FORMAT 		= "[^0-9]";
-	protected static String PHONE_FORMAT 		= "^[0-9]{10}$";
-	protected static String EMAIL_FORMAT 		= "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]+$";
-	
-	protected static HttpFieldFilterer numberFilterer;
-	protected static HttpFieldValidator phoneValidator;
-	protected static HttpFieldValidator emailValidator;
-	protected static LinkedHashMap<String, HttpFieldFilterer> fieldFilterers = new LinkedHashMap<String, HttpFieldFilterer>();
-	protected static LinkedHashMap<String, HttpFieldValidator> fieldValidators = new LinkedHashMap<String, HttpFieldValidator>();
-	
-	static
-	{
-		numberFilterer = new HttpFieldFilterer()
-		{
-			@Override
-			public Object filter(Object value)
-			{
-				if(value != null && value instanceof String)
-				{
-					return ((String) value).replaceAll(NUMBER_FORMAT, "");
-				}
-				else
-				{
-					return value;
-				}
-			}
-		};
-		phoneValidator = new HttpFieldValidator()
-		{
-			@Override
-			public boolean validate(Object value)
-			{
-				if(value != null && value instanceof String)
-				{
-					return ((String) value).matches(PHONE_FORMAT);
-				}
-				return true;
-			}
-		};
-		emailValidator = new HttpFieldValidator()
-		{
-			@Override
-			public boolean validate(Object value)
-			{
-				if(value != null && value instanceof String)
-				{
-					return ((String) value).matches(EMAIL_FORMAT);
-				}
-				return true;
-			}
-		};
-		fieldFilterers.put(NUMBER, numberFilterer);
-		fieldValidators.put(PHONE, phoneValidator);
-		fieldValidators.put(EMAIL, emailValidator);
-	}
-	*/
 	
 	protected ServletContext servletContext;
 	protected HttpServletRequest httpServletRequest;

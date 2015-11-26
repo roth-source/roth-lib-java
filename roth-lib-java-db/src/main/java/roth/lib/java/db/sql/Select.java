@@ -906,6 +906,10 @@ public class Select extends Sql
 	public LinkedList<Object> values()
 	{
 		LinkedList<Object> values = new LinkedList<Object>();
+		if(joins != null)
+		{
+			values.addAll(joins.values());
+		}
 		if(wheres != null)
 		{
 			values.addAll(wheres.values());
@@ -920,6 +924,11 @@ public class Select extends Sql
 	@Override
 	public String toString()
 	{
+		return toString(true);
+	}
+	
+	public String toString(boolean end)
+	{
 		if(columns == null) throw new IllegalArgumentException("columns cannot be null");
 		if(table == null) throw new IllegalArgumentException("table cannot be null");
 		StringBuilder builder = new StringBuilder();
@@ -931,7 +940,7 @@ public class Select extends Sql
 		builder.append(havings != null ? havings : "");
 		builder.append(orders != null ? orders : "");
 		builder.append(page != null ? page : "");
-		builder.append(END);
+		builder.append(end ? END : "");
 		return builder.toString();
 	}
 	

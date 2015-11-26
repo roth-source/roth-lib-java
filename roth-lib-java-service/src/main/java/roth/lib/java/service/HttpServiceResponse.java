@@ -5,7 +5,6 @@ import java.util.LinkedList;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
-import roth.lib.java.service.endpoint.HttpError;
 
 @Entity
 @SuppressWarnings("serial")
