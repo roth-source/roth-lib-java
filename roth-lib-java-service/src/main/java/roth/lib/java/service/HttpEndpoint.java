@@ -28,9 +28,11 @@ import roth.lib.java.map.form.FormReflector;
 import roth.lib.java.map.json.JsonReflector;
 import roth.lib.java.map.xml.XmlReflector;
 import roth.lib.java.net.http.HttpMethod;
+import roth.lib.java.service.annotation.Service;
 import roth.lib.java.service.reflector.MethodReflector;
 import roth.lib.java.service.reflector.ServiceReflector;
 import roth.lib.java.type.MimeType;
+import roth.lib.java.util.ClassLoaderUtil;
 
 @SuppressWarnings("serial")
 public class HttpEndpoint extends HttpServlet
@@ -49,7 +51,7 @@ public class HttpEndpoint extends HttpServlet
 	protected static String ALLOWED_METHODS 					= "GET, POST, PUT, DELETE";
 	protected static List<HttpMethod> SUPPORTED_METHODS			= Arrays.asList(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE);
 	protected static List<String> LOCALHOSTS 					= Arrays.asList("localhost", "127.0.0.1");
-	protected static String ENDPOINT 							= "endpoint";
+	protected static String ENDPOINT 							= "_endpoint";
 	protected static String SERVICE 							= "service";
 	protected static String METHOD 								= "method";
 	protected static Pattern SERVICE_METHOD_PATTERN 			= Pattern.compile("(?:^|/)(?<" + SERVICE + ">\\w+)/(?<" + METHOD + ">\\w+)(?:/|$)");
@@ -70,10 +72,26 @@ public class HttpEndpoint extends HttpServlet
 	
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	public void init(ServletConfig config) throws ServletException
 	{
-		//File file = new File(config.getServletContext().getRealPath("WEB-INF/classes"));
-		// TODO: implement annotated @Service discovery
+		LinkedList<Class<?>> classes = ClassLoaderUtil.getClasses();
+		for(Class<?> klass : classes)
+		{
+			if(HttpService.class.isAssignableFrom(klass))
+			{
+				Class<? extends HttpService> serviceClass = (Class<HttpService>) klass;
+				Service service = klass.getDeclaredAnnotation(Service.class);
+				if(service != null)
+				{
+					String serviceName = service.name();
+					if(serviceName != null && !serviceName.isEmpty())
+					{
+						serviceReflectorMap.put(serviceName, new ServiceReflector(serviceClass, serviceName));
+					}
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -101,105 +119,108 @@ public class HttpEndpoint extends HttpServlet
 						HttpServiceMethod serviceMethod = getServiceMethod(request, response);
 						if(serviceMethod != null)
 						{
-							HttpService service = getService(request, response, serviceMethod.getServiceName());
-							if(service != null)
+							if(!ENDPOINT.equalsIgnoreCase(serviceMethod.getServiceName()))
 							{
-								service.setServletContext(request.getServletContext()).setHttpServletRequest(request).setHttpServletResponse(response);
-								service.setService(serviceMethod.getServiceName()).setMethod(serviceMethod.getMethodName());
-								if(dev)
+								HttpService service = getAnnotatedService(request, response, serviceMethod.getServiceName());
+								if(service != null)
 								{
-									service.initDev();
-								}
-								MethodReflector methodReflector = getMethodReflector(request, response, service.getClass(), serviceMethod.getServiceName(), serviceMethod.getMethodName());
-								if(methodReflector != null)
-								{
-									responseMapper.setContext(methodReflector.getContext());
-									if(methodReflector.isHttpMethodImplemented(httpMethod))
+									service.setServletContext(request.getServletContext()).setHttpServletRequest(request).setHttpServletResponse(response);
+									service.setService(serviceMethod.getServiceName()).setMethod(serviceMethod.getMethodName());
+									MethodReflector methodReflector = getMethodReflector(request, response, service.getClass(), serviceMethod.getServiceName(), serviceMethod.getMethodName());
+									if(methodReflector != null)
 									{
-										boolean hasAjax = methodReflector.isAjax();
-										boolean hasApi = methodReflector.isApi();
-										boolean ajaxAuthenticated = hasAjax && (!methodReflector.isAuthenticated() || service.isAjaxAuthenticated(methodReflector));
-										boolean apiAuthenticated = hasApi && (!methodReflector.isAuthenticated() || service.isApiAuthenticated(methodReflector));
-										if(ajaxAuthenticated || apiAuthenticated)
+										responseMapper.setContext(methodReflector.getContext());
+										if(methodReflector.isHttpMethodImplemented(httpMethod))
 										{
-											Object methodRequest = null;
-											Parameter parameter = methodReflector.getParameter();
-											if(parameter != null)
+											boolean hasAjax = methodReflector.isAjax();
+											boolean hasApi = methodReflector.isApi();
+											boolean ajaxAuthenticated = hasAjax && (!methodReflector.isAuthenticated() || service.isAjaxAuthenticated(methodReflector));
+											boolean apiAuthenticated = hasApi && (!methodReflector.isAuthenticated() || service.isApiAuthenticated(methodReflector));
+											if(ajaxAuthenticated || apiAuthenticated)
 											{
-												InputStream input = methodReflector.isGzippedInput() ? new GZIPInputStream(request.getInputStream()) : request.getInputStream();
-												Type methodParameterType = parameter.getParameterizedType();
-												service.setRequestContentType(requestContentType);
-												Mapper requestMapper = getRequestMapper(request, response, requestContentType);
-												service.setRequestMapper(requestMapper);
-												methodRequest = requestMapper.setContext(methodReflector.getContext()).deserialize(input, methodParameterType);
-											}
-											if(dev)
-											{
-												debugRequest(request, methodRequest);
-											}
-											boolean validCsrf = !(ajaxAuthenticated && methodReflector.isAuthenticated() && !service.isValidCsrfToken(methodRequest, dev));
-											if(validCsrf)
-											{
-												boolean authorized = service.isAuthorized(methodReflector, methodRequest);
-												if(authorized)
+												Object methodRequest = null;
+												Parameter parameter = methodReflector.getParameter();
+												if(parameter != null)
 												{
-													//errors.addAll(service.validate(methodRequest));
-													if(errors.isEmpty())
+													InputStream input = methodReflector.isGzippedInput() ? new GZIPInputStream(request.getInputStream()) : request.getInputStream();
+													Type methodParameterType = parameter.getParameterizedType();
+													service.setRequestContentType(requestContentType);
+													Mapper requestMapper = getRequestMapper(request, response, requestContentType);
+													service.setRequestMapper(requestMapper);
+													methodRequest = requestMapper.setContext(methodReflector.getContext()).deserialize(input, methodParameterType);
+												}
+												if(dev)
+												{
+													debugRequest(request, methodRequest);
+												}
+												boolean validCsrf = !(ajaxAuthenticated && methodReflector.isAuthenticated() && !service.isValidCsrfToken(methodRequest, dev));
+												if(validCsrf)
+												{
+													boolean authorized = service.isAuthorized(methodReflector, methodRequest);
+													if(authorized)
 													{
-														service.setResponseContentType(responseContentType);
-														service.setResponseMapper(responseMapper);
-														try
+														//errors.addAll(service.validate(methodRequest));
+														if(errors.isEmpty())
 														{
-															methodResponse = methodReflector.invoke(service, methodRequest);
-														}
-														catch(InvocationTargetException e)
-														{
-															if(e.getCause() != null)
+															service.setResponseContentType(responseContentType);
+															service.setResponseMapper(responseMapper);
+															try
 															{
-																throw e.getCause();
+																methodResponse = methodReflector.invoke(service, methodRequest);
+															}
+															catch(InvocationTargetException e)
+															{
+																if(e.getCause() != null)
+																{
+																	throw e.getCause();
+																}
 															}
 														}
+													}
+													else
+													{
+														errors.add(HttpErrorType.SERVICE_NOT_AUTHORIZED.error());
 													}
 												}
 												else
 												{
-													errors.add(HttpErrorType.SERVICE_NOT_AUTHORIZED.error());
+													errors.add(HttpErrorType.SERVICE_CSRF_TOKEN_INVALID.error());
 												}
 											}
 											else
 											{
-												errors.add(HttpErrorType.SERVICE_CSRF_TOKEN_INVALID.error());
+												if(hasAjax && !ajaxAuthenticated)
+												{
+													errors.add(HttpErrorType.SERVICE_AJAX_NOT_AUTHENTICATED.error());
+												}
+												else if(hasApi && !apiAuthenticated)
+												{
+													errors.add(HttpErrorType.SERVICE_API_NOT_AUTHENTICATED.error());
+												}
+												else
+												{
+													errors.add(HttpErrorType.SERVICE_CHANNEL_NOT_IMPLEMENTED.error());
+												}
 											}
 										}
 										else
 										{
-											if(hasAjax && !ajaxAuthenticated)
-											{
-												errors.add(HttpErrorType.SERVICE_AJAX_NOT_AUTHENTICATED.error());
-											}
-											else if(hasApi && !apiAuthenticated)
-											{
-												errors.add(HttpErrorType.SERVICE_API_NOT_AUTHENTICATED.error());
-											}
-											else
-											{
-												errors.add(HttpErrorType.SERVICE_CHANNEL_NOT_IMPLEMENTED.error());
-											}
+											errors.add(HttpErrorType.HTTP_METHOD_NOT_IMPLEMENTED.error());
 										}
 									}
 									else
 									{
-										errors.add(HttpErrorType.HTTP_METHOD_NOT_IMPLEMENTED.error());
+										errors.add(HttpErrorType.SERVICE_METHOD_MISSING.error());
 									}
 								}
 								else
 								{
-									errors.add(HttpErrorType.SERVICE_METHOD_MISSING.error());
+									errors.add(HttpErrorType.SERVICE_NOT_IMPLEMENTED.error());
 								}
 							}
 							else
 							{
-								errors.add(HttpErrorType.SERVICE_NOT_IMPLEMENTED.error());
+								methodResponse = endpoint(request, response, serviceMethod.getMethodName());
 							}
 						}
 						else
@@ -271,6 +292,11 @@ public class HttpEndpoint extends HttpServlet
 		debugResponse(response, methodResponse);
 	}
 	
+	protected Object endpoint(HttpServletRequest request, HttpServletResponse response, String methodName)
+	{
+		return null;
+	}
+
 	protected boolean isDev(HttpServletRequest request, HttpServletResponse response)
 	{
 		return getLocalHosts(request, response).contains(request.getServerName());
@@ -297,9 +323,19 @@ public class HttpEndpoint extends HttpServlet
 		return serviceMethod;
 	}
 	
-	protected HttpService getAnnotatedService(HttpServletRequest request, HttpServletResponse response, String serviceName)
+	protected final HttpService getAnnotatedService(HttpServletRequest request, HttpServletResponse response, String serviceName)
 	{
-		return null;
+		HttpService service = null;
+		ServiceReflector serviceReflector = serviceReflectorMap.get(serviceName);
+		if(serviceReflector != null)
+		{
+			service = serviceReflector.getService();
+		}
+		if(service == null)
+		{
+			service = getService(request, response, serviceName);
+		}
+		return service;
 	}
 	
 	protected HttpService getService(HttpServletRequest request, HttpServletResponse response, String serviceName)
@@ -307,7 +343,7 @@ public class HttpEndpoint extends HttpServlet
 		return null;
 	}
 	
-	protected ServiceReflector getServiceReflector(HttpServletRequest request, HttpServletResponse response, Class<?> serviceClass, String serviceName)
+	protected ServiceReflector getServiceReflector(HttpServletRequest request, HttpServletResponse response, Class<? extends HttpService> serviceClass, String serviceName)
 	{
 		ServiceReflector serviceReflector = serviceReflectorMap.get(serviceName);
 		if(serviceReflector == null)
@@ -318,7 +354,7 @@ public class HttpEndpoint extends HttpServlet
 		return serviceReflector;
 	}
 	
-	protected MethodReflector getMethodReflector(HttpServletRequest request, HttpServletResponse response, Class<?> serviceClass, String serviceName, String methodName)
+	protected MethodReflector getMethodReflector(HttpServletRequest request, HttpServletResponse response, Class<? extends HttpService> serviceClass, String serviceName, String methodName)
 	{
 		MethodReflector methodReflector = null;
 		ServiceReflector serviceReflector = getServiceReflector(request, response, serviceClass, serviceName);

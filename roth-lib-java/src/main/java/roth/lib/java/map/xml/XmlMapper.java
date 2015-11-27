@@ -79,6 +79,10 @@ public class XmlMapper extends Mapper
 		try
 		{
 			String rootName = getMapperReflector().getEntityName(value.getClass());
+			if(rootName == null || rootName.isEmpty())
+			{
+				rootName = "root";
+			}
 			writer.write(XML_HEADER);
 			writeNewLine(writer);
 			writeOpenTag(writer, rootName, getMapperReflector().getXmlAttributeMap(value));

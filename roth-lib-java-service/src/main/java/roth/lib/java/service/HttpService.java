@@ -137,11 +137,6 @@ public abstract class HttpService
 		return this;
 	}
 	
-	public void initDev()
-	{
-		
-	}
-	
 	public HttpSession initSession()
 	{
 		HttpSession session = httpServletRequest.getSession(false);

@@ -6,9 +6,7 @@ public class InitialContextUtil
 {
 	protected static String JAVA_COMP 		= "java:comp/";
 	protected static String ENV 			= "env/";
-	protected static String ENDPOINT_ENV	= "endpoint/env";
-	protected static String ENDPOINT_LIST	= "endpoint/list";
-	
+		
 	protected InitialContextUtil()
 	{
 		
@@ -38,22 +36,6 @@ public class InitialContextUtil
 	public static Object getResource(String name)
 	{
 		return lookup(name);
-	}
-	
-	public static String getEnv()
-	{
-		return getEnvEntry(ENDPOINT_ENV);
-	}
-	
-	public static String[] getEndpoints()
-	{
-		String[] endpoints = null;
-		String endpointList = getEnvEntry(ENDPOINT_LIST);
-		if(endpointList != null)
-		{
-			endpoints = endpointList.split(",");
-		}
-		return endpoints;
 	}
 	
 }

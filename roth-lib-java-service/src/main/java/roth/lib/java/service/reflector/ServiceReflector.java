@@ -9,11 +9,11 @@ import roth.lib.java.util.ReflectionUtil;
 
 public class ServiceReflector
 {
-	protected Class<?> serviceClass;
+	protected Class<? extends HttpService> serviceClass;
 	protected String serviceName;
 	protected LinkedHashMap<String, MethodReflector> serviceMethodReflectorMap = new LinkedHashMap<String, MethodReflector>();
 	
-	public ServiceReflector(Class<?> serviceClass, String serviceName)
+	public ServiceReflector(Class<? extends HttpService> serviceClass, String serviceName)
 	{
 		this.serviceClass = serviceClass;
 		this.serviceName = serviceName;
@@ -56,7 +56,21 @@ public class ServiceReflector
 		return serviceMethodReflectors;
 	}
 	
-	public Class<?> getServiceClass()
+	public HttpService getService()
+	{
+		HttpService service = null;
+		try
+		{
+			service = serviceClass.newInstance();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return service;
+	}
+	
+	public Class<? extends HttpService> getServiceClass()
 	{
 		return serviceClass;
 	}
@@ -71,7 +85,7 @@ public class ServiceReflector
 		return serviceMethodReflectorMap;
 	}
 	
-	public ServiceReflector setServiceClass(Class<?> serviceClass)
+	public ServiceReflector setServiceClass(Class<? extends HttpService> serviceClass)
 	{
 		this.serviceClass = serviceClass;
 		return this;
