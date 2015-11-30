@@ -64,7 +64,7 @@ public class ServiceServer
 		httpsConfig.addCustomizer(new SecureRequestCustomizer());
 		serverConnector = new ServerConnector(server, new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()), new HttpConnectionFactory(httpsConfig));
 		webAppContext = new WebAppContext();
-		contextPath = "/";
+		contextPath = "/endpoint";
 		scanner = new Scanner();
 		scanInterval = 2;
 		scanListener = new Scanner.BulkListener()

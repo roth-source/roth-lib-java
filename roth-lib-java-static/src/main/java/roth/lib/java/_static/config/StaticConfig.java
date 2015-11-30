@@ -33,7 +33,7 @@ public class StaticConfig
 	protected static String CONFIG_FILE				= "configFile";
 	protected static String DEV_FILE				= "devFile";
 	protected static String LOCAL_ENV				= "local";
-	protected static String LOCAL_DEFAULT			= "https://localhost:8443/";
+	protected static String LOCAL_DEFAULT			= "localhost:8443";
 	protected static Pattern TEXT_PATTERN			= Pattern.compile("^(\\S+_([A-Za-z]{2}))\\.");
 	protected static Pattern VIEW_PATTERN			= Pattern.compile("^(\\S+)\\.");
 	protected static Pattern REQUEST_PATTERN		= Pattern.compile("-request-(\\w+?)\\.");
@@ -163,7 +163,7 @@ public class StaticConfig
 				endpointMap = new LinkedHashMap<String, LinkedHashSet<String>>();
 			}
 			LinkedHashSet<String> localEndpoints = endpointMap.get(LOCAL_ENV);
-			if(localEndpoints == null || !localEndpoints.isEmpty())
+			if(localEndpoints == null || localEndpoints.isEmpty())
 			{
 				localEndpoints = new LinkedHashSet<String>();
 				localEndpoints.add(LOCAL_DEFAULT);
