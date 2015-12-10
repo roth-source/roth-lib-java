@@ -4,8 +4,17 @@ roth.lib.js = roth.lib.js || {};
 roth.lib.js.template = roth.lib.js.template || {};
 roth.lib.js.template.version = "0.1.5-SNAPSHOT";
 
+
+/**
+ * @class
+ * @param {object} [config]
+ */
 roth.lib.js.template.Template = roth.lib.js.template.Template || function(config)
 {
+	/**
+	 * @lends Template.prototype
+	 */
+	
 	var self = this;
 	
 	var Config =
@@ -16,7 +25,7 @@ roth.lib.js.template.Template = roth.lib.js.template.Template || function(config
 		closeUnescapedExpression	: "}}}",
 		closeEscapedExpression		: "}}",
 		closeStatement				: "%}",
-		dataVar						: "$_d",
+		scopeVar					: "$_d",
 		escapeVar					: "$_e",
 		issetVar					: "$_i",
 		argVar						: "$_a",
@@ -56,17 +65,35 @@ roth.lib.js.template.Template = roth.lib.js.template.Template || function(config
 		return new RegExp(builder, "g");
 	})();
 	
-	this.parse = function(source, data)
+	/**
+	 * parse scope object into flattened strings
+	 * @method
+	 * @param {Object} scope
+	 * @returns {String}
+	 */
+	this.parseScope = function(scope)
+	{
+		var parsedScope = ""
+		if(typeof scope === "object")
+		{
+			for(var name in scope)
+			{
+				parsedScope += "var " + name + " = " + config.scopeVar + "[\"" + name + "\"];\n";
+			}
+		}
+		return parsedScope;
+	};
+	
+	/**
+	 * creates a parsed source string from the source
+	 * @method
+	 * @param {String} source
+	 * @returns {String}
+	 */
+	this.parse = function(source)
 	{
 		var escape = true;
 		var parsedSource = "";
-		if(typeof data === "object")
-		{
-			for(var name in data)
-			{
-				parsedSource += "var " + name + " = " + config.dataVar + "[\"" + name + "\"];\n";
-			}
-		}
 		parsedSource += "var " + config.escapeVar + " = function(" + config.argVar + ") { return " + config.argVar + ".replace(/&/g, \"&amp;\").replace(/</g, \"&lt;\").replace(/>/g, \"&gt;\"); };\n";
 		parsedSource += "var " + config.issetVar + " = function(" + config.argVar + ") { return "  + config.argVar + " !== undefined && " + config.argVar + " !== null };\n";
 		parsedSource += "var " + config.tempVar + ";\nvar " + config.sourceVar + "=\"\";\n" + config.sourceVar + "+=\"";
@@ -150,14 +177,28 @@ roth.lib.js.template.Template = roth.lib.js.template.Template || function(config
 		return parsedSource;
 	};
 	
-	this.renderParsed = function(parsedSource, data)
+	/**
+	 * renders template by evaling parsed source with scope object
+	 * @method
+	 * @param {String} parsedSource
+	 * @param {Object} scope
+	 * @returns {String}
+	 */
+	this.renderParsed = function(parsedSource, scope)
 	{
-		return new Function(config.dataVar, parsedSource)(data);
+		return new Function(config.scopeVar, self.parseScope(scope) + parsedSource)(scope);
 	};
 	
-	this.render = function(source, data)
+	/**
+	 * parses and renders source with scope data
+	 * @method
+	 * @param {String} source
+	 * @param {Object} scope
+	 * @returns {String}
+	 */
+	this.render = function(source, scope)
 	{
-		return self.renderParsed(self.parse(source, data), data);
+		return self.renderParsed(self.parse(source, scope), scope);
 	};
 	
 };
