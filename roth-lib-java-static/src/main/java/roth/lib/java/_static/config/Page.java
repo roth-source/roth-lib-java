@@ -20,6 +20,9 @@ public class Page implements Serializable
 	@Property(name = "translated")
 	protected Boolean translated;
 	
+	@Property(name = "text")
+	protected String text;
+	
 	@Property(name = "layout")
 	protected String layout;
 	
@@ -56,6 +59,11 @@ public class Page implements Serializable
 	public Boolean getTranslated()
 	{
 		return translated;
+	}
+
+	public String getText()
+	{
+		return text;
 	}
 
 	public String getLayout()
@@ -101,6 +109,11 @@ public class Page implements Serializable
 	public void setTranslated(Boolean translated)
 	{
 		this.translated = translated;
+	}
+
+	public void setText(String text)
+	{
+		this.text = text;
 	}
 
 	public void setLayout(String layout)

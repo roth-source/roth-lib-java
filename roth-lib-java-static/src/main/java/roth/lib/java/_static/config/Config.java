@@ -11,11 +11,11 @@ import roth.lib.java.annotation.Property;
 @SuppressWarnings("serial")
 public class Config implements Serializable
 {
+	@Property(name = "langs")
+	protected LinkedHashSet<String> langs = new LinkedHashSet<String>();
+	
 	@Property(name = "endpoint")
 	protected LinkedHashMap<String, LinkedHashSet<String>> endpointMap = new LinkedHashMap<String, LinkedHashSet<String>>();
-	
-	@Property(name = "text")
-	protected LinkedHashMap<String, LinkedHashSet<String>> textMap = new LinkedHashMap<String, LinkedHashSet<String>>();
 	
 	@Property(name = "layout")
 	protected LinkedHashMap<String, Layout> layoutMap = new LinkedHashMap<String, Layout>();
@@ -27,17 +27,17 @@ public class Config implements Serializable
 	{
 		
 	}
-
+	
+	public LinkedHashSet<String> getLangs()
+	{
+		return langs;
+	}
+	
 	public LinkedHashMap<String, LinkedHashSet<String>> getEndpointMap()
 	{
 		return endpointMap;
 	}
-
-	public LinkedHashMap<String, LinkedHashSet<String>> getTextMap()
-	{
-		return textMap;
-	}
-
+	
 	public LinkedHashMap<String, Layout> getLayoutMap()
 	{
 		return layoutMap;
@@ -53,9 +53,9 @@ public class Config implements Serializable
 		this.endpointMap = endpointMap;
 	}
 
-	public void setTextMap(LinkedHashMap<String, LinkedHashSet<String>> textMap)
+	public void setLangs(LinkedHashSet<String> langs)
 	{
-		this.textMap = textMap;
+		this.langs = langs;
 	}
 
 	public void setLayoutMap(LinkedHashMap<String, Layout> layoutMap)

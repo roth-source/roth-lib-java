@@ -34,7 +34,7 @@ public class StaticConfig
 	protected static String DEV_FILE				= "devFile";
 	protected static String LOCAL_ENV				= "local";
 	protected static String LOCAL_DEFAULT			= "localhost:8443";
-	protected static Pattern TEXT_PATTERN			= Pattern.compile("^(\\S+_([A-Za-z]{2}))\\.");
+	protected static Pattern LANG_PATTERN			= Pattern.compile("^\\S+_([A-Za-z]{2})\\.");
 	protected static Pattern VIEW_PATTERN			= Pattern.compile("^(\\S+)\\.");
 	protected static Pattern REQUEST_PATTERN		= Pattern.compile("-request-(\\w+?)\\.");
 	protected static Pattern RESPONSE_PATTERN		= Pattern.compile("-response-(\\w+?)\\.");
@@ -176,18 +176,11 @@ public class StaticConfig
 				{
 					if(file.isFile() && !file.isHidden())
 					{
-						Matcher textMatcher = TEXT_PATTERN.matcher(file.getName());
-						if(textMatcher.find())
+						Matcher langMatcher = LANG_PATTERN.matcher(file.getName());
+						if(langMatcher.find())
 						{
-							String text = textMatcher.group(1);
-							String lang = textMatcher.group(2).toLowerCase();
-							LinkedHashSet<String> texts = config.getTextMap().get(lang);
-							if(texts == null)
-							{
-								texts = new LinkedHashSet<String>();
-								config.getTextMap().put(lang, texts);
-							}
-							texts.add(text);
+							String lang = langMatcher.group(1).toLowerCase();
+							config.getLangs().add(lang);
 						}
 					}
 				}
