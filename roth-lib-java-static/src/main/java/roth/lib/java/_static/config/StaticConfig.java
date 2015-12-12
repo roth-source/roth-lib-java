@@ -157,6 +157,27 @@ public class StaticConfig
 					config = mapper.deserialize(input, Config.class);
 				}
 			}
+			
+			System.out.println("Syncing langs");
+			if(textDir.exists() && textDir.isDirectory())
+			{
+				LinkedHashSet<String> langs = new LinkedHashSet<String>();
+				for(File file : textDir.listFiles())
+				{
+					if(file.isFile() && !file.isHidden())
+					{
+						Matcher langMatcher = LANG_PATTERN.matcher(file.getName());
+						if(langMatcher.find())
+						{
+							String lang = langMatcher.group(1).toLowerCase();
+							langs.add(lang);
+						}
+					}
+				}
+				config.setLangs(langs);
+			}
+			
+			System.out.println("Syncing endpoint map");
 			LinkedHashMap<String, LinkedHashSet<String>> endpointMap = config.getEndpointMap();
 			if(endpointMap == null)
 			{
@@ -170,21 +191,8 @@ public class StaticConfig
 				endpointMap.put(LOCAL_ENV, localEndpoints);
 			}
 			config.setEndpointMap(endpointMap);
-			if(textDir.exists() && textDir.isDirectory())
-			{
-				for(File file : textDir.listFiles())
-				{
-					if(file.isFile() && !file.isHidden())
-					{
-						Matcher langMatcher = LANG_PATTERN.matcher(file.getName());
-						if(langMatcher.find())
-						{
-							String lang = langMatcher.group(1).toLowerCase();
-							config.getLangs().add(lang);
-						}
-					}
-				}
-			}
+			
+			System.out.println("Syncing layout map");
 			if(layoutDir.exists() && layoutDir.isDirectory())
 			{
 				LinkedHashSet<String> layouts = new LinkedHashSet<String>();
@@ -215,6 +223,8 @@ public class StaticConfig
 					}
 				}
 			}
+			
+			System.out.println("Syncing module map");
 			if(pageDir.exists() && pageDir.isDirectory())
 			{
 				LinkedHashSet<String> modules = new LinkedHashSet<String>();
@@ -287,6 +297,8 @@ public class StaticConfig
 					dev = mapper.deserialize(input, Dev.class);
 				}
 			}
+			
+			System.out.println("Syncing services");
 			LinkedHashSet<String> services = new LinkedHashSet<String>();
 			for(File methodsDir : serviceDir.listFiles())
 			{

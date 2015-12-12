@@ -17,58 +17,44 @@ public class GzipUtil
 		
 	}
 	
-	public static byte[] compress(String contents)
+	public static byte[] compress(String contents) throws IOException
 	{
 		return compress(contents.getBytes());
 	}
 	
-	public static byte[] compress(byte[] bytes)
+	public static byte[] compress(byte[] bytes) throws IOException
 	{
 		return compress(new ByteArrayInputStream(bytes));
 	}
 	
-	public static byte[] compress(InputStream input)
+	public static byte[] compress(InputStream input) throws IOException
 	{
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		try
-		{
-			GZIPOutputStream gzipOutput = new GZIPOutputStream(output);
-			IoUtil.copy(input, gzipOutput);
-			gzipOutput.finish();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		GZIPOutputStream gzipOutput = new GZIPOutputStream(output);
+		IoUtil.copy(input, gzipOutput);
+		gzipOutput.finish();
 		return output.toByteArray();
 	}
 	
-	public static String decompressContents(byte[] bytes)
+	public static String decompressContents(byte[] bytes) throws IOException
 	{
 		return decompressContents(new ByteArrayInputStream(bytes));
 	}
 	
-	public static String decompressContents(InputStream input)
+	public static String decompressContents(InputStream input) throws IOException
 	{
 		return new String(decompressBytes(input), Characters.UTF_8);
 	}
 	
-	public static byte[] decompressBytes(byte[] bytes)
+	public static byte[] decompressBytes(byte[] bytes) throws IOException
 	{
 		return decompressBytes(new ByteArrayInputStream(bytes));
 	}
 	
-	public static byte[] decompressBytes(InputStream input)
+	public static byte[] decompressBytes(InputStream input) throws IOException
 	{
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		try
-		{
-			IoUtil.copy(new GZIPInputStream(input), output);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		IoUtil.copy(new GZIPInputStream(input), output);
 		return output.toByteArray();
 	}
 	
