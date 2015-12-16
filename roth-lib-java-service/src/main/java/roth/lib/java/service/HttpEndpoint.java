@@ -172,7 +172,7 @@ public class HttpEndpoint extends HttpServlet
 															{
 																if(e.getCause() != null)
 																{
-																	throw e.getCause();
+																	errors.add(service.exception(HttpErrorType.SERVICE_EXCEPTION.error(), e.getCause()));
 																}
 															}
 														}
@@ -249,7 +249,6 @@ public class HttpEndpoint extends HttpServlet
 			{
 				e.printStackTrace();
 			}
-			errors.add(exception(request, response, e));
 		}
 		
 		if(!errors.isEmpty())
@@ -526,11 +525,6 @@ public class HttpEndpoint extends HttpServlet
 	public MapperConfig getResponseXmlConfig()
 	{
 		return responseXmlConfig;
-	}
-	
-	protected HttpError exception(HttpServletRequest request, HttpServletResponse response, Throwable e)
-	{
-		return new HttpError(HttpErrorType.SERVICE_EXCEPTION).setContext(e.getClass().getSimpleName()).setMessage(e.getMessage());
 	}
 	
 	protected void debugRequest(HttpServletRequest request, Object methodRequest)

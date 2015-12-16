@@ -1,14 +1,10 @@
 package roth.lib.java.service;
 
-import java.lang.reflect.Field;
-import java.util.LinkedList;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import roth.lib.java.annotation.Required;
 import roth.lib.java.map.Mapper;
 import roth.lib.java.service.reflector.MethodReflector;
 import roth.lib.java.type.MimeType;
@@ -179,10 +175,13 @@ public abstract class HttpService
 		return csrfToken;
 	}
 	
+	public abstract HttpError exception(HttpError error, Throwable e);
+	
+	/*
 	public LinkedList<HttpError> validate(Object request)
 	{
 		LinkedList<HttpError> errors = new LinkedList<HttpError>();
-		/*
+		
 		if(request != null)
 		{
 			LinkedList<Field> fields = ReflectionUtil.getFields(request.getClass());
@@ -203,9 +202,10 @@ public abstract class HttpService
 				}
 			}
 		}
-		*/
+		
 		return errors;
 	}
+	*/
 	
 	/*
 	public void filterField(Field field, Object request)
@@ -234,6 +234,7 @@ public abstract class HttpService
 		}
 	}
 	*/
+	/*
 	public Boolean requiredField(Field field, Object request)
 	{
 		Boolean valid = null;
@@ -257,6 +258,7 @@ public abstract class HttpService
 		}
 		return valid;
 	}
+	*/
 	/*
 	public boolean validateField(Field field, Object request)
 	{
