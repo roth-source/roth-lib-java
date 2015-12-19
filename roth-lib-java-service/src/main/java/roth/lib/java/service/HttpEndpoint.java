@@ -38,7 +38,7 @@ import roth.lib.java.util.ClassLoaderUtil;
 public class HttpEndpoint extends HttpServlet
 {
 	protected static String ORIGIN 								= "Origin";
-	protected static String ANY_ORIGIN 							= "*";
+	protected static String ANY 								= "*";
 	protected static String ACCESS_CONTROL_ALLOW_ORIGIN 		= "Access-Control-Allow-Origin";
 	protected static String ACCESS_CONTROL_ALLOW_CREDENTIALS 	= "Access-Control-Allow-Credentials";
 	protected static String ACCESS_CONTROL_ALLOW_METHODS 		= "Access-Control-Allow-Methods";
@@ -48,8 +48,8 @@ public class HttpEndpoint extends HttpServlet
 	protected static String ACCESS_CONTROL_MAX_AGE 				= "Access-Control-Max-Age";
 	protected static String CONTENT_TYPE 						= "Content-Type";
 	protected static String ACCEPT		 						= "Accept";
-	protected static String ALLOWED_METHODS 					= "GET, POST, PUT, DELETE";
-	protected static List<HttpMethod> SUPPORTED_METHODS			= Arrays.asList(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE);
+	protected static String ALLOWED_METHODS 					= "GET, POST";
+	protected static List<HttpMethod> SUPPORTED_METHODS			= Arrays.asList(HttpMethod.GET, HttpMethod.POST);
 	protected static List<String> LOCALHOSTS 					= Arrays.asList("localhost", "127.0.0.1");
 	protected static String ENDPOINT 							= "_endpoint";
 	protected static String SERVICE 							= "service";
@@ -103,13 +103,23 @@ public class HttpEndpoint extends HttpServlet
 		MimeType responseContentType = getResponseContentType(request, response);
 		Mapper responseMapper = getResponseMapper(request, response, responseContentType);
 		response.setHeader(CONTENT_TYPE, responseContentType.toString());
-		boolean dev = isDev(request, response);
+		String origin = request.getHeader(ORIGIN);
+		boolean mock = origin == null;
+		boolean local = isLocal(request, response);
+		boolean dev = mock || local;
 		try
 		{
-			if(dev || isOriginAllowed(request, response))
+			if(mock || local || isOriginAllowed(request, response))
 			{
-				response.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, !dev ? request.getHeader(ORIGIN) : ANY_ORIGIN);
-				response.setHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS, Boolean.TRUE.toString());
+				if(local)
+				{
+					response.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, ANY);
+				}
+				else
+				{
+					response.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+					response.setHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS, Boolean.TRUE.toString());
+				}
 				response.setHeader(ACCESS_CONTROL_ALLOW_METHODS, ALLOWED_METHODS);
 				HttpMethod httpMethod = HttpMethod.fromString(request.getMethod());
 				if(httpMethod != null)
@@ -296,7 +306,7 @@ public class HttpEndpoint extends HttpServlet
 		return null;
 	}
 
-	protected boolean isDev(HttpServletRequest request, HttpServletResponse response)
+	protected boolean isLocal(HttpServletRequest request, HttpServletResponse response)
 	{
 		return getLocalHosts(request, response).contains(request.getServerName());
 	}
