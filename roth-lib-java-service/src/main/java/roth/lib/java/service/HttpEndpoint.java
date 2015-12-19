@@ -15,8 +15,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,10 +30,9 @@ import roth.lib.java.service.annotation.Service;
 import roth.lib.java.service.reflector.MethodReflector;
 import roth.lib.java.service.reflector.ServiceReflector;
 import roth.lib.java.type.MimeType;
-import roth.lib.java.util.ClassLoaderUtil;
 
 @SuppressWarnings("serial")
-public class HttpEndpoint extends HttpServlet
+public abstract class HttpEndpoint extends HttpServlet
 {
 	protected static String ORIGIN 								= "Origin";
 	protected static String ANY 								= "*";
@@ -56,7 +53,7 @@ public class HttpEndpoint extends HttpServlet
 	protected static String METHOD 								= "method";
 	protected static Pattern SERVICE_METHOD_PATTERN 			= Pattern.compile("(?:^|/)(?<" + SERVICE + ">\\w+)/(?<" + METHOD + ">\\w+)(?:/|$)");
 	
-	protected LinkedHashMap<String, ServiceReflector> serviceReflectorMap = new LinkedHashMap<String, ServiceReflector>();
+	protected static LinkedHashMap<String, ServiceReflector> serviceReflectorMap = new LinkedHashMap<String, ServiceReflector>();
 	
 	protected FormReflector requestFormReflector = new FormReflector();
 	protected JsonReflector requestJsonReflector = new JsonReflector();
@@ -70,25 +67,18 @@ public class HttpEndpoint extends HttpServlet
 	protected MapperConfig responseJsonConfig = new MapperConfig();
 	protected MapperConfig responseXmlConfig = new MapperConfig();
 	
-	
-	@Override
-	@SuppressWarnings("unchecked")
-	public void init(ServletConfig config) throws ServletException
+	@SafeVarargs
+	public static void serviceClasses(Class<? extends HttpService>... serviceClasses)
 	{
-		LinkedList<Class<?>> classes = ClassLoaderUtil.getClasses();
-		for(Class<?> klass : classes)
+		for(Class<? extends HttpService> serviceClass : serviceClasses)
 		{
-			if(HttpService.class.isAssignableFrom(klass))
+			Service service = serviceClass.getDeclaredAnnotation(Service.class);
+			if(service != null)
 			{
-				Class<? extends HttpService> serviceClass = (Class<HttpService>) klass;
-				Service service = klass.getDeclaredAnnotation(Service.class);
-				if(service != null)
+				String serviceName = service.name();
+				if(serviceName != null && !serviceName.isEmpty())
 				{
-					String serviceName = service.name();
-					if(serviceName != null && !serviceName.isEmpty())
-					{
-						serviceReflectorMap.put(serviceName, new ServiceReflector(serviceClass, serviceName));
-					}
+					serviceReflectorMap.put(serviceName, new ServiceReflector(serviceClass, serviceName));
 				}
 			}
 		}
@@ -103,22 +93,20 @@ public class HttpEndpoint extends HttpServlet
 		MimeType responseContentType = getResponseContentType(request, response);
 		Mapper responseMapper = getResponseMapper(request, response, responseContentType);
 		response.setHeader(CONTENT_TYPE, responseContentType.toString());
-		String origin = request.getHeader(ORIGIN);
-		boolean mock = origin == null;
-		boolean local = isLocal(request, response);
-		boolean dev = mock || local;
+		boolean dev = isDev(request, response);
 		try
 		{
-			if(mock || local || isOriginAllowed(request, response))
+			if(dev || isOriginAllowed(request, response))
 			{
-				if(local)
-				{
-					response.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, ANY);
-				}
-				else
+				String origin = request.getHeader(ORIGIN);
+				if(origin != null)
 				{
 					response.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, origin);
 					response.setHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS, Boolean.TRUE.toString());
+				}
+				else
+				{
+					response.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, ANY);
 				}
 				response.setHeader(ACCESS_CONTROL_ALLOW_METHODS, ALLOWED_METHODS);
 				HttpMethod httpMethod = HttpMethod.fromString(request.getMethod());
@@ -306,7 +294,7 @@ public class HttpEndpoint extends HttpServlet
 		return null;
 	}
 
-	protected boolean isLocal(HttpServletRequest request, HttpServletResponse response)
+	protected boolean isDev(HttpServletRequest request, HttpServletResponse response)
 	{
 		return getLocalHosts(request, response).contains(request.getServerName());
 	}
