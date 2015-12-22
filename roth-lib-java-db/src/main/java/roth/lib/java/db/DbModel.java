@@ -7,6 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 
 import roth.lib.java.Model;
+import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.PropertyReflector;
 
 @SuppressWarnings({"serial","unchecked"})
@@ -166,12 +167,12 @@ public abstract class DbModel extends Model
 		if(presistedModel != null)
 		{
 			persisted();
-			LinkedHashMap<String, PropertyReflector> fieldPropertyReflectorMap = db.getReflector().getFieldPropertyReflectorMap(getClass());
+			EntityReflector entityReflector = db.getMapperReflector().getEntityReflector(getClass());
 			for(String deserializedName : getDeserializedNames())
 			{
 				try
 				{
-					PropertyReflector propertyReflector = fieldPropertyReflectorMap.get(deserializedName);
+					PropertyReflector propertyReflector = entityReflector.getPropertyReflector(deserializedName, getDb().getMapperType(), db.getMapperReflector());
 					if(propertyReflector != null)
 					{
 						Field field = propertyReflector.getField();

@@ -6,69 +6,64 @@ import java.lang.reflect.Parameter;
 
 import roth.lib.java.net.http.HttpMethod;
 import roth.lib.java.service.HttpService;
+import roth.lib.java.service.annotation.ServiceMethod;
 
 public class MethodReflector
 {
-	protected String name;
-	protected String context;
-	protected boolean ajax;
-	protected boolean api;
-	protected boolean authenticated;
-	protected boolean post;
-	protected boolean get;
-	protected boolean put;
-	protected boolean delete;
-	protected boolean gzippedInput;
+	protected ServiceReflector serviceReflector;
 	protected Method method;
+	protected ServiceMethod serviceMethod;
 	
-	public MethodReflector()
+	public MethodReflector(ServiceReflector serviceReflector, Method method, ServiceMethod serviceMethod)
 	{
-		
+		this.serviceReflector = serviceReflector;
+		this.method = method;
+		this.serviceMethod = serviceMethod;
 	}
 	
 	public String getName()
 	{
-		return name;
+		return serviceMethod.name();
 	}
 	
 	public String getContext()
 	{
-		return context;
+		return serviceMethod.context();
 	}
 	
 	public boolean isAjax()
 	{
-		return ajax;
+		return serviceMethod.ajax();
 	}
 	
 	public boolean isApi()
 	{
-		return api;
+		return serviceMethod.api();
 	}
 	
 	public boolean isAuthenticated()
 	{
-		return authenticated;
+		return serviceMethod.authenticated();
 	}
 	
 	public boolean isPost()
 	{
-		return post;
+		return serviceMethod.post();
 	}
 	
 	public boolean isGet()
 	{
-		return get;
+		return serviceMethod.get();
 	}
 	
 	public boolean isPut()
 	{
-		return put;
+		return serviceMethod.put();
 	}
 	
 	public boolean isDelete()
 	{
-		return delete;
+		return serviceMethod.delete();
 	}
 	
 	public boolean isHttpMethodImplemented(HttpMethod httpMethod)
@@ -108,7 +103,7 @@ public class MethodReflector
 	
 	public boolean isGzippedInput()
 	{
-		return gzippedInput;
+		return serviceMethod.gzippedInput();
 	}
 	
 	public Method getMethod()
@@ -125,72 +120,6 @@ public class MethodReflector
 			parameter = parameters[0];
 		}
 		return parameter;
-	}
-	
-	public MethodReflector setName(String name)
-	{
-		this.name = name;
-		return this;
-	}
-	
-	public MethodReflector setContext(String context)
-	{
-		this.context = context;
-		return this;
-	}
-	
-	public MethodReflector setAjax(boolean ajax)
-	{
-		this.ajax = ajax;
-		return this;
-	}
-	
-	public MethodReflector setApi(boolean api)
-	{
-		this.api = api;
-		return this;
-	}
-	
-	public MethodReflector setAuthenticated(boolean authenticated)
-	{
-		this.authenticated = authenticated;
-		return this;
-	}
-	
-	public MethodReflector setPost(boolean post)
-	{
-		this.post = post;
-		return this;
-	}
-	
-	public MethodReflector setGet(boolean get)
-	{
-		this.get = get;
-		return this;
-	}
-	
-	public MethodReflector setPut(boolean put)
-	{
-		this.put = put;
-		return this;
-	}
-	
-	public MethodReflector setDelete(boolean delete)
-	{
-		this.delete = delete;
-		return this;
-	}
-	
-	public MethodReflector setGzippedInput(boolean gzippedInput)
-	{
-		this.gzippedInput = gzippedInput;
-		return this;
-	}
-	
-	public MethodReflector setMethod(Method method)
-	{
-		this.method = method;
-		return this;
 	}
 	
 	public Object invoke(HttpService service, Object methodRequest) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException

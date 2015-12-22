@@ -1,7 +1,11 @@
 package roth.lib.java.db;
 
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.sql.Driver;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.Collection;
@@ -20,15 +24,22 @@ import roth.lib.java.db.sql.Insert;
 import roth.lib.java.db.sql.Select;
 import roth.lib.java.db.sql.Sql;
 import roth.lib.java.db.sql.Update;
+import roth.lib.java.db.sql.Where;
+import roth.lib.java.db.sql.Wheres;
+import roth.lib.java.mapper.MapperType;
+import roth.lib.java.reflector.EntityReflector;
+import roth.lib.java.reflector.MapperReflector;
+import roth.lib.java.reflector.PropertyReflector;
 
 public abstract class DbDataSource implements DataSource, DbWrapper
 {
+	protected MapperType mapperType;
+	protected MapperReflector mapperReflector;
 	protected DbDriver driver;
 	protected String url;
 	protected String username;
 	protected String password;
 	protected Properties properties;
-	protected DbReflector reflector;
 	protected int maxConnections = 20;
 	protected int loginTimeout = 60;
 	protected PrintWriter logWriter;
@@ -55,28 +66,32 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		}));
 	}
 	
-	protected DbDataSource()
+	protected DbDataSource(MapperType mapperType)
 	{
-		
+		this.mapperType = mapperType;
 	}
 	
-	public DbDataSource(String driver, String url)
+	public DbDataSource(MapperType mapperType, String driver, String url)
 	{
+		this.mapperType = mapperType;
 		init(driver, url);
 	}
 	
-	public DbDataSource(String driver, String url, Properties properties)
+	public DbDataSource(MapperType mapperType, String driver, String url, Properties properties)
 	{
+		this.mapperType = mapperType;
 		init(driver, url, properties);
 	}
 	
-	public DbDataSource(String driver, String url, String username, String password)
+	public DbDataSource(MapperType mapperType, String driver, String url, String username, String password)
 	{
+		this.mapperType = mapperType;
 		init(driver, url, username, password);
 	}
 	
-	public DbDataSource(String driver, String url, String username, String password, Properties properties)
+	public DbDataSource(MapperType mapperType, String driver, String url, String username, String password, Properties properties)
 	{
+		this.mapperType = mapperType;
 		init(driver, url, username, password, properties);
 	}
 	
@@ -102,14 +117,17 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		this.username = username;
 		this.password = password;
 		this.properties = properties;
-		this.reflector = createDbReflector();
+		this.mapperReflector = MapperReflector.get();
 	}
 	
-	protected abstract DbReflector createDbReflector();
-	
-	public DbReflector getReflector()
+	public MapperType getMapperType()
 	{
-		return reflector;
+		return mapperType;
+	}
+	
+	public MapperReflector getMapperReflector()
+	{
+		return mapperReflector;
 	}
 	
 	public DbDriver createDriver(String driverName)
@@ -191,7 +209,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 			}
 			catch(Exception e)
 			{
-				
+				e.printStackTrace();
 			}
 		}
 		return connection;
@@ -256,6 +274,277 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		return false;
 	}
 	
+	public LinkedList<String> getGeneratedColumns(Type type)
+	{
+		LinkedList<String> generatedColumns = new LinkedList<String>();
+		EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
+		if(entityReflector != null)
+		{
+			for(PropertyReflector propertyReflector : entityReflector.getGeneratedReflectors(getMapperType()))
+			{
+				generatedColumns.add(propertyReflector.getPropertyName(getMapperType()));
+			}
+		}
+		return generatedColumns;
+	}
+	
+	public void setGeneratedFields(DbResultSet resultSet, LinkedList<String> generatedColumns, DbModel model)
+	{
+		try
+		{
+			if(resultSet.next())
+			{
+				EntityReflector entityReflector = getMapperReflector().getEntityReflector(model.getClass());
+				for(String name : generatedColumns)
+				{
+					PropertyReflector propertyReflector = entityReflector.getPropertyReflector(name, getMapperType(), getMapperReflector());
+					if(propertyReflector != null)
+					{
+						try
+						{
+							Field field = propertyReflector.getField();
+							Object value = resultSet.getValue(1, field.getType());
+							field.set(model, value);
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public Wheres toIdWheres(DbModel model)
+	{
+		Wheres wheres = new Wheres();
+		wheres = new Wheres();
+		EntityReflector entityReflector = getMapperReflector().getEntityReflector(model.getClass());
+		for(PropertyReflector idReflector : entityReflector.getIdReflectors(getMapperType()))
+		{
+			try
+			{
+				String propertyName = idReflector.getPropertyName(getMapperType());
+				String fieldName = idReflector.getFieldName();
+				Field field = idReflector.getField();
+				Object value = null;
+				if(model.getDirtyIdMap().containsKey(fieldName))
+				{
+					value = model.getDirtyIdMap().get(fieldName);
+				}
+				else
+				{
+					value = field.get(model);
+				}
+				if(value != null)
+				{
+					wheres.and(Where.equals(propertyName, value));
+				}
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return wheres;
+	}
+	
+	public Select toSelect(DbModel model)
+	{
+		EntityReflector entityReflector = getMapperReflector().getEntityReflector(model.getClass());
+		Wheres wheres = toIdWheres(model);
+		if(!wheres.isEmpty())
+		{
+			return new Select(entityReflector.getEntityName()).wheres(wheres);
+		}
+		return null;
+	}
+	
+	public Insert toInsert(DbModel model)
+	{
+		EntityReflector entityReflector = getMapperReflector().getEntityReflector(model.getClass());
+		LinkedHashMap<String, Object> nameValues = new LinkedHashMap<String, Object>();
+		for(PropertyReflector propertyReflector : entityReflector.getPropertyReflectors(getMapperType()))
+		{
+			String column = propertyReflector.getPropertyName(getMapperType());
+			Field field = propertyReflector.getField();
+			try
+			{
+				Object value = field.get(model);
+				nameValues.put(column, value);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		if(!nameValues.isEmpty())
+		{
+			return new Insert(entityReflector.getEntityName(), nameValues);
+		}
+		return null;
+	}
+	
+	public Update toUpdate(DbModel model)
+	{
+		EntityReflector entityReflector = getMapperReflector().getEntityReflector(model.getClass());
+		LinkedHashMap<String, Object> nameValues = new LinkedHashMap<String, Object>();
+		if(model.isDirty())
+		{
+			for(String name : model.getDirtyNames())
+			{
+				PropertyReflector propertyReflector = entityReflector.getPropertyReflector(name, getMapperType(), getMapperReflector());
+				if(propertyReflector != null)
+				{
+					String column = propertyReflector.getPropertyName(getMapperType());
+					Field field = propertyReflector.getField();
+					try
+					{
+						Object value = field.get(model);
+						nameValues.put(column, value);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		Wheres wheres = null;
+		if(!nameValues.isEmpty() && !(wheres = toIdWheres(model)).isEmpty())
+		{
+			return new Update(entityReflector.getEntityName(), nameValues).wheres(wheres);
+		}
+		return null;
+	}
+	
+	public Delete toDelete(DbModel model)
+	{
+		EntityReflector entityReflector = getMapperReflector().getEntityReflector(model.getClass());
+		Wheres wheres = toIdWheres(model);
+		if(!wheres.isEmpty())
+		{
+			return new Delete(entityReflector.getEntityName()).wheres(wheres);
+		}
+		return null;
+	}
+	
+	public <T> void fromDb(DbResultSet resultSet, Callback<T> callback)
+	{
+		try
+		{
+			Class<T> klass = callback.getKlass();
+			ResultSetMetaData metaData = resultSet.getMetaData();
+			EntityReflector entityReflector = getMapperReflector().getEntityReflector(klass);
+			while(resultSet.next())
+			{
+				T model = fromDb(resultSet, klass, metaData, entityReflector);
+				if(model != null)
+				{
+					callback.call(model);
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public <T> LinkedList<T> fromDb(DbResultSet resultSet, Class<T> klass)
+	{
+		LinkedList<T> models = new LinkedList<T>();
+		try
+		{
+			ResultSetMetaData metaData = resultSet.getMetaData();
+			EntityReflector entityReflector = getMapperReflector().getEntityReflector(klass);
+			while(resultSet.next())
+			{
+				T model = fromDb(resultSet, klass, metaData, entityReflector);
+				if(model != null)
+				{
+					models.add(model);
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return models;
+	}
+	
+	public <T> T fromDb(DbResultSet resultSet, Class<T> klass, ResultSetMetaData metaData, EntityReflector entityReflector)
+	{
+		T model = null;
+		try
+		{
+			Constructor<T> constructor = null;
+			constructor = klass.getDeclaredConstructor();
+			constructor.setAccessible(true);
+			model = constructor.newInstance();
+			if(model instanceof DbModel)
+			{
+				((DbModel) model).setDb(this).persisted();
+			}
+			for(int i = 1; i <= metaData.getColumnCount(); i++)
+			{
+				String columnLabel = metaData.getColumnLabel(i).toUpperCase();
+				PropertyReflector propertyReflector = entityReflector.getPropertyReflector(columnLabel, getMapperType(), getMapperReflector());
+				if(propertyReflector != null)
+				{
+					Field field = propertyReflector.getField();
+					Object value = resultSet.getValue(columnLabel, field.getType());
+					field.set(model, value);
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return model;
+	}
+	
+	public LinkedList<LinkedHashMap<String, Object>> fromDb(DbResultSet resultSet)
+	{
+		LinkedList<LinkedHashMap<String, Object>> dataMaps = new LinkedList<LinkedHashMap<String, Object>>();
+		try
+		{
+			while(resultSet.next())
+			{
+				LinkedHashMap<String, Object> dataMap = new LinkedHashMap<String, Object>();
+				try
+				{
+					ResultSetMetaData metaData = resultSet.getMetaData();
+					for(int i = 1; i <= metaData.getColumnCount(); i++)
+					{
+						String columnLabel = metaData.getColumnLabel(i);
+						dataMap.put(columnLabel, resultSet.getObject(columnLabel));
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+				if(!dataMap.isEmpty())
+				{
+					dataMaps.add(dataMap);
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return dataMaps;
+	}
+	
 	public DbPreparedStatement prepareStatement(DbConnection connection, Sql sql) throws SQLException
 	{
 		return prepareStatement(connection, sql.sql(), sql.values());
@@ -300,15 +589,29 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		return preparedStatement;
 	}
 	
-	public <T extends DbModel> String table(Class<T> klass)
+	public String table(Class<?> klass)
 	{
-		return getReflector().getEntityName(klass);
+		String table = null;
+		EntityReflector entityReflector = getMapperReflector().getEntityReflector(klass);
+		if(entityReflector != null)
+		{
+			table = entityReflector.getEntityName();
+			if(table == null)
+			{
+				throw new DbException("Entity name not found");
+			}
+		}
+		else
+		{
+			throw new DbException("Entity annotation not found");
+		}
+		return table;
 	}
 	
 	@SuppressWarnings("unchecked")
 	public <T extends DbModel> T query(T model)
 	{
-		Select select = getReflector().toSelect(model);
+		Select select = toSelect(model);
 		if(select != null)
 		{
 			return query(select, (Class<T>) model.getClass());
@@ -399,7 +702,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		{
 			try(DbResultSet resultSet = preparedStatement.executeQuery())
 			{
-				LinkedList<T> result = getReflector().fromDb(resultSet, this, klass);
+				LinkedList<T> result = fromDb(resultSet, klass);
 				connection.commit();
 				return result;
 			}
@@ -462,7 +765,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		{
 			try(DbResultSet resultSet = preparedStatement.executeQuery())
 			{
-				getReflector().fromDb(resultSet, this, callback);
+				fromDb(resultSet, callback);
 				connection.commit();
 			}
 		}
@@ -546,7 +849,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		{
 			try(DbResultSet resultSet = preparedStatement.executeQuery())
 			{
-				 LinkedList<LinkedHashMap<String, Object>> result = getReflector().fromDb(resultSet);
+				 LinkedList<LinkedHashMap<String, Object>> result = fromDb(resultSet);
 				 connection.commit();
 				 return result;
 			}
@@ -555,7 +858,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public int executeInsert(DbModel model)
 	{
-		Insert insert = getReflector().toInsert(model);
+		Insert insert = toInsert(model);
 		if(insert != null)
 		{
 			return executeInsert(insert, model);
@@ -608,7 +911,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public int executeInsert(DbModel model, DbConnection connection) throws SQLException
 	{
-		Insert insert = getReflector().toInsert(model);
+		Insert insert = toInsert(model);
 		if(insert != null)
 		{
 			return executeInsert(insert, model, connection);
@@ -642,7 +945,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		LinkedList<String> generatedColumns = new LinkedList<String>();
 		if(model != null)
 		{
-			generatedColumns = getReflector().getGeneratedColumns(model.getClass());
+			generatedColumns = getGeneratedColumns(model.getClass());
 		}
 		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values, generatedColumns))
 		{
@@ -655,7 +958,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 				{
 					try(DbResultSet resultSet = preparedStatement.getGeneratedKeys())
 					{
-						getReflector().setGeneratedFields(resultSet, generatedColumns, model);
+						setGeneratedFields(resultSet, generatedColumns, model);
 					}
 				}
 			}
@@ -665,7 +968,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public int executeUpdate(DbModel model)
 	{
-		Update update = getReflector().toUpdate(model);
+		Update update = toUpdate(model);
 		if(update != null)
 		{
 			return executeUpdate(update, model);
@@ -718,7 +1021,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public int executeUpdate(DbModel model, DbConnection connection) throws SQLException
 	{
-		Update update = getReflector().toUpdate(model);
+		Update update = toUpdate(model);
 		if(update != null)
 		{
 			return executeUpdate(update, model, connection);
@@ -763,7 +1066,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public int executeDelete(DbModel model)
 	{
-		Delete delete = getReflector().toDelete(model);
+		Delete delete = toDelete(model);
 		if(delete != null)
 		{
 			return executeDelete(delete, model);
@@ -816,7 +1119,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public int executeDelete(DbModel model, DbConnection connection) throws SQLException
 	{
-		Delete delete = getReflector().toDelete(model);
+		Delete delete = toDelete(model);
 		if(delete != null)
 		{
 			return executeDelete(delete, connection);

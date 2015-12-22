@@ -30,7 +30,7 @@ public abstract class DbTable<T>
 	
 	public String tableName()
 	{
-		return getDb().getReflector().getEntityName(klass);
+		return getDb().table(klass);
 	}
 	
 	public Select select()
@@ -105,20 +105,40 @@ public abstract class DbTable<T>
 	
 	public T findBy(Select select)
 	{
-		return getDb().query(select, klass);
+		return findBy(select, klass);
 	}
 	
 	public T findBy(String sql)
 	{
-		return getDb().query(sql, klass);
+		return findBy(sql, klass);
 	}
 	
 	public T findBy(String sql, Collection<Object> values)
 	{
-		return getDb().query(sql, values, klass);
+		return findBy(sql, values, klass);
 	}
 	
 	public T findBy(String sql, Map<String, Object> valueMap)
+	{
+		return findBy(sql, valueMap, klass);
+	}
+	
+	public <C> C findBy(Select select, Class<C> klass)
+	{
+		return getDb().query(select, klass);
+	}
+	
+	public <C> C findBy(String sql, Class<C> klass)
+	{
+		return getDb().query(sql, klass);
+	}
+	
+	public <C> C findBy(String sql, Collection<Object> values, Class<C> klass)
+	{
+		return getDb().query(sql, values, klass);
+	}
+	
+	public <C> C findBy(String sql, Map<String, Object> valueMap, Class<C> klass)
 	{
 		return getDb().query(sql, valueMap, klass);
 	}
@@ -180,40 +200,80 @@ public abstract class DbTable<T>
 	
 	public LinkedList<T> findAllBy(Select select)
 	{
-		return getDb().queryAll(select, klass);
+		return findAllBy(select, klass);
 	}
 	
 	public LinkedList<T> findAllBy(String sql)
 	{
-		return getDb().queryAll(sql, klass);
+		return findAllBy(sql, klass);
 	}
 	
 	public LinkedList<T> findAllBy(String sql, Collection<Object> values)
 	{
-		return getDb().queryAll(sql, values, klass);
+		return findAllBy(sql, values, klass);
 	}
 	
 	public LinkedList<T> findAllBy(String sql, Map<String, Object> valueMap)
+	{
+		return findAllBy(sql, valueMap, klass);
+	}
+	
+	public <C> LinkedList<C> findAllBy(Select select, Class<C> klass)
+	{
+		return getDb().queryAll(select, klass);
+	}
+	
+	public <C> LinkedList<C> findAllBy(String sql, Class<C> klass)
+	{
+		return getDb().queryAll(sql, klass);
+	}
+	
+	public <C> LinkedList<C> findAllBy(String sql, Collection<Object> values, Class<C> klass)
+	{
+		return getDb().queryAll(sql, values, klass);
+	}
+	
+	public <C> LinkedList<C> findAllBy(String sql, Map<String, Object> valueMap, Class<C> klass)
 	{
 		return getDb().queryAll(sql, valueMap, klass);
 	}
 	
 	public void callback(Select select, Callback<T> callback)
 	{
-		getDb().queryAll(select, callback.setKlass(klass));
+		callback(select, callback.setKlass(klass));
 	}
 	
 	public void callback(String sql, Callback<T> callback)
 	{
-		getDb().queryAll(sql, callback.setKlass(klass));
+		callback(sql, callback.setKlass(klass));
 	}
 	
 	public void callback(String sql, Collection<Object> values, Callback<T> callback)
 	{
-		getDb().queryAll(sql, values, callback.setKlass(klass));
+		callback(sql, values, callback.setKlass(klass));
 	}
 	
 	public void callback(String sql, Map<String, Object> valueMap, Callback<T> callback)
+	{
+		callback(sql, valueMap, callback.setKlass(klass));
+	}
+	
+	public <C> void callback(Select select, Callback<C> callback, Class<C> klass)
+	{
+		getDb().queryAll(select, callback.setKlass(klass));
+	}
+	
+	public <C> void callback(String sql, Callback<C> callback, Class<C> klass)
+	{
+		getDb().queryAll(sql, callback.setKlass(klass));
+	}
+	
+	public <C> void callback(String sql, Collection<Object> values, Callback<C> callback, Class<C> klass)
+	{
+		getDb().queryAll(sql, values, callback.setKlass(klass));
+	}
+	
+	public <C> void callback(String sql, Map<String, Object> valueMap, Callback<C> callback, Class<C> klass)
 	{
 		getDb().queryAll(sql, valueMap, callback.setKlass(klass));
 	}

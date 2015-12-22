@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import roth.lib.java.map.Mapper;
+import roth.lib.java.mapper.Mapper;
 import roth.lib.java.service.reflector.MethodReflector;
 import roth.lib.java.type.MimeType;
 import roth.lib.java.util.IdUtil;
@@ -175,123 +175,6 @@ public abstract class HttpService
 		return csrfToken;
 	}
 	
-	public abstract HttpError exception(HttpError error, Throwable e);
-	
-	/*
-	public LinkedList<HttpError> validate(Object request)
-	{
-		LinkedList<HttpError> errors = new LinkedList<HttpError>();
-		
-		if(request != null)
-		{
-			LinkedList<Field> fields = ReflectionUtil.getFields(request.getClass());
-			for(Field field : fields)
-			{
-				filterField(field, request);
-				Boolean valid = requiredField(field, request);
-				if(valid == null || valid)
-				{
-					if(!validateField(field, request))
-					{
-						errors.add(new HttpError(HttpErrorType.REQUEST_FIELD_INVALID, readableName(field.getName())));
-					}
-				}
-				else
-				{
-					errors.add(new HttpError(HttpErrorType.REQUEST_FIELD_REQUIRED, readableName(field.getName())));
-				}
-			}
-		}
-		
-		return errors;
-	}
-	*/
-	
-	/*
-	public void filterField(Field field, Object request)
-	{
-		Filter filter = field.getDeclaredAnnotation(Filter.class);
-		if(filter != null)
-		{
-			try
-			{
-				field.setAccessible(true);
-				Object value = field.get(request);
-				String name = filter.value();
-				if(name != null && !name.isEmpty() && value != null)
-				{
-					HttpFieldFilterer fieldFilterer = fieldFilterers.get(name);
-					if(fieldFilterer != null)
-					{
-						field.set(request, fieldFilterer.filter(value));
-					}
-				}
-			}
-			catch(Exception e)
-			{
-				
-			}
-		}
-	}
-	*/
-	/*
-	public Boolean requiredField(Field field, Object request)
-	{
-		Boolean valid = null;
-		Required required = field.getDeclaredAnnotation(Required.class);
-		if(required != null)
-		{
-			try
-			{
-				field.setAccessible(true);
-				Object value = field.get(request);
-				valid = value != null;
-				if(valid && value != null && value instanceof String)
-				{
-					valid = !((String) value).trim().isEmpty();
-				}
-			}
-			catch(Exception e)
-			{
-				
-			}
-		}
-		return valid;
-	}
-	*/
-	/*
-	public boolean validateField(Field field, Object request)
-	{
-		boolean valid = true;
-		Validate validate = field.getDeclaredAnnotation(Validate.class);
-		if(validate != null)
-		{
-			try
-			{
-				field.setAccessible(true);
-				Object value = field.get(request);
-				String name = validate.value();
-				if(name != null && !name.isEmpty() && value != null)
-				{
-					HttpFieldValidator fieldValidator = fieldValidators.get(name);
-					if(fieldValidator != null)
-					{
-						valid = fieldValidator.validate(value);
-					}
-					else if(value instanceof String)
-					{
-						valid = ((String) value).matches(name);
-					}
-				}
-			}
-			catch(Exception e)
-			{
-				
-			}
-		}
-		return valid;
-	}
-	*/
 	public static String readableName(String name)
 	{
 		StringBuilder builder = new StringBuilder();
@@ -312,5 +195,7 @@ public abstract class HttpService
 		}
 		return builder.toString();
 	}
+
+	public abstract HttpError exception(HttpError error, Throwable e);
 	
 }

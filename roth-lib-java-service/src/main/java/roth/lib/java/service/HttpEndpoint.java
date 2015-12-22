@@ -20,12 +20,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import roth.lib.java.map.Mapper;
-import roth.lib.java.map.MapperConfig;
-import roth.lib.java.map.form.FormReflector;
-import roth.lib.java.map.json.JsonReflector;
-import roth.lib.java.map.xml.XmlReflector;
+import roth.lib.java.mapper.Mapper;
+import roth.lib.java.mapper.MapperConfig;
+import roth.lib.java.mapper.MapperType;
 import roth.lib.java.net.http.HttpMethod;
+import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.service.annotation.Service;
 import roth.lib.java.service.reflector.MethodReflector;
 import roth.lib.java.service.reflector.ServiceReflector;
@@ -39,10 +38,6 @@ public abstract class HttpEndpoint extends HttpServlet
 	protected static String ACCESS_CONTROL_ALLOW_ORIGIN 		= "Access-Control-Allow-Origin";
 	protected static String ACCESS_CONTROL_ALLOW_CREDENTIALS 	= "Access-Control-Allow-Credentials";
 	protected static String ACCESS_CONTROL_ALLOW_METHODS 		= "Access-Control-Allow-Methods";
-	protected static String ACCESS_CONTROL_ALLOW_METHOD 		= "Access-Control-Allow-Method";
-	protected static String ACCESS_CONTROL_ALLOW_HEADERS 		= "Access-Control-Allow-Headers";
-	protected static String ACCESS_CONTROL_EXPOSE_HEADERS 		= "Access-Control-Expose-Headers";
-	protected static String ACCESS_CONTROL_MAX_AGE 				= "Access-Control-Max-Age";
 	protected static String CONTENT_TYPE 						= "Content-Type";
 	protected static String ACCEPT		 						= "Accept";
 	protected static String ALLOWED_METHODS 					= "GET, POST";
@@ -55,31 +50,19 @@ public abstract class HttpEndpoint extends HttpServlet
 	
 	protected static LinkedHashMap<String, ServiceReflector> serviceReflectorMap = new LinkedHashMap<String, ServiceReflector>();
 	
-	protected FormReflector requestFormReflector = new FormReflector();
-	protected JsonReflector requestJsonReflector = new JsonReflector();
-	protected XmlReflector requestXmlReflector = new XmlReflector();
-	protected JsonReflector responseJsonReflector = new JsonReflector();
-	protected XmlReflector responseXmlReflector = new XmlReflector();
+	protected MapperReflector mapperReflector = MapperReflector.get();
+	protected MapperConfig mapperConfig = MapperConfig.get();
+	protected MapperConfig debugMapperConfig = MapperConfig.debug();
 	
-	protected MapperConfig requestFormConfig = new MapperConfig();
-	protected MapperConfig requestJsonConfig = new MapperConfig();
-	protected MapperConfig requestXmlConfig = new MapperConfig();
-	protected MapperConfig responseJsonConfig = new MapperConfig();
-	protected MapperConfig responseXmlConfig = new MapperConfig();
-	
-	@SafeVarargs
-	public static void serviceClasses(Class<? extends HttpService>... serviceClasses)
+	public static void register(Class<? extends HttpService> serviceClass)
 	{
-		for(Class<? extends HttpService> serviceClass : serviceClasses)
+		Service service = serviceClass.getDeclaredAnnotation(Service.class);
+		if(service != null)
 		{
-			Service service = serviceClass.getDeclaredAnnotation(Service.class);
-			if(service != null)
+			String serviceName = service.name();
+			if(serviceName != null && !serviceName.isEmpty())
 			{
-				String serviceName = service.name();
-				if(serviceName != null && !serviceName.isEmpty())
-				{
-					serviceReflectorMap.put(serviceName, new ServiceReflector(serviceClass, serviceName));
-				}
+				serviceReflectorMap.put(serviceName, new ServiceReflector(serviceClass, serviceName));
 			}
 		}
 	}
@@ -137,19 +120,20 @@ public abstract class HttpEndpoint extends HttpServlet
 											if(ajaxAuthenticated || apiAuthenticated)
 											{
 												Object methodRequest = null;
+												Mapper requestMapper = null;
 												Parameter parameter = methodReflector.getParameter();
 												if(parameter != null)
 												{
 													InputStream input = methodReflector.isGzippedInput() ? new GZIPInputStream(request.getInputStream()) : request.getInputStream();
 													Type methodParameterType = parameter.getParameterizedType();
 													service.setRequestContentType(requestContentType);
-													Mapper requestMapper = getRequestMapper(request, response, requestContentType);
-													service.setRequestMapper(requestMapper);
+													requestMapper = getRequestMapper(request, response, requestContentType);
+													//service.setRequestMapper(requestMapper);
 													methodRequest = requestMapper.setContext(methodReflector.getContext()).deserialize(input, methodParameterType);
 												}
 												if(dev)
 												{
-													debugRequest(request, methodRequest);
+													debugRequest(request, methodRequest, requestMapper);
 												}
 												boolean validCsrf = !(ajaxAuthenticated && methodReflector.isAuthenticated() && !service.isValidCsrfToken(methodRequest, dev));
 												if(validCsrf)
@@ -161,7 +145,7 @@ public abstract class HttpEndpoint extends HttpServlet
 														if(errors.isEmpty())
 														{
 															service.setResponseContentType(responseContentType);
-															service.setResponseMapper(responseMapper);
+															//service.setResponseMapper(responseMapper);
 															try
 															{
 																methodResponse = methodReflector.invoke(service, methodRequest);
@@ -247,6 +231,7 @@ public abstract class HttpEndpoint extends HttpServlet
 			{
 				e.printStackTrace();
 			}
+			exception(request, response, e);
 		}
 		
 		if(!errors.isEmpty())
@@ -286,8 +271,13 @@ public abstract class HttpEndpoint extends HttpServlet
 				e.printStackTrace();
 			}
 		}
-		debugResponse(response, methodResponse);
+		if(dev)
+		{
+			debugResponse(response, methodResponse, responseMapper);
+		}
 	}
+	
+	public abstract void exception(HttpServletRequest request, HttpServletResponse response, Throwable e);
 	
 	protected Object endpoint(HttpServletRequest request, HttpServletResponse response, String methodName)
 	{
@@ -326,7 +316,7 @@ public abstract class HttpEndpoint extends HttpServlet
 		ServiceReflector serviceReflector = serviceReflectorMap.get(serviceName);
 		if(serviceReflector != null)
 		{
-			service = serviceReflector.getService();
+			service = serviceReflector.service();
 		}
 		if(service == null)
 		{
@@ -357,9 +347,24 @@ public abstract class HttpEndpoint extends HttpServlet
 		ServiceReflector serviceReflector = getServiceReflector(request, response, serviceClass, serviceName);
 		if(serviceReflector != null)
 		{
-			methodReflector = serviceReflector.getServiceMethodReflectorMap().get(methodName);
+			methodReflector = serviceReflector.getMethodReflectorMap().get(methodName);
 		}
 		return methodReflector;
+	}
+	
+	protected MapperReflector getMapperReflector()
+	{
+		return mapperReflector;
+	}
+	
+	protected MapperConfig getMapperConfig()
+	{
+		return mapperConfig;
+	}
+	
+	protected MapperConfig getDebugMapperConfig()
+	{
+		return debugMapperConfig;
 	}
 	
 	protected MimeType getRequestContentType(HttpServletRequest request, HttpServletResponse response)
@@ -439,17 +444,18 @@ public abstract class HttpEndpoint extends HttpServlet
 		{
 			case APPLICATION_XML:
 			{
-				mapper = getRequestXmlReflector().getMapper(getRequestXmlConfig());
+				mapper = getMapperReflector().getMapper(MapperType.XML, getMapperConfig());
 				break;
 			}
 			case APPLICATION_X_WWW_FORM_URLENCODED:
+			case MULTIPART_FORM_DATA:
 			{
-				mapper = getRequestFormReflector().getMapper(getRequestFormConfig());
+				mapper = getMapperReflector().getMapper(MapperType.FORM, getMapperConfig());
 				break;
 			}
 			default:
 			{
-				mapper = getRequestJsonReflector().getMapper(getRequestJsonConfig());
+				mapper = getMapperReflector().getMapper(MapperType.JSON, getMapperConfig());
 				break;
 			}
 		}
@@ -463,69 +469,19 @@ public abstract class HttpEndpoint extends HttpServlet
 		{
 			case APPLICATION_XML:
 			{
-				mapper = getResponseXmlReflector().getMapper(getResponseXmlConfig());
+				mapper = getMapperReflector().getMapper(MapperType.XML, getMapperConfig());
 				break;
 			}
 			default:
 			{
-				mapper = getResponseJsonReflector().getMapper(getResponseJsonConfig());
+				mapper = getMapperReflector().getMapper(MapperType.JSON, getMapperConfig());
 				break;
 			}
 		}
 		return mapper;
 	}
 	
-	public FormReflector getRequestFormReflector()
-	{
-		return requestFormReflector;
-	}
-
-	public JsonReflector getRequestJsonReflector()
-	{
-		return requestJsonReflector;
-	}
-	
-	public XmlReflector getRequestXmlReflector()
-	{
-		return requestXmlReflector;
-	}
-	
-	public JsonReflector getResponseJsonReflector()
-	{
-		return responseJsonReflector;
-	}
-	
-	public XmlReflector getResponseXmlReflector()
-	{
-		return responseXmlReflector;
-	}
-	
-	public MapperConfig getRequestFormConfig()
-	{
-		return requestFormConfig;
-	}
-	
-	public MapperConfig getRequestJsonConfig()
-	{
-		return requestJsonConfig;
-	}
-	
-	public MapperConfig getRequestXmlConfig()
-	{
-		return requestXmlConfig;
-	}
-	
-	public MapperConfig getResponseJsonConfig()
-	{
-		return responseJsonConfig;
-	}
-	
-	public MapperConfig getResponseXmlConfig()
-	{
-		return responseXmlConfig;
-	}
-	
-	protected void debugRequest(HttpServletRequest request, Object methodRequest)
+	protected void debugRequest(HttpServletRequest request, Object methodRequest, Mapper mapper)
 	{
 		System.out.println();
 		System.out.println();
@@ -540,14 +496,14 @@ public abstract class HttpEndpoint extends HttpServlet
 			System.out.println(name + ": " + value);
 		}
 		System.out.println();
-		if(methodRequest != null)
+		if(methodRequest != null && mapper != null)
 		{
-			getRequestJsonReflector().getMapper(new MapperConfig(true)).serialize(methodRequest, System.out);
+			mapper.setMapperConfig(getDebugMapperConfig()).serialize(methodRequest);
 			System.out.println();
 		}
 	}
 	
-	protected void debugResponse(HttpServletResponse response, Object methodResponse)
+	protected void debugResponse(HttpServletResponse response, Object methodResponse, Mapper mapper)
 	{
 		System.out.println();
 		System.out.println();
@@ -560,9 +516,9 @@ public abstract class HttpEndpoint extends HttpServlet
 			System.out.println(name + ": " + value);
 		}
 		System.out.println();
-		if(methodResponse != null)
+		if(methodResponse != null && mapper != null)
 		{
-			getResponseJsonReflector().getMapper(new MapperConfig(true)).serialize(methodResponse, System.out);
+			mapper.setMapperConfig(getDebugMapperConfig()).serialize(methodResponse);
 			System.out.println();
 		}
 	}

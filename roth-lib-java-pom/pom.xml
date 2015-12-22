@@ -22,8 +22,9 @@
 		<module>../roth-lib-java-http</module>
 		<module>../roth-lib-java-ssh</module>
 		<module>../roth-lib-java-service</module>
-		<module>../roth-lib-java-static</module>
+		<module>../roth-lib-java-web</module>
 		<module>../roth-lib-java-template</module>
+		<module>../roth-lib-java-code</module>
 		<module>../roth-lib-java-framework</module>
 		<module>../roth-lib-java-api</module>
 	</modules>

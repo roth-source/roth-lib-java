@@ -1381,4 +1381,192 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 		return value;
 	}
 	
+	public Object getValue(String columnLabel, Class<?> klass) throws SQLException
+	{
+		Object value = null;
+		if(String.class.isAssignableFrom(klass))
+		{
+			value = getString(columnLabel);
+		}
+		else if(Enum.class.isAssignableFrom(klass))
+		{
+			value = getEnum(columnLabel, klass);
+		}
+		else if(Calendar.class.isAssignableFrom(klass))
+		{
+			value = getCalendar(columnLabel);
+		}
+		else if(Timestamp.class.isAssignableFrom(klass))
+		{
+			value = getTimestamp(columnLabel);
+		}
+		else if(Time.class.isAssignableFrom(klass))
+		{
+			value = getTime(columnLabel);
+		}
+		else if(Date.class.isAssignableFrom(klass))
+		{
+			value = getDate(columnLabel);
+		}
+		else if(Boolean.class.isAssignableFrom(klass))
+		{
+			value = getBooleanWrapper(columnLabel);
+		}
+		else if(Byte.class.isAssignableFrom(klass))
+		{
+			value = getByteWrapper(columnLabel);
+		}
+		else if(Short.class.isAssignableFrom(klass))
+		{
+			value = getShortWrapper(columnLabel);
+		}
+		else if(Integer.class.isAssignableFrom(klass))
+		{
+			value = getIntegerWrapper(columnLabel);
+		}
+		else if(Long.class.isAssignableFrom(klass))
+		{
+			value = getLongWrapper(columnLabel);
+		}
+		else if(Float.class.isAssignableFrom(klass))
+		{
+			value = getFloatWrapper(columnLabel);
+		}
+		else if(Double.class.isAssignableFrom(klass))
+		{
+			value = getDoubleWrapper(columnLabel);
+		}
+		else if(BigDecimal.class.isAssignableFrom(klass))
+		{
+			value = getBigDecimal(columnLabel);
+		}
+		else if(boolean.class.isAssignableFrom(klass))
+		{
+			value = getBoolean(columnLabel);
+		}
+		else if(byte.class.isAssignableFrom(klass))
+		{
+			value = getByte(columnLabel);
+		}
+		else if(short.class.isAssignableFrom(klass))
+		{
+			value = getShort(columnLabel);
+		}
+		else if(int.class.isAssignableFrom(klass))
+		{
+			value = getInt(columnLabel);
+		}
+		else if(long.class.isAssignableFrom(klass))
+		{
+			value = getLong(columnLabel);
+		}
+		else if(float.class.isAssignableFrom(klass))
+		{
+			value = getFloat(columnLabel);
+		}
+		else if(double.class.isAssignableFrom(klass))
+		{
+			value = getDouble(columnLabel);
+		}
+		else
+		{
+			value = getObject(columnLabel, klass);
+		}
+		return value;
+	}
+	
+	public Object getValue(int columnIndex, Class<?> klass) throws SQLException
+	{
+		Object value = null;
+		if(String.class.isAssignableFrom(klass))
+		{
+			value = getString(columnIndex);
+		}
+		else if(Enum.class.isAssignableFrom(klass))
+		{
+			value = getEnum(columnIndex, klass);
+		}
+		else if(Calendar.class.isAssignableFrom(klass))
+		{
+			value = getCalendar(columnIndex);
+		}
+		else if(Timestamp.class.isAssignableFrom(klass))
+		{
+			value = getTimestamp(columnIndex);
+		}
+		else if(Time.class.isAssignableFrom(klass))
+		{
+			value = getTime(columnIndex);
+		}
+		else if(Date.class.isAssignableFrom(klass))
+		{
+			value = getDate(columnIndex);
+		}
+		else if(Boolean.class.isAssignableFrom(klass))
+		{
+			value = getBooleanWrapper(columnIndex);
+		}
+		else if(Byte.class.isAssignableFrom(klass))
+		{
+			value = getByteWrapper(columnIndex);
+		}
+		else if(Short.class.isAssignableFrom(klass))
+		{
+			value = getShortWrapper(columnIndex);
+		}
+		else if(Integer.class.isAssignableFrom(klass))
+		{
+			value = getIntegerWrapper(columnIndex);
+		}
+		else if(Long.class.isAssignableFrom(klass))
+		{
+			value = getLongWrapper(columnIndex);
+		}
+		else if(Float.class.isAssignableFrom(klass))
+		{
+			value = getFloatWrapper(columnIndex);
+		}
+		else if(Double.class.isAssignableFrom(klass))
+		{
+			value = getDoubleWrapper(columnIndex);
+		}
+		else if(BigDecimal.class.isAssignableFrom(klass))
+		{
+			value = getBigDecimal(columnIndex);
+		}
+		else if(boolean.class.isAssignableFrom(klass))
+		{
+			value = getBoolean(columnIndex);
+		}
+		else if(byte.class.isAssignableFrom(klass))
+		{
+			value = getByte(columnIndex);
+		}
+		else if(short.class.isAssignableFrom(klass))
+		{
+			value = getShort(columnIndex);
+		}
+		else if(int.class.isAssignableFrom(klass))
+		{
+			value = getInt(columnIndex);
+		}
+		else if(long.class.isAssignableFrom(klass))
+		{
+			value = getLong(columnIndex);
+		}
+		else if(float.class.isAssignableFrom(klass))
+		{
+			value = getFloat(columnIndex);
+		}
+		else if(double.class.isAssignableFrom(klass))
+		{
+			value = getDouble(columnIndex);
+		}
+		else
+		{
+			value = getObject(columnIndex, klass);
+		}
+		return value;
+	}
+	
 }

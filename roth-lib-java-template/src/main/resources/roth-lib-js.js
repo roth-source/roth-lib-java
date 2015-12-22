@@ -4,54 +4,6 @@ roth.lib.js = roth.lib.js || {};
 roth.lib.js.version = "0.1.5-SNAPSHOT";
 
 
-/**
- * Javascript variable type enum.
- * @enum {String}
- */
-var Type = Type ||
-{
-	UNDEFINED 	: "undefined",
-	NULL		: "null",
-	BOOLEAN		: "boolean",
-	NUMBER		: "number",
-	STRING		: "string",
-	ARRAY		: "array",
-	FUNCTION	: "function",
-	DATE		: "date",
-	ERROR		: "error",
-	REGEXP		: "regexp",
-	OBJECT		: "object"
-};
-
-/**
- * The var type from a toString slice.
- * @function
- * @param {*} value
- * @returns {String}
- */
-var typeOf = typeOf || function(value)
-{
-	return Object.prototype.toString.call(value).slice(8, -1).toLowerCase();
-};
-
-/**
- * Checks if var is one of the param types.
- * @function
- * @param {*} value
- * @returns {Boolean}
- */
-var isType = isType || function(value)
-{
-	var type = typeOf(value);
-	for(var i = 1; i < arguments.length; i++)
-	{
-		if(type == arguments[i])
-		{
-			return true;
-		}
-	}
-	return false;
-};
 
 /**
  * === undefined
@@ -198,7 +150,7 @@ var isFalse = isFalse || function(value)
  */
 var isBoolean = isBoolean || function(value)
 {
-	return isType(value, Type.BOOLEAN);
+	return typeof value === "boolean";
 };
 
 /**
@@ -209,7 +161,7 @@ var isBoolean = isBoolean || function(value)
  */
 var isNumber = isNumber || function(value)
 {
-	return isType(value, Type.NUMBER);
+	return typeof value === "number";
 };
 
 /**
@@ -220,7 +172,7 @@ var isNumber = isNumber || function(value)
  */
 var isString = isString || function(value)
 {
-	return isType(value, Type.STRING);
+	return typeof value === "string";
 };
 
 /**
@@ -231,7 +183,7 @@ var isString = isString || function(value)
  */
 var isArray = isArray || function(value)
 {
-	return isType(value, Type.ARRAY);
+	return Array.isArray(value);
 };
 
 /**
@@ -242,7 +194,7 @@ var isArray = isArray || function(value)
  */
 var isFunction = isFunction || function(value)
 {
-	return isType(value, Type.FUNCTION);
+	return typeof value === "function";
 };
 
 /**
@@ -253,7 +205,7 @@ var isFunction = isFunction || function(value)
  */
 var isDate = isDate || function(value)
 {
-	return isType(value, Type.DATE);
+	return value instanceof Date;
 };
 
 /**
@@ -264,7 +216,7 @@ var isDate = isDate || function(value)
  */
 var isError = isError || function(value)
 {
-	return isType(value, Type.ERROR);
+	return value instanceof Error;
 };
 
 /**
@@ -275,7 +227,7 @@ var isError = isError || function(value)
  */
 var isRegExp = isRegExp || function(value)
 {
-	return isType(value, Type.REGEXP);
+	return value instanceof RegExp;
 };
 
 /**
@@ -286,7 +238,7 @@ var isRegExp = isRegExp || function(value)
  */
 var isObject = isObject || function(value)
 {
-	return isType(value, Type.OBJECT);
+	return isSet(value) && typeof value === "object";
 };
 
 /**
@@ -344,7 +296,10 @@ var forEach = forEach || function(object, callback)
 					first	: i == 0,
 					last	: i == object.length - 1
 				};
-				callback(object[i], i, loop);
+				if(isFalse(callback(object[i], i, loop)))
+				{
+					break;
+				}
 			}
 		}
 		else if(isObject(object))
@@ -360,7 +315,10 @@ var forEach = forEach || function(object, callback)
 					first	: i == 0,
 					last	: i == keys.length - 1
 				};
-				callback(object[key], key, loop);
+				if(isFalse(callback(object[key], key, loop)))
+				{
+					break;
+				}
 			}
 		}
 	}
@@ -1156,6 +1114,26 @@ var DateUtil = DateUtil ||
 			date = new Date(year, month, day, hours, minutes, seconds, milliseconds);
 		}
 		return date;
+	},
+	
+	/**
+	 * Parses a date string into a date object
+	 * @memberof DateUtil
+	 * @method
+	 * @param {String} parsePattern
+	 * @param {String} formatPattern
+	 * @param {String} value
+	 * @param {String} [lang]
+	 * @returns {Date}
+	 */
+	reformat : function(parsePattern, formatPattern, value, lang)
+	{
+		var date = parse(parsePattern, value, lang);
+		if(isSet(date))
+		{
+			value = format(formatPattern, date, lang);
+		}
+		return value;
 	}
 	
 };
@@ -1313,7 +1291,7 @@ var ObjectUtil = ObjectUtil ||
 		var paths = path.split(".");
 		for(var i in paths)
 		{
-			if(object[paths[i]])
+			if(isSet(object[paths[i]]))
 			{
 				object = object[paths[i]];
 			}
@@ -1451,6 +1429,23 @@ var StringUtil = StringUtil ||
 	capitalize : function(value)
 	{
 		return value.charAt(0).toUpperCase() + value.slice(1);
+	},
+	
+	/**
+	 * Replaces named parameters with values from param object
+	 * @method
+	 * @param {String} value
+	 * @param {Object} param
+	 * @returns {String}
+	 */
+	replace : function(value, param)
+	{
+		value = value.replace(/{{\s*?(\w+)\s*?}}/g, function(match, capture)
+		{
+			var replacement = ObjectUtil.find(param, capture);
+			return isSet(replacement) ? replacement : "";
+		});
+		return value;
 	}
 	
 };

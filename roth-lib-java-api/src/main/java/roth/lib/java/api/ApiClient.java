@@ -5,11 +5,9 @@ import java.lang.reflect.Type;
 
 import roth.lib.java.Generic;
 import roth.lib.java.inputter.Inputter;
-import roth.lib.java.map.MapperConfig;
-import roth.lib.java.map.MapperInputter;
-import roth.lib.java.map.MapperOutputter;
-import roth.lib.java.map.MapperReflector;
-import roth.lib.java.map.serializer.Serializer;
+import roth.lib.java.inputter.MapperInputter;
+import roth.lib.java.mapper.MapperConfig;
+import roth.lib.java.mapper.MapperType;
 import roth.lib.java.net.http.HttpClient;
 import roth.lib.java.net.http.HttpHeader;
 import roth.lib.java.net.http.HttpHeaders;
@@ -17,7 +15,10 @@ import roth.lib.java.net.http.HttpMethod;
 import roth.lib.java.net.http.HttpRequest;
 import roth.lib.java.net.http.HttpResponse;
 import roth.lib.java.net.http.HttpUrl;
+import roth.lib.java.outputter.MapperOutputter;
 import roth.lib.java.outputter.Outputter;
+import roth.lib.java.reflector.MapperReflector;
+import roth.lib.java.serializer.Serializer;
 import roth.lib.java.type.MimeType;
 
 public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
@@ -25,56 +26,51 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	protected static String RAW_BODY		= "RAW BODY";
 	protected static String MAPPED_ENTITY	= "MAPPED ENTITY";
 	
+	protected MapperType requestMapperType;
+	protected MapperType responseMapperType;
+	protected MapperReflector mapperReflector;
+	protected MapperConfig mapperConfig;
+	protected MapperConfig debugMapperConfig;
 	protected boolean debug;
-	protected MapperReflector requestMapperReflector;
-	protected MapperConfig requestMapperConfig;
-	protected MapperConfig requestDebugMapperConfig;
-	protected MapperReflector responseMapperReflector;
-	protected MapperConfig responseMapperConfig;
-	protected MapperConfig responseDebugMapperConfig;
 	
-	public ApiClient(boolean debug)
+	public ApiClient(boolean debug, MapperType requestMapperType, MapperType responseMapperType)
 	{
 		this.debug = debug;
-		requestMapperConfig = new MapperConfig();
-		requestDebugMapperConfig = new MapperConfig(true);
-		responseMapperConfig = new MapperConfig();
-		responseDebugMapperConfig = new MapperConfig(true);
+		this.requestMapperType = requestMapperType;
+		this.responseMapperType = responseMapperType;
+		mapperReflector = MapperReflector.get();
+		mapperConfig = MapperConfig.get();
+		debugMapperConfig = MapperConfig.debug();
+	}
+	
+	public MapperType getRequestMapperType()
+	{
+		return requestMapperType;
+	}
+	
+	public MapperType getResponseMapperType()
+	{
+		return responseMapperType;
+	}
+	
+	public MapperReflector getMapperReflector()
+	{
+		return mapperReflector;
+	}
+	
+	public MapperConfig getMapperConfig()
+	{
+		return mapperConfig;
+	}
+	
+	public MapperConfig getDebugMapperConfig()
+	{
+		return debugMapperConfig;
 	}
 	
 	public boolean isDebug()
 	{
 		return debug;
-	}
-	
-	public MapperReflector getRequestMapperReflector()
-	{
-		return requestMapperReflector;
-	}
-	
-	public MapperConfig getRequestMapperConfig()
-	{
-		return requestMapperConfig;
-	}
-	
-	public MapperConfig getRequestDebugMapperConfig()
-	{
-		return requestDebugMapperConfig;
-	}
-	
-	public MapperReflector getResponseMapperReflector()
-	{
-		return responseMapperReflector;
-	}
-	
-	public MapperConfig getResponseMapperConfig()
-	{
-		return responseMapperConfig;
-	}
-	
-	public MapperConfig getResponseDebugMapperConfig()
-	{
-		return responseDebugMapperConfig;
 	}
 	
 	public ApiClient<ApiRequest, ApiResponse> setDebug(boolean debug)
@@ -83,85 +79,95 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 		return this;
 	}
 	
-	public ApiClient<ApiRequest, ApiResponse> setRequestMapperReflector(MapperReflector requestMapperReflector)
-	{
-		this.requestMapperReflector = requestMapperReflector;
-		return this;
-	}
-	
-	public ApiClient<ApiRequest, ApiResponse> setRequestMapperConfig(MapperConfig requestMapperConfig)
-	{
-		this.requestMapperConfig = requestMapperConfig;
-		return this;
-	}
-	
-	public ApiClient<ApiRequest, ApiResponse> setRequestDebugMapperConfig(MapperConfig requestDebugMapperConfig)
-	{
-		this.requestDebugMapperConfig = requestDebugMapperConfig;
-		return this;
-	}
-	
-	public ApiClient<ApiRequest, ApiResponse> setResponseMapperReflector(MapperReflector responseMapperReflector)
-	{
-		this.responseMapperReflector = responseMapperReflector;
-		return this;
-	}
-	
-	public ApiClient<ApiRequest, ApiResponse> setResponseMapperConfig(MapperConfig responseMapperConfig)
-	{
-		this.responseMapperConfig = responseMapperConfig;
-		return this;
-	}
-	
-	public ApiClient<ApiRequest, ApiResponse> setResponseDebugMapperConfig(MapperConfig responseDebugMapperConfig)
-	{
-		this.responseDebugMapperConfig = responseDebugMapperConfig;
-		return this;
-	}
-	
 	public void setTimeFormat(String timeFormat)
 	{
-		requestMapperConfig.setTimeFormat(timeFormat);
-		requestDebugMapperConfig.setTimeFormat(timeFormat);
-		responseMapperConfig.setTimeFormat(timeFormat);
-		responseDebugMapperConfig.setTimeFormat(timeFormat);
+		getMapperConfig().setTimeFormat(timeFormat);
+		getDebugMapperConfig().setTimeFormat(timeFormat);
+	}
+	
+	protected MimeType getRequestContentType()
+	{
+		MimeType contentType = null;
+		switch(getRequestMapperType())
+		{
+			case JSON:
+			{
+				contentType = MimeType.APPLICATION_JSON;
+				break;
+			}
+			case XML:
+			{
+				contentType = MimeType.APPLICATION_XML;
+				break;
+			}
+			case FORM:
+			{
+				contentType = MimeType.APPLICATION_X_WWW_FORM_URLENCODED;
+				break;
+			}
+			case TABLE:
+			case MYSQL:
+			{
+				break;
+			}
+		}
+		return contentType;
+	}
+	
+	protected MimeType getResponseContentType()
+	{
+		MimeType contentType = null;
+		switch(getResponseMapperType())
+		{
+			case JSON:
+			{
+				contentType = MimeType.APPLICATION_JSON;
+				break;
+			}
+			case XML:
+			{
+				contentType = MimeType.APPLICATION_XML;
+				break;
+			}
+			case FORM:
+			{
+				contentType = MimeType.APPLICATION_X_WWW_FORM_URLENCODED;
+				break;
+			}
+			case TABLE:
+			case MYSQL:
+			{
+				break;
+			}
+		}
+		return contentType;
 	}
 	
 	protected abstract HttpUrl url();
 	
 	protected Outputter getOutputter(ApiRequest apiRequest)
 	{
-		return new MapperOutputter<ApiRequest>().setMapperReflector(getRequestMapperReflector()).setMapperConfig(getRequestMapperConfig()).setValue(apiRequest);
+		return new MapperOutputter<ApiRequest>(getRequestMapperType(), getMapperReflector(), getMapperConfig(), apiRequest);
 	}
 	
 	protected <T extends ApiResponse> Inputter<T> getInputter(Type type)
 	{
-		return new MapperInputter<T>().setMapperReflector(getResponseMapperReflector()).setMapperConfig(getResponseMapperConfig()).setType(type);
+		return new MapperInputter<T>(getResponseMapperType(), getMapperReflector(), getMapperConfig(), type);
 	}
 	
 	protected String debugRequest(ApiRequest apiRequest)
 	{
-		return getRequestMapperReflector().getMapper(getRequestDebugMapperConfig()).serialize(apiRequest);
+		return getMapperReflector().getMapper(getRequestMapperType(), getDebugMapperConfig()).serialize(apiRequest);
 	}
 	
 	protected String debugResponse(ApiResponse apiResponse)
 	{
-		return getResponseMapperReflector().getMapper(getResponseDebugMapperConfig()).serialize(apiResponse);
+		return getMapperReflector().getMapper(getResponseMapperType(), getDebugMapperConfig()).serialize(apiResponse);
 	}
 	
 	protected String debugBody(String body)
 	{
-		return getResponseMapperReflector().getMapper(getResponseDebugMapperConfig()).prettyPrint(body);
-	}
-	
-	protected MimeType getRequestContentType()
-	{
-		return null;
-	}
-	
-	protected MimeType getResponseContentType()
-	{
-		return null;
+		return getMapperReflector().getMapper(getResponseMapperType(), getDebugMapperConfig()).prettyPrint(body);
 	}
 	
 	protected void setHeaders(HttpHeaders headers)
