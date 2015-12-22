@@ -9,20 +9,17 @@ import java.util.LinkedList;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
-import roth.lib.java.map.MapperConfig;
-import roth.lib.java.map.MapperReflector;
-import roth.lib.java.map.xml.XmlModel;
-import roth.lib.java.map.xml.XmlReflector;
-import roth.lib.java.map.xml.annotation.XmlAttribute;
-import roth.lib.java.map.xml.annotation.XmlElements;
+import roth.lib.java.mapper.MapperConfig;
+import roth.lib.java.xml.XmlMapper;
+import roth.lib.java.xml.XmlModel;
 
 @Entity(name = "test")
 @SuppressWarnings("serial")
 public class XmlTestModel extends XmlModel
 {
 	
-	@XmlAttribute(name = "attribute")
-	private String attribute = "";
+	@Property(name = "attribute", attribute = true)
+	private String attribute = "test";
 	
 	@Property(name = "null-primitive-boolean")
 	private boolean nullPrimitiveBoolean;
@@ -135,20 +132,17 @@ public class XmlTestModel extends XmlModel
 	@Property(name = "empty-string-array")
 	private String[] emptyStringArray = new String[]{};
 	
-	@Property(name = "test-string-array")
-	@XmlElements(name = "element")
+	@Property(name = "test-string-array", elementsName = "element")
 	//private String[] testStringArray = new String[]{"one", "two", "three"};
 	private String[] testStringArray;
 	
-	@Property(name = "null-string-list")
-	@XmlElements(name = "nullElement")
+	@Property(name = "null-string-list", elementsName = "nullElement")
 	private LinkedList<String> nullStringList;
 	
 	@Property(name = "empty-string-list")
 	private LinkedList<String> emptyStringList = new LinkedList<String>();
 	
-	@Property(name = "test-string-list")
-	@XmlElements(name = "element")
+	@Property(name = "test-string-list", elementsName = "element")
 	//private LinkedList<String> testStringList = new LinkedList<String>(Arrays.asList(new String[]{"one", "two", "three"}));
 	private LinkedList<String> testStringList;
 	
@@ -161,8 +155,7 @@ public class XmlTestModel extends XmlModel
 	@Property(name = "test-string-map")
 	private LinkedHashMap<String, String> testStringMap = new LinkedHashMap<String, String>();
 	
-	@Property(name = "test-model-list")
-	@XmlElements(name = "element")
+	@Property(name = "test-model-list", elementsName = "element")
 	//private LinkedList<XmlSubModel> testModelList = new LinkedList<XmlSubModel>(Arrays.asList(new XmlSubModel[]{new XmlSubModel(), new XmlSubModel()}));
 	private LinkedList<XmlSubModel> testModelList;
 	
@@ -207,9 +200,8 @@ public class XmlTestModel extends XmlModel
 	@Override
 	public String toString()
 	{
-		MapperReflector mapperReflector = new XmlReflector();
 		MapperConfig mapperConfig = new MapperConfig().setPrettyPrinting(true).setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
-		return mapperReflector.getMapper(mapperConfig).serialize(this);
+		return new XmlMapper(mapperConfig).serialize(this);
 	}
 	
 }

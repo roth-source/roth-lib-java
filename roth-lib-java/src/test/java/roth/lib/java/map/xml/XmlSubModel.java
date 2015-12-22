@@ -6,10 +6,8 @@ import java.util.GregorianCalendar;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
-import roth.lib.java.map.xml.annotation.XmlProperty;
 
-@Entity
-@XmlProperty(name = "test-sub")
+@Entity(propertyName = "test-sub")
 public class XmlSubModel
 {
 	

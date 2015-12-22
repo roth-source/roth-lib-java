@@ -9,9 +9,8 @@ import java.util.LinkedList;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
-import roth.lib.java.map.MapperConfig;
-import roth.lib.java.map.MapperReflector;
-import roth.lib.java.map.json.JsonReflector;
+import roth.lib.java.json.JsonMapper;
+import roth.lib.java.mapper.MapperConfig;
 
 @Entity
 public class JsonModel
@@ -563,9 +562,8 @@ public class JsonModel
 	@Override
 	public String toString()
 	{
-		MapperReflector mapperReflector = new JsonReflector();
 		MapperConfig mapperConfig = new MapperConfig().setPrettyPrinting(true).setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
-		return mapperReflector.getMapper(mapperConfig).serialize(this);
+		return new JsonMapper(mapperConfig).serialize(this);
 	}
 	
 }

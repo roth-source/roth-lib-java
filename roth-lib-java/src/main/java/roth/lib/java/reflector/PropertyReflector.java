@@ -2,34 +2,32 @@ package roth.lib.java.reflector;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.LinkedList;
+import java.util.List;
 
+import roth.lib.java.annotation.Property;
+import roth.lib.java.mapper.MapperType;
+import roth.lib.java.util.AnnotationUtil;
 import roth.lib.java.util.ReflectionUtil;
 
 public class PropertyReflector
 {
+	protected EntityReflector entityReflector;
 	protected Field field;
 	protected Type fieldType;
-	protected String propertyName;
-	protected boolean id;
-	protected boolean generated;
-	protected String timeFormat;
-	protected LinkedList<String> excludes;
+	protected Property property;
 	
-	public PropertyReflector(Field field, Type fieldType, String propertyName, boolean id, boolean generated, String timeFormat, LinkedList<String> excludes)
+	public PropertyReflector(EntityReflector entityReflector, Field field, Property property)
 	{
+		field.setAccessible(true);
+		this.entityReflector = entityReflector;
 		this.field = field;
-		this.fieldType = fieldType;
-		this.propertyName = propertyName;
-		this.id = id;
-		this.generated = generated;
-		this.timeFormat = timeFormat;
-		this.excludes = excludes;
+		this.fieldType = ReflectionUtil.getGenericType(entityReflector.getType(), field.getGenericType());
+		this.property = property;
 	}
 	
-	public String getPropertyName()
+	public EntityReflector getEntityReflector()
 	{
-		return propertyName;
+		return entityReflector;
 	}
 	
 	public Field getField()
@@ -52,24 +50,259 @@ public class PropertyReflector
 		return ReflectionUtil.getTypeClass(fieldType);
 	}
 	
-	public boolean isId()
+	public Property getProperty()
 	{
-		return id;
+		return property;
 	}
 	
-	public boolean isGenerated()
+	public boolean isProperty(MapperType mapperType)
 	{
-		return generated;
+		boolean property = true;
+		switch(mapperType)
+		{
+			case MYSQL:
+			{
+				property = isMysql();
+				if(property)
+				{
+					property = isDb();
+				}
+				break;
+			}
+			case JSON:
+			{
+				property = isJson();
+				if(property)
+				{
+					property = isSerial();
+				}
+				break;
+			}
+			case XML:
+			{
+				property = isXml();
+				if(property)
+				{
+					property = isSerial();
+				}
+				break;
+			}
+			case FORM:
+			{
+				property = isForm();
+				if(property)
+				{
+					property = isSerial();
+				}
+				break;
+			}
+			case TABLE:
+			{
+				property = isTable();
+				if(property)
+				{
+					property = isSerial();
+				}
+				break;
+			}
+		}
+		return property;
+	}
+	
+	public String getPropertyName(MapperType mapperType)
+	{
+		String name = null;
+		switch(mapperType)
+		{
+			case MYSQL:
+			{
+				name = getMysqlName();
+				if(name == null)
+				{
+					name = getDbName();
+				}
+				break;
+			}
+			case JSON:
+			{
+				name = getJsonName();
+				if(name == null)
+				{
+					name = getSerialName();
+				}
+				break;
+			}
+			case XML:
+			{
+				name = getXmlName();
+				if(name == null)
+				{
+					name = getSerialName();
+				}
+				break;
+			}
+			case FORM:
+			{
+				name = getFormName();
+				if(name == null)
+				{
+					name = getSerialName();
+				}
+				break;
+			}
+			case TABLE:
+			{
+				name = getTableName();
+				if(name == null)
+				{
+					name = getSerialName();
+				}
+				break;
+			}
+		}
+		if(name == null)
+		{
+			name = getName();
+		}
+		return name;
+	}
+	
+	public String getName()
+	{
+		return AnnotationUtil.validate(property.name());
 	}
 	
 	public String getTimeFormat()
 	{
-		return timeFormat;
+		return AnnotationUtil.validate(property.timeFormat());
 	}
 	
-	public LinkedList<String> getExcludes()
+	public List<String> getExcludes()
 	{
-		return excludes;
+		return AnnotationUtil.validate(property.exclude());
+	}
+	
+	public boolean isExcluded(String context)
+	{
+		boolean contains = false;
+		String[] excludes = property.exclude();
+		if(excludes != null)
+		{
+			for(String exclude : excludes)
+			{
+				if(exclude.equalsIgnoreCase(context))
+				{
+					contains = true;
+					break;
+				}
+			}
+		}
+		return contains;
+	}
+	
+	public boolean isDb()
+	{
+		return property.db();
+	}
+	
+	public String getDbName()
+	{
+		return AnnotationUtil.validate(property.dbName());
+	}
+	
+	public boolean isId()
+	{
+		return property.id();
+	}
+	
+	public boolean isGenerated()
+	{
+		return property.generated();
+	}
+	
+	public boolean isMysql()
+	{
+		return property.mysql();
+	}
+	
+	public String getMysqlName()
+	{
+		return AnnotationUtil.validate(property.mysqlName());
+	}
+	
+	public boolean isSerial()
+	{
+		return property.serial();
+	}
+	
+	public String getSerialName()
+	{
+		return AnnotationUtil.validate(property.serialName());
+	}
+	
+	public boolean isJson()
+	{
+		return property.json();
+	}
+	
+	public String getJsonName()
+	{
+		return AnnotationUtil.validate(property.jsonName());
+	}
+	
+	public boolean isXml()
+	{
+		return property.xml();
+	}
+	
+	public String getXmlName()
+	{
+		return AnnotationUtil.validate(property.xmlName());
+	}
+	
+	public boolean isAttribute()
+	{
+		return property.attribute();
+	}
+	
+	public String getElementsName()
+	{
+		return AnnotationUtil.validate(property.elementsName());
+	}
+	
+	public boolean isForm()
+	{
+		return property.form();
+	}
+	
+	public String getFormName()
+	{
+		return AnnotationUtil.validate(property.formName());
+	}
+	
+	public boolean isTable()
+	{
+		return property.table();
+	}
+	
+	public String getTableName()
+	{
+		return AnnotationUtil.validate(property.tableName());
+	}
+	
+	public boolean isRequired()
+	{
+		return property.required();
+	}
+	
+	public List<String> getFilters()
+	{
+		return AnnotationUtil.validate(property.filter());
+	}
+	
+	public List<String> getValidates()
+	{
+		return AnnotationUtil.validate(property.validate());
 	}
 	
 }

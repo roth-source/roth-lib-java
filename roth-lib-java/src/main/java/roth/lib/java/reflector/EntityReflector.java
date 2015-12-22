@@ -1,329 +1,293 @@
 package roth.lib.java.reflector;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
-import roth.lib.java.accessor.GetEntityNameAccessor;
-import roth.lib.java.accessor.GetExcludesAccessor;
-import roth.lib.java.accessor.GetPropertyNameAccessor;
-import roth.lib.java.accessor.GetTimeFormatAccessor;
-import roth.lib.java.accessor.IsEntityAccessor;
-import roth.lib.java.accessor.IsGeneratedAccessor;
-import roth.lib.java.accessor.IsIdAccessor;
+import roth.lib.java.annotation.Attributes;
 import roth.lib.java.annotation.Entity;
-import roth.lib.java.annotation.Generate;
-import roth.lib.java.annotation.Id;
+import roth.lib.java.annotation.Properties;
 import roth.lib.java.annotation.Property;
+import roth.lib.java.mapper.MapperType;
+import roth.lib.java.util.AnnotationUtil;
 import roth.lib.java.util.ReflectionUtil;
 
-public abstract class EntityReflector
+public class EntityReflector
 {
-	protected LinkedList<IsEntityAccessor<? extends Annotation>> isEntityAccessors = new LinkedList<IsEntityAccessor<? extends Annotation>>();
-	protected LinkedList<GetEntityNameAccessor<? extends Annotation>> getEntityNameAccessors = new LinkedList<GetEntityNameAccessor<? extends Annotation>>();
-	protected LinkedList<GetPropertyNameAccessor<? extends Annotation>> getPropertyNameAccessors = new LinkedList<GetPropertyNameAccessor<? extends Annotation>>();
-	protected LinkedList<IsIdAccessor<? extends Annotation>> isIdAccessors = new LinkedList<IsIdAccessor<? extends Annotation>>();
-	protected LinkedList<IsGeneratedAccessor<? extends Annotation>> isGeneratedAccessors = new LinkedList<IsGeneratedAccessor<? extends Annotation>>();
-	protected LinkedList<GetTimeFormatAccessor<? extends Annotation>> getTimeFormatAccessors = new LinkedList<GetTimeFormatAccessor<? extends Annotation>>();
-	protected LinkedList<GetExcludesAccessor<? extends Annotation>> getExcludesAccessors = new LinkedList<GetExcludesAccessor<? extends Annotation>>();
+	protected Type type;
+	protected Entity entity;
+	protected LinkedList<PropertyReflector> propertyReflectors;
+	protected PropertiesReflector propertiesReflector;
+	protected AttributesReflector attributesReflector;
 	
-	protected LinkedHashMap<Type, LinkedList<PropertyReflector>> propertyReflectorsMap = new LinkedHashMap<Type, LinkedList<PropertyReflector>>();
-	
-	protected EntityReflector()
+	public EntityReflector(Type type, Entity entity)
 	{
-		addIsEntityAccessor(new IsEntityAccessor<Entity>(Entity.class){});
-		addGetEntityNameAccessor(new GetEntityNameAccessor<Entity>(Entity.class)
-		{
-			@Override
-			public String getEntityName(Entity entity)
-			{
-				return entity.name();
-			}	
-		});
-		addIsIdAccessor(new IsIdAccessor<Id>(Id.class){});
-		addIsGeneratedAccessor(new IsGeneratedAccessor<Generate>(Generate.class){});
-		addGetTimeFormatAccessor(new GetTimeFormatAccessor<Property>(Property.class)
-		{
-			@Override
-			public String getTimeFormat(Property property)
-			{
-				return isValid(property.timeFormat()) ? property.timeFormat() : null;
-			}
-		});
-		addGetExcludesAccessor(new GetExcludesAccessor<Property>(Property.class)
-		{
-			@Override
-			public String[] getExcludes(Property property)
-			{
-				return property.exclude();
-			}
-		});
+		this.type = type;
+		this.entity = entity;
 	}
 	
-	public EntityReflector addIsEntityAccessor(IsEntityAccessor<? extends Annotation> isEntityAccessor)
+	protected void init()
 	{
-		isEntityAccessors.addFirst(isEntityAccessor);
-		return this;
-	}
-	
-	public EntityReflector addGetEntityNameAccessor(GetEntityNameAccessor<? extends Annotation> getEntityNameAccessor)
-	{
-		getEntityNameAccessors.addFirst(getEntityNameAccessor);
-		return this;
-	}
-	
-	public EntityReflector addGetPropertyNameAccessor(GetPropertyNameAccessor<? extends Annotation> getPropertyNameAccessor)
-	{
-		getPropertyNameAccessors.addFirst(getPropertyNameAccessor);
-		return this;
-	}
-	
-	public EntityReflector addIsIdAccessor(IsIdAccessor<? extends Annotation> isIdAccessor)
-	{
-		isIdAccessors.addFirst(isIdAccessor);
-		return this;
-	}
-	
-	public EntityReflector addIsGeneratedAccessor(IsGeneratedAccessor<? extends Annotation> isGeneratedAccessor)
-	{
-		isGeneratedAccessors.addFirst(isGeneratedAccessor);
-		return this;
-	}
-	
-	public EntityReflector addGetTimeFormatAccessor(GetTimeFormatAccessor<? extends Annotation> getTimeFormatAccessor)
-	{
-		getTimeFormatAccessors.addFirst(getTimeFormatAccessor);
-		return this;
-	}
-	
-	public EntityReflector addGetExcludesAccessor(GetExcludesAccessor<? extends Annotation> getExcludesAccessor)
-	{
-		getExcludesAccessors.addFirst(getExcludesAccessor);
-		return this;
-	}
-	
-	public LinkedList<IsEntityAccessor<? extends Annotation>> getIsEntityAccessors()
-	{
-		return isEntityAccessors;
-	}
-	
-	public LinkedList<GetEntityNameAccessor<? extends Annotation>> getGetEntityNameAccessors()
-	{
-		return getEntityNameAccessors;
-	}
-	
-	public LinkedList<GetPropertyNameAccessor<? extends Annotation>> getGetPropertyNameAccessors()
-	{
-		return getPropertyNameAccessors;
-	}
-	
-	public LinkedList<IsIdAccessor<? extends Annotation>> getIsIdAccessors()
-	{
-		return isIdAccessors;
-	}
-	
-	public LinkedList<IsGeneratedAccessor<? extends Annotation>> getIsGeneratedAccessors()
-	{
-		return isGeneratedAccessors;
-	}
-	
-	public LinkedList<GetTimeFormatAccessor<? extends Annotation>> getGetTimeFormatAccessors()
-	{
-		return getTimeFormatAccessors;
-	}
-	
-	public LinkedList<GetExcludesAccessor<? extends Annotation>> getGetExcludesAccessors()
-	{
-		return getExcludesAccessors;
-	}
-	
-	public LinkedHashMap<Type, LinkedList<PropertyReflector>> getPropertyReflectorsMap()
-	{
-		return propertyReflectorsMap;
-	}
-	
-	public boolean isEntity(Type type)
-	{
-		for(IsEntityAccessor<? extends Annotation> isEntityAccessor : getIsEntityAccessors())
-		{
-			if(isEntityAccessor.isEntity(type))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public String getEntityName(Type type)
-	{
-		for(GetEntityNameAccessor<? extends Annotation> getEntityNameAccessor : getGetEntityNameAccessors())
-		{
-			String entityName = getEntityNameAccessor.getEntityName(type);
-			if(entityName != null)
-			{
-				return entityName;
-			}
-		}
-		return null;
-	}
-	
-	public String getPropertyName(Field field)
-	{
-		for(GetPropertyNameAccessor<? extends Annotation> getPropertyNameAccessor : getGetPropertyNameAccessors())
-		{
-			String propertyName = getPropertyNameAccessor.getPropertyName(field);
-			if(propertyName != null)
-			{
-				return propertyName;
-			}
-		}
-		return null;
-	}
-	
-	public boolean isId(Field field)
-	{
-		for(IsIdAccessor<? extends Annotation> isIdAccessor : getIsIdAccessors())
-		{
-			if(isIdAccessor.isId(field))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public boolean isGenerated(Field field)
-	{
-		for(IsGeneratedAccessor<? extends Annotation> isGeneratedAccessor : getIsGeneratedAccessors())
-		{
-			if(isGeneratedAccessor.isGenerated(field))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public String getTimeFormat(Field field)
-	{
-		for(GetTimeFormatAccessor<? extends Annotation> getTimeFormatAccessor : getGetTimeFormatAccessors())
-		{
-			String timeFormat = getTimeFormatAccessor.getTimeFormat(field);
-			if(timeFormat != null)
-			{
-				return timeFormat;
-			}
-		}
-		return null;
-	}
-	
-	public LinkedList<String> getExcludes(Field field)
-	{
-		for(GetExcludesAccessor<? extends Annotation> getExcludesAccessor : getGetExcludesAccessors())
-		{
-			LinkedList<String> excludes = getExcludesAccessor.getExcludes(field);
-			if(excludes != null && !excludes.isEmpty())
-			{
-				return excludes;
-			}
-		}
-		return new LinkedList<String>();
-	}
-	
-	public LinkedHashMap<String, PropertyReflector> getNamePropertyReflectorMap(Type type, boolean flexible)
-	{
-		LinkedHashMap<String, PropertyReflector> namePropertyReflectorMap = new LinkedHashMap<String, PropertyReflector>();
-		for(PropertyReflector propertyReflector : getPropertyReflectors(type))
-		{
-			String name = flexible ? getFlexibleName(propertyReflector.getPropertyName()) : propertyReflector.getPropertyName();
-			namePropertyReflectorMap.put(name, propertyReflector);
-		}
-		return namePropertyReflectorMap;
-	}
-	
-	public String getFlexibleName(String name)
-	{
-		return name.toUpperCase();
-	}
-	
-	public LinkedHashMap<String, PropertyReflector> getFieldPropertyReflectorMap(Type type)
-	{
-		LinkedHashMap<String, PropertyReflector> fieldPropertyReflectorMap = new LinkedHashMap<String, PropertyReflector>();
-		for(PropertyReflector propertyReflector : getPropertyReflectors(type))
-		{
-			fieldPropertyReflectorMap.put(propertyReflector.getFieldName(), propertyReflector);
-		}
-		return fieldPropertyReflectorMap;
-	}
-	
-	public LinkedList<PropertyReflector> getPropertyReflectors(Type type)
-	{
-		LinkedList<PropertyReflector> propertyReflectors = getPropertyReflectorsMap().get(type);
 		if(propertyReflectors == null)
 		{
 			propertyReflectors = new LinkedList<PropertyReflector>();
 			for(Field field : ReflectionUtil.getFields(type))
 			{
-				String propertyName = getPropertyName(field);
-				if(propertyName != null)
+				Property property = field.getDeclaredAnnotation(Property.class);
+				if(property != null)
 				{
-					field.setAccessible(true);
-					Type fieldType = ReflectionUtil.getGenericType(type, field.getGenericType());
-					boolean id = isId(field);
-					boolean generated = isGenerated(field);
-					String timeFormat = getTimeFormat(field);
-					LinkedList<String> excludes = getExcludes(field);
-					propertyReflectors.add(createPropertyReflector(field, fieldType, propertyName, id, generated, timeFormat, excludes));
+					propertyReflectors.add(new PropertyReflector(this, field, property));
+				}
+				else
+				{
+					Properties properties = field.getDeclaredAnnotation(Properties.class);
+					if(properties != null)
+					{
+						propertiesReflector = new PropertiesReflector(this, field);
+					}
+					else
+					{
+						Attributes attributes = field.getDeclaredAnnotation(Attributes.class);
+						if(attributes != null)
+						{
+							attributesReflector = new AttributesReflector(this, field);
+						}
+					}
 				}
 			}
-			getPropertyReflectorsMap().put(type, propertyReflectors);
+		}
+	}
+	
+	public Type getType()
+	{
+		return type;
+	}
+	
+	public Entity getEntity()
+	{
+		return entity;
+	}
+	
+	public String getEntityName()
+	{
+		return AnnotationUtil.validate(entity.name());
+	}
+	
+	public String getPropertyName()
+	{
+		return AnnotationUtil.validate(entity.propertyName());
+	}
+	
+	public LinkedList<PropertyReflector> getPropertyReflectors(MapperType mapperType)
+	{
+		init();
+		LinkedList<PropertyReflector> propertyReflectors = new LinkedList<PropertyReflector>();
+		for(PropertyReflector propertyReflector : this.propertyReflectors)
+		{
+			if(!propertyReflector.isAttribute() && propertyReflector.isProperty(mapperType))
+			{
+				propertyReflectors.add(propertyReflector);
+			}
 		}
 		return propertyReflectors;
 	}
 	
-	protected PropertyReflector createPropertyReflector(Field field, Type fieldType, String propertyName, boolean id, boolean generated, String timeFormat, LinkedList<String> excludes)
+	public LinkedList<PropertyReflector> getAttributeReflectors(MapperType mapperType)
 	{
-		return new PropertyReflector(field, fieldType, propertyName, id, generated, timeFormat, excludes);
-	}
-	
-	public LinkedList<PropertyReflector> getIdPropertyReflectors(Type type)
-	{
-		LinkedList<PropertyReflector> idPropertyReflectors = new LinkedList<PropertyReflector>();
-		for(PropertyReflector propertyReflector : getPropertyReflectors(type))
+		init();
+		LinkedList<PropertyReflector> attributeReflectors = new LinkedList<PropertyReflector>();
+		for(PropertyReflector propertyReflector : this.propertyReflectors)
 		{
-			if(propertyReflector.isId())
+			if(propertyReflector.isAttribute() && propertyReflector.isProperty(mapperType))
 			{
-				idPropertyReflectors.add(propertyReflector);
+				attributeReflectors.add(propertyReflector);
 			}
 		}
-		return idPropertyReflectors;
+		return attributeReflectors;
 	}
 	
-	public LinkedList<PropertyReflector> getGeneratedPropertyReflectors(Type type)
+	public LinkedList<PropertyReflector> getIdReflectors(MapperType mapperType)
 	{
-		LinkedList<PropertyReflector> generatedPropertyReflectors = new LinkedList<PropertyReflector>();
-		for(PropertyReflector propertyReflector : getPropertyReflectors(type))
+		init();
+		LinkedList<PropertyReflector> idReflectors = new LinkedList<PropertyReflector>();
+		for(PropertyReflector propertyReflector : this.propertyReflectors)
 		{
-			if(propertyReflector.isGenerated())
+			if(propertyReflector.isId() && propertyReflector.isProperty(mapperType))
 			{
-				generatedPropertyReflectors.add(propertyReflector);
+				idReflectors.add(propertyReflector);
 			}
 		}
-		return generatedPropertyReflectors;
+		return idReflectors;
 	}
 	
-	public boolean hasGeneratedPropertyReflectors(Type type)
+	public LinkedList<PropertyReflector> getGeneratedReflectors(MapperType mapperType)
 	{
-		for(PropertyReflector propertyReflector : getPropertyReflectors(type))
+		init();
+		LinkedList<PropertyReflector> generatedReflectors = new LinkedList<PropertyReflector>();
+		for(PropertyReflector propertyReflector : this.propertyReflectors)
 		{
-			if(propertyReflector.isGenerated())
+			if(propertyReflector.isGenerated() && propertyReflector.isProperty(mapperType))
 			{
-				return true;
+				generatedReflectors.add(propertyReflector);
 			}
 		}
-		return false;
+		return generatedReflectors;
+	}
+	
+	public PropertiesReflector getPropertiesReflector()
+	{
+		init();
+		return propertiesReflector;
+	}
+	
+	public AttributesReflector getAttributesReflector()
+	{
+		init();
+		return attributesReflector;
+	}
+	
+	public PropertyReflector getPropertyReflector(String name, MapperType mapperType, MapperReflector mapperReflector)
+	{
+		return getPropertyReflector(name, mapperType, mapperReflector, false);
+	}
+	
+	public PropertyReflector getAttributeReflector(String name, MapperType mapperType, MapperReflector mapperReflector)
+	{
+		return getPropertyReflector(name, mapperType, mapperReflector, true);
+	}
+	
+	public PropertyReflector getPropertyReflector(String name, MapperType mapperType, MapperReflector mapperReflector, boolean attribute)
+	{
+		PropertyReflector reflector = null;
+		if(name != null)
+		{
+			name = stripNamespace(name, mapperType);
+			for(PropertyReflector propertyReflector : getPropertyReflectors(mapperType))
+			{
+				if((!attribute && !propertyReflector.isAttribute()) || (attribute && propertyReflector.isAttribute()))
+				{
+					String propertyName = stripNamespace(propertyReflector.getPropertyName(mapperType), mapperType);
+					if(name.equalsIgnoreCase(propertyName))
+					{
+						reflector = propertyReflector;
+						break;
+					}
+				}
+			}
+			if(reflector == null)
+			{
+				for(PropertyReflector propertyReflector : getPropertyReflectors(mapperType))
+				{
+					if(!attribute && !propertyReflector.isAttribute())
+					{
+						EntityReflector entityReflector = mapperReflector.getEntityReflector(propertyReflector.getFieldType());
+						String propertyName = stripNamespace(entityReflector.getPropertyName(), mapperType);
+						if(name.equalsIgnoreCase(propertyName))
+						{
+							reflector = propertyReflector;
+							break;
+						}
+					}
+				}
+			}
+		}
+		return reflector;
+	}
+	
+	public String stripNamespace(String name, MapperType type)
+	{
+		if(name != null && MapperType.XML.equals(type))
+		{
+			int index = name.indexOf(":");
+			if(index > -1 && index + 1 < name.length())
+			{
+				return name.substring(index + 1);
+			}
+		}
+		return name;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public LinkedHashMap<String, String> getAttributeMap(Object value, MapperType mapperType)
+	{
+		LinkedHashMap<String, String> attributeMap = new LinkedHashMap<String, String>();
+		if(value != null)
+		{
+			AttributesReflector attributesReflector = getAttributesReflector();
+			if(attributesReflector != null)
+			{
+				try
+				{
+					Object attributesObject = attributesReflector.getField().get(value);
+					if(attributesObject instanceof Map)
+					{
+						attributeMap.putAll((Map<String, String>) attributesObject);
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			for(PropertyReflector propertyReflector : getAttributeReflectors(mapperType))
+			{
+				try
+				{
+					Object attributeValue = propertyReflector.getField().get(value);
+					if(attributeValue != null)
+					{
+						attributeMap.put(propertyReflector.getPropertyName(mapperType), attributeValue.toString());
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		return attributeMap;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void setAttributeMap(Object value, MapperType mapperType, LinkedHashMap<String, String> attributeMap)
+	{
+		if(value != null && attributeMap != null && !attributeMap.isEmpty())
+		{
+			attributeMap = new LinkedHashMap<String, String>(attributeMap);
+			for(PropertyReflector attributeReflector : getAttributeReflectors(mapperType))
+			{
+				String attributeName = attributeReflector.getPropertyName(mapperType);
+				String attributeValue = attributeMap.get(attributeName);
+				try
+				{
+					attributeReflector.getField().set(value, attributeValue);
+					attributeMap.remove(attributeName);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			
+			Field attributesField = getAttributesReflector().getField();
+			if(attributesField != null)
+			{
+				try
+				{
+					Object attributesObject = attributesField.get(value);
+					if(attributesObject instanceof Map)
+					{
+						((Map<String, String>) attributesObject).putAll(attributeMap);
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 	
 }
