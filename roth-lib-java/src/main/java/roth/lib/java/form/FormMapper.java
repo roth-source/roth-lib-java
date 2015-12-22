@@ -149,7 +149,7 @@ public class FormMapper extends Mapper
 								if(BLANK.equals(seperator))
 								{
 									seperator += AMPERSAND;
-									if(getMapperConfig().isPrettyPrinting())
+									if(isPrettyPrint())
 									{
 										seperator += NEW_LINE;
 									}
@@ -200,7 +200,7 @@ public class FormMapper extends Mapper
 					if(BLANK.equals(seperator))
 					{
 						seperator += AMPERSAND;
-						if(getMapperConfig().isPrettyPrinting())
+						if(isPrettyPrint())
 						{
 							seperator += NEW_LINE;
 						}

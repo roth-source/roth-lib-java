@@ -53,7 +53,7 @@ public class WebServer
 		projectDir = new File(System.getProperty(USER_DIR));
 		webAppDir = new File(projectDir, WEB_APP);
 		webInfDir = new File(webAppDir, WEB_INF);
-		port = 8443;
+		port = 9443;
 		server = new Server();
 		sslContextFactory = new SslContextFactory();
 		sslContextFactory.setKeyStorePath(getClass().getClassLoader().getResource("localhost.jks").toExternalForm());

@@ -111,8 +111,8 @@ public class FormModel
 	@Override
 	public String toString()
 	{
-		MapperConfig mapperConfig = new MapperConfig().setPrettyPrinting(true).setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
-		return new FormMapper(mapperConfig).serialize(this);
+		MapperConfig mapperConfig = new MapperConfig().setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
+		return new FormMapper(mapperConfig).setPrettyPrint(true).serialize(this);
 	}
 	
 }

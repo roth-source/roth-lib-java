@@ -12,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import roth.lib.java.json.JsonMapper;
-import roth.lib.java.mapper.MapperConfig;
 
 public class WebConfig
 {
@@ -39,7 +38,7 @@ public class WebConfig
 	protected static Pattern REQUEST_PATTERN		= Pattern.compile("-request-(\\w+?)\\.");
 	protected static Pattern RESPONSE_PATTERN		= Pattern.compile("-response-(\\w+?)\\.");
 	
-	protected JsonMapper mapper = new JsonMapper(new MapperConfig(true));
+	protected JsonMapper mapper = new JsonMapper();
 	protected File projectDir;
 	protected File webAppDir;
 	protected File textDir;
@@ -51,6 +50,7 @@ public class WebConfig
 	
 	public WebConfig()
 	{
+		mapper.setPrettyPrint(true);
 		init();
 	}
 	

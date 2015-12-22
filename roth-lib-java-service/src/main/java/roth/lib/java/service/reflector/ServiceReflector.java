@@ -23,7 +23,7 @@ public class ServiceReflector
 			if(serviceMethod != null)
 			{
 				MethodReflector methodReflector = new MethodReflector(this, method, serviceMethod);
-				methodReflectorMap.put(methodReflector.getName(), methodReflector);
+				methodReflectorMap.put(methodReflector.getMethodName(), methodReflector);
 			}
 		}
 	}

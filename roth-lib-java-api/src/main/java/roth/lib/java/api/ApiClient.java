@@ -30,7 +30,6 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	protected MapperType responseMapperType;
 	protected MapperReflector mapperReflector;
 	protected MapperConfig mapperConfig;
-	protected MapperConfig debugMapperConfig;
 	protected boolean debug;
 	
 	public ApiClient(boolean debug, MapperType requestMapperType, MapperType responseMapperType)
@@ -40,7 +39,6 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 		this.responseMapperType = responseMapperType;
 		mapperReflector = MapperReflector.get();
 		mapperConfig = MapperConfig.get();
-		debugMapperConfig = MapperConfig.debug();
 	}
 	
 	public MapperType getRequestMapperType()
@@ -63,11 +61,6 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 		return mapperConfig;
 	}
 	
-	public MapperConfig getDebugMapperConfig()
-	{
-		return debugMapperConfig;
-	}
-	
 	public boolean isDebug()
 	{
 		return debug;
@@ -82,7 +75,6 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	public void setTimeFormat(String timeFormat)
 	{
 		getMapperConfig().setTimeFormat(timeFormat);
-		getDebugMapperConfig().setTimeFormat(timeFormat);
 	}
 	
 	protected MimeType getRequestContentType()
@@ -157,17 +149,17 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected String debugRequest(ApiRequest apiRequest)
 	{
-		return getMapperReflector().getMapper(getRequestMapperType(), getDebugMapperConfig()).serialize(apiRequest);
+		return getMapperReflector().getMapper(getRequestMapperType(), getMapperConfig()).setPrettyPrint(true).serialize(apiRequest);
 	}
 	
 	protected String debugResponse(ApiResponse apiResponse)
 	{
-		return getMapperReflector().getMapper(getResponseMapperType(), getDebugMapperConfig()).serialize(apiResponse);
+		return getMapperReflector().getMapper(getResponseMapperType(), getMapperConfig()).setPrettyPrint(true).serialize(apiResponse);
 	}
 	
 	protected String debugBody(String body)
 	{
-		return getMapperReflector().getMapper(getResponseMapperType(), getDebugMapperConfig()).prettyPrint(body);
+		return getMapperReflector().getMapper(getResponseMapperType(), getMapperConfig()).prettyPrint(body);
 	}
 	
 	protected void setHeaders(HttpHeaders headers)

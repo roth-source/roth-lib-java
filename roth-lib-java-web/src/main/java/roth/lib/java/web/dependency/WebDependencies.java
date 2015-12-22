@@ -15,7 +15,6 @@ import javax.script.ScriptEngineManager;
 
 import roth.lib.java.Generic;
 import roth.lib.java.json.JsonMapper;
-import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.util.FileUtil;
 import roth.lib.java.util.IoUtil;
 import roth.lib.java.util.ResourceUtil;
@@ -84,7 +83,8 @@ public class WebDependencies
 	{
 		if(envFile.exists())
 		{
-			JsonMapper mapper = new JsonMapper(new MapperConfig(true));
+			JsonMapper mapper = new JsonMapper();
+			mapper.setPrettyPrint(true);
 			engine.eval(ResourceUtil.toString(ROTH_LIB_JS_ENV));
 			engine.eval(FileUtil.toString(envFile));
 			String json = (String) ((Invocable) engine).invokeFunction(GET_DEPENDENCIES);

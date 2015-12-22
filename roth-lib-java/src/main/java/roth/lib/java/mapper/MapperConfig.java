@@ -41,10 +41,7 @@ import roth.lib.java.serializer.UnescapedSerializer;
 public class MapperConfig
 {
 	protected static MapperConfig instance;
-	protected static MapperConfig debugInstance;
 	
-	protected boolean debug = false;
-	protected boolean prettyPrinting = false;
 	protected boolean serializeNulls = false;
 	protected boolean serializeEmptyArray = true;
 	protected boolean serializeEmptyMap = true;
@@ -54,16 +51,6 @@ public class MapperConfig
 	
 	public MapperConfig()
 	{
-		this(false);
-	}
-	
-	public MapperConfig(boolean debug)
-	{
-		this.debug = debug;
-		if(debug)
-		{
-			this.prettyPrinting = true;
-		}
 		initSerializers();
 		initDeserializers();
 	}
@@ -143,28 +130,9 @@ public class MapperConfig
 		return instance;
 	}
 	
-	public static MapperConfig debug()
-	{
-		if(instance == null)
-		{
-			instance = new MapperConfig(true);
-		}
-		return instance;
-	}
-	
 	public static void set(MapperConfig mapperConfig)
 	{
 		instance = mapperConfig;
-	}
-	
-	public boolean isDebug()
-	{
-		return debug;
-	}
-	
-	public boolean isPrettyPrinting()
-	{
-		return prettyPrinting;
 	}
 	
 	public boolean isSerializeNulls()
@@ -243,18 +211,6 @@ public class MapperConfig
 				((TemporalDeserializer<?>) deserializer).setTimeFormat(timeFormat);
 			}
 		}
-		return this;
-	}
-	
-	public MapperConfig setDebug(boolean debug)
-	{
-		this.debug = debug;
-		return this;
-	}
-	
-	public MapperConfig setPrettyPrinting(boolean prettyPrinting)
-	{
-		this.prettyPrinting = prettyPrinting;
 		return this;
 	}
 	

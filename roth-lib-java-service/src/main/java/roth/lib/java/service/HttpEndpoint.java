@@ -29,6 +29,8 @@ import roth.lib.java.service.annotation.Service;
 import roth.lib.java.service.reflector.MethodReflector;
 import roth.lib.java.service.reflector.ServiceReflector;
 import roth.lib.java.type.MimeType;
+import roth.lib.java.validate.Filterer;
+import roth.lib.java.validate.Validator;
 
 @SuppressWarnings("serial")
 public abstract class HttpEndpoint extends HttpServlet
@@ -49,10 +51,11 @@ public abstract class HttpEndpoint extends HttpServlet
 	protected static Pattern SERVICE_METHOD_PATTERN 			= Pattern.compile("(?:^|/)(?<" + SERVICE + ">\\w+)/(?<" + METHOD + ">\\w+)(?:/|$)");
 	
 	protected static LinkedHashMap<String, ServiceReflector> serviceReflectorMap = new LinkedHashMap<String, ServiceReflector>();
+	protected static LinkedHashMap<String, Filterer> filtererMap = new LinkedHashMap<String, Filterer>();
+	protected static LinkedHashMap<String, Validator> validatorMap = new LinkedHashMap<String, Validator>();
 	
 	protected MapperReflector mapperReflector = MapperReflector.get();
 	protected MapperConfig mapperConfig = MapperConfig.get();
-	protected MapperConfig debugMapperConfig = MapperConfig.debug();
 	
 	public static void register(Class<? extends HttpService> serviceClass)
 	{
@@ -65,6 +68,16 @@ public abstract class HttpEndpoint extends HttpServlet
 				serviceReflectorMap.put(serviceName, new ServiceReflector(serviceClass, serviceName));
 			}
 		}
+	}
+	
+	public static void filter(String name, Filterer filterer)
+	{
+		filtererMap.put(name, filterer);
+	}
+	
+	public static void validator(String name, Validator validator)
+	{
+		validatorMap.put(name, validator);
 	}
 	
 	@Override
@@ -128,7 +141,7 @@ public abstract class HttpEndpoint extends HttpServlet
 													Type methodParameterType = parameter.getParameterizedType();
 													service.setRequestContentType(requestContentType);
 													requestMapper = getRequestMapper(request, response, requestContentType);
-													//service.setRequestMapper(requestMapper);
+													service.setRequestMapper(requestMapper);
 													methodRequest = requestMapper.setContext(methodReflector.getContext()).deserialize(input, methodParameterType);
 												}
 												if(dev)
@@ -142,10 +155,11 @@ public abstract class HttpEndpoint extends HttpServlet
 													if(authorized)
 													{
 														//errors.addAll(service.validate(methodRequest));
+														// TODO validate request
 														if(errors.isEmpty())
 														{
 															service.setResponseContentType(responseContentType);
-															//service.setResponseMapper(responseMapper);
+															service.setResponseMapper(responseMapper);
 															try
 															{
 																methodResponse = methodReflector.invoke(service, methodRequest);
@@ -362,11 +376,6 @@ public abstract class HttpEndpoint extends HttpServlet
 		return mapperConfig;
 	}
 	
-	protected MapperConfig getDebugMapperConfig()
-	{
-		return debugMapperConfig;
-	}
-	
 	protected MimeType getRequestContentType(HttpServletRequest request, HttpServletResponse response)
 	{
 		MimeType contentType = null;
@@ -498,7 +507,7 @@ public abstract class HttpEndpoint extends HttpServlet
 		System.out.println();
 		if(methodRequest != null && mapper != null)
 		{
-			mapper.setMapperConfig(getDebugMapperConfig()).serialize(methodRequest);
+			System.out.println(mapper.setPrettyPrint(true).serialize(methodRequest));
 			System.out.println();
 		}
 	}
@@ -518,7 +527,7 @@ public abstract class HttpEndpoint extends HttpServlet
 		System.out.println();
 		if(methodResponse != null && mapper != null)
 		{
-			mapper.setMapperConfig(getDebugMapperConfig()).serialize(methodResponse);
+			System.out.println(mapper.setPrettyPrint(true).serialize(methodResponse));
 			System.out.println();
 		}
 	}

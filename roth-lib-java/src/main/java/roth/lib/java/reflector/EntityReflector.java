@@ -183,11 +183,14 @@ public class EntityReflector
 					if(!attribute && !propertyReflector.isAttribute())
 					{
 						EntityReflector entityReflector = mapperReflector.getEntityReflector(propertyReflector.getFieldType());
-						String propertyName = stripNamespace(entityReflector.getPropertyName(), mapperType);
-						if(name.equalsIgnoreCase(propertyName))
+						if(entityReflector != null)
 						{
-							reflector = propertyReflector;
-							break;
+							String propertyName = stripNamespace(entityReflector.getPropertyName(), mapperType);
+							if(name.equalsIgnoreCase(propertyName))
+							{
+								reflector = propertyReflector;
+								break;
+							}
 						}
 					}
 				}

@@ -23,6 +23,7 @@ import roth.lib.java.reflector.MapperReflector;
 
 public abstract class Mapper implements Characters
 {
+	protected boolean prettyPrint = false;
 	protected MapperType mapperType;
 	protected MapperReflector mapperReflector;
 	protected MapperConfig mapperConfig;
@@ -36,6 +37,11 @@ public abstract class Mapper implements Characters
 		this.mapperType = mapperType;
 		this.mapperReflector = mapperReflector != null ? mapperReflector : MapperReflector.get();
 		this.mapperConfig = mapperConfig != null ? mapperConfig : MapperConfig.get();
+	}
+	
+	public boolean isPrettyPrint()
+	{
+		return prettyPrint;
 	}
 	
 	public MapperType getMapperType()
@@ -76,6 +82,12 @@ public abstract class Mapper implements Characters
 	public int getTabs()
 	{
 		return tabs;
+	}
+	
+	public Mapper setPrettyPrint(boolean prettyPrint)
+	{
+		this.prettyPrint = prettyPrint;
+		return this;
 	}
 	
 	public Mapper setMapperReflector(MapperReflector mapperReflector)

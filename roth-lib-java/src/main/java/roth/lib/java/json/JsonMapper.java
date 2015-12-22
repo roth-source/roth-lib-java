@@ -366,7 +366,7 @@ public class JsonMapper extends Mapper
 	
 	protected void writeNewLine(Writer writer) throws IOException
 	{
-		if(getMapperConfig().isPrettyPrinting())
+		if(isPrettyPrint())
 		{
 			writer.write(NEW_LINE);
 			for(int i = 0; i < getTabs(); i++)

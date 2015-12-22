@@ -7,6 +7,7 @@ import java.lang.reflect.Parameter;
 import roth.lib.java.net.http.HttpMethod;
 import roth.lib.java.service.HttpService;
 import roth.lib.java.service.annotation.ServiceMethod;
+import roth.lib.java.util.AnnotationUtil;
 
 public class MethodReflector
 {
@@ -21,14 +22,24 @@ public class MethodReflector
 		this.serviceMethod = serviceMethod;
 	}
 	
+	public String getMethodName()
+	{
+		String name = getName();
+		if(name == null)
+		{
+			name = method.getName();
+		}
+		return name;
+	}
+	
 	public String getName()
 	{
-		return serviceMethod.name();
+		return AnnotationUtil.validate(serviceMethod.name());
 	}
 	
 	public String getContext()
 	{
-		return serviceMethod.context();
+		return  AnnotationUtil.validate(serviceMethod.context());
 	}
 	
 	public boolean isAjax()

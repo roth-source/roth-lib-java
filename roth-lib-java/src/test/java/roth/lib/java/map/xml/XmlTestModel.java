@@ -200,8 +200,8 @@ public class XmlTestModel extends XmlModel
 	@Override
 	public String toString()
 	{
-		MapperConfig mapperConfig = new MapperConfig().setPrettyPrinting(true).setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
-		return new XmlMapper(mapperConfig).serialize(this);
+		MapperConfig mapperConfig = new MapperConfig().setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
+		return new XmlMapper(mapperConfig).setPrettyPrint(true).serialize(this);
 	}
 	
 }

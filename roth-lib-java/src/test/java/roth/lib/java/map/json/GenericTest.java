@@ -6,7 +6,7 @@ import roth.lib.java.mapper.MapperConfig;
 
 public class GenericTest
 {
-	protected static MapperConfig mapperConfig = new MapperConfig().setPrettyPrinting(true).setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
+	protected static MapperConfig mapperConfig = new MapperConfig().setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
 	
 	public static void main(String[] args)
 	{
@@ -19,13 +19,13 @@ public class GenericTest
 	{
 		GenericModelOne<GenericModelTwo<GenericModelA, GenericModelB>> genericModel = new GenericModelOne<>();
 		genericModel.setValue(true).setModel(new GenericModelTwo<GenericModelA, GenericModelB>().setValue("test").setModel1(new GenericModelA().setValue(1234)).setModel2(new GenericModelB().setValue(1.234)));
-		new JsonMapper(mapperConfig).serialize(genericModel, System.out);
+		new JsonMapper(mapperConfig).setPrettyPrint(true).serialize(genericModel, System.out);
 	}
 	
 	protected static void deserialize()
 	{
 		String data = "{\"value\":true,\"model\":{\"value\":\"test\",\"model1\":{\"value\":1234},\"model2\":{\"value\":1.234}}}";
-		GenericModelOne<GenericModelTwo<GenericModelA, GenericModelB>> model = new JsonMapper(mapperConfig).deserialize(data, new Generic<GenericModelOne<GenericModelTwo<GenericModelA, GenericModelB>>>(){});
+		GenericModelOne<GenericModelTwo<GenericModelA, GenericModelB>> model = new JsonMapper(mapperConfig).setPrettyPrint(true).deserialize(data, new Generic<GenericModelOne<GenericModelTwo<GenericModelA, GenericModelB>>>(){});
 		System.out.println(model);
 	}
 	

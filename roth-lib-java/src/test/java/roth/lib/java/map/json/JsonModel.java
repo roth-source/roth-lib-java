@@ -562,8 +562,8 @@ public class JsonModel
 	@Override
 	public String toString()
 	{
-		MapperConfig mapperConfig = new MapperConfig().setPrettyPrinting(true).setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
-		return new JsonMapper(mapperConfig).serialize(this);
+		MapperConfig mapperConfig = new MapperConfig().setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
+		return new JsonMapper(mapperConfig).setPrettyPrint(true).serialize(this);
 	}
 	
 }
