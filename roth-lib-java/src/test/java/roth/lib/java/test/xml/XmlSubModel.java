@@ -1,4 +1,4 @@
-package roth.lib.java.map.xml;
+package roth.lib.java.test.xml;
 
 import java.util.Calendar;
 import java.util.Date;

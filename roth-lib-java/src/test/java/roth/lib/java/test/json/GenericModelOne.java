@@ -1,4 +1,4 @@
-package roth.lib.java.map.json;
+package roth.lib.java.test.json;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;

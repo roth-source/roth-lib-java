@@ -12,9 +12,6 @@ public class HttpServiceDev implements Serializable
 	@Property(name = "jsessionid")
 	protected String jsessionId;
 	
-	@Property(name = "csrfToken")
-	protected String csrfToken;
-	
 	public HttpServiceDev()
 	{
 		
@@ -24,21 +21,10 @@ public class HttpServiceDev implements Serializable
 	{
 		return jsessionId;
 	}
-	
-	public String getCsrfToken()
-	{
-		return csrfToken;
-	}
-	
+
 	public HttpServiceDev setJsessionId(String jsessionId)
 	{
 		this.jsessionId = jsessionId;
-		return this;
-	}
-	
-	public HttpServiceDev setCsrfToken(String csrfToken)
-	{
-		this.csrfToken = csrfToken;
 		return this;
 	}
 	

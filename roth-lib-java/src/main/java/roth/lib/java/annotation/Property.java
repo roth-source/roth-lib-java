@@ -48,7 +48,7 @@ public @interface Property
 	String tableName() default "";
 	
 	// VALIDATION
-	boolean required() default true;
+	boolean required() default false;
 	String[] filter() default {};
 	String[] validate() default {};
 	

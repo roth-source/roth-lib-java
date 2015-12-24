@@ -29,6 +29,7 @@ import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
 import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.MapperReflector;
+import roth.lib.java.reflector.PropertiesReflector;
 import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.serializer.Serializer;
 import roth.lib.java.serializer.TemporalSerializer;
@@ -119,12 +120,20 @@ public class JsonMapper extends Mapper
 		String seperator = BLANK;
 		for(PropertyReflector propertyReflector : entityReflector.getPropertyReflectors(getMapperType()))
 		{
-			if(!propertyReflector.isAttribute() || !hasContext() || !propertyReflector.getExcludes().contains(getContext()))
+			if(!propertyReflector.isAttribute() || !hasContext() || !propertyReflector.isExcluded(getContext()))
 			{
 				setTimeFormat(propertyReflector.getTimeFormat());
 				String propertyName = propertyReflector.getPropertyName(getMapperType());
 				Object propertyValue = getFieldValue(propertyReflector.getField(), value);
 				seperator = writeProperty(writer, propertyName, propertyValue, seperator, propertyReflector);
+			}
+		}
+		PropertiesReflector propertiesReflector = entityReflector.getPropertiesReflector();
+		if(propertiesReflector != null)
+		{
+			for(Entry<String, Object> entry : propertiesReflector.getMap(value).entrySet())
+			{
+				seperator = writeProperty(writer, entry.getKey(), entry.getValue(), seperator, null);
 			}
 		}
 		writeNewLine(writer);
@@ -165,6 +174,7 @@ public class JsonMapper extends Mapper
 					seperator = writeSeperator(writer, seperator);
 					writeNewLine(writer);
 					writePropertyName(writer, name);
+					writeNewLine(writer);
 					writeArray(writer, values);
 				}
 				else if(getMapperConfig().isSerializeEmptyArray())
@@ -235,10 +245,6 @@ public class JsonMapper extends Mapper
 	
 	protected void writeArray(Writer writer, Collection<?> values) throws IOException
 	{
-		if(getTabs() > 0)
-		{
-			writeNewLine(writer);
-		}
 		writer.write(LEFT_BRACKET);
 		String seperator = BLANK;
 		for(Object value : values)
@@ -544,6 +550,14 @@ public class JsonMapper extends Mapper
 								setDeserializedName(model, propertyReflector.getFieldName());
 							}
 						}
+						else
+						{
+							PropertiesReflector propertiesReflector = entityReflector.getPropertiesReflector();
+							if(propertiesReflector != null)
+							{
+								propertiesReflector.put(model, name, value);
+							}
+						}
 						name = null;
 					}
 					builder.setLength(0);
@@ -556,11 +570,15 @@ public class JsonMapper extends Mapper
 						PropertyReflector propertyReflector = entityReflector.getPropertyReflector(name, getMapperType(), getMapperReflector());
 						if(propertyReflector == null)
 						{
-							c = readUnmapped(reader);
-							name = null;
-							if(RIGHT_BRACE == c)
+							PropertiesReflector propertiesReflector = entityReflector.getPropertiesReflector();
+							if(propertiesReflector == null)
 							{
-								break read;
+								c = readUnmapped(reader);
+								name = null;
+								if(RIGHT_BRACE == c)
+								{
+									break read;
+								}
 							}
 						}
 					}
@@ -592,6 +610,14 @@ public class JsonMapper extends Mapper
 							{
 								field.set(model, null);
 								setDeserializedName(model, propertyReflector.getFieldName());
+							}
+						}
+						else
+						{
+							PropertiesReflector propertiesReflector = entityReflector.getPropertiesReflector();
+							if(propertiesReflector != null)
+							{
+								propertiesReflector.put(model, name, value);
 							}
 						}
 						name = null;
@@ -631,7 +657,12 @@ public class JsonMapper extends Mapper
 						}
 						else
 						{
-							// exception
+							LinkedHashMap<String, Object> value = readMap(reader, LinkedHashMap.class);
+							PropertiesReflector propertiesReflector = entityReflector.getPropertiesReflector();
+							if(propertiesReflector != null)
+							{
+								propertiesReflector.put(model, name, value);
+							}
 						}
 						builder.setLength(0);
 						name = null;
@@ -654,7 +685,12 @@ public class JsonMapper extends Mapper
 						}
 						else
 						{
-							// exception
+							LinkedList<Object> value = readCollection(reader, LinkedList.class);
+							PropertiesReflector propertiesReflector = entityReflector.getPropertiesReflector();
+							if(propertiesReflector != null)
+							{
+								propertiesReflector.put(model, name, value);
+							}
 						}
 						name = null;
 					}
@@ -876,13 +912,28 @@ public class JsonMapper extends Mapper
 				case QUOTE:
 				case SINGLE_QUOTE:
 				{
-					Deserializer<?> deserializer = getMapperConfig().getDeserializer(elementClass);
-					if(deserializer != null)
+					String value = readEscaped(reader, c);
+					if(value != null && !value.trim().isEmpty() && !NULL.equalsIgnoreCase(value))
 					{
-						Object value = deserializer.deserialize(readEscaped(reader, c), getTimeFormat(), elementClass);
-						if(value != null && elementClass.isAssignableFrom(value.getClass()))
+						Deserializer<?> deserializer = getMapperConfig().getDeserializer(elementClass);
+						if(deserializer != null)
 						{
-							collection.add((E) value);
+							Object object = deserializer.deserialize(value, getTimeFormat(), elementClass);
+							if(object != null && elementClass.isAssignableFrom(object.getClass()))
+							{
+								collection.add((E) object);
+							}
+						}
+						else
+						{
+							try
+							{
+								collection.add((E) value);
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
+							}
 						}
 					}
 					builder.setLength(0);
@@ -896,16 +947,27 @@ public class JsonMapper extends Mapper
 				case COMMA:
 				case RIGHT_BRACKET:
 				{
-					Deserializer<?> deserializer = getMapperConfig().getDeserializer(elementClass);
-					if(deserializer != null)
+					String value = builder.toString();
+					if(value != null && !value.trim().isEmpty() && !NULL.equalsIgnoreCase(value))
 					{
-						String value = builder.toString();
-						if(value != null && !value.trim().isEmpty() && !NULL.equalsIgnoreCase(value))
+						Deserializer<?> deserializer = getMapperConfig().getDeserializer(elementClass);
+						if(deserializer != null)
 						{
 							Object object = deserializer.deserialize(value, getTimeFormat(), elementClass);
 							if(object != null && elementClass.isAssignableFrom(object.getClass()))
 							{
 								collection.add((E) object);
+							}
+						}
+						else
+						{
+							try
+							{
+								collection.add((E) value);
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
 							}
 						}
 					}
@@ -926,7 +988,7 @@ public class JsonMapper extends Mapper
 					{
 						value = readEntity(reader, elementClass);;
 					}
-					else if(isMap(elementType))
+					else
 					{
 						value = readMap(reader, elementClass);;
 					}
@@ -939,6 +1001,11 @@ public class JsonMapper extends Mapper
 				}
 				case LEFT_BRACKET:
 				{
+					Object value = readCollection(reader, elementClass);
+					if(value != null && elementClass.isAssignableFrom(value.getClass()))
+					{
+						collection.add((E) value);
+					}
 					builder.setLength(0);
 					break;
 				}

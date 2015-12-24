@@ -56,12 +56,6 @@ public class HttpServiceResponse implements Serializable
 		getDev().setJsessionId(jsessionId);
 		return this;
 	}
-
-	public HttpServiceResponse setCsrfToken(String csrfToken)
-	{
-		getDev().setCsrfToken(csrfToken);
-		return this;
-	}
 	
 	public HttpServiceResponse setErrors(LinkedList<HttpError> errors)
 	{

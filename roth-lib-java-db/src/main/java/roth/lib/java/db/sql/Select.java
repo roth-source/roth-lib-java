@@ -62,6 +62,46 @@ public class Select extends Sql
 		return this;
 	}
 	
+	public Select columnSql(String sql)
+	{
+		return column(Column.sql(sql));
+	}
+	
+	public Select columnSqlAs(String sql, String alias)
+	{
+		return column(Column.sqlAs(sql, alias));
+	}
+	
+	public Select column(String name)
+	{
+		return column(Column.name(name));
+	}
+	
+	public Select columnAs(String name, String alias)
+	{
+		return column(Column.nameAs(name, alias));
+	}
+	
+	public Select column(String table, String name)
+	{
+		return column(Column.tableName(table, name));
+	}
+	
+	public Select columnAs(String table, String name, String alias)
+	{
+		return column(Column.tableNameAs(table, name, alias));
+	}
+	
+	public Select column(Column column)
+	{
+		if(columns == null)
+		{
+			columns = new Columns();
+		}
+		columns.add(column);
+		return this;
+	}
+	
 	public boolean hasTable()
 	{
 		return table != null;
@@ -70,7 +110,6 @@ public class Select extends Sql
 	public Select table(Table table)
 	{
 		this.table = table;
-		columns = columns != null ? columns : new Columns(table.alias());
 		return this;
 	}
 	
@@ -929,8 +968,8 @@ public class Select extends Sql
 	
 	public String toString(boolean end)
 	{
-		if(columns == null) throw new IllegalArgumentException("columns cannot be null");
 		if(table == null) throw new IllegalArgumentException("table cannot be null");
+		columns = columns != null ? columns : new Columns(table.alias());
 		StringBuilder builder = new StringBuilder();
 		builder.append(columns);
 		builder.append(table);

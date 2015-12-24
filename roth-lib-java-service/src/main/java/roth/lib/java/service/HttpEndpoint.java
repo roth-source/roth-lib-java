@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import roth.lib.java.Characters;
 import roth.lib.java.mapper.Mapper;
 import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
@@ -33,13 +34,15 @@ import roth.lib.java.validate.Filterer;
 import roth.lib.java.validate.Validator;
 
 @SuppressWarnings("serial")
-public abstract class HttpEndpoint extends HttpServlet
+public abstract class HttpEndpoint extends HttpServlet implements Characters
 {
 	protected static String ORIGIN 								= "Origin";
 	protected static String ANY 								= "*";
+	protected static String X_CSRF_TOKEN						= "X-Csrf-Token";
 	protected static String ACCESS_CONTROL_ALLOW_ORIGIN 		= "Access-Control-Allow-Origin";
 	protected static String ACCESS_CONTROL_ALLOW_CREDENTIALS 	= "Access-Control-Allow-Credentials";
 	protected static String ACCESS_CONTROL_ALLOW_METHODS 		= "Access-Control-Allow-Methods";
+	protected static String ACCESS_CONTROL_EXPOSE_HEADERS 		= "Access-Control-Expose-Headers";
 	protected static String CONTENT_TYPE 						= "Content-Type";
 	protected static String ACCEPT		 						= "Accept";
 	protected static String ALLOWED_METHODS 					= "GET, POST";
@@ -84,6 +87,7 @@ public abstract class HttpEndpoint extends HttpServlet
 	protected void service(HttpServletRequest request, HttpServletResponse response)
 	{
 		Object methodResponse = null;
+		String debugRequest = "";
 		LinkedList<HttpError> errors = new LinkedList<HttpError>();
 		MimeType requestContentType = getRequestContentType(request, response);
 		MimeType responseContentType = getResponseContentType(request, response);
@@ -105,6 +109,7 @@ public abstract class HttpEndpoint extends HttpServlet
 					response.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, ANY);
 				}
 				response.setHeader(ACCESS_CONTROL_ALLOW_METHODS, ALLOWED_METHODS);
+				response.setHeader(ACCESS_CONTROL_EXPOSE_HEADERS, X_CSRF_TOKEN);
 				HttpMethod httpMethod = HttpMethod.fromString(request.getMethod());
 				if(httpMethod != null)
 				{
@@ -143,10 +148,11 @@ public abstract class HttpEndpoint extends HttpServlet
 													requestMapper = getRequestMapper(request, response, requestContentType);
 													service.setRequestMapper(requestMapper);
 													methodRequest = requestMapper.setContext(methodReflector.getContext()).deserialize(input, methodParameterType);
+													errors.addAll(validate(request, response, methodRequest, requestMapper.getMapperType()));
 												}
 												if(dev)
 												{
-													debugRequest(request, methodRequest, requestMapper);
+													debugRequest = getDebugRequest(request, methodRequest, requestMapper);
 												}
 												boolean validCsrf = !(ajaxAuthenticated && methodReflector.isAuthenticated() && !service.isValidCsrfToken(methodRequest, dev));
 												if(validCsrf)
@@ -154,8 +160,6 @@ public abstract class HttpEndpoint extends HttpServlet
 													boolean authorized = service.isAuthorized(methodReflector, methodRequest);
 													if(authorized)
 													{
-														//errors.addAll(service.validate(methodRequest));
-														// TODO validate request
 														if(errors.isEmpty())
 														{
 															service.setResponseContentType(responseContentType);
@@ -269,11 +273,6 @@ public abstract class HttpEndpoint extends HttpServlet
 				if(session != null)
 				{
 					serviceResponse.setJsessionId(session.getId());
-					Object csrfTokenObject = session.getAttribute(HttpService.CSRF_TOKEN);
-					if(csrfTokenObject != null && csrfTokenObject instanceof String)
-					{
-						serviceResponse.setCsrfToken((String) csrfTokenObject);
-					}
 				}
 			}
 			try(OutputStream output = response.getOutputStream())
@@ -287,7 +286,7 @@ public abstract class HttpEndpoint extends HttpServlet
 		}
 		if(dev)
 		{
-			debugResponse(response, methodResponse, responseMapper);
+			System.out.println(debugRequest + getDebugResponse(response, methodResponse, responseMapper));
 		}
 	}
 	
@@ -490,46 +489,100 @@ public abstract class HttpEndpoint extends HttpServlet
 		return mapper;
 	}
 	
-	protected void debugRequest(HttpServletRequest request, Object methodRequest, Mapper mapper)
+	protected LinkedList<HttpError> validate(HttpServletRequest request, HttpServletResponse response, Object value, MapperType mapperType)
 	{
-		System.out.println();
-		System.out.println();
-		System.out.println("REQUEST");
-		System.out.println("----------------------------------");
-		System.out.println(request.getMethod() + " " + request.getRequestURI());
+		LinkedList<HttpError> errors = new LinkedList<HttpError>();
+		if(value != null)
+		{
+			/*
+			EntityReflector entityReflector = getMapperReflector().getEntityReflector(value.getClass());
+			for(PropertyReflector propertyReflector : entityReflector.getPropertyReflectors(mapperType))
+			{
+				try
+				{
+					String propertyName = propertyReflector.getPropertyName(mapperType);
+					Object propertyValue = propertyReflector.getField().get(value);
+					for(String filter : propertyReflector.getFilters())
+					{
+						Filterer filterer = filtererMap.get(filter);
+						if(filterer != null)
+						{
+							propertyValue = filterer.filter(propertyValue);
+						}
+					}
+					for(String validate : propertyReflector.getValidates())
+					{
+						
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			*/
+		}
+		return errors;
+	}
+	
+	protected String getDebugRequest(HttpServletRequest request, Object methodRequest, Mapper mapper)
+	{
+		StringBuilder builder = new StringBuilder();
+		builder.append(NEW_LINE);
+		builder.append(NEW_LINE);
+		builder.append("REQUEST");
+		builder.append(NEW_LINE);
+		builder.append("----------------------------------");
+		builder.append(NEW_LINE);
+		builder.append(request.getMethod());
+		builder.append(SPACE);
+		builder.append(request.getRequestURI());
+		builder.append(NEW_LINE);
 		Enumeration<String> names = request.getHeaderNames();
 		while(names.hasMoreElements())
 		{
 			String name = names.nextElement();
-			String value = request.getHeader(name);
-			System.out.println(name + ": " + value);
+			builder.append(name);
+			builder.append(": ");
+			builder.append(request.getHeader(name));
+			builder.append(NEW_LINE);
 		}
-		System.out.println();
+		builder.append(NEW_LINE);
 		if(methodRequest != null && mapper != null)
 		{
-			System.out.println(mapper.setPrettyPrint(true).serialize(methodRequest));
-			System.out.println();
+			builder.append(mapper.setPrettyPrint(true).serialize(methodRequest));
+			builder.append(NEW_LINE);
+			builder.append(NEW_LINE);
 		}
+		return builder.toString();
 	}
 	
-	protected void debugResponse(HttpServletResponse response, Object methodResponse, Mapper mapper)
+	protected String getDebugResponse(HttpServletResponse response, Object methodResponse, Mapper mapper)
 	{
-		System.out.println();
-		System.out.println();
-		System.out.println("RESPONSE");
-		System.out.println("----------------------------------");
-		System.out.println(response.getStatus());
+		StringBuilder builder = new StringBuilder();
+		builder.append(NEW_LINE);
+		builder.append(NEW_LINE);
+		builder.append("RESPONSE");
+		builder.append(NEW_LINE);
+		builder.append("----------------------------------");
+		builder.append(NEW_LINE);
+		builder.append(response.getStatus());
+		builder.append(NEW_LINE);
 		for(String name : response.getHeaderNames())
 		{
-			String value = response.getHeader(name);
-			System.out.println(name + ": " + value);
+			builder.append(name);
+			builder.append(": ");
+			builder.append(response.getHeader(name));
+			builder.append(NEW_LINE);
 		}
-		System.out.println();
+		builder.append(NEW_LINE);
 		if(methodResponse != null && mapper != null)
 		{
-			System.out.println(mapper.setPrettyPrint(true).serialize(methodResponse));
-			System.out.println();
+			builder.append(mapper.setPrettyPrint(true).serialize(methodResponse));
+			builder.append(NEW_LINE);
+			builder.append(NEW_LINE);
 		}
+		return builder.toString();
 	}
 	
 }

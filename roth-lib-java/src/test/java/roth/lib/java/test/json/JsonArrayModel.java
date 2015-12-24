@@ -1,4 +1,4 @@
-package roth.lib.java.map.json;
+package roth.lib.java.test.json;
 
 import java.util.Arrays;
 import java.util.LinkedList;
