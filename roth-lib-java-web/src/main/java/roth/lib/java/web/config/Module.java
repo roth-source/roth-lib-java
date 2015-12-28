@@ -15,8 +15,9 @@ public class Module extends Page
 	
 	public Module()
 	{
-		params = new LinkedList<LinkedHashMap<String, String>>();
+		LinkedList<LinkedHashMap<String, String>> params = new LinkedList<LinkedHashMap<String, String>>();
 		params.add(new LinkedHashMap<String, String>());
+		properties.put("params", params);
 	}
 
 	public LinkedHashMap<String, Page> getPageMap()

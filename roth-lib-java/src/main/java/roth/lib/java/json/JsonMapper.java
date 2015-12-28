@@ -118,6 +118,14 @@ public class JsonMapper extends Mapper
 	{
 		writer.write(LEFT_BRACE);
 		String seperator = BLANK;
+		PropertiesReflector propertiesReflector = entityReflector.getPropertiesReflector();
+		if(propertiesReflector != null && propertiesReflector.isFirst())
+		{
+			for(Entry<String, Object> entry : propertiesReflector.getMap(value).entrySet())
+			{
+				seperator = writeProperty(writer, entry.getKey(), entry.getValue(), seperator, null);
+			}
+		}
 		for(PropertyReflector propertyReflector : entityReflector.getPropertyReflectors(getMapperType()))
 		{
 			if(!propertyReflector.isAttribute() || !hasContext() || !propertyReflector.isExcluded(getContext()))
@@ -128,8 +136,7 @@ public class JsonMapper extends Mapper
 				seperator = writeProperty(writer, propertyName, propertyValue, seperator, propertyReflector);
 			}
 		}
-		PropertiesReflector propertiesReflector = entityReflector.getPropertiesReflector();
-		if(propertiesReflector != null)
+		if(propertiesReflector != null && !propertiesReflector.isFirst())
 		{
 			for(Entry<String, Object> entry : propertiesReflector.getMap(value).entrySet())
 			{

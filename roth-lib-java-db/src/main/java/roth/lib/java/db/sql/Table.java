@@ -7,21 +7,33 @@ public class Table extends Sql
 	
 	protected String name;
 	protected String alias;
+	protected Index index;
 	
-	protected Table(String name, String alias)
+	protected Table(String name, String alias, Index index)
 	{
 		this.name = name;
 		this.alias = alias;
+		this.index = index;
 	}
 	
 	public static Table name(String name)
 	{
-		return new Table(name, null);
+		return new Table(name, null, null);
 	}
 	
 	public static Table nameAs(String name, String alias)
 	{
-		return new Table(name, alias);
+		return new Table(name, alias, null);
+	}
+	
+	public static Table name(String name, Index index)
+	{
+		return new Table(name, null, index);
+	}
+	
+	public static Table nameAs(String name, String alias, Index index)
+	{
+		return new Table(name, alias, index);
 	}
 	
 	public String alias()
@@ -32,7 +44,7 @@ public class Table extends Sql
 	@Override
 	public String toString()
 	{
-		return LF + FROM + tick(name) + (alias != null ? AS + tick(alias) : "");
+		return LF + FROM + tick(name) + (alias != null ? AS + tick(alias) : "") + (index != null ? index.toString() : "");
 	}
 	
 }

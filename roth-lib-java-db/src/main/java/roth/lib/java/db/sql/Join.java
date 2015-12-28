@@ -23,17 +23,17 @@ public class Join extends Sql
 		this.values = values;
 	}
 	
-	protected static Join join(JoinType joinType, String name, String alias, On...ons)
+	protected static Join join(JoinType joinType, String name, String alias, Index index, On...ons)
 	{
-		return new Join(joinType.get() + tick(name) + (alias != null ? AS + tick(alias) : "") + ON + list(Arrays.asList(values(ons)), AND));
+		return new Join(joinType.get() + tick(name) + (alias != null ? AS + tick(alias) : "") + (index != null ? index.toString() : "") + ON + list(Arrays.asList(values(ons)), AND));
 	}
 	
-	protected static Join join(JoinType joinType, String name, String alias, String...ons)
+	protected static Join join(JoinType joinType, String name, String alias, Index index, String...ons)
 	{
-		return new Join(joinType.get() + tick(name) + (alias != null ? AS + tick(alias) : "") + ON + list(Arrays.asList(ons), AND));
+		return new Join(joinType.get() + tick(name) + (alias != null ? AS + tick(alias) : "") + (index != null ? index.toString() : "") + ON + list(Arrays.asList(ons), AND));
 	}
 	
-	protected static Join join(JoinType joinType, Select select, String alias, String...ons)
+	protected static Join join(JoinType joinType, Select select, String alias, Index index, String...ons)
 	{
 		StringBuilder builder = new StringBuilder();
 		builder.append(joinType.get());
@@ -44,6 +44,7 @@ public class Join extends Sql
 		builder.append("        ) ");
 		builder.append(AS);
 		builder.append(tick(alias));
+		builder.append(index != null ? index.toString() : "");
 		builder.append(ON);
 		builder.append(list(Arrays.asList(ons), AND));
 		return new Join(builder.toString(), select.values());
@@ -51,127 +52,252 @@ public class Join extends Sql
 	
 	public static Join join(String table, On...ons)
 	{
-		return join(JoinType.JOIN, table, null, ons);
+		return join(JoinType.JOIN, table, null, null, ons);
 	}
 	
 	public static Join joinAs(String table, String alias, On...ons)
 	{
-		return join(JoinType.JOIN, table, alias, ons);
+		return join(JoinType.JOIN, table, alias, null, ons);
 	}
 	
 	public static Join join(String table, String...ons)
 	{
-		return join(JoinType.JOIN, table, null, ons);
+		return join(JoinType.JOIN, table, null, null, ons);
 	}
 	
 	public static Join joinAs(String table, String alias, String...ons)
 	{
-		return join(JoinType.JOIN, table, alias, ons);
+		return join(JoinType.JOIN, table, alias, null, ons);
 	}
 	
 	public static Join joinAs(Select select, String alias, String...ons)
 	{
-		return join(JoinType.JOIN, select, alias, ons);
+		return join(JoinType.JOIN, select, alias, null, ons);
+	}
+
+	public static Join join(String table, Index index, On...ons)
+	{
+		return join(JoinType.JOIN, table, null, index, ons);
+	}
+	
+	public static Join joinAs(String table, String alias, Index index, On...ons)
+	{
+		return join(JoinType.JOIN, table, alias, index, ons);
+	}
+	
+	public static Join join(String table, Index index, String...ons)
+	{
+		return join(JoinType.JOIN, table, null, index, ons);
+	}
+	
+	public static Join joinAs(String table, String alias, Index index, String...ons)
+	{
+		return join(JoinType.JOIN, table, alias, index, ons);
+	}
+	
+	public static Join joinAs(Select select, String alias, Index index, String...ons)
+	{
+		return join(JoinType.JOIN, select, alias, index, ons);
 	}
 	
 	public static Join inner(String table, On...ons)
 	{
-		return join(JoinType.INNER_JOIN, table, null, ons);
+		return join(JoinType.INNER_JOIN, table, null, null, ons);
 	}
 	
 	public static Join innerAs(String table, String alias, On...ons)
 	{
-		return join(JoinType.INNER_JOIN, table, alias, ons);
+		return join(JoinType.INNER_JOIN, table, alias, null, ons);
 	}
 	
 	public static Join inner(String table, String...ons)
 	{
-		return join(JoinType.INNER_JOIN, table, null, ons);
+		return join(JoinType.INNER_JOIN, table, null, null, ons);
 	}
 	
 	public static Join innerAs(String table, String alias, String...ons)
 	{
-		return join(JoinType.INNER_JOIN, table, alias, ons);
+		return join(JoinType.INNER_JOIN, table, alias, null, ons);
 	}
 	
 	public static Join innerAs(Select select, String alias, String...ons)
 	{
-		return join(JoinType.INNER_JOIN, select, alias, ons);
+		return join(JoinType.INNER_JOIN, select, alias, null, ons);
+	}
+	
+	public static Join inner(String table, Index index, On...ons)
+	{
+		return join(JoinType.INNER_JOIN, table, null, index, ons);
+	}
+	
+	public static Join innerAs(String table, String alias, Index index, On...ons)
+	{
+		return join(JoinType.INNER_JOIN, table, alias, index, ons);
+	}
+	
+	public static Join inner(String table, Index index, String...ons)
+	{
+		return join(JoinType.INNER_JOIN, table, null, index, ons);
+	}
+	
+	public static Join innerAs(String table, String alias, Index index, String...ons)
+	{
+		return join(JoinType.INNER_JOIN, table, alias, index, ons);
+	}
+	
+	public static Join innerAs(Select select, String alias, Index index, String...ons)
+	{
+		return join(JoinType.INNER_JOIN, select, alias, index, ons);
 	}
 	
 	public static Join left(String table, On...ons)
 	{
-		return join(JoinType.LEFT_JOIN, table, null, ons);
+		return join(JoinType.LEFT_JOIN, table, null, null, ons);
 	}
 	
 	public static Join leftAs(String table, String alias, On...ons)
 	{
-		return join(JoinType.LEFT_JOIN, table, alias, ons);
+		return join(JoinType.LEFT_JOIN, table, alias, null, ons);
 	}
 	
 	public static Join left(String table, String...ons)
 	{
-		return join(JoinType.LEFT_JOIN, table, null, ons);
+		return join(JoinType.LEFT_JOIN, table, null, null, ons);
 	}
 	
 	public static Join leftAs(String table, String alias, String...ons)
 	{
-		return join(JoinType.LEFT_JOIN, table, alias, ons);
+		return join(JoinType.LEFT_JOIN, table, alias, null, ons);
 	}
 	
 	public static Join leftAs(Select select, String alias, String...ons)
 	{
-		return join(JoinType.LEFT_JOIN, select, alias, ons);
+		return join(JoinType.LEFT_JOIN, select, alias, null, ons);
+	}
+	
+	public static Join left(String table, Index index, On...ons)
+	{
+		return join(JoinType.LEFT_JOIN, table, null, index, ons);
+	}
+	
+	public static Join leftAs(String table, String alias, Index index, On...ons)
+	{
+		return join(JoinType.LEFT_JOIN, table, alias, index, ons);
+	}
+	
+	public static Join left(String table, Index index, String...ons)
+	{
+		return join(JoinType.LEFT_JOIN, table, null, index, ons);
+	}
+	
+	public static Join leftAs(String table, String alias, Index index, String...ons)
+	{
+		return join(JoinType.LEFT_JOIN, table, alias, index, ons);
+	}
+	
+	public static Join leftAs(Select select, String alias, Index index, String...ons)
+	{
+		return join(JoinType.LEFT_JOIN, select, alias, index, ons);
 	}
 	
 	public static Join right(String table, On...ons)
 	{
-		return join(JoinType.RIGHT_JOIN, table, null, ons);
+		return join(JoinType.RIGHT_JOIN, table, null, null, ons);
 	}
 	
 	public static Join rightAs(String table, String alias, On...ons)
 	{
-		return join(JoinType.RIGHT_JOIN, table, alias, ons);
+		return join(JoinType.RIGHT_JOIN, table, alias, null, ons);
 	}
 	
 	public static Join right(String table, String...ons)
 	{
-		return join(JoinType.RIGHT_JOIN, table, null, ons);
+		return join(JoinType.RIGHT_JOIN, table, null, null, ons);
 	}
 	
 	public static Join rightAs(String table, String alias, String...ons)
 	{
-		return join(JoinType.RIGHT_JOIN, table, alias, ons);
+		return join(JoinType.RIGHT_JOIN, table, alias, null, ons);
 	}
 	
 	public static Join rightAs(Select select, String alias, String...ons)
 	{
-		return join(JoinType.RIGHT_JOIN, select, alias, ons);
+		return join(JoinType.RIGHT_JOIN, select, alias, null, ons);
+	}
+	
+	public static Join right(String table, Index index, On...ons)
+	{
+		return join(JoinType.RIGHT_JOIN, table, null, index, ons);
+	}
+	
+	public static Join rightAs(String table, String alias, Index index, On...ons)
+	{
+		return join(JoinType.RIGHT_JOIN, table, alias, index, ons);
+	}
+	
+	public static Join right(String table, Index index, String...ons)
+	{
+		return join(JoinType.RIGHT_JOIN, table, null, index, ons);
+	}
+	
+	public static Join rightAs(String table, String alias, Index index, String...ons)
+	{
+		return join(JoinType.RIGHT_JOIN, table, alias, index, ons);
+	}
+	
+	public static Join rightAs(Select select, String alias, Index index, String...ons)
+	{
+		return join(JoinType.RIGHT_JOIN, select, alias, index, ons);
 	}
 	
 	public static Join outer(String table, On...ons)
 	{
-		return join(JoinType.OUTER_JOIN, table, null, ons);
+		return join(JoinType.OUTER_JOIN, table, null, null, ons);
 	}
 	
 	public static Join outerAs(String table, String alias, On...ons)
 	{
-		return join(JoinType.OUTER_JOIN, table, alias, ons);
+		return join(JoinType.OUTER_JOIN, table, alias, null, ons);
 	}
 	
 	public static Join outer(String table, String...ons)
 	{
-		return join(JoinType.OUTER_JOIN, table, null, ons);
+		return join(JoinType.OUTER_JOIN, table, null, null, ons);
 	}
 	
 	public static Join outerAs(String table, String alias, String...ons)
 	{
-		return join(JoinType.OUTER_JOIN, table, alias, ons);
+		return join(JoinType.OUTER_JOIN, table, alias, null, ons);
 	}
 	
 	public static Join outerAs(Select select, String alias, String...ons)
 	{
-		return join(JoinType.OUTER_JOIN, select, alias, ons);
+		return join(JoinType.OUTER_JOIN, select, alias, null, ons);
+	}
+	
+	public static Join outer(String table, Index index, On...ons)
+	{
+		return join(JoinType.OUTER_JOIN, table, null, index, ons);
+	}
+	
+	public static Join outerAs(String table, String alias, Index index, On...ons)
+	{
+		return join(JoinType.OUTER_JOIN, table, alias, index, ons);
+	}
+	
+	public static Join outer(String table, Index index, String...ons)
+	{
+		return join(JoinType.OUTER_JOIN, table, null, index, ons);
+	}
+	
+	public static Join outerAs(String table, String alias, Index index, String...ons)
+	{
+		return join(JoinType.OUTER_JOIN, table, alias, index, ons);
+	}
+	
+	public static Join outerAs(Select select, String alias, Index index, String...ons)
+	{
+		return join(JoinType.OUTER_JOIN, select, alias, index, ons);
 	}
 	
 	public static Join sql(String sql)

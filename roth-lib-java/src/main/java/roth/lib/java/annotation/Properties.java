@@ -10,5 +10,6 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface Properties
 {
+	boolean first() default false;
 	
 }

@@ -41,6 +41,18 @@ public class Select extends Sql
 		tableAs(table, alias);
 	}
 	
+	public Select(Columns columns, String table, Index index)
+	{
+		columns(columns);
+		table(table, index);
+	}
+	
+	public Select(Columns columns, String table, String alias, Index index)
+	{
+		columns(columns);
+		tableAs(table, alias, index);
+	}
+	
 	public Select(Table table)
 	{
 		table(table);
@@ -54,6 +66,16 @@ public class Select extends Sql
 	public Select(String table, String alias)
 	{
 		tableAs(table, alias);
+	}
+	
+	public Select(String table, Index index)
+	{
+		table(table, index);
+	}
+	
+	public Select(String table, String alias, Index index)
+	{
+		tableAs(table, alias, index);
 	}
 	
 	public Select columns(Columns columns)
@@ -123,6 +145,16 @@ public class Select extends Sql
 		return table(Table.nameAs(name, alias));
 	}
 	
+	public Select table(String name, Index index)
+	{
+		return table(Table.name(name, index));
+	}
+	
+	public Select tableAs(String name, String alias, Index index)
+	{
+		return table(Table.nameAs(name, alias, index));
+	}
+	
 	public Select joins(Joins joins)
 	{
 		this.joins = joins;
@@ -189,6 +221,56 @@ public class Select extends Sql
 	public Select joinOuterAs(String table1, String alias, String name1, String table2, String name2)
 	{
 		return join(Join.outerAs(table1, alias, Join.on(alias, name1, table2, name2)));
+	}
+	
+	public Select join(String table1, String name1, String table2, String name2, Index index)
+	{
+		return join(Join.join(table1, index, Join.on(table1, name1, table2, name2)));
+	}
+	
+	public Select joinAs(String table1, String alias, String name1, String table2, String name2, Index index)
+	{
+		return join(Join.joinAs(table1, alias, index, Join.on(alias, name1, table2, name2)));
+	}
+	
+	public Select joinInner(String table1, String name1, String table2, String name2, Index index)
+	{
+		return join(Join.inner(table1, index, Join.on(table1, name1, table2, name2)));
+	}
+	
+	public Select joinInnerAs(String table1, String alias, String name1, String table2, String name2, Index index)
+	{
+		return join(Join.innerAs(table1, alias, index, Join.on(alias, name1, table2, name2)));
+	}
+	
+	public Select joinLeft(String table1, String name1, String table2, String name2, Index index)
+	{
+		return join(Join.left(table1, index, Join.on(table1, name1, table2, name2)));
+	}
+	
+	public Select joinLeftAs(String table1, String alias, String name1, String table2, String name2, Index index)
+	{
+		return join(Join.leftAs(table1, alias, index, Join.on(alias, name1, table2, name2)));
+	}
+	
+	public Select joinRight(String table1, String name1, String table2, String name2, Index index)
+	{
+		return join(Join.right(table1, index, Join.on(table1, name1, table2, name2)));
+	}
+	
+	public Select joinRightAs(String table1, String alias, String name1, String table2, String name2, Index index)
+	{
+		return join(Join.rightAs(table1, alias, index, Join.on(alias, name1, table2, name2)));
+	}
+	
+	public Select joinOuter(String table1, String name1, String table2, String name2, Index index)
+	{
+		return join(Join.outer(table1, index, Join.on(table1, name1, table2, name2)));
+	}
+	
+	public Select joinOuterAs(String table1, String alias, String name1, String table2, String name2, Index index)
+	{
+		return join(Join.outerAs(table1, alias, index, Join.on(alias, name1, table2, name2)));
 	}
 	
 	public Select wheres(Wheres wheres)

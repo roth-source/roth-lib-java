@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import roth.lib.java.annotation.Properties;
 import roth.lib.java.util.ReflectionUtil;
 
 public class PropertiesReflector
@@ -12,13 +13,15 @@ public class PropertiesReflector
 	protected EntityReflector entityReflector;
 	protected Field field;
 	protected Type fieldType;
+	protected Properties properties;
 	
-	public PropertiesReflector(EntityReflector entityReflector, Field field)
+	public PropertiesReflector(EntityReflector entityReflector, Field field, Properties properties)
 	{
 		field.setAccessible(true);
 		this.entityReflector = entityReflector;
 		this.field = field;
 		this.fieldType = ReflectionUtil.getGenericType(entityReflector.getType(), field.getGenericType());
+		this.properties = properties;
 	}
 	
 	public EntityReflector getEntityReflector()
@@ -44,6 +47,16 @@ public class PropertiesReflector
 	public Class<?> getFieldClass()
 	{
 		return ReflectionUtil.getTypeClass(fieldType);
+	}
+	
+	public Properties getProperties()
+	{
+		return properties;
+	}
+	
+	public boolean isFirst()
+	{
+		return properties.first();
 	}
 	
 	@SuppressWarnings("unchecked")

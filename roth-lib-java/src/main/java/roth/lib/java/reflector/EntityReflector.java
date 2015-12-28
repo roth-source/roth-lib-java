@@ -45,14 +45,14 @@ public class EntityReflector
 					Properties properties = field.getDeclaredAnnotation(Properties.class);
 					if(properties != null)
 					{
-						propertiesReflector = new PropertiesReflector(this, field);
+						propertiesReflector = new PropertiesReflector(this, field, properties);
 					}
 					else
 					{
 						Attributes attributes = field.getDeclaredAnnotation(Attributes.class);
 						if(attributes != null)
 						{
-							attributesReflector = new AttributesReflector(this, field);
+							attributesReflector = new AttributesReflector(this, field, attributes);
 						}
 					}
 				}
