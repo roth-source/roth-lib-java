@@ -42,9 +42,9 @@ public class Index extends Sql
 	
 	public static enum IndexType
 	{
-		FORCE		(" FORCE "),
-		USE			(" USE "),
-		IGNORE  	(" IGNORE "),
+		FORCE		(" FORCE"),
+		USE			(" USE"),
+		IGNORE  	(" IGNORE"),
 		;
 		
 		final String name;

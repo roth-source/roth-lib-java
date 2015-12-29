@@ -11,6 +11,7 @@ import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -25,13 +26,18 @@ import roth.lib.java.mapper.Mapper;
 import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
 import roth.lib.java.net.http.HttpMethod;
+import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.MapperReflector;
+import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.service.annotation.Service;
 import roth.lib.java.service.reflector.MethodReflector;
 import roth.lib.java.service.reflector.ServiceReflector;
 import roth.lib.java.type.MimeType;
+import roth.lib.java.util.EnumUtil;
+import roth.lib.java.util.ReflectionUtil;
 import roth.lib.java.validate.Filterer;
 import roth.lib.java.validate.Validator;
+import roth.lib.java.validate.ValidatorException;
 
 @SuppressWarnings("serial")
 public abstract class HttpEndpoint extends HttpServlet implements Characters
@@ -73,7 +79,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		}
 	}
 	
-	public static void filter(String name, Filterer filterer)
+	public static void filterer(String name, Filterer filterer)
 	{
 		filtererMap.put(name, filterer);
 	}
@@ -491,36 +497,111 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 	
 	protected LinkedList<HttpError> validate(HttpServletRequest request, HttpServletResponse response, Object value, MapperType mapperType)
 	{
+		return validate(request, response, value, mapperType, BLANK);
+	}
+	
+	protected LinkedList<HttpError> validate(HttpServletRequest request, HttpServletResponse response, Object value, MapperType mapperType, String path)
+	{
 		LinkedList<HttpError> errors = new LinkedList<HttpError>();
 		if(value != null)
 		{
-			/*
 			EntityReflector entityReflector = getMapperReflector().getEntityReflector(value.getClass());
-			for(PropertyReflector propertyReflector : entityReflector.getPropertyReflectors(mapperType))
+			if(entityReflector != null)
 			{
-				try
+				for(PropertyReflector propertyReflector : entityReflector.getPropertyReflectors(mapperType))
 				{
-					String propertyName = propertyReflector.getPropertyName(mapperType);
-					Object propertyValue = propertyReflector.getField().get(value);
-					for(String filter : propertyReflector.getFilters())
+					try
 					{
-						Filterer filterer = filtererMap.get(filter);
-						if(filterer != null)
+						Type propertyType = propertyReflector.getFieldType();
+						String propertyName = propertyReflector.getPropertyName(mapperType);
+						Object propertyValue = propertyReflector.getField().get(value);
+						if(ReflectionUtil.isArray(propertyType) || ReflectionUtil.isCollection(propertyType))
 						{
-							propertyValue = filterer.filter(propertyValue);
+							if(propertyValue != null)
+							{
+								int i = 0;
+								for(Object element : ReflectionUtil.asCollection(propertyValue))
+								{
+									errors.addAll(validate(request, response, element, mapperType, path + LEFT_BRACE + i + RIGHT_BRACE));
+									i++;
+								}
+							}
+						}
+						else if(ReflectionUtil.isMap(propertyType))
+						{
+							if(propertyValue != null)
+							{
+								for(Entry<?, ?> elementEntry : ReflectionUtil.asMap(propertyValue).entrySet())
+								{
+									String elementName = null;
+									Object elementKey = elementEntry.getKey();
+									if(elementKey != null)
+									{
+										if(elementKey instanceof Enum)
+										{
+											elementName = EnumUtil.toString((Enum<?>) elementKey);
+										}
+										else
+										{
+											elementName = elementKey.toString();
+										}
+									}
+									if(elementName != null)
+									{
+										errors.addAll(validate(request, response, elementEntry.getValue(), mapperType, path + DOT + elementName));
+									}
+								}
+							}
+						}
+						else
+						{
+							if(propertyValue != null)
+							{
+								for(String filter : propertyReflector.getFilters())
+								{
+									Filterer filterer = filtererMap.get(filter);
+									if(filterer != null)
+									{
+										propertyValue = filterer.filter(propertyValue);
+									}
+								}
+							}
+							boolean blank = propertyValue == null;
+							if(!blank && propertyValue instanceof String)
+							{
+								blank = ((String) propertyValue).isEmpty();
+							}
+							if(!blank)
+							{
+								for(String validate : propertyReflector.getValidates())
+								{
+									Validator validator = validatorMap.get(validate);
+									if(validator != null)
+									{
+										try
+										{
+											validator.validate(propertyValue, value, entityReflector);
+										}
+										catch(ValidatorException e)
+										{
+											errors.add(HttpErrorType.REQUEST_FIELD_INVALID.error().setContext(path + DOT + propertyName).setMessage(e.getMessage()));
+											break;
+										}
+									}
+								}
+							}
+							else if(blank && propertyReflector.isRequired())
+							{
+								errors.add(HttpErrorType.REQUEST_FIELD_REQUIRED.error().setContext(path + DOT + propertyName));
+							}
 						}
 					}
-					for(String validate : propertyReflector.getValidates())
+					catch(Exception e)
 					{
-						
+						e.printStackTrace();
 					}
 				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
 			}
-			*/
 		}
 		return errors;
 	}
