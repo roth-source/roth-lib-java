@@ -25,6 +25,10 @@ public @interface Property
 	boolean mysql() default true;
 	String mysqlName() default "";
 	
+	// ORIENT
+	boolean orient() default true;
+	String orientName() default "";
+	
 	// SERIAL
 	boolean serial() default true;
 	String serialName() default "";

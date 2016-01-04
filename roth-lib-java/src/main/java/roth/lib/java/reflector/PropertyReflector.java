@@ -69,6 +69,15 @@ public class PropertyReflector
 				}
 				break;
 			}
+			case ORIENT:
+			{
+				property = isOrient();
+				if(property)
+				{
+					property = isDb();
+				}
+				break;
+			}
 			case JSON:
 			{
 				property = isJson();
@@ -117,6 +126,15 @@ public class PropertyReflector
 			case MYSQL:
 			{
 				name = getMysqlName();
+				if(name == null)
+				{
+					name = getDbName();
+				}
+				break;
+			}
+			case ORIENT:
+			{
+				name = getOrientName();
 				if(name == null)
 				{
 					name = getDbName();
@@ -228,6 +246,16 @@ public class PropertyReflector
 	public String getMysqlName()
 	{
 		return AnnotationUtil.validate(property.mysqlName());
+	}
+	
+	public boolean isOrient()
+	{
+		return property.orient();
+	}
+	
+	public String getOrientName()
+	{
+		return AnnotationUtil.validate(property.orientName());
 	}
 	
 	public boolean isSerial()

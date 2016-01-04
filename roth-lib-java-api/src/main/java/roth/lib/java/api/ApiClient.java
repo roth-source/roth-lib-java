@@ -99,6 +99,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 			}
 			case TABLE:
 			case MYSQL:
+			case ORIENT:
 			{
 				break;
 			}
@@ -128,6 +129,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 			}
 			case TABLE:
 			case MYSQL:
+			case ORIENT:
 			{
 				break;
 			}
