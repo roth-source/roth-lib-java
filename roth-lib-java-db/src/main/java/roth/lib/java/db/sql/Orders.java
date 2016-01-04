@@ -1,19 +1,28 @@
 package roth.lib.java.db.sql;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 @SuppressWarnings("serial")
-public class Orders extends Sql
+public abstract class Orders extends Sql
 {
-	public static final String ORDER_BY = "  ORDER BY ";
-	
 	protected LinkedList<Order> orders = new LinkedList<Order>();
 	
-	public Orders() {}
-	
-	public void add(Order order)
+	protected Orders()
 	{
-		orders.add(order);
+		
+	}
+	
+	public Orders setOrders(LinkedList<Order> orders)
+	{
+		this.orders = orders;
+		return this;
+	}
+	
+	public Orders addOrders(Order... orders)
+	{
+		this.orders.addAll(Arrays.asList(orders));
+		return this;
 	}
 	
 	@Override

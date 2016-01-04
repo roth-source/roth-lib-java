@@ -5,189 +5,86 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 @SuppressWarnings("serial")
-public class Where extends Condition
+public abstract class Where extends Condition
 {
 	protected String sql;
-	protected LinkedList<Object> values = new LinkedList<Object>();
+	protected String table;
+	protected String name;
+	protected String opType;
 	
-	protected Where(String sql)
+	protected Where()
 	{
-		this.sql = sql;
+		
 	}
-	
-	protected Where(String sql, Object value)
-	{
-		this.sql = sql;
-		values.add(value);
-	}
-	
-	protected Where(String sql, Collection<?> values)
-	{
-		this.sql = sql;
-		this.values.addAll(values);
-	}
-	
-	public static Where sql(String sql)
-	{
-		return new Where(sql);
-	}
-	
-	public static Where sql(String sql, Object value)
-	{
-		return new Where(sql, value);
-	}
-	
-	public static Where sql(String sql, Collection<?> values)
-	{
-		return new Where(sql, values);
-	}
-	
-	public static Where equals(String name, Object value)
-	{
-		return new Where(tick(name) + Op.EQ.get(), value);
-	}
-	
-	public static Where equals(String table, String name, Object value)
-	{
-		return new Where(tick(table) + DOT + tick(name) + Op.EQ.get(), value);
-	}
-	
-	public static Where notEquals(String name, Object value)
-	{
-		return new Where(tick(name) + Op.NE.get(), value);
-	}
-	
-	public static Where notEquals(String table, String name, Object value)
-	{
-		return new Where(tick(table) + DOT + tick(name) + Op.NE.get(), value);
-	}
-	
-	public static Where lessThan(String name, Object value)
-	{
-		return new Where(tick(name) + Op.LT.get(), value);
-	}
-	
-	public static Where lessThan(String table, String name, Object value)
-	{
-		return new Where(tick(table) + DOT + tick(name) + Op.LT.get(), value);
-	}
-	
-	public static Where greaterThan(String name, Object value)
-	{
-		return new Where(tick(name) + Op.GT.get(), value);
-	}
-	
-	public static Where greaterThan(String table, String name, Object value)
-	{
-		return new Where(tick(table) + DOT + tick(name) + Op.GT.get(), value);
-	}
-	
-	public static Where lessThanOrEquals(String name, Object value)
-	{
-		return new Where(tick(name) + Op.LE.get(), value);
-	}
-	
-	public static Where lessThanOrEquals(String table, String name, Object value)
-	{
-		return new Where(tick(table) + DOT + tick(name) + Op.LE.get(), value);
-	}
-	
-	public static Where greaterThanOrEquals(String name, Object value)
-	{
-		return new Where(tick(name) + Op.GE.get(), value);
-	}
-	
-	public static Where greaterThanOrEquals(String table, String name, Object value)
-	{
-		return new Where(tick(table) + DOT + tick(name) + Op.GE.get(), value);
-	}
-	
-	public static Where in(String name, Collection<?> values)
-	{
-		return new Where(tick(name) + String.format(Op.IN.get(), param(values.size())), values);
-	}
-	
-	public static Where in(String table, String name, Collection<?> values)
-	{
-		return new Where(tick(table) + DOT + tick(name) + String.format(Op.IN.get(), param(values.size())), values);
-	}
-	
-	public static Where notIn(String name, Collection<?> values)
-	{
-		return new Where(tick(name) + String.format(Op.NOT_IN.get(), param(values.size())), values);
-	}
-	
-	public static Where notIn(String table, String name, Collection<?> values)
-	{
-		return new Where(tick(table) + DOT + tick(name) + String.format(Op.NOT_IN.get(), param(values.size())), values);
-	}
-	
-	public static Where like(String name, Object value)
-	{
-		return new Where(tick(name) + Op.LIKE.get(), value);
-	}
-	
-	public static Where like(String table, String name, Object value)
-	{
-		return new Where(tick(table) + DOT + tick(name) + Op.LIKE.get(), value);
-	}
-	
-	public static Where notLike(String name, Object value)
-	{
-		return new Where(tick(name) + Op.NOT_LIKE.get(), value);
-	}
-	
-	public static Where notLike(String table, String name, Object value)
-	{
-		return new Where(tick(table) + DOT + tick(name) + Op.NOT_LIKE.get(), value);
-	}
-	
-	public static Where between(String name, Object value1, Object value2)
-	{
-		return new Where(tick(name) + Op.BETWEEN.get(), Arrays.asList(value1, value2));
-	}
-	
-	public static Where between(String table, String name, Object value1, Object value2)
-	{
-		return new Where(tick(table) + DOT + tick(name) + Op.BETWEEN.get(), Arrays.asList(value1, value2));
-	}
-	
-	public static Where isNull(String name)
-	{
-		return new Where(tick(name) + Op.IS_NULL.get());
-	}
-	
-	public static Where isNull(String table, String name)
-	{
-		return new Where(tick(table) + DOT + tick(name) + Op.IS_NULL.get());
-	}
-	
-	public static Where isNotNull(String name)
-	{
-		return new Where(tick(name) + Op.IS_NOT_NULL.get());
-	}
-	
-	public static Where isNotNull(String table, String name)
-	{
-		return new Where(tick(table) + DOT + tick(name) + Op.IS_NOT_NULL.get());
-	}
-	
+
 	@Override
-	public LinkedList<Object> values()
+	public Where setLogicType(String logicType)
 	{
-		return values;
+		this.logicType = logicType;
+		return this;
+	}
+	
+	public Where setSql(String sql)
+	{
+		this.sql = sql;
+		return this;
+	}
+	
+	public Where setTable(String table)
+	{
+		this.table = table;
+		return this;
+	}
+	
+	public Where setName(String name)
+	{
+		this.name = name;
+		return this;
+	}
+	
+	public Where setOpType(String opType)
+	{
+		this.opType = opType;
+		return this;
+	}
+	
+	public Where setValues(Collection<?> values)
+	{
+		this.values = new LinkedList<Object>(values);
+		return this;
+	}
+	
+	public Where addValues(Object...values)
+	{
+		this.values.addAll(Arrays.asList(values));
+		return this;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return toStringNested();
+		return toString(false);
 	}
 	
 	@Override
-	public String toStringNested()
+	public String toString(boolean nested)
 	{
-		return sql;
+		if(sql != null)
+		{
+			return sql;
+		}
+		else
+		{
+			StringBuilder builder = new StringBuilder();
+			if(table != null)
+			{
+				builder.append(tick(table));
+				builder.append(DOT);
+			}
+			builder.append(tick(name));
+			builder.append(opType);
+			return builder.toString();
+		}
 	}
 	
 }

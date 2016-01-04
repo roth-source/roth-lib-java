@@ -13,11 +13,12 @@ import roth.lib.java.db.sql.Delete;
 import roth.lib.java.db.sql.Insert;
 import roth.lib.java.db.sql.Order;
 import roth.lib.java.db.sql.Select;
+import roth.lib.java.db.sql.SqlFactory;
 import roth.lib.java.db.sql.Update;
 import roth.lib.java.db.sql.Where;
 import roth.lib.java.db.sql.Wheres;
 
-public abstract class DbTable<T>
+public abstract class DbTable<T> implements SqlFactory
 {
 	protected Class<T> klass;
 	
@@ -35,57 +36,57 @@ public abstract class DbTable<T>
 	
 	public Select select()
 	{
-		return new Select(tableName());
+		return newSelect().from(tableName());
 	}
 	
-	public Select select(Column... columns)
+	public Select select(Column...columns)
 	{
-		return select(new Columns(columns));
+		return select().column(columns);
 	}
 	
 	public Select select(Columns columns)
 	{
-		return new Select(columns, tableName());
+		return select().columns(columns);
 	}
 	
 	public Insert insert(Collection<Object> values)
 	{
-		return new Insert(tableName(), values);
+		return newInsert();
 	}
 	
 	public Insert insert(Collection<String> names, Collection<Object> values)
 	{
-		return new Insert(tableName(), names, values);
+		return newInsert().setTable(tableName()).setNameValues(names, values);
 	}
 	
 	public Insert insert(Map<String, Object> nameValues)
 	{
-		return new Insert(tableName(), nameValues);
+		return newInsert().setTable(tableName()).setNameValues(nameValues);
 	}
 	
 	public Update update()
 	{
-		return new Update(tableName());
+		return newUpdate().setTable(tableName());
 	}
 	
 	public Update update(Map<String, Object> nameValues)
 	{
-		return new Update(tableName(), nameValues);
+		return newUpdate().setTable(tableName()).setNameValues(nameValues);
 	}
 	
 	public Update update(Collection<String> names, Collection<Object> values)
 	{
-		return new Update(tableName(), names, values);
+		return newUpdate().setTable(tableName()).setNameValues(names, values);
 	}
 	
 	public Delete delete()
 	{
-		return new Delete(tableName());
+		return newDelete().setTable(tableName());
 	}
 	
 	public T findBy(Where... wheres)
 	{
-		return findBy(new Wheres(wheres));
+		return findBy(newWheres().andConditions(wheres));
 	}
 	
 	public T findBy(Wheres wheres)
@@ -95,7 +96,7 @@ public abstract class DbTable<T>
 	
 	public T findBy(Where where, Columns columns)
 	{
-		return findBy(new Wheres().and(where), columns);
+		return findBy(newWheres().andWhere(where), columns);
 	}
 	
 	public T findBy(Wheres wheres, Columns columns)
@@ -155,7 +156,7 @@ public abstract class DbTable<T>
 	
 	public LinkedList<T> findAllBy(Where... wheres)
 	{
-		return findAllBy(new Wheres(wheres));
+		return findAllBy(newWheres().andConditions(wheres));
 	}
 	
 	public LinkedList<T> findAllBy(Wheres wheres)
@@ -165,7 +166,7 @@ public abstract class DbTable<T>
 	
 	public LinkedList<T> findAllBy(Where where, Order order)
 	{
-		return findAllBy(new Wheres().and(where), order);
+		return findAllBy(newWheres().andWhere(where), order);
 	}
 	
 	public LinkedList<T> findAllBy(Wheres wheres, Order order)
@@ -180,7 +181,7 @@ public abstract class DbTable<T>
 	
 	public LinkedList<T> findAllBy(Where where, Columns columns)
 	{
-		return findAllBy(new Wheres().and(where), columns);
+		return findAllBy(newWheres().andWhere(where), columns);
 	}
 	
 	public LinkedList<T> findAllBy(Wheres wheres, Columns columns)
@@ -190,7 +191,7 @@ public abstract class DbTable<T>
 	
 	public LinkedList<T> findAllBy(Where where, Columns columns, Order order)
 	{
-		return findAllBy(new Wheres().and(where), columns, order);
+		return findAllBy(newWheres().andWhere(where), columns, order);
 	}
 	
 	public LinkedList<T> findAllBy(Wheres wheres, Columns columns, Order order)
@@ -371,7 +372,7 @@ public abstract class DbTable<T>
 	public int count(Select select)
 	{
 		int count = 0;
-		select.columns(new Columns().add(Column.sqlAs("count(*)", "count")));
+		select.columns(newColumns().addColumns(newColumn().setSql("count(*)").setAlias("count")));
 		LinkedHashMap<String, Object> results = getDb().query(select);
 		Object object = results.get("count");
 		if(object instanceof Number)

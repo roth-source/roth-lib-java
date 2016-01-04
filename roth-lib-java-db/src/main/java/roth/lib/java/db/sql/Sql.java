@@ -6,18 +6,21 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 @SuppressWarnings("serial")
-public abstract class Sql implements Serializable
+public abstract class Sql implements Serializable, SqlFactory
 {
-	public static final String LF = "\n";
-	public static final String END = ";";
-	public static final String DOT = ".";
-	public static final String ALL = "*";
-	public static final String TICK = "`";
-	public static final String COMMA = ", ";
-	public static final String PARAM = " = ?";
-	public static final String AS = " AS ";
 	
-	protected Sql() {}
+	
+	protected Sql()
+	{
+		
+	}
+	
+	public abstract String toString();
+	
+	public LinkedList<Object> getValues()
+	{
+		return new LinkedList<Object>();
+	}
 	
 	public static String tick(String value)
 	{
@@ -93,19 +96,9 @@ public abstract class Sql implements Serializable
 		return builder.toString();
 	}
 	
-	public static LinkedList<Object> values(Object...values)
+	public static LinkedList<Object> asList(Object...values)
 	{
 		return new LinkedList<Object>(Arrays.asList(values));
-	}
-	
-	public LinkedList<Object> values()
-	{
-		return new LinkedList<Object>();
-	}
-	
-	public String sql()
-	{
-		return toString();
 	}
 	
 }

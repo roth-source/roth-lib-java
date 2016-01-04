@@ -7,11 +7,12 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 
 import roth.lib.java.Model;
+import roth.lib.java.db.sql.SqlFactory;
 import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.PropertyReflector;
 
 @SuppressWarnings({"serial","unchecked"})
-public abstract class DbModel extends Model
+public abstract class DbModel extends Model implements SqlFactory
 {
 	protected transient LinkedHashMap<String, Object> dirtyIdMap = new LinkedHashMap<String, Object>();
 	protected transient LinkedHashSet<String> dirtyNames = new LinkedHashSet<String>();

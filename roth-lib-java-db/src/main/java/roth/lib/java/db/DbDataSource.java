@@ -19,19 +19,20 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 import roth.lib.java.Callback;
+import roth.lib.java.Characters;
 import roth.lib.java.db.sql.Delete;
 import roth.lib.java.db.sql.Insert;
 import roth.lib.java.db.sql.Select;
 import roth.lib.java.db.sql.Sql;
+import roth.lib.java.db.sql.SqlFactory;
 import roth.lib.java.db.sql.Update;
-import roth.lib.java.db.sql.Where;
 import roth.lib.java.db.sql.Wheres;
 import roth.lib.java.mapper.MapperType;
 import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertyReflector;
 
-public abstract class DbDataSource implements DataSource, DbWrapper
+public abstract class DbDataSource implements DataSource, DbWrapper, Characters, SqlFactory
 {
 	protected MapperType mapperType;
 	protected MapperReflector mapperReflector;
@@ -322,8 +323,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public Wheres toIdWheres(DbModel model)
 	{
-		Wheres wheres = new Wheres();
-		wheres = new Wheres();
+		Wheres wheres = newWheres();
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(model.getClass());
 		for(PropertyReflector idReflector : entityReflector.getIdReflectors(getMapperType()))
 		{
@@ -343,7 +343,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 				}
 				if(value != null)
 				{
-					wheres.and(Where.equals(propertyName, value));
+					wheres.andWhere(newWhere().setOpType(OP_EQ).setName(propertyName).addValues(value));
 				}
 			}
 			catch(Exception e)
@@ -360,7 +360,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		Wheres wheres = toIdWheres(model);
 		if(!wheres.isEmpty())
 		{
-			return new Select(entityReflector.getEntityName()).wheres(wheres);
+			return newSelect().from(entityReflector.getEntityName()).wheres(wheres);
 		}
 		return null;
 	}
@@ -385,7 +385,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		}
 		if(!nameValues.isEmpty())
 		{
-			return new Insert(entityReflector.getEntityName(), nameValues);
+			return newInsert().setTable(entityReflector.getEntityName()).setNameValues(nameValues);
 		}
 		return null;
 	}
@@ -418,7 +418,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		Wheres wheres = null;
 		if(!nameValues.isEmpty() && !(wheres = toIdWheres(model)).isEmpty())
 		{
-			return new Update(entityReflector.getEntityName(), nameValues).wheres(wheres);
+			return newUpdate().setTable(entityReflector.getEntityName()).setNameValues(nameValues).wheres(wheres);
 		}
 		return null;
 	}
@@ -429,11 +429,12 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		Wheres wheres = toIdWheres(model);
 		if(!wheres.isEmpty())
 		{
-			return new Delete(entityReflector.getEntityName()).wheres(wheres);
+			return newDelete().setTable(entityReflector.getEntityName()).wheres(wheres);
 		}
 		return null;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public <T> void fromDb(DbResultSet resultSet, Callback<T> callback)
 	{
 		try
@@ -441,12 +442,23 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 			Class<T> klass = callback.getKlass();
 			ResultSetMetaData metaData = resultSet.getMetaData();
 			EntityReflector entityReflector = getMapperReflector().getEntityReflector(klass);
-			while(resultSet.next())
+			if(entityReflector != null)
 			{
-				T model = fromDb(resultSet, klass, metaData, entityReflector);
-				if(model != null)
+				while(resultSet.next())
 				{
-					callback.call(model);
+					T model = fromDb(resultSet, klass, metaData, entityReflector);
+					if(model != null)
+					{
+						callback.call(model);
+					}
+				}
+			}
+			else
+			{
+				Object value = resultSet.getValue(1, klass);
+				if(value != null && value.getClass().isAssignableFrom(klass))
+				{
+					callback.call((T) value);
 				}
 			}
 		}
@@ -456,6 +468,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public <T> LinkedList<T> fromDb(DbResultSet resultSet, Class<T> klass)
 	{
 		LinkedList<T> models = new LinkedList<T>();
@@ -463,12 +476,23 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		{
 			ResultSetMetaData metaData = resultSet.getMetaData();
 			EntityReflector entityReflector = getMapperReflector().getEntityReflector(klass);
-			while(resultSet.next())
+			if(entityReflector != null)
 			{
-				T model = fromDb(resultSet, klass, metaData, entityReflector);
-				if(model != null)
+				while(resultSet.next())
 				{
-					models.add(model);
+					T model = fromDb(resultSet, klass, metaData, entityReflector);
+					if(model != null)
+					{
+						models.add(model);
+					}
+				}
+			}
+			else
+			{
+				Object value = resultSet.getValue(1, klass);
+				if(value != null && value.getClass().isAssignableFrom(klass))
+				{
+					models.add((T) value);
 				}
 			}
 		}
@@ -547,12 +571,12 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public DbPreparedStatement prepareStatement(DbConnection connection, Sql sql) throws SQLException
 	{
-		return prepareStatement(connection, sql.sql(), sql.values());
+		return prepareStatement(connection, sql.toString(), sql.getValues());
 	}
 	
 	public DbPreparedStatement prepareStatement(DbConnection connection, Sql sql,  LinkedList<String> generated) throws SQLException
 	{
-		return prepareStatement(connection, sql.sql(), sql.values(), generated);
+		return prepareStatement(connection, sql.toString(), sql.getValues(), generated);
 	}
 	
 	public DbPreparedStatement prepareStatement(DbConnection connection, String sql, Collection<Object> values) throws SQLException
@@ -584,7 +608,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 		}
 		if(logWriter != null)
 		{
-			logWriter.println(Sql.LF + preparedStatement.toString());
+			logWriter.println(NEW_LINE + preparedStatement.toString());
 		}
 		return preparedStatement;
 	}
@@ -622,7 +646,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	public <T> T query(Select select, Class<T> klass)
 	{
 		select.limit(1);
-		return query(select.sql(), select.values(), klass);
+		return query(select.toString(), select.getValues(), klass);
 	}
 	
 	public <T> T query(String sql, Class<T> klass)
@@ -644,7 +668,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public <T> LinkedList<T> queryAll(Select select, Class<T> klass)
 	{
-		return queryAll(select.sql(), select.values(), klass);
+		return queryAll(select.toString(), select.getValues(), klass);
 	}
 	
 	public <T> LinkedList<T> queryAll(String sql, Class<T> klass)
@@ -682,7 +706,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public <T> LinkedList<T> queryAll(Select select, Class<T> klass, DbConnection connection) throws SQLException
 	{
-		return queryAll(select.sql(), select.values(), klass, connection);
+		return queryAll(select.toString(), select.getValues(), klass, connection);
 	}
 	
 	public <T> LinkedList<T> queryAll(String sql, Class<T> klass, DbConnection connection) throws SQLException
@@ -711,7 +735,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public <T> void queryAll(Select select, Callback<T> callback)
 	{
-		queryAll(select.sql(), select.values(), callback);
+		queryAll(select.toString(), select.getValues(), callback);
 	}
 	
 	public <T> void queryAll(String sql, Callback<T> callback)
@@ -745,7 +769,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public <T> void queryAll(Select select, Callback<T> callback, DbConnection connection) throws SQLException
 	{
-		queryAll(select.sql(), select.values(), callback, connection);
+		queryAll(select.toString(), select.getValues(), callback, connection);
 	}
 	
 	public <T> void queryAll(String sql, Callback<T> callback, DbConnection connection) throws SQLException
@@ -774,7 +798,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	public LinkedHashMap<String, Object> query(Select select)
 	{
 		select.limit(1);
-		return query(select.sql(), select.values());
+		return query(select.toString(), select.getValues());
 	}
 	
 	public LinkedHashMap<String, Object> query(String sql)
@@ -796,7 +820,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public LinkedList<LinkedHashMap<String, Object>> queryAll(Select select)
 	{
-		return queryAll(select.sql(), select.values());
+		return queryAll(select.toString(), select.getValues());
 	}
 	
 	public LinkedList<LinkedHashMap<String, Object>> queryAll(String sql, Map<String, Object> valueMap)
@@ -829,7 +853,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public LinkedList<LinkedHashMap<String, Object>> queryAll(Select select, DbConnection connection) throws SQLException
 	{
-		return queryAll(select.sql(), select.values(), connection);
+		return queryAll(select.toString(), select.getValues(), connection);
 	}
 	
 	public LinkedList<LinkedHashMap<String, Object>> queryAll(String sql, DbConnection connection) throws SQLException
@@ -873,7 +897,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public int executeInsert(Insert insert, DbModel model)
 	{
-		return executeInsert(insert.sql(), insert.values(), model);
+		return executeInsert(insert.toString(), insert.getValues(), model);
 	}
 	
 	public int executeInsert(String sql)
@@ -926,7 +950,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public int executeInsert(Insert insert, DbModel model, DbConnection connection) throws SQLException
 	{
-		return executeInsert(insert.sql(), insert.values(), model, connection);
+		return executeInsert(insert.toString(), insert.getValues(), model, connection);
 	}
 	
 	public int executeInsert(String sql, DbConnection connection) throws SQLException
@@ -983,7 +1007,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public int executeUpdate(Update update, DbModel model)
 	{
-		return executeUpdate(update.sql(), update.values(), model);
+		return executeUpdate(update.toString(), update.getValues(), model);
 	}
 	
 	public int executeUpdate(String sql)
@@ -1036,7 +1060,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public int executeUpdate(Update update, DbModel model, DbConnection connection) throws SQLException
 	{
-		return executeUpdate(update.sql(), update.values(), model, connection);
+		return executeUpdate(update.toString(), update.getValues(), model, connection);
 	}
 	
 	public int executeUpdate(String sql, DbConnection connection) throws SQLException
@@ -1081,7 +1105,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public int executeDelete(Delete delete, DbModel model)
 	{
-		return executeDelete(delete.sql(), delete.values(), model);
+		return executeDelete(delete.toString(), delete.getValues(), model);
 	}
 	
 	public int executeDelete(String sql)
@@ -1134,7 +1158,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper
 	
 	public int executeDelete(Delete delete, DbModel model, DbConnection connection) throws SQLException
 	{
-		return executeDelete(delete.sql(), delete.values(), model, connection);
+		return executeDelete(delete.toString(), delete.getValues(), model, connection);
 	}
 	
 	public int executeDelete(String sql, DbConnection connection) throws SQLException

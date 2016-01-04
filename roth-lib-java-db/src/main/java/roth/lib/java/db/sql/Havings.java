@@ -1,37 +1,74 @@
 package roth.lib.java.db.sql;
 
+import java.util.LinkedList;
 
 @SuppressWarnings("serial")
-public class Havings extends Conditions
+public abstract class Havings extends Conditions
 {
-	public static final String HAVING	= " HAVING ";
-	
-	public Havings() {}
-	
-	public Havings and(Having having)
+
+	public Havings()
 	{
-		having.logic = Logic.AND;
-		conditions.add(having);
+		
+	}
+	
+	@Override
+	public Havings setLogicType(String logicType)
+	{
+		this.logicType = logicType;
 		return this;
 	}
 	
-	public Havings or(Having having)
+	@Override
+	public Havings setConditions(LinkedList<Condition> conditions)
 	{
-		having.logic = Logic.OR;
-		conditions.add(having);
+		this.conditions = conditions;
 		return this;
 	}
 	
-	public Havings and(Havings havings)
+	@Override
+	public Havings andConditions(Condition...conditions)
 	{
-		havings.logic = Logic.AND;
+		for(Condition condition : conditions)
+		{
+			condition.setLogicType(LOGIC_AND);
+			this.conditions.add(condition);
+		}
+		return this;
+	}
+	
+	@Override
+	public Havings orConditions(Condition...conditions)
+	{
+		for(Condition condition : conditions)
+		{
+			condition.setLogicType(LOGIC_OR);
+			this.conditions.add(condition);
+		}
+		return this;
+	}
+	
+	public Havings andHaving(Having having)
+	{
+		andConditions(having);
+		return this;
+	}
+	
+	public Havings orHaving(Having having)
+	{
+		orConditions(having);
+		return this;
+	}
+	
+	public Havings andHavings(Havings havings)
+	{
+		havings.setLogicType(LOGIC_AND);
 		this.conditions.add(havings);
 		return this;
 	}
 	
-	public Havings or(Havings havings)
+	public Havings orHavings(Havings havings)
 	{
-		havings.logic = Logic.OR;
+		havings.setLogicType(LOGIC_OR);
 		this.conditions.add(havings);
 		return this;
 	}
@@ -39,13 +76,17 @@ public class Havings extends Conditions
 	@Override
 	public String toString()
 	{
-		return !conditions.isEmpty() ? LF + HAVING + toStringNested() : "";
+		return toString(false);
 	}
 	
 	@Override
-	public String toStringNested()
+	public String toString(boolean nested)
 	{
 		StringBuilder builder = new StringBuilder();
+		if(!nested && !conditions.isEmpty())
+		{
+			builder.append(LF + WHERE);
+		}
 		boolean first = true;
 		for(Condition condition : conditions)
 		{
@@ -55,11 +96,11 @@ public class Havings extends Conditions
 			}
 			else
 			{
-				builder.append(LF + condition.logic.get());
+				builder.append(LF + condition.logicType);
 			}
 			boolean isHavings = condition instanceof Havings;
 			builder.append(isHavings ? "(" : "");
-			builder.append(condition.toStringNested());
+			builder.append(condition.toString(true));
 			builder.append(isHavings ? ")" : "");
 		}
 		return builder.toString();

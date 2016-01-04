@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 @SuppressWarnings("serial")
-public class Select extends Sql
+public abstract class Select extends Sql implements SqlFactory
 {
 	protected Columns columns;
-	protected Table table;
+	protected From from;
 	protected Joins joins;
 	protected Wheres wheres;
 	protected Groups groups;
@@ -18,64 +18,9 @@ public class Select extends Sql
 	protected LinkedList<Wheres> nestedWheres = new LinkedList<Wheres>();
 	protected LinkedList<Havings> nestedHavings = new LinkedList<Havings>();
 	
-	public Select()
+	protected Select()
 	{
 		
-	}
-	
-	public Select(Columns columns, Table table)
-	{
-		columns(columns);
-		table(table);
-	}
-	
-	public Select(Columns columns, String table)
-	{
-		columns(columns);
-		table(table);
-	}
-	
-	public Select(Columns columns, String table, String alias)
-	{
-		columns(columns);
-		tableAs(table, alias);
-	}
-	
-	public Select(Columns columns, String table, Index index)
-	{
-		columns(columns);
-		table(table, index);
-	}
-	
-	public Select(Columns columns, String table, String alias, Index index)
-	{
-		columns(columns);
-		tableAs(table, alias, index);
-	}
-	
-	public Select(Table table)
-	{
-		table(table);
-	}
-	
-	public Select(String table)
-	{
-		table(table);
-	}
-	
-	public Select(String table, String alias)
-	{
-		tableAs(table, alias);
-	}
-	
-	public Select(String table, Index index)
-	{
-		table(table, index);
-	}
-	
-	public Select(String table, String alias, Index index)
-	{
-		tableAs(table, alias, index);
 	}
 	
 	public Select columns(Columns columns)
@@ -84,75 +29,65 @@ public class Select extends Sql
 		return this;
 	}
 	
+	public Select column(Column...columns)
+	{
+		if(this.columns == null)
+		{
+			this.columns = newColumns();
+		}
+		this.columns.addColumns(columns);
+		return this;
+	}
+	
+	public Select columnAll(String table)
+	{
+		return column(newColumn().setTable(table).setName(ALL));
+	}
+	
 	public Select columnSql(String sql)
 	{
-		return column(Column.sql(sql));
+		return column(newColumn().setSql(sql));
 	}
 	
 	public Select columnSqlAs(String sql, String alias)
 	{
-		return column(Column.sqlAs(sql, alias));
+		return column(newColumn().setSql(sql).setAlias(alias));
 	}
 	
 	public Select column(String name)
 	{
-		return column(Column.name(name));
+		return column(newColumn().setName(name));
 	}
 	
 	public Select columnAs(String name, String alias)
 	{
-		return column(Column.nameAs(name, alias));
+		return column(newColumn().setName(name).setAlias(alias));
 	}
 	
 	public Select column(String table, String name)
 	{
-		return column(Column.tableName(table, name));
+		return column(newColumn().setTable(table).setName(name));
 	}
 	
 	public Select columnAs(String table, String name, String alias)
 	{
-		return column(Column.tableNameAs(table, name, alias));
+		return column(newColumn().setTable(table).setName(name).setAlias(alias));
 	}
 	
-	public Select column(Column column)
+	public Select from(From from)
 	{
-		if(columns == null)
-		{
-			columns = new Columns();
-		}
-		columns.add(column);
+		this.from = from;
 		return this;
 	}
 	
-	public boolean hasTable()
+	public Select from(String name)
 	{
-		return table != null;
+		return from(newFrom().setName(name));
 	}
 	
-	public Select table(Table table)
+	public Select fromAs(String name, String alias)
 	{
-		this.table = table;
-		return this;
-	}
-	
-	public Select table(String name)
-	{
-		return table(Table.name(name));
-	}
-	
-	public Select tableAs(String name, String alias)
-	{
-		return table(Table.nameAs(name, alias));
-	}
-	
-	public Select table(String name, Index index)
-	{
-		return table(Table.name(name, index));
-	}
-	
-	public Select tableAs(String name, String alias, Index index)
-	{
-		return table(Table.nameAs(name, alias, index));
+		return from(newFrom().setName(name).setAlias(alias));
 	}
 	
 	public Select joins(Joins joins)
@@ -163,114 +98,159 @@ public class Select extends Sql
 	
 	public Select join(Join join)
 	{
-		joins = joins != null ? joins : new Joins();
-		joins.add(join);
+		joins = joins != null ? joins : newJoins();
+		joins.addJoins(join);
 		return this;
-	}
-	
-	public Select join(String sql)
-	{
-		return join(Join.sql(sql));
 	}
 	
 	public Select join(String table1, String name1, String table2, String name2)
 	{
-		return join(Join.join(table1, Join.on(table1, name1, table2, name2)));
+		return join(newJoin().setJoinType(JOIN).setTable(table1).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
 	}
 	
 	public Select joinAs(String table1, String alias, String name1, String table2, String name2)
 	{
-		return join(Join.joinAs(table1, alias, Join.on(alias, name1, table2, name2)));
+		return join(newJoin().setJoinType(JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Select joinAs(Select select, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(JOIN).setSelect(select).setAlias(alias).addOns(ons));
+	}
+	
+	public Select joinAs(Select select, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(JOIN).setSelect(select).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Select join(String table, On...ons)
+	{
+		return join(newJoin().setJoinType(JOIN).setTable(table).addOns(ons));
+	}
+	
+	public Select joinAs(String table, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(JOIN).setTable(table).setAlias(alias).addOns(ons));
 	}
 	
 	public Select joinInner(String table1, String name1, String table2, String name2)
 	{
-		return join(Join.inner(table1, Join.on(table1, name1, table2, name2)));
+		return join(newJoin().setJoinType(INNER_JOIN).setTable(table1).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
 	}
 	
 	public Select joinInnerAs(String table1, String alias, String name1, String table2, String name2)
 	{
-		return join(Join.innerAs(table1, alias, Join.on(alias, name1, table2, name2)));
+		return join(newJoin().setJoinType(INNER_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Select joinInnerAs(Select select, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(INNER_JOIN).setSelect(select).setAlias(alias).addOns(ons));
+	}
+	
+	public Select joinInnerAs(Select select, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(INNER_JOIN).setSelect(select).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Select joinInner(String table, On...ons)
+	{
+		return join(newJoin().setJoinType(INNER_JOIN).setTable(table).addOns(ons));
+	}
+	
+	public Select joinInnerAs(String table, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(INNER_JOIN).setTable(table).setAlias(alias).addOns(ons));
 	}
 	
 	public Select joinLeft(String table1, String name1, String table2, String name2)
 	{
-		return join(Join.left(table1, Join.on(table1, name1, table2, name2)));
+		return join(newJoin().setJoinType(LEFT_JOIN).setTable(table1).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
 	}
 	
 	public Select joinLeftAs(String table1, String alias, String name1, String table2, String name2)
 	{
-		return join(Join.leftAs(table1, alias, Join.on(alias, name1, table2, name2)));
+		return join(newJoin().setJoinType(LEFT_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Select joinLeftAs(Select select, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(LEFT_JOIN).setSelect(select).setAlias(alias).addOns(ons));
+	}
+	
+	public Select joinLeftAs(Select select, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(LEFT_JOIN).setSelect(select).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Select joinLeft(String table, On...ons)
+	{
+		return join(newJoin().setJoinType(LEFT_JOIN).setTable(table).addOns(ons));
+	}
+	
+	public Select joinLeftAs(String table, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(LEFT_JOIN).setTable(table).setAlias(alias).addOns(ons));
 	}
 	
 	public Select joinRight(String table1, String name1, String table2, String name2)
 	{
-		return join(Join.right(table1, Join.on(table1, name1, table2, name2)));
+		return join(newJoin().setJoinType(RIGHT_JOIN).setTable(table1).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
 	}
 	
 	public Select joinRightAs(String table1, String alias, String name1, String table2, String name2)
 	{
-		return join(Join.rightAs(table1, alias, Join.on(alias, name1, table2, name2)));
+		return join(newJoin().setJoinType(RIGHT_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Select joinRightAs(Select select, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(RIGHT_JOIN).setSelect(select).setAlias(alias).addOns(ons));
+	}
+	
+	public Select joinRightAs(Select select, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(RIGHT_JOIN).setSelect(select).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Select joinRight(String table, On...ons)
+	{
+		return join(newJoin().setJoinType(RIGHT_JOIN).setTable(table).addOns(ons));
+	}
+	
+	public Select joinRightAs(String table, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(RIGHT_JOIN).setTable(table).setAlias(alias).addOns(ons));
 	}
 	
 	public Select joinOuter(String table1, String name1, String table2, String name2)
 	{
-		return join(Join.outer(table1, Join.on(table1, name1, table2, name2)));
+		return join(newJoin().setJoinType(OUTER_JOIN).setTable(table1).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
 	}
 	
 	public Select joinOuterAs(String table1, String alias, String name1, String table2, String name2)
 	{
-		return join(Join.outerAs(table1, alias, Join.on(alias, name1, table2, name2)));
+		return join(newJoin().setJoinType(OUTER_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
 	}
 	
-	public Select join(String table1, String name1, String table2, String name2, Index index)
+	public Select joinOuterAs(Select select, String alias, On...ons)
 	{
-		return join(Join.join(table1, index, Join.on(table1, name1, table2, name2)));
+		return join(newJoin().setJoinType(OUTER_JOIN).setSelect(select).setAlias(alias).addOns(ons));
 	}
 	
-	public Select joinAs(String table1, String alias, String name1, String table2, String name2, Index index)
+	public Select joinOuterAs(Select select, String alias, String name1, String table2, String name2)
 	{
-		return join(Join.joinAs(table1, alias, index, Join.on(alias, name1, table2, name2)));
+		return join(newJoin().setJoinType(OUTER_JOIN).setSelect(select).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
 	}
 	
-	public Select joinInner(String table1, String name1, String table2, String name2, Index index)
+	public Select joinOuter(String table, On...ons)
 	{
-		return join(Join.inner(table1, index, Join.on(table1, name1, table2, name2)));
+		return join(newJoin().setJoinType(OUTER_JOIN).setTable(table).addOns(ons));
 	}
 	
-	public Select joinInnerAs(String table1, String alias, String name1, String table2, String name2, Index index)
+	public Select joinOuterAs(String table, String alias, On...ons)
 	{
-		return join(Join.innerAs(table1, alias, index, Join.on(alias, name1, table2, name2)));
-	}
-	
-	public Select joinLeft(String table1, String name1, String table2, String name2, Index index)
-	{
-		return join(Join.left(table1, index, Join.on(table1, name1, table2, name2)));
-	}
-	
-	public Select joinLeftAs(String table1, String alias, String name1, String table2, String name2, Index index)
-	{
-		return join(Join.leftAs(table1, alias, index, Join.on(alias, name1, table2, name2)));
-	}
-	
-	public Select joinRight(String table1, String name1, String table2, String name2, Index index)
-	{
-		return join(Join.right(table1, index, Join.on(table1, name1, table2, name2)));
-	}
-	
-	public Select joinRightAs(String table1, String alias, String name1, String table2, String name2, Index index)
-	{
-		return join(Join.rightAs(table1, alias, index, Join.on(alias, name1, table2, name2)));
-	}
-	
-	public Select joinOuter(String table1, String name1, String table2, String name2, Index index)
-	{
-		return join(Join.outer(table1, index, Join.on(table1, name1, table2, name2)));
-	}
-	
-	public Select joinOuterAs(String table1, String alias, String name1, String table2, String name2, Index index)
-	{
-		return join(Join.outerAs(table1, alias, index, Join.on(alias, name1, table2, name2)));
+		return join(newJoin().setJoinType(OUTER_JOIN).setTable(table).setAlias(alias).addOns(ons));
 	}
 	
 	public Select wheres(Wheres wheres)
@@ -286,179 +266,196 @@ public class Select extends Sql
 		Wheres wheres = nestedWheres.peekLast();
 		if(wheres == null)
 		{
-			wheres = new Wheres();
+			wheres = newWheres();
 			wheres(wheres);
 		}
-		wheres.and(where);
+		wheres.andWhere(where);
 		return this;
 	}
 	
 	public Select whereOpenParen()
 	{
-		Wheres wheres = new Wheres();
+		Wheres wheres = newWheres();
 		Wheres lastWheres = nestedWheres.peekLast();
 		if(lastWheres == null)
 		{
-			lastWheres = new Wheres();
+			lastWheres = newWheres();
 			wheres(lastWheres);
 		}
 		nestedWheres.add(wheres);
-		lastWheres.and(wheres);
+		lastWheres.andWheres(wheres);
 		return this;
 	}
 	
 	public Select whereCloseParen()
 	{
-		if(!nestedWheres.isEmpty())
-		{
-			nestedWheres.removeLast();
-		}
+		nestedWheres.pollLast();
 		return this;
 	}
 	
-	public Select where(String sql)
+	public Select whereSql(String sql)
 	{
-		return where(Where.sql(sql));
+		return where(newWhere().setSql(sql));
 	}
 	
-	public Select where(String sql, Object value)
+	public Select whereSql(String sql, Object...values)
 	{
-		return where(Where.sql(sql, value));
+		return where(newWhere().setSql(sql).addValues(values));
 	}
 	
-	public Select where(String sql, Collection<?> values)
+	public Select whereSql(String sql, Collection<?> values)
 	{
-		return where(Where.sql(sql, values));
+		return where(newWhere().setSql(sql).setValues(values));
 	}
 	
 	public Select whereEquals(String name, Object value)
 	{
-		return where(Where.equals(name, value));
+		return where(newWhere().setName(name).setOpType(OP_EQ).addValues(value));
 	}
 	
 	public Select whereEquals(String table, String name, Object value)
 	{
-		return where(Where.equals(table, name, value));
+		return where(newWhere().setTable(table).setName(name).setOpType(OP_EQ).addValues(value));
 	}
 	
 	public Select whereNotEquals(String name, Object value)
 	{
-		return where(Where.notEquals(name, value));
+		return where(newWhere().setName(name).setOpType(OP_NE).addValues(value));
 	}
 	
 	public Select whereNotEquals(String table, String name, Object value)
 	{
-		return where(Where.notEquals(table, name, value));
+		return where(newWhere().setTable(table).setName(name).setOpType(OP_NE).addValues(value));
 	}
 	
 	public Select whereLessThan(String name, Object value)
 	{
-		return where(Where.lessThan(name, value));
+		return where(newWhere().setName(name).setOpType(OP_LT).addValues(value));
 	}
 	
 	public Select whereLessThan(String table, String name, Object value)
 	{
-		return where(Where.lessThan(table, name, value));
+		return where(newWhere().setTable(table).setName(name).setOpType(OP_LT).addValues(value));
 	}
 	
 	public Select whereGreaterThan(String name, Object value)
 	{
-		return where(Where.greaterThan(name, value));
+		return where(newWhere().setName(name).setOpType(OP_GT).addValues(value));
 	}
 	
 	public Select whereGreaterThan(String table, String name, Object value)
 	{
-		return where(Where.greaterThan(table, name, value));
+		return where(newWhere().setTable(table).setName(name).setOpType(OP_GT).addValues(value));
 	}
 	
 	public Select whereLessThanOrEquals(String name, Object value)
 	{
-		return where(Where.lessThanOrEquals(name, value));
+		return where(newWhere().setName(name).setOpType(OP_LE).addValues(value));
 	}
 	
 	public Select whereLessThanOrEquals(String table, String name, Object value)
 	{
-		return where(Where.lessThanOrEquals(table, name, value));
+		return where(newWhere().setTable(table).setName(name).setOpType(OP_LE).addValues(value));
 	}
 	
 	public Select whereGreaterThanOrEquals(String name, Object value)
 	{
-		return where(Where.greaterThanOrEquals(name, value));
+		return where(newWhere().setName(name).setOpType(OP_GE).addValues(value));
 	}
 	
 	public Select whereGreaterThanOrEquals(String table, String name, Object value)
 	{
-		return where(Where.greaterThanOrEquals(table, name, value));
+		return where(newWhere().setTable(table).setName(name).setOpType(OP_GE).addValues(value));
+	}
+	
+	public Select whereIn(String name, Object...values)
+	{
+		return where(newWhere().setName(name).setOpType(OP_IN).addValues(values));
 	}
 	
 	public Select whereIn(String name, Collection<?> values)
 	{
-		return where(Where.in(name, values));
+		return where(newWhere().setName(name).setOpType(OP_IN).setValues(values));
+	}
+	
+	public Select whereIn(String table, String name, Object...values)
+	{
+		return where(newWhere().setTable(table).setName(name).setOpType(OP_IN).addValues(values));
 	}
 	
 	public Select whereIn(String table, String name, Collection<?> values)
 	{
-		return where(Where.in(table, name, values));
+		return where(newWhere().setTable(table).setName(name).setOpType(OP_IN).setValues(values));
+	}
+	
+	public Select whereNotIn(String name, Object...values)
+	{
+		return where(newWhere().setName(name).setOpType(OP_NOT_IN).addValues(values));
 	}
 	
 	public Select whereNotIn(String name, Collection<?> values)
 	{
-		return where(Where.notIn(name, values));
+		return where(newWhere().setName(name).setOpType(OP_NOT_IN).setValues(values));
+	}
+	
+	public Select whereNotIn(String table, String name, Object...values)
+	{
+		return where(newWhere().setTable(table).setName(name).setOpType(OP_NOT_IN).addValues(values));
 	}
 	
 	public Select whereNotIn(String table, String name, Collection<?> values)
 	{
-		return where(Where.notIn(table, name, values));
+		return where(newWhere().setTable(table).setName(name).setOpType(OP_NOT_IN).setValues(values));
 	}
 	
 	public Select whereLike(String name, Object value)
 	{
-		return where(Where.like(name, value));
+		return where(newWhere().setName(name).setOpType(OP_LIKE).addValues(value));
 	}
 	
 	public Select whereLike(String table, String name, Object value)
 	{
-		return where(Where.like(table, name, value));
+		return where(newWhere().setTable(table).setName(name).setOpType(OP_LIKE).addValues(value));
 	}
 	
 	public Select whereNotLike(String name, Object value)
 	{
-		return where(Where.notLike(name, value));
+		return where(newWhere().setName(name).setOpType(OP_NOT_LIKE).addValues(value));
 	}
 	
 	public Select whereNotLike(String table, String name, Object value)
 	{
-		return where(Where.notLike(table, name, value));
+		return where(newWhere().setTable(table).setName(name).setOpType(OP_NOT_LIKE).addValues(value));
 	}
 	
 	public Select whereBetween(String name, Object value1, Object value2)
 	{
-		return where(Where.between(name, value1, value2));
+		return where(newWhere().setName(name).setOpType(OP_BETWEEN).addValues(value1, value2));
 	}
 	
 	public Select whereBetween(String table, String name, Object value1, Object value2)
 	{
-		return where(Where.between(table, name, value1, value2));
+		return where(newWhere().setTable(table).setName(name).setOpType(OP_BETWEEN).addValues(value1, value2));
 	}
 	
 	public Select whereIsNull(String name)
 	{
-		return where(Where.isNull(name));
+		return where(newWhere().setName(name).setOpType(OP_IS_NULL));
 	}
 	
 	public Select whereIsNull(String table, String name)
 	{
-		return where(Where.isNull(table, name));
+		return where(newWhere().setTable(table).setName(name).setOpType(OP_IS_NULL));
 	}
 	
 	public Select whereIsNotNull(String name)
 	{
-		return where(Where.isNotNull(name));
+		return where(newWhere().setName(name).setOpType(OP_IS_NOT_NULL));
 	}
 	
 	public Select whereIsNotNull(String table, String name)
 	{
-		return where(Where.isNotNull(table, name));
+		return where(newWhere().setTable(table).setName(name).setOpType(OP_IS_NOT_NULL));
 	}
 	
 	public Select orWhere(Where where)
@@ -466,160 +463,190 @@ public class Select extends Sql
 		Wheres wheres = nestedWheres.peekLast();
 		if(wheres == null)
 		{
-			wheres = new Wheres();
+			wheres = newWheres();
 			wheres(wheres);
 		}
-		wheres.or(where);
+		wheres.orWhere(where);
 		return this;
 	}
 	
 	public Select orWhereOpenParen()
 	{
-		Wheres wheres = new Wheres();
+		Wheres wheres = newWheres();
 		Wheres lastWheres = nestedWheres.peekLast();
 		if(lastWheres == null)
 		{
-			lastWheres = new Wheres();
+			lastWheres = newWheres();
 			wheres(lastWheres);
 		}
 		nestedWheres.add(wheres);
-		lastWheres.or(wheres);
+		lastWheres.orWheres(wheres);
 		return this;
 	}
 	
-	public Select orWhere(String sql)
+	public Select orWhereSql(String sql)
 	{
-		return orWhere(Where.sql(sql));
+		return orWhere(newWhere().setSql(sql));
 	}
 	
-	public Select orWhere(String sql, Object value)
+	public Select orWhereSql(String sql, Object...values)
 	{
-		return orWhere(Where.sql(sql, value));
+		return orWhere(newWhere().setSql(sql).addValues(values));
 	}
 	
-	public Select orWhere(String sql, Collection<?> values)
+	public Select orWhereSql(String sql, Collection<?> values)
 	{
-		return orWhere(Where.sql(sql, values));
+		return orWhere(newWhere().setSql(sql).setValues(values));
 	}
 	
 	public Select orWhereEquals(String name, Object value)
 	{
-		return orWhere(Where.equals(name, value));
+		return orWhere(newWhere().setName(name).setOpType(OP_EQ).addValues(value));
 	}
 	
 	public Select orWhereEquals(String table, String name, Object value)
 	{
-		return orWhere(Where.equals(table, name, value));
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_EQ).addValues(value));
 	}
 	
 	public Select orWhereNotEquals(String name, Object value)
 	{
-		return orWhere(Where.notEquals(name, value));
+		return orWhere(newWhere().setName(name).setOpType(OP_NE).addValues(value));
 	}
 	
 	public Select orWhereNotEquals(String table, String name, Object value)
 	{
-		return orWhere(Where.notEquals(table, name, value));
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_NE).addValues(value));
 	}
 	
 	public Select orWhereLessThan(String name, Object value)
 	{
-		return orWhere(Where.lessThan(name, value));
+		return orWhere(newWhere().setName(name).setOpType(OP_LT).addValues(value));
 	}
 	
 	public Select orWhereLessThan(String table, String name, Object value)
 	{
-		return orWhere(Where.lessThan(table, name, value));
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_LT).addValues(value));
 	}
 	
 	public Select orWhereGreaterThan(String name, Object value)
 	{
-		return orWhere(Where.greaterThan(name, value));
+		return orWhere(newWhere().setName(name).setOpType(OP_GT).addValues(value));
 	}
 	
 	public Select orWhereGreaterThan(String table, String name, Object value)
 	{
-		return orWhere(Where.greaterThan(table, name, value));
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_GT).addValues(value));
 	}
 	
 	public Select orWhereLessThanOrEquals(String name, Object value)
 	{
-		return orWhere(Where.lessThanOrEquals(name, value));
+		return orWhere(newWhere().setName(name).setOpType(OP_LE).addValues(value));
 	}
 	
 	public Select orWhereLessThanOrEquals(String table, String name, Object value)
 	{
-		return orWhere(Where.lessThanOrEquals(table, name, value));
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_LE).addValues(value));
 	}
 	
 	public Select orWhereGreaterThanOrEquals(String name, Object value)
 	{
-		return orWhere(Where.greaterThanOrEquals(name, value));
+		return orWhere(newWhere().setName(name).setOpType(OP_GE).addValues(value));
 	}
 	
 	public Select orWhereGreaterThanOrEquals(String table, String name, Object value)
 	{
-		return orWhere(Where.greaterThanOrEquals(table, name, value));
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_GE).addValues(value));
+	}
+	
+	public Select orWhereIn(String name, Object...values)
+	{
+		return orWhere(newWhere().setName(name).setOpType(OP_IN).addValues(values));
 	}
 	
 	public Select orWhereIn(String name, Collection<?> values)
 	{
-		return orWhere(Where.in(name, values));
+		return orWhere(newWhere().setName(name).setOpType(OP_IN).setValues(values));
+	}
+	
+	public Select orWhereIn(String table, String name, Object...values)
+	{
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_IN).addValues(values));
 	}
 	
 	public Select orWhereIn(String table, String name, Collection<?> values)
 	{
-		return orWhere(Where.in(table, name, values));
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_IN).setValues(values));
+	}
+	
+	public Select orWhereNotIn(String name, Object...values)
+	{
+		return orWhere(newWhere().setName(name).setOpType(OP_NOT_IN).addValues(values));
+	}
+	
+	public Select orWhereNotIn(String name, Collection<?> values)
+	{
+		return orWhere(newWhere().setName(name).setOpType(OP_NOT_IN).setValues(values));
+	}
+	
+	public Select orWhereNotIn(String table, String name, Object...values)
+	{
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_NOT_IN).addValues(values));
+	}
+	
+	public Select orWhereNotIn(String table, String name, Collection<?> values)
+	{
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_NOT_IN).setValues(values));
 	}
 	
 	public Select orWhereLike(String name, Object value)
 	{
-		return orWhere(Where.like(name, value));
+		return orWhere(newWhere().setName(name).setOpType(OP_LIKE).addValues(value));
 	}
 	
 	public Select orWhereLike(String table, String name, Object value)
 	{
-		return orWhere(Where.like(table, name, value));
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_LIKE).addValues(value));
 	}
 	
 	public Select orWhereNotLike(String name, Object value)
 	{
-		return orWhere(Where.notLike(name, value));
+		return orWhere(newWhere().setName(name).setOpType(OP_NOT_LIKE).addValues(value));
 	}
 	
 	public Select orWhereNotLike(String table, String name, Object value)
 	{
-		return orWhere(Where.notLike(table, name, value));
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_NOT_LIKE).addValues(value));
 	}
 	
 	public Select orWhereBetween(String name, Object value1, Object value2)
 	{
-		return orWhere(Where.between(name, value1, value2));
+		return orWhere(newWhere().setName(name).setOpType(OP_BETWEEN).addValues(value1, value2));
 	}
 	
 	public Select orWhereBetween(String table, String name, Object value1, Object value2)
 	{
-		return orWhere(Where.between(table, name, value1, value2));
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_BETWEEN).addValues(value1, value2));
 	}
 	
 	public Select orWhereIsNull(String name)
 	{
-		return orWhere(Where.isNull(name));
+		return orWhere(newWhere().setName(name).setOpType(OP_IS_NULL));
 	}
 	
 	public Select orWhereIsNull(String table, String name)
 	{
-		return orWhere(Where.isNull(table, name));
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_IS_NULL));
 	}
 	
 	public Select orWhereIsNotNull(String name)
 	{
-		return orWhere(Where.isNotNull(name));
+		return orWhere(newWhere().setName(name).setOpType(OP_IS_NOT_NULL));
 	}
 	
 	public Select orWhereIsNotNull(String table, String name)
 	{
-		return orWhere(Where.isNotNull(table, name));
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_IS_NOT_NULL));
 	}
 	
 	public Select groups(Groups groups)
@@ -630,19 +657,24 @@ public class Select extends Sql
 	
 	public Select group(Group group)
 	{
-		groups = groups != null ? groups : new Groups();
-		groups.add(group);
+		groups = groups != null ? groups : newGroups();
+		groups.addGroups(group);
 		return this;
 	}
 	
 	public Select groupBy(String name)
 	{
-		return group(Group.byName(name));
+		return group(newGroup().setName(name));
 	}
 	
 	public Select groupBy(String table, String name)
 	{
-		return group(Group.byTableName(table, name));
+		return group(newGroup().setTable(table).setName(name));
+	}
+	
+	public Select groupBySql(String sql)
+	{
+		return group(newGroup().setSql(sql));
 	}
 	
 	public Select havings(Havings havings)
@@ -658,159 +690,196 @@ public class Select extends Sql
 		Havings havings = nestedHavings.peekLast();
 		if(havings == null)
 		{
-			havings = new Havings();
+			havings = newHavings();
 			havings(havings);
 		}
-		havings.and(having);
+		havings.andHaving(having);
 		return this;
 	}
 	
 	public Select havingOpenParen()
 	{
-		Havings havings = new Havings();
+		Havings havings = newHavings();
 		Havings lastHavings = nestedHavings.peekLast();
 		if(lastHavings == null)
 		{
-			lastHavings = new Havings();
+			lastHavings = newHavings();
 			havings(lastHavings);
 		}
 		nestedHavings.add(havings);
-		lastHavings.and(havings);
+		lastHavings.andHavings(havings);
 		return this;
 	}
 	
 	public Select havingCloseParen()
 	{
-		if(!nestedHavings.isEmpty())
-		{
-			nestedHavings.removeLast();
-		}
+		nestedHavings.pollLast();
 		return this;
 	}
 	
-	public Select having(String sql)
+	public Select havingSql(String sql)
 	{
-		return having(Having.sql(sql));
+		return having(newHaving().setSql(sql));
 	}
 	
-	public Select having(String sql, Object value)
+	public Select havingSql(String sql, Object...values)
 	{
-		return having(Having.sql(sql, value));
+		return having(newHaving().setSql(sql).addValues(values));
 	}
 	
-	public Select having(String sql, Collection<?> values)
+	public Select havingSql(String sql, Collection<?> values)
 	{
-		return having(Having.sql(sql, values));
+		return having(newHaving().setSql(sql).setValues(values));
 	}
 	
 	public Select havingEquals(String name, Object value)
 	{
-		return having(Having.equals(name, value));
+		return having(newHaving().setName(name).setOpType(OP_EQ).addValues(value));
 	}
 	
 	public Select havingEquals(String table, String name, Object value)
 	{
-		return having(Having.equals(table, name, value));
+		return having(newHaving().setTable(table).setName(name).setOpType(OP_EQ).addValues(value));
 	}
 	
 	public Select havingNotEquals(String name, Object value)
 	{
-		return having(Having.notEquals(name, value));
+		return having(newHaving().setName(name).setOpType(OP_NE).addValues(value));
 	}
 	
 	public Select havingNotEquals(String table, String name, Object value)
 	{
-		return having(Having.notEquals(table, name, value));
+		return having(newHaving().setTable(table).setName(name).setOpType(OP_NE).addValues(value));
 	}
 	
 	public Select havingLessThan(String name, Object value)
 	{
-		return having(Having.lessThan(name, value));
+		return having(newHaving().setName(name).setOpType(OP_LT).addValues(value));
 	}
 	
 	public Select havingLessThan(String table, String name, Object value)
 	{
-		return having(Having.lessThan(table, name, value));
+		return having(newHaving().setTable(table).setName(name).setOpType(OP_LT).addValues(value));
 	}
 	
 	public Select havingGreaterThan(String name, Object value)
 	{
-		return having(Having.greaterThan(name, value));
+		return having(newHaving().setName(name).setOpType(OP_GT).addValues(value));
 	}
 	
 	public Select havingGreaterThan(String table, String name, Object value)
 	{
-		return having(Having.greaterThan(table, name, value));
+		return having(newHaving().setTable(table).setName(name).setOpType(OP_GT).addValues(value));
 	}
 	
 	public Select havingLessThanOrEquals(String name, Object value)
 	{
-		return having(Having.lessThanOrEquals(name, value));
+		return having(newHaving().setName(name).setOpType(OP_LE).addValues(value));
 	}
 	
 	public Select havingLessThanOrEquals(String table, String name, Object value)
 	{
-		return having(Having.lessThanOrEquals(table, name, value));
+		return having(newHaving().setTable(table).setName(name).setOpType(OP_LE).addValues(value));
 	}
 	
 	public Select havingGreaterThanOrEquals(String name, Object value)
 	{
-		return having(Having.greaterThanOrEquals(name, value));
+		return having(newHaving().setName(name).setOpType(OP_GE).addValues(value));
 	}
 	
 	public Select havingGreaterThanOrEquals(String table, String name, Object value)
 	{
-		return having(Having.greaterThanOrEquals(table, name, value));
+		return having(newHaving().setTable(table).setName(name).setOpType(OP_GE).addValues(value));
+	}
+	
+	public Select havingIn(String name, Object...values)
+	{
+		return having(newHaving().setName(name).setOpType(OP_IN).addValues(values));
 	}
 	
 	public Select havingIn(String name, Collection<?> values)
 	{
-		return having(Having.in(name, values));
+		return having(newHaving().setName(name).setOpType(OP_IN).setValues(values));
+	}
+	
+	public Select havingIn(String table, String name, Object...values)
+	{
+		return having(newHaving().setTable(table).setName(name).setOpType(OP_IN).addValues(values));
 	}
 	
 	public Select havingIn(String table, String name, Collection<?> values)
 	{
-		return having(Having.in(table, name, values));
+		return having(newHaving().setTable(table).setName(name).setOpType(OP_IN).setValues(values));
+	}
+	
+	public Select havingNotIn(String name, Object...values)
+	{
+		return having(newHaving().setName(name).setOpType(OP_NOT_IN).addValues(values));
+	}
+	
+	public Select havingNotIn(String name, Collection<?> values)
+	{
+		return having(newHaving().setName(name).setOpType(OP_NOT_IN).setValues(values));
+	}
+	
+	public Select havingNotIn(String table, String name, Object...values)
+	{
+		return having(newHaving().setTable(table).setName(name).setOpType(OP_NOT_IN).addValues(values));
+	}
+	
+	public Select havingNotIn(String table, String name, Collection<?> values)
+	{
+		return having(newHaving().setTable(table).setName(name).setOpType(OP_NOT_IN).setValues(values));
 	}
 	
 	public Select havingLike(String name, Object value)
 	{
-		return having(Having.like(name, value));
+		return having(newHaving().setName(name).setOpType(OP_LIKE).addValues(value));
 	}
 	
 	public Select havingLike(String table, String name, Object value)
 	{
-		return having(Having.like(table, name, value));
+		return having(newHaving().setTable(table).setName(name).setOpType(OP_LIKE).addValues(value));
+	}
+	
+	public Select havingNotLike(String name, Object value)
+	{
+		return having(newHaving().setName(name).setOpType(OP_NOT_LIKE).addValues(value));
+	}
+	
+	public Select havingNotLike(String table, String name, Object value)
+	{
+		return having(newHaving().setTable(table).setName(name).setOpType(OP_NOT_LIKE).addValues(value));
 	}
 	
 	public Select havingBetween(String name, Object value1, Object value2)
 	{
-		return having(Having.between(name, value1, value2));
+		return having(newHaving().setName(name).setOpType(OP_BETWEEN).addValues(value1, value2));
 	}
 	
 	public Select havingBetween(String table, String name, Object value1, Object value2)
 	{
-		return having(Having.between(table, name, value1, value2));
+		return having(newHaving().setTable(table).setName(name).setOpType(OP_BETWEEN).addValues(value1, value2));
 	}
 	
 	public Select havingIsNull(String name)
 	{
-		return having(Having.isNull(name));
+		return having(newHaving().setName(name).setOpType(OP_IS_NULL));
 	}
 	
 	public Select havingIsNull(String table, String name)
 	{
-		return having(Having.isNull(table, name));
+		return having(newHaving().setTable(table).setName(name).setOpType(OP_IS_NULL));
 	}
 	
 	public Select havingIsNotNull(String name)
 	{
-		return having(Having.isNotNull(name));
+		return having(newHaving().setName(name).setOpType(OP_IS_NOT_NULL));
 	}
 	
 	public Select havingIsNotNull(String table, String name)
 	{
-		return having(Having.isNotNull(table, name));
+		return having(newHaving().setTable(table).setName(name).setOpType(OP_IS_NOT_NULL));
 	}
 	
 	public Select orHaving(Having having)
@@ -818,150 +887,190 @@ public class Select extends Sql
 		Havings havings = nestedHavings.peekLast();
 		if(havings == null)
 		{
-			havings = new Havings();
+			havings = newHavings();
 			havings(havings);
 		}
-		havings.or(having);
+		havings.orHaving(having);
 		return this;
 	}
 	
 	public Select orHavingOpenParen()
 	{
-		Havings havings = new Havings();
+		Havings havings = newHavings();
 		Havings lastHavings = nestedHavings.peekLast();
 		if(lastHavings == null)
 		{
-			lastHavings = new Havings();
+			lastHavings = newHavings();
 			havings(lastHavings);
 		}
 		nestedHavings.add(havings);
-		lastHavings.or(havings);
+		lastHavings.orHavings(havings);
 		return this;
 	}
 	
-	public Select orHaving(String sql)
+	public Select orHavingSql(String sql)
 	{
-		return orHaving(Having.sql(sql));
+		return orHaving(newHaving().setSql(sql));
 	}
 	
-	public Select orHaving(String sql, Object value)
+	public Select orHavingSql(String sql, Object...values)
 	{
-		return orHaving(Having.sql(sql, value));
+		return orHaving(newHaving().setSql(sql).addValues(values));
 	}
 	
-	public Select orHaving(String sql, Collection<?> values)
+	public Select orHavingSql(String sql, Collection<?> values)
 	{
-		return orHaving(Having.sql(sql, values));
+		return orHaving(newHaving().setSql(sql).setValues(values));
 	}
 	
 	public Select orHavingEquals(String name, Object value)
 	{
-		return orHaving(Having.equals(name, value));
+		return orHaving(newHaving().setName(name).setOpType(OP_EQ).addValues(value));
 	}
 	
 	public Select orHavingEquals(String table, String name, Object value)
 	{
-		return orHaving(Having.equals(table, name, value));
+		return orHaving(newHaving().setTable(table).setName(name).setOpType(OP_EQ).addValues(value));
 	}
 	
 	public Select orHavingNotEquals(String name, Object value)
 	{
-		return orHaving(Having.notEquals(name, value));
+		return orHaving(newHaving().setName(name).setOpType(OP_NE).addValues(value));
 	}
 	
 	public Select orHavingNotEquals(String table, String name, Object value)
 	{
-		return orHaving(Having.notEquals(table, name, value));
+		return orHaving(newHaving().setTable(table).setName(name).setOpType(OP_NE).addValues(value));
 	}
 	
 	public Select orHavingLessThan(String name, Object value)
 	{
-		return orHaving(Having.lessThan(name, value));
+		return orHaving(newHaving().setName(name).setOpType(OP_LT).addValues(value));
 	}
 	
 	public Select orHavingLessThan(String table, String name, Object value)
 	{
-		return orHaving(Having.lessThan(table, name, value));
+		return orHaving(newHaving().setTable(table).setName(name).setOpType(OP_LT).addValues(value));
 	}
 	
 	public Select orHavingGreaterThan(String name, Object value)
 	{
-		return orHaving(Having.greaterThan(name, value));
+		return orHaving(newHaving().setName(name).setOpType(OP_GT).addValues(value));
 	}
 	
 	public Select orHavingGreaterThan(String table, String name, Object value)
 	{
-		return orHaving(Having.greaterThan(table, name, value));
+		return orHaving(newHaving().setTable(table).setName(name).setOpType(OP_GT).addValues(value));
 	}
 	
 	public Select orHavingLessThanOrEquals(String name, Object value)
 	{
-		return orHaving(Having.lessThanOrEquals(name, value));
+		return orHaving(newHaving().setName(name).setOpType(OP_LE).addValues(value));
 	}
 	
 	public Select orHavingLessThanOrEquals(String table, String name, Object value)
 	{
-		return orHaving(Having.lessThanOrEquals(table, name, value));
+		return orHaving(newHaving().setTable(table).setName(name).setOpType(OP_LE).addValues(value));
 	}
 	
 	public Select orHavingGreaterThanOrEquals(String name, Object value)
 	{
-		return orHaving(Having.greaterThanOrEquals(name, value));
+		return orHaving(newHaving().setName(name).setOpType(OP_GE).addValues(value));
 	}
 	
 	public Select orHavingGreaterThanOrEquals(String table, String name, Object value)
 	{
-		return orHaving(Having.greaterThanOrEquals(table, name, value));
+		return orHaving(newHaving().setTable(table).setName(name).setOpType(OP_GE).addValues(value));
+	}
+	
+	public Select orHavingIn(String name, Object...values)
+	{
+		return orHaving(newHaving().setName(name).setOpType(OP_IN).addValues(values));
 	}
 	
 	public Select orHavingIn(String name, Collection<?> values)
 	{
-		return orHaving(Having.in(name, values));
+		return orHaving(newHaving().setName(name).setOpType(OP_IN).setValues(values));
+	}
+	
+	public Select orHavingIn(String table, String name, Object...values)
+	{
+		return orHaving(newHaving().setTable(table).setName(name).setOpType(OP_IN).addValues(values));
 	}
 	
 	public Select orHavingIn(String table, String name, Collection<?> values)
 	{
-		return orHaving(Having.in(table, name, values));
+		return orHaving(newHaving().setTable(table).setName(name).setOpType(OP_IN).setValues(values));
+	}
+	
+	public Select orHavingNotIn(String name, Object...values)
+	{
+		return orHaving(newHaving().setName(name).setOpType(OP_NOT_IN).addValues(values));
+	}
+	
+	public Select orHavingNotIn(String name, Collection<?> values)
+	{
+		return orHaving(newHaving().setName(name).setOpType(OP_NOT_IN).setValues(values));
+	}
+	
+	public Select orHavingNotIn(String table, String name, Object...values)
+	{
+		return orHaving(newHaving().setTable(table).setName(name).setOpType(OP_NOT_IN).addValues(values));
+	}
+	
+	public Select orHavingNotIn(String table, String name, Collection<?> values)
+	{
+		return orHaving(newHaving().setTable(table).setName(name).setOpType(OP_NOT_IN).setValues(values));
 	}
 	
 	public Select orHavingLike(String name, Object value)
 	{
-		return orHaving(Having.like(name, value));
+		return orHaving(newHaving().setName(name).setOpType(OP_LIKE).addValues(value));
 	}
 	
 	public Select orHavingLike(String table, String name, Object value)
 	{
-		return orHaving(Having.like(table, name, value));
+		return orHaving(newHaving().setTable(table).setName(name).setOpType(OP_LIKE).addValues(value));
+	}
+	
+	public Select orHavingNotLike(String name, Object value)
+	{
+		return orHaving(newHaving().setName(name).setOpType(OP_NOT_LIKE).addValues(value));
+	}
+	
+	public Select orHavingNotLike(String table, String name, Object value)
+	{
+		return orHaving(newHaving().setTable(table).setName(name).setOpType(OP_NOT_LIKE).addValues(value));
 	}
 	
 	public Select orHavingBetween(String name, Object value1, Object value2)
 	{
-		return orHaving(Having.between(name, value1, value2));
+		return orHaving(newHaving().setName(name).setOpType(OP_BETWEEN).addValues(value1, value2));
 	}
 	
 	public Select orHavingBetween(String table, String name, Object value1, Object value2)
 	{
-		return orHaving(Having.between(table, name, value1, value2));
+		return orHaving(newHaving().setTable(table).setName(name).setOpType(OP_BETWEEN).addValues(value1, value2));
 	}
 	
 	public Select orHavingIsNull(String name)
 	{
-		return orHaving(Having.isNull(name));
+		return orHaving(newHaving().setName(name).setOpType(OP_IS_NULL));
 	}
 	
 	public Select orHavingIsNull(String table, String name)
 	{
-		return orHaving(Having.isNull(table, name));
+		return orHaving(newHaving().setTable(table).setName(name).setOpType(OP_IS_NULL));
 	}
 	
 	public Select orHavingIsNotNull(String name)
 	{
-		return orHaving(Having.isNotNull(name));
+		return orHaving(newHaving().setName(name).setOpType(OP_IS_NOT_NULL));
 	}
 	
 	public Select orHavingIsNotNull(String table, String name)
 	{
-		return orHaving(Having.isNotNull(table, name));
+		return orHaving(newHaving().setTable(table).setName(name).setOpType(OP_IS_NOT_NULL));
 	}
 	
 	public Select orders(Orders orders)
@@ -972,34 +1081,34 @@ public class Select extends Sql
 	
 	public Select order(Order order)
 	{
-		orders = orders != null ? orders : new Orders();
-		orders.add(order);
+		orders = orders != null ? orders : newOrders();
+		orders.addOrders(order);
 		return this;
 	}
 	
 	public Select orderByAsc(String name)
 	{
-		return order(Order.byAsc(name));
+		return order(newOrder().setName(name).setOrderType(ASC));
 	}
 	
 	public Select orderByAsc(String table, String name)
 	{
-		return order(Order.byAsc(table, name));
+		return order(newOrder().setTable(table).setName(name).setOrderType(ASC));
 	}
 	
 	public Select orderByDesc(String name)
 	{
-		return order(Order.byDesc(name));
+		return order(newOrder().setName(name).setOrderType(DESC));
 	}
 	
 	public Select orderByDesc(String table, String name)
 	{
-		return order(Order.byDesc(table, name));
+		return order(newOrder().setTable(table).setName(name).setOrderType(DESC));
 	}
 	
 	public Select orderBy(String sql)
 	{
-		return order(Order.bySql(sql));
+		return order(newOrder().setSql(sql));
 	}
 	
 	public Select page(Page page)
@@ -1010,34 +1119,34 @@ public class Select extends Sql
 	
 	public Select limit(int limit)
 	{
-		return page(Page.limit(limit));
+		return page(newPage().setLimit(limit));
 	}
 	
 	public Select offset(int offset)
 	{
-		return page(Page.offset(offset));
+		return page(newPage().setOffset(offset));
 	}
 	
 	public Select limitOffset(int limit, int offset)
 	{
-		return page(Page.limitOffset(limit, offset));
+		return page(newPage().setLimit(limit).setOffset(offset));
 	}
 	
 	@Override
-	public LinkedList<Object> values()
+	public LinkedList<Object> getValues()
 	{
 		LinkedList<Object> values = new LinkedList<Object>();
 		if(joins != null)
 		{
-			values.addAll(joins.values());
+			values.addAll(joins.getValues());
 		}
 		if(wheres != null)
 		{
-			values.addAll(wheres.values());
+			values.addAll(wheres.getValues());
 		}
 		if(havings != null)
 		{
-			values.addAll(havings.values());
+			values.addAll(havings.getValues());
 		}
 		return values;
 	}
@@ -1050,11 +1159,17 @@ public class Select extends Sql
 	
 	public String toString(boolean end)
 	{
-		if(table == null) throw new IllegalArgumentException("table cannot be null");
-		columns = columns != null ? columns : new Columns(table.alias());
+		if(from == null) 
+		{
+			throw new IllegalArgumentException("from cannot be null");
+		}
+		if(columns == null)
+		{
+			columnAll(from.alias());
+		}
 		StringBuilder builder = new StringBuilder();
 		builder.append(columns);
-		builder.append(table);
+		builder.append(from);
 		builder.append(joins != null ? joins : "");
 		builder.append(wheres != null ? wheres : "");
 		builder.append(groups != null ? groups : "");

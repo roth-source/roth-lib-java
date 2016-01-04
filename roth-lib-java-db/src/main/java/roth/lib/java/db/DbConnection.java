@@ -157,6 +157,11 @@ public abstract class DbConnection implements Connection, DbWrapper
 		return connection.unwrap(iface);
 	}
 	
+	public Connection unwrap()
+	{
+		return connection;
+	}
+	
 	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException
 	{

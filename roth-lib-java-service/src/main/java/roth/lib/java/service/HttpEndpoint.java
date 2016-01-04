@@ -522,7 +522,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 								int i = 0;
 								for(Object element : ReflectionUtil.asCollection(propertyValue))
 								{
-									errors.addAll(validate(request, response, element, mapperType, path + LEFT_BRACE + i + RIGHT_BRACE));
+									errors.addAll(validate(request, response, element, mapperType, path + propertyName + LEFT_BRACE + i + RIGHT_BRACE + DOT));
 									i++;
 								}
 							}
@@ -548,7 +548,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 									}
 									if(elementName != null)
 									{
-										errors.addAll(validate(request, response, elementEntry.getValue(), mapperType, path + DOT + elementName));
+										errors.addAll(validate(request, response, elementEntry.getValue(), mapperType, path + elementName + DOT));
 									}
 								}
 							}
@@ -584,7 +584,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 										}
 										catch(ValidatorException e)
 										{
-											errors.add(HttpErrorType.REQUEST_FIELD_INVALID.error().setContext(path + DOT + propertyName).setMessage(e.getMessage()));
+											errors.add(HttpErrorType.REQUEST_FIELD_INVALID.error().setContext(path + propertyName).setMessage(e.getMessage()));
 											break;
 										}
 									}
@@ -592,7 +592,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 							}
 							else if(blank && propertyReflector.isRequired())
 							{
-								errors.add(HttpErrorType.REQUEST_FIELD_REQUIRED.error().setContext(path + DOT + propertyName));
+								errors.add(HttpErrorType.REQUEST_FIELD_REQUIRED.error().setContext(path + propertyName));
 							}
 						}
 					}

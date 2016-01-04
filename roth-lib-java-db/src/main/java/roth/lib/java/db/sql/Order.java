@@ -1,48 +1,61 @@
 package roth.lib.java.db.sql;
 
 @SuppressWarnings("serial")
-public class Order extends Sql
+public abstract class Order extends Sql
 {
-	public static final String ORDER_BY = "  ORDER BY ";
-	public static final String ASC 	= " ASC";
-	public static final String DESC = " DESC";
-	
 	protected String sql;
+	protected String table;
+	protected String name;
+	protected String orderType = ASC;
 	
-	protected Order(String sql)
+	protected Order()
+	{
+		
+	}
+
+	public Order setSql(String sql)
 	{
 		this.sql = sql;
+		return this;
 	}
 	
-	public static Order byAsc(String name)
+	public Order setTable(String table)
 	{
-		return new Order(tick(name) + ASC);
+		this.table = table;
+		return this;
 	}
 	
-	public static Order byAsc(String table, String name)
+	public Order setName(String name)
 	{
-		return new Order(tick(table) + DOT + tick(name) + ASC);
+		this.name = name;
+		return this;
 	}
 	
-	public static Order byDesc(String name)
+	public Order setOrderType(String orderType)
 	{
-		return new Order(tick(name) + DESC);
-	}
-	
-	public static Order byDesc(String table, String name)
-	{
-		return new Order(tick(table) + DOT + tick(name) + DESC);
-	}
-	
-	public static Order bySql(String sql)
-	{
-		return new Order(sql);
+		this.orderType = orderType;
+		return this;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return sql;
+		if(sql != null)
+		{
+			return sql;
+		}
+		else
+		{
+			StringBuilder builder = new StringBuilder();
+			if(table != null)
+			{
+				builder.append(tick(table));
+				builder.append(DOT);
+			}
+			builder.append(tick(name));
+			builder.append(orderType);
+			return builder.toString();
+		}
 	}
 	
 }

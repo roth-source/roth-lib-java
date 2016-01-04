@@ -4,31 +4,24 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 @SuppressWarnings("serial")
-public class Columns extends Sql
+public abstract class Columns extends Sql
 {
-	protected static final String SELECT = " SELECT ";
-	protected static final String COLUMN = COMMA + LF + "        ";
-	
 	protected LinkedList<Column> columns = new LinkedList<Column>();
 	
-	public Columns()
+	protected Columns()
 	{
 		
 	}
 	
-	public Columns(Column... columns)
+	public Columns setColumns(LinkedList<Column> columns)
+	{
+		this.columns = columns;
+		return this;
+	}
+	
+	public Columns addColumns(Column... columns)
 	{
 		this.columns.addAll(Arrays.asList(columns));
-	}
-	
-	public Columns(String table)
-	{
-		columns.add(Column.all(table));
-	}
-	
-	public Columns add(Column column)
-	{
-		columns.add(column);
 		return this;
 	}
 	

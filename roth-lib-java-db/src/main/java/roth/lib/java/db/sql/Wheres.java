@@ -1,46 +1,74 @@
 package roth.lib.java.db.sql;
 
-import java.util.Arrays;
+import java.util.LinkedList;
 
 @SuppressWarnings("serial")
-public class Wheres extends Conditions
+public abstract class Wheres extends Conditions
 {
-	public static final String WHERE	= "  WHERE ";
 	
 	public Wheres()
 	{
 		
 	}
 	
-	public Wheres(Where... wheres)
+	@Override
+	public Wheres setLogicType(String logicType)
 	{
-		this.conditions.addAll(Arrays.asList(wheres));
-	}
-	
-	public Wheres and(Where where)
-	{
-		where.logic = Logic.AND;
-		conditions.add(where);
+		this.logicType = logicType;
 		return this;
 	}
 	
-	public Wheres or(Where where)
+	@Override
+	public Wheres setConditions(LinkedList<Condition> conditions)
 	{
-		where.logic = Logic.OR;
-		conditions.add(where);
+		this.conditions = conditions;
 		return this;
 	}
 	
-	public Wheres and(Wheres wheres)
+	@Override
+	public Wheres andConditions(Condition...conditions)
 	{
-		wheres.logic = Logic.AND;
+		for(Condition condition : conditions)
+		{
+			condition.setLogicType(LOGIC_AND);
+			this.conditions.add(condition);
+		}
+		return this;
+	}
+	
+	@Override
+	public Wheres orConditions(Condition...conditions)
+	{
+		for(Condition condition : conditions)
+		{
+			condition.setLogicType(LOGIC_OR);
+			this.conditions.add(condition);
+		}
+		return this;
+	}
+	
+	public Wheres andWhere(Where where)
+	{
+		andConditions(where);
+		return this;
+	}
+	
+	public Wheres orWhere(Where where)
+	{
+		orConditions(where);
+		return this;
+	}
+	
+	public Wheres andWheres(Wheres wheres)
+	{
+		wheres.setLogicType(LOGIC_AND);
 		this.conditions.add(wheres);
 		return this;
 	}
 	
-	public Wheres or(Wheres wheres)
+	public Wheres orWheres(Wheres wheres)
 	{
-		wheres.logic = Logic.OR;
+		wheres.setLogicType(LOGIC_OR);
 		this.conditions.add(wheres);
 		return this;
 	}
@@ -48,13 +76,17 @@ public class Wheres extends Conditions
 	@Override
 	public String toString()
 	{
-		return !conditions.isEmpty() ? LF + WHERE + toStringNested() : "";
+		return toString(false);
 	}
 	
 	@Override
-	public String toStringNested()
+	public String toString(boolean nested)
 	{
 		StringBuilder builder = new StringBuilder();
+		if(!nested && !conditions.isEmpty())
+		{
+			builder.append(LF + WHERE);
+		}
 		boolean first = true;
 		for(Condition condition : conditions)
 		{
@@ -64,11 +96,11 @@ public class Wheres extends Conditions
 			}
 			else
 			{
-				builder.append(LF + condition.logic.get());
+				builder.append(LF + condition.logicType);
 			}
 			boolean isWheres = condition instanceof Wheres;
 			builder.append(isWheres ? "(" : "");
-			builder.append(condition.toStringNested());
+			builder.append(condition.toString(true));
 			builder.append(isWheres ? ")" : "");
 		}
 		return builder.toString();

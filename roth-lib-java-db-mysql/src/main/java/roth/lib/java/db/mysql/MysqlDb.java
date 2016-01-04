@@ -3,9 +3,10 @@ package roth.lib.java.db.mysql;
 import java.util.Properties;
 
 import roth.lib.java.db.DbDataSource;
+import roth.lib.java.db.mysql.sql.MysqlSqlFactory;
 import roth.lib.java.mapper.MapperType;
 
-public class MysqlDb extends DbDataSource implements MysqlDbWrapper
+public class MysqlDb extends DbDataSource implements MysqlDbWrapper, MysqlSqlFactory
 {
 	
 	public MysqlDb()

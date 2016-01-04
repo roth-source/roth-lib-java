@@ -6,32 +6,30 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 @SuppressWarnings("serial")
-public class Insert extends Sql
+public abstract class Insert extends Values
 {
-	public static final String INSERT = " INSERT INTO ";
-	public static final String VALUES = " VALUES ";
-	
 	protected String table;
-	protected LinkedList<String> names;
-	protected LinkedList<Object> values;
+	protected LinkedList<String> names =  new LinkedList<String>();
 	
-	public Insert(String table, Collection<?> values)
+	public Insert()
+	{
+		
+	}
+
+	public Insert setTable(String table)
 	{
 		this.table = table;
-		this.values = new LinkedList<Object>(values);
+		return this;
 	}
 	
-	public Insert(String table, Collection<String> names, Collection<?> values)
+	public Insert setValues(Collection<Object> values)
 	{
-		if(names.size() != values.size()) throw new IllegalArgumentException("names is different size than values");
-		this.table = table;
-		this.names = new LinkedList<String>(names);
 		this.values = new LinkedList<Object>(values);
+		return this;
 	}
 	
-	public Insert(String table, Map<String, Object> nameValues)
+	public Insert setNameValues(Map<String, Object> nameValues)
 	{
-		this.table = table;
 		names = new LinkedList<String>();
 		values = new LinkedList<Object>();
 		for(Entry<String, Object> nameValueEntry : nameValues.entrySet())
@@ -39,18 +37,25 @@ public class Insert extends Sql
 			names.add(nameValueEntry.getKey());
 			values.add(nameValueEntry.getValue());
 		}
+		return this;
 	}
 	
-	public LinkedList<Object> values()
+	public Insert setNameValues(Collection<String> names, Collection<?> values)
 	{
-		return new LinkedList<Object>(values);
+		if(names.size() != values.size())
+		{
+			throw new IllegalArgumentException("names is different size than values");
+		}
+		this.names = new LinkedList<String>(names);
+		this.values = new LinkedList<Object>(values);
+		return this;
 	}
 	
 	@Override
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder.append(INSERT + tick(table) + (names != null && !names.isEmpty() ? " (" + tick(names) + ")" : ""));
+		builder.append(INSERT + tick(table) + " (" + tick(names) + ")");
 		builder.append(LF + VALUES + "(" + param(values.size()) + ")");
 		builder.append(END);
 		return builder.toString();

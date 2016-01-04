@@ -1,19 +1,28 @@
 package roth.lib.java.db.sql;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 @SuppressWarnings("serial")
-public class Groups extends Sql
+public abstract class Groups extends Sql
 {
-	public static final String GROUP_BY = "  GROUP BY ";
-	
 	protected LinkedList<Group> groups = new LinkedList<Group>();
 	
-	public Groups() {}
-	
-	public void add(Group group)
+	protected Groups()
 	{
-		groups.add(group);
+		
+	}
+	
+	public Groups setGroups(LinkedList<Group> groups)
+	{
+		this.groups = groups;
+		return this;
+	}
+	
+	public Groups addGroups(Group... groups)
+	{
+		this.groups.addAll(Arrays.asList(groups));
+		return this;
 	}
 	
 	@Override

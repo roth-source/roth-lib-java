@@ -1,54 +1,65 @@
 package roth.lib.java.db.sql;
 
 @SuppressWarnings("serial")
-public class Column extends Sql
+public abstract class Column extends Sql
 {
 	protected String sql;
+	protected String table;
+	protected String name;
+	protected String alias;
 	
-	protected Column(String sql)
+	protected Column()
+	{
+		
+	}
+
+	public Column setSql(String sql)
 	{
 		this.sql = sql;
+		return this;
 	}
 	
-	public static Column all(String table)
+	public Column setTable(String table)
 	{
-		return new Column(tick(table) + DOT + ALL);
+		this.table = table;
+		return this;
 	}
 	
-	public static Column sql(String sql)
+	public Column setName(String name)
 	{
-		return new Column(sql);
+		this.name = name;
+		return this;
 	}
 	
-	public static Column sqlAs(String sql, String alias)
+	public Column setAlias(String alias)
 	{
-		return new Column(sql + AS + tick(alias));
-	}
-	
-	public static Column name(String name)
-	{
-		return new Column(tick(name));
-	}
-	
-	public static Column nameAs(String name, String alias)
-	{
-		return new Column(tick(name) + AS + tick(alias));
-	}
-	
-	public static Column tableName(String table, String name)
-	{
-		return new Column(tick(table) + DOT + tick(name));
-	}
-	
-	public static Column tableNameAs(String table, String name, String alias)
-	{
-		return new Column(tick(table) + DOT + tick(name) + AS + tick(alias));
+		this.alias = alias;
+		return this;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return sql;
+		StringBuilder builder = new StringBuilder();
+		if(sql != null)
+		{
+			builder.append(sql);
+		}
+		else if(name != null)
+		{
+			if(table != null)
+			{
+				builder.append(tick(table));
+				builder.append(DOT);
+			}
+			builder.append(ALL.equals(name) ? ALL : tick(name));
+		}
+		if(alias != null)
+		{
+			builder.append(AS);
+			builder.append(tick(alias));
+		}
+		return builder.toString();
 	}
 	
 }

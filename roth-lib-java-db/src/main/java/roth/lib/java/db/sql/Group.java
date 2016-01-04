@@ -1,34 +1,53 @@
 package roth.lib.java.db.sql;
 
 @SuppressWarnings("serial")
-public class Group extends Sql
+public abstract class Group extends Sql
 {
 	protected String sql;
+	protected String table;
+	protected String name;
 	
-	protected Group(String sql)
+	protected Group()
+	{
+		
+	}
+	
+	public Group setSql(String sql)
 	{
 		this.sql = sql;
+		return this;
 	}
 	
-	public static Group byName(String name)
+	public Group setTable(String table)
 	{
-		return new Group(tick(name));
+		this.table = table;
+		return this;
 	}
 	
-	public static Group byTableName(String table, String name)
+	public Group setName(String name)
 	{
-		return new Group(tick(table) + DOT + tick(name));
-	}
-	
-	public static Group bySql(String sql)
-	{
-		return new Group(sql);
+		this.name = name;
+		return this;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return sql;
+		if(sql != null)
+		{
+			return sql;
+		}
+		else
+		{
+			StringBuilder builder = new StringBuilder();
+			if(table != null)
+			{
+				builder.append(tick(table));
+				builder.append(DOT);
+			}
+			builder.append(tick(name));
+			return builder.toString();
+		}
 	}
 	
 }

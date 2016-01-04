@@ -5,169 +5,86 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 @SuppressWarnings("serial")
-public class Having extends Condition
+public abstract class Having extends Condition
 {
 	protected String sql;
-	protected LinkedList<Object> values = new LinkedList<Object>();
+	protected String table;
+	protected String name;
+	protected String opType;
 	
-	protected Having(String sql)
+	protected Having()
 	{
-		this.sql = sql;
+		
 	}
-	
-	protected Having(String sql, Object value)
-	{
-		this.sql = sql;
-		values.add(value);
-	}
-	
-	protected Having(String sql, Collection<?> values)
-	{
-		this.sql = sql;
-		this.values.addAll(values);
-	}
-	
-	public static Having sql(String sql)
-	{
-		return new Having(sql);
-	}
-	
-	public static Having sql(String sql, Object value)
-	{
-		return new Having(sql, value);
-	}
-	
-	public static Having sql(String sql, Collection<?> values)
-	{
-		return new Having(sql, values);
-	}
-	
-	public static Having equals(String name, Object value)
-	{
-		return new Having(tick(name) + Op.EQ.get(), value);
-	}
-	
-	public static Having equals(String table, String name, Object value)
-	{
-		return new Having(tick(table) + DOT + tick(name) + Op.EQ.get(), value);
-	}
-	
-	public static Having notEquals(String name, Object value)
-	{
-		return new Having(tick(name) + Op.NE.get(), value);
-	}
-	
-	public static Having notEquals(String table, String name, Object value)
-	{
-		return new Having(tick(table) + DOT + tick(name) + Op.NE.get(), value);
-	}
-	
-	public static Having lessThan(String name, Object value)
-	{
-		return new Having(tick(name) + Op.LT.get(), value);
-	}
-	
-	public static Having lessThan(String table, String name, Object value)
-	{
-		return new Having(tick(table) + DOT + tick(name) + Op.LT.get(), value);
-	}
-	
-	public static Having greaterThan(String name, Object value)
-	{
-		return new Having(tick(name) + Op.GT.get(), value);
-	}
-	
-	public static Having greaterThan(String table, String name, Object value)
-	{
-		return new Having(tick(table) + DOT + tick(name) + Op.GT.get(), value);
-	}
-	
-	public static Having lessThanOrEquals(String name, Object value)
-	{
-		return new Having(tick(name) + Op.LE.get(), value);
-	}
-	
-	public static Having lessThanOrEquals(String table, String name, Object value)
-	{
-		return new Having(tick(table) + DOT + tick(name) + Op.LE.get(), value);
-	}
-	
-	public static Having greaterThanOrEquals(String name, Object value)
-	{
-		return new Having(tick(name) + Op.GE.get(), value);
-	}
-	
-	public static Having greaterThanOrEquals(String table, String name, Object value)
-	{
-		return new Having(tick(table) + DOT + tick(name) + Op.GE.get(), value);
-	}
-	
-	public static Having in(String name, Collection<?> values)
-	{
-		return new Having(tick(name) + String.format(Op.IN.get(), param(values.size())), values);
-	}
-	
-	public static Having in(String table, String name, Collection<?> values)
-	{
-		return new Having(tick(table) + DOT + tick(name) + String.format(Op.IN.get(), param(values.size())), values);
-	}
-	
-	public static Having like(String name, Object value)
-	{
-		return new Having(tick(name) + Op.LIKE.get(), value);
-	}
-	
-	public static Having like(String table, String name, Object value)
-	{
-		return new Having(tick(table) + DOT + tick(name) + Op.LIKE.get(), value);
-	}
-	
-	public static Having between(String name, Object value1, Object value2)
-	{
-		return new Having(tick(name) + Op.BETWEEN.get(), Arrays.asList(value1, value2));
-	}
-	
-	public static Having between(String table, String name, Object value1, Object value2)
-	{
-		return new Having(tick(table) + DOT + tick(name) + Op.BETWEEN.get(), Arrays.asList(value1, value2));
-	}
-	
-	public static Having isNull(String name)
-	{
-		return new Having(tick(name) + Op.IS_NULL.get());
-	}
-	
-	public static Having isNull(String table, String name)
-	{
-		return new Having(tick(table) + DOT + tick(name) + Op.IS_NULL.get());
-	}
-	
-	public static Having isNotNull(String name)
-	{
-		return new Having(tick(name) + Op.IS_NOT_NULL.get());
-	}
-	
-	public static Having isNotNull(String table, String name)
-	{
-		return new Having(tick(table) + DOT + tick(name) + Op.IS_NOT_NULL.get());
-	}
-	
+
 	@Override
-	public LinkedList<Object> values()
+	public Having setLogicType(String logicType)
 	{
-		return values;
+		this.logicType = logicType;
+		return this;
+	}
+	
+	public Having setSql(String sql)
+	{
+		this.sql = sql;
+		return this;
+	}
+	
+	public Having setTable(String table)
+	{
+		this.table = table;
+		return this;
+	}
+	
+	public Having setName(String name)
+	{
+		this.name = name;
+		return this;
+	}
+	
+	public Having setOpType(String opType)
+	{
+		this.opType = opType;
+		return this;
+	}
+	
+	public Having setValues(Collection<?> values)
+	{
+		this.values = new LinkedList<Object>(values);
+		return this;
+	}
+	
+	public Having addValues(Object...values)
+	{
+		this.values.addAll(Arrays.asList(values));
+		return this;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return toStringNested();
+		return toString(false);
 	}
 	
 	@Override
-	public String toStringNested()
+	public String toString(boolean nested)
 	{
-		return sql;
+		if(sql != null)
+		{
+			return sql;
+		}
+		else
+		{
+			StringBuilder builder = new StringBuilder();
+			if(table != null)
+			{
+				builder.append(tick(table));
+				builder.append(DOT);
+			}
+			builder.append(tick(name));
+			builder.append(opType);
+			return builder.toString();
+		}
 	}
 	
 }
