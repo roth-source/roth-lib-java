@@ -6,6 +6,7 @@ import java.util.LinkedList;
 @SuppressWarnings("serial")
 public abstract class Join extends Sql
 {
+	protected String sql;
 	protected String joinType = INNER_JOIN;
 	protected Select select;
 	protected String table;
@@ -15,6 +16,12 @@ public abstract class Join extends Sql
 	protected Join()
 	{
 		
+	}
+	
+	public Join setSql(String sql)
+	{
+		this.sql = sql;
+		return this;
 	}
 	
 	public Join setJoinType(String joinType)
@@ -74,28 +81,35 @@ public abstract class Join extends Sql
 	@Override
 	public String toString()
 	{
-		StringBuilder builder = new StringBuilder();
-		builder.append(joinType.toString());
-		if(select != null)
+		if(sql != null)
 		{
-			builder.append("(");
-			builder.append(LF);
-			builder.append(select.toString(false));
-			builder.append(LF);
-			builder.append("        ) ");
+			return sql;
 		}
 		else
 		{
-			builder.append(tick(table));
+			StringBuilder builder = new StringBuilder();
+			builder.append(joinType.toString());
+			if(select != null)
+			{
+				builder.append("(");
+				builder.append(LF);
+				builder.append(select.toString(false));
+				builder.append(LF);
+				builder.append("        ) ");
+			}
+			else
+			{
+				builder.append(tick(table));
+			}
+			if(alias != null)
+			{
+				builder.append(AS);
+				builder.append(tick(alias));
+			}
+			builder.append(ON);
+			builder.append(list(ons, AND));
+			return builder.toString();
 		}
-		if(alias != null)
-		{
-			builder.append(AS);
-			builder.append(tick(alias));
-		}
-		builder.append(ON);
-		builder.append(list(ons, AND));
-		return builder.toString();
 	}
 	
 }

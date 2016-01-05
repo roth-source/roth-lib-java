@@ -199,6 +199,23 @@ public class EntityReflector
 		return reflector;
 	}
 	
+	public PropertyReflector getFieldReflector(String fieldName, MapperType mapperType, MapperReflector mapperReflector)
+	{
+		PropertyReflector reflector = null;
+		if(fieldName != null)
+		{
+			for(PropertyReflector propertyReflector : getPropertyReflectors(mapperType))
+			{
+				if(fieldName.equalsIgnoreCase(propertyReflector.getFieldName()))
+				{
+					reflector = propertyReflector;
+					break;
+				}
+			}
+		}
+		return reflector;
+	}
+	
 	public String stripNamespace(String name, MapperType type)
 	{
 		if(name != null && MapperType.XML.equals(type))

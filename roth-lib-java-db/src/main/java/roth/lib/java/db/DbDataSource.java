@@ -398,7 +398,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		{
 			for(String name : model.getDirtyNames())
 			{
-				PropertyReflector propertyReflector = entityReflector.getPropertyReflector(name, getMapperType(), getMapperReflector());
+				PropertyReflector propertyReflector = entityReflector.getFieldReflector(name, getMapperType(), getMapperReflector());
 				if(propertyReflector != null)
 				{
 					String column = propertyReflector.getPropertyName(getMapperType());

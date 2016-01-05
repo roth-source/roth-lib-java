@@ -20,6 +20,11 @@ public class MysqlJoin extends Join implements MysqlSqlFactory
 		return this;
 	}
 	
+	public static MysqlJoin sql(String sql)
+	{
+		return (MysqlJoin) new MysqlJoin().setSql(sql);
+	}
+	
 	public static MysqlJoin joinAs(Select select, String alias, On...ons)
 	{
 		return (MysqlJoin) new MysqlJoin().setJoinType(JOIN).setSelect(select).setAlias(alias).addOns(ons);
@@ -148,32 +153,39 @@ public class MysqlJoin extends Join implements MysqlSqlFactory
 	@Override
 	public String toString()
 	{
-		StringBuilder builder = new StringBuilder();
-		builder.append(joinType);
-		if(select != null)
+		if(sql != null)
 		{
-			builder.append("(");
-			builder.append(LF);
-			builder.append(select.toString(false));
-			builder.append(LF);
-			builder.append("        ) ");
+			return sql;
 		}
 		else
 		{
-			builder.append(tick(table));
+			StringBuilder builder = new StringBuilder();
+			builder.append(joinType);
+			if(select != null)
+			{
+				builder.append("(");
+				builder.append(LF);
+				builder.append(select.toString(false));
+				builder.append(LF);
+				builder.append("        ) ");
+			}
+			else
+			{
+				builder.append(tick(table));
+			}
+			if(alias != null)
+			{
+				builder.append(AS);
+				builder.append(tick(alias));
+			}
+			if(indexHint != null)
+			{
+				builder.append(indexHint);
+			}
+			builder.append(ON);
+			builder.append(list(ons, AND));
+			return builder.toString();
 		}
-		if(alias != null)
-		{
-			builder.append(AS);
-			builder.append(tick(alias));
-		}
-		if(indexHint != null)
-		{
-			builder.append(indexHint);
-		}
-		builder.append(ON);
-		builder.append(list(ons, AND));
-		return builder.toString();
 	}
 	
 }
