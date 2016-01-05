@@ -14,7 +14,7 @@ public class Module extends Page
 	
 	public Module()
 	{
-		
+		properties.remove("params");
 	}
 
 	public LinkedHashMap<String, Page> getPageMap()
