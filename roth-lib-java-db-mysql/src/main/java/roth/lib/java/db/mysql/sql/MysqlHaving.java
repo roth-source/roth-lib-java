@@ -90,42 +90,42 @@ public class MysqlHaving extends Having implements MysqlSqlFactory
 	
 	public static MysqlHaving in(String name, Object...values)
 	{
-		return (MysqlHaving) new MysqlHaving().setName(name).setOpType(OP_IN).addValues(values);
+		return (MysqlHaving) new MysqlHaving().setName(name).setOpType(String.format(OP_IN, param(values.length))).addValues(values);
 	}
 	
 	public static MysqlHaving in(String name, Collection<?> values)
 	{
-		return (MysqlHaving) new MysqlHaving().setName(name).setOpType(OP_IN).setValues(values);
+		return (MysqlHaving) new MysqlHaving().setName(name).setOpType(String.format(OP_IN, param(values.size()))).setValues(values);
 	}
 	
 	public static MysqlHaving in(String table, String name, Object...values)
 	{
-		return (MysqlHaving) new MysqlHaving().setTable(table).setName(name).setOpType(OP_IN).addValues(values);
+		return (MysqlHaving) new MysqlHaving().setTable(table).setName(name).setOpType(String.format(OP_IN, param(values.length))).addValues(values);
 	}
 	
 	public static MysqlHaving in(String table, String name, Collection<?> values)
 	{
-		return (MysqlHaving) new MysqlHaving().setTable(table).setName(name).setOpType(OP_IN).setValues(values);
+		return (MysqlHaving) new MysqlHaving().setTable(table).setName(name).setOpType(String.format(OP_IN, param(values.size()))).setValues(values);
 	}
 	
 	public static MysqlHaving notIn(String name, Object...values)
 	{
-		return (MysqlHaving) new MysqlHaving().setName(name).setOpType(OP_NOT_IN).addValues(values);
+		return (MysqlHaving) new MysqlHaving().setName(name).setOpType(String.format(OP_NOT_IN, param(values.length))).addValues(values);
 	}
 	
 	public static MysqlHaving notIn(String name, Collection<?> values)
 	{
-		return (MysqlHaving) new MysqlHaving().setName(name).setOpType(OP_NOT_IN).setValues(values);
+		return (MysqlHaving) new MysqlHaving().setName(name).setOpType(String.format(OP_NOT_IN, param(values.size()))).setValues(values);
 	}
 	
 	public static MysqlHaving notIn(String table, String name, Object...values)
 	{
-		return (MysqlHaving) new MysqlHaving().setTable(table).setName(name).setOpType(OP_NOT_IN).addValues(values);
+		return (MysqlHaving) new MysqlHaving().setTable(table).setName(name).setOpType(String.format(OP_NOT_IN, param(values.length))).addValues(values);
 	}
 	
 	public static MysqlHaving notIn(String table, String name, Collection<?> values)
 	{
-		return (MysqlHaving) new MysqlHaving().setTable(table).setName(name).setOpType(OP_NOT_IN).setValues(values);
+		return (MysqlHaving) new MysqlHaving().setTable(table).setName(name).setOpType(String.format(OP_NOT_IN, param(values.size()))).setValues(values);
 	}
 	
 	public static MysqlHaving like(String name, Object value)
