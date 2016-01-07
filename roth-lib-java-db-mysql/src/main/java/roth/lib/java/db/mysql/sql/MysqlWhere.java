@@ -90,42 +90,42 @@ public class MysqlWhere extends Where implements MysqlSqlFactory
 	
 	public static MysqlWhere in(String name, Object...values)
 	{
-		return (MysqlWhere) new MysqlWhere().setName(name).setOpType(OP_IN).addValues(values);
+		return (MysqlWhere) new MysqlWhere().setName(name).setOpType(String.format(OP_IN, param(values.length))).addValues(values);
 	}
 	
 	public static MysqlWhere in(String name, Collection<?> values)
 	{
-		return (MysqlWhere) new MysqlWhere().setName(name).setOpType(OP_IN).setValues(values);
+		return (MysqlWhere) new MysqlWhere().setName(name).setOpType(String.format(OP_IN, param(values.size()))).setValues(values);
 	}
 	
 	public static MysqlWhere in(String table, String name, Object...values)
 	{
-		return (MysqlWhere) new MysqlWhere().setTable(table).setName(name).setOpType(OP_IN).addValues(values);
+		return (MysqlWhere) new MysqlWhere().setTable(table).setName(name).setOpType(String.format(OP_IN, param(values.length))).addValues(values);
 	}
 	
 	public static MysqlWhere in(String table, String name, Collection<?> values)
 	{
-		return (MysqlWhere) new MysqlWhere().setTable(table).setName(name).setOpType(OP_IN).setValues(values);
+		return (MysqlWhere) new MysqlWhere().setTable(table).setName(name).setOpType(String.format(OP_IN, param(values.size()))).setValues(values);
 	}
 	
 	public static MysqlWhere notIn(String name, Object...values)
 	{
-		return (MysqlWhere) new MysqlWhere().setName(name).setOpType(OP_NOT_IN).addValues(values);
+		return (MysqlWhere) new MysqlWhere().setName(name).setOpType(String.format(OP_NOT_IN, param(values.length))).addValues(values);
 	}
 	
 	public static MysqlWhere notIn(String name, Collection<?> values)
 	{
-		return (MysqlWhere) new MysqlWhere().setName(name).setOpType(OP_NOT_IN).setValues(values);
+		return (MysqlWhere) new MysqlWhere().setName(name).setOpType(String.format(OP_NOT_IN, param(values.size()))).setValues(values);
 	}
 	
 	public static MysqlWhere notIn(String table, String name, Object...values)
 	{
-		return (MysqlWhere) new MysqlWhere().setTable(table).setName(name).setOpType(OP_NOT_IN).addValues(values);
+		return (MysqlWhere) new MysqlWhere().setTable(table).setName(name).setOpType(String.format(OP_NOT_IN, param(values.length))).addValues(values);
 	}
 	
 	public static MysqlWhere notIn(String table, String name, Collection<?> values)
 	{
-		return (MysqlWhere) new MysqlWhere().setTable(table).setName(name).setOpType(OP_NOT_IN).setValues(values);
+		return (MysqlWhere) new MysqlWhere().setTable(table).setName(name).setOpType(String.format(OP_NOT_IN, param(values.size()))).setValues(values);
 	}
 	
 	public static MysqlWhere like(String name, Object value)

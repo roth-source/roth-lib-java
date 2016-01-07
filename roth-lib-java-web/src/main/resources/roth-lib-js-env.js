@@ -10,6 +10,7 @@ roth.lib.js.env.environment = roth.lib.js.env.environment || null;
 roth.lib.js.env.debug = roth.lib.js.env.debug || null;
 roth.lib.js.env.compiled = roth.lib.js.env.compiled || false;
 roth.lib.js.env.context = roth.lib.js.env.context || null;
+roth.lib.js.env.mockDemo = roth.lib.js.env.mockDemo || false;
 roth.lib.js.env.dependencies = roth.lib.js.env.dependencies || [];
 
 /**
@@ -56,6 +57,15 @@ var setHosts = setHosts || function(environment, hosts)
 var setEnvironment = setEnvironment || function(environment)
 {
 	roth.lib.js.env.environment = environment;
+};
+
+/**
+ * sets the environment to mock
+ * @function
+ */
+var setMockDemo = setMockDemo || function()
+{
+	roth.lib.js.env.mockDemo = true;
 };
 
 /**
@@ -250,6 +260,16 @@ var isEnvironment = isEnvironment || function(environment)
 };
 
 /**
+ * is mock demo
+ * @function
+ * @returns {Boolean}
+ */
+var isMockDemo = isMockDemo || function()
+{
+	return roth.lib.js.env.mockDemo;
+}
+
+/**
  * is mock environment
  * @function
  * @returns {Boolean}
@@ -318,8 +338,14 @@ var isDebug = isDebug || function()
 {
 	if(roth.lib.js.env.debug == null)
 	{
-		var search = window.location.search.toLowerCase();
-		roth.lib.js.env.debug = search.indexOf("debug") != -1;
+		if(isFileProtocol())
+		{
+			setDebug(true);
+		}
+		else
+		{
+			setDebug(window.location.search.toLowerCase().indexOf("debug") != -1);
+		}
 	}
 	return roth.lib.js.env.debug;
 };

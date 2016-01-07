@@ -24,170 +24,147 @@ import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
 
-import roth.lib.java.db.DbArray;
-import roth.lib.java.db.DbBlob;
-import roth.lib.java.db.DbCallableStatement;
-import roth.lib.java.db.DbClob;
-import roth.lib.java.db.DbConnection;
-import roth.lib.java.db.DbDatabaseMetaData;
-import roth.lib.java.db.DbDriver;
-import roth.lib.java.db.DbDriverAction;
-import roth.lib.java.db.DbNClob;
-import roth.lib.java.db.DbParameterMetaData;
-import roth.lib.java.db.DbPreparedStatement;
-import roth.lib.java.db.DbRef;
-import roth.lib.java.db.DbResultSet;
-import roth.lib.java.db.DbResultSetMetaData;
-import roth.lib.java.db.DbRowId;
-import roth.lib.java.db.DbSQLData;
-import roth.lib.java.db.DbSQLInput;
-import roth.lib.java.db.DbSQLOutput;
-import roth.lib.java.db.DbSQLType;
-import roth.lib.java.db.DbSQLXML;
-import roth.lib.java.db.DbSavepoint;
-import roth.lib.java.db.DbStatement;
-import roth.lib.java.db.DbStruct;
 import roth.lib.java.db.DbWrapper;
 
 public interface MysqlDbWrapper extends DbWrapper
 {
 	
 	@Override
-	default DbArray wrap(Array array)
+	default MysqlDbArray wrap(Array array)
 	{
-		return array instanceof DbArray ? (DbArray) array : new MysqlDbArray(array);
+		return array instanceof MysqlDbArray ? (MysqlDbArray) array : new MysqlDbArray(array);
 	}
 	
 	@Override
-	default DbBlob wrap(Blob blob)
+	default MysqlDbBlob wrap(Blob blob)
 	{
-		return blob instanceof DbBlob ? (DbBlob) blob : new MysqlDbBlob(blob);
+		return blob instanceof MysqlDbBlob ? (MysqlDbBlob) blob : new MysqlDbBlob(blob);
 	}
 	
 	@Override
-	default DbCallableStatement wrap(CallableStatement callableStatement)
+	default MysqlDbCallableStatement wrap(CallableStatement callableStatement)
 	{
-		return callableStatement instanceof DbCallableStatement ? (DbCallableStatement) callableStatement : new MysqlDbCallableStatement(callableStatement);
+		return callableStatement instanceof MysqlDbCallableStatement ? (MysqlDbCallableStatement) callableStatement : new MysqlDbCallableStatement(callableStatement);
 	}
 	
 	@Override
-	default DbClob wrap(Clob clob)
+	default MysqlDbClob wrap(Clob clob)
 	{
-		return clob instanceof DbClob ? (DbClob) clob : new MysqlDbClob(clob);
+		return clob instanceof MysqlDbClob ? (MysqlDbClob) clob : new MysqlDbClob(clob);
 	}
 	
 	@Override
-	default DbConnection wrap(Connection connection)
+	default MysqlDbConnection wrap(Connection connection)
 	{
-		return connection instanceof DbConnection ? (DbConnection) connection : new MysqlDbConnection(connection);
+		return connection instanceof MysqlDbConnection ? (MysqlDbConnection) connection : new MysqlDbConnection(connection);
 	}
 	
 	@Override
-	default DbDatabaseMetaData wrap(DatabaseMetaData databaseMetaData)
+	default MysqlDbDatabaseMetaData wrap(DatabaseMetaData databaseMetaData)
 	{
-		return databaseMetaData instanceof DbDatabaseMetaData ? (DbDatabaseMetaData) databaseMetaData : new MysqlDbDatabaseMetaData(databaseMetaData);
+		return databaseMetaData instanceof MysqlDbDatabaseMetaData ? (MysqlDbDatabaseMetaData) databaseMetaData : new MysqlDbDatabaseMetaData(databaseMetaData);
 	}
 	
 	@Override
-	default DbDriver wrap(Driver driver)
+	default MysqlDbDriver wrap(Driver driver)
 	{
-		return driver instanceof DbDriver ? (DbDriver) driver : new MysqlDbDriver(driver);
+		return driver instanceof MysqlDbDriver ? (MysqlDbDriver) driver : new MysqlDbDriver(driver);
 	}
 	
 	@Override
-	default DbDriverAction wrap(DriverAction driverAction)
+	default MysqlDbDriverAction wrap(DriverAction driverAction)
 	{
-		return driverAction instanceof DbDriverAction ? (DbDriverAction) driverAction : new MysqlDbDriverAction(driverAction);
+		return driverAction instanceof MysqlDbDriverAction ? (MysqlDbDriverAction) driverAction : new MysqlDbDriverAction(driverAction);
 	}
 	
 	@Override
-	default DbNClob wrap(NClob nClob)
+	default MysqlDbNClob wrap(NClob nClob)
 	{
-		return nClob instanceof DbNClob ? (DbNClob) nClob : new MysqlDbNClob(nClob);
+		return nClob instanceof MysqlDbNClob ? (MysqlDbNClob) nClob : new MysqlDbNClob(nClob);
 	}
 	
 	@Override
-	default DbParameterMetaData wrap(ParameterMetaData parameterMetaData)
+	default MysqlDbParameterMetaData wrap(ParameterMetaData parameterMetaData)
 	{
-		return parameterMetaData instanceof DbParameterMetaData ? (DbParameterMetaData) parameterMetaData : new MysqlDbParameterMetaData(parameterMetaData);
+		return parameterMetaData instanceof MysqlDbParameterMetaData ? (MysqlDbParameterMetaData) parameterMetaData : new MysqlDbParameterMetaData(parameterMetaData);
 	}
 	
 	@Override
-	default DbPreparedStatement wrap(PreparedStatement preparedStatement)
+	default MysqlDbPreparedStatement wrap(PreparedStatement preparedStatement)
 	{
-		return preparedStatement instanceof DbPreparedStatement ? (DbPreparedStatement) preparedStatement : new MysqlDbPreparedStatement(preparedStatement);
+		return preparedStatement instanceof MysqlDbPreparedStatement ? (MysqlDbPreparedStatement) preparedStatement : new MysqlDbPreparedStatement(preparedStatement);
 	}
 	
 	@Override
-	default DbRef wrap(Ref ref)
+	default MysqlDbRef wrap(Ref ref)
 	{
-		return ref instanceof DbRef ? (DbRef) ref : new MysqlDbRef(ref);
+		return ref instanceof MysqlDbRef ? (MysqlDbRef) ref : new MysqlDbRef(ref);
 	}
 	
 	@Override
-	default DbResultSet wrap(ResultSet resultSet)
+	default MysqlDbResultSet wrap(ResultSet resultSet)
 	{
-		return resultSet instanceof DbResultSet ? (DbResultSet) resultSet : new MysqlDbResultSet(resultSet);
+		return resultSet instanceof MysqlDbResultSet ? (MysqlDbResultSet) resultSet : new MysqlDbResultSet(resultSet);
 	}
 	
 	@Override
-	default DbResultSetMetaData wrap(ResultSetMetaData resultSetMetaData)
+	default MysqlDbResultSetMetaData wrap(ResultSetMetaData resultSetMetaData)
 	{
-		return resultSetMetaData instanceof DbResultSetMetaData ? (DbResultSetMetaData) resultSetMetaData : new MysqlDbResultSetMetaData(resultSetMetaData);
+		return resultSetMetaData instanceof MysqlDbResultSetMetaData ? (MysqlDbResultSetMetaData) resultSetMetaData : new MysqlDbResultSetMetaData(resultSetMetaData);
 	}
 	
 	@Override
-	default DbRowId wrap(RowId rowId)
+	default MysqlDbRowId wrap(RowId rowId)
 	{
-		return rowId instanceof DbRowId ? (DbRowId) rowId : new MysqlDbRowId(rowId);
+		return rowId instanceof MysqlDbRowId ? (MysqlDbRowId) rowId : new MysqlDbRowId(rowId);
 	}
 	
 	@Override
-	default DbSavepoint wrap(Savepoint savepoint)
+	default MysqlDbSavepoint wrap(Savepoint savepoint)
 	{
-		return savepoint instanceof DbSavepoint ? (DbSavepoint) savepoint : new MysqlDbSavepoint(savepoint);
+		return savepoint instanceof MysqlDbSavepoint ? (MysqlDbSavepoint) savepoint : new MysqlDbSavepoint(savepoint);
 	}
 	
 	@Override
-	default DbSQLData wrap(SQLData sqlData)
+	default MysqlDbSQLData wrap(SQLData sqlData)
 	{
-		return sqlData instanceof DbSQLData ? (DbSQLData) sqlData : new MysqlDbSQLData(sqlData);
+		return sqlData instanceof MysqlDbSQLData ? (MysqlDbSQLData) sqlData : new MysqlDbSQLData(sqlData);
 	}
 	
 	@Override
-	default DbSQLInput wrap(SQLInput sqlInput)
+	default MysqlDbSQLInput wrap(SQLInput sqlInput)
 	{
-		return sqlInput instanceof DbSQLInput ? (DbSQLInput) sqlInput : new MysqlDbSQLInput(sqlInput);
+		return sqlInput instanceof MysqlDbSQLInput ? (MysqlDbSQLInput) sqlInput : new MysqlDbSQLInput(sqlInput);
 	}
 	
 	@Override
-	default DbSQLOutput wrap(SQLOutput sqlOutput)
+	default MysqlDbSQLOutput wrap(SQLOutput sqlOutput)
 	{
-		return sqlOutput instanceof DbSQLOutput ? (DbSQLOutput) sqlOutput : new MysqlDbSQLOutput(sqlOutput);
+		return sqlOutput instanceof MysqlDbSQLOutput ? (MysqlDbSQLOutput) sqlOutput : new MysqlDbSQLOutput(sqlOutput);
 	}
 	
 	@Override
-	default DbSQLType wrap(SQLType sqlType)
+	default MysqlDbSQLType wrap(SQLType sqlType)
 	{
-		return sqlType instanceof DbSQLType ? (DbSQLType) sqlType : new MysqlDbSQLType(sqlType);
+		return sqlType instanceof MysqlDbSQLType ? (MysqlDbSQLType) sqlType : new MysqlDbSQLType(sqlType);
 	}
 	
 	@Override
-	default DbSQLXML wrap(SQLXML sqlXml)
+	default MysqlDbSQLXML wrap(SQLXML sqlXml)
 	{
-		return sqlXml instanceof DbSQLXML ? (DbSQLXML) sqlXml : new MysqlDbSQLXML(sqlXml);
+		return sqlXml instanceof MysqlDbSQLXML ? (MysqlDbSQLXML) sqlXml : new MysqlDbSQLXML(sqlXml);
 	}
 	
 	@Override
-	default DbStatement wrap(Statement statement)
+	default MysqlDbStatement wrap(Statement statement)
 	{
-		return statement instanceof DbStatement ? (DbStatement) statement : new MysqlDbStatement(statement);
+		return statement instanceof MysqlDbStatement ? (MysqlDbStatement) statement : new MysqlDbStatement(statement);
 	}
 	
 	@Override
-	default DbStruct wrap(Struct struct)
+	default MysqlDbStruct wrap(Struct struct)
 	{
-		return struct instanceof DbStruct ? (DbStruct) struct : new MysqlDbStruct(struct);
+		return struct instanceof MysqlDbStruct ? (MysqlDbStruct) struct : new MysqlDbStruct(struct);
 	}
 	
 }

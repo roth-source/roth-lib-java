@@ -561,42 +561,42 @@ public abstract class Select extends Sql implements SqlFactory
 	
 	public Select orWhereIn(String name, Object...values)
 	{
-		return orWhere(newWhere().setName(name).setOpType(OP_IN).addValues(values));
+		return orWhere(newWhere().setName(name).setOpType(String.format(OP_IN, param(values.length))).addValues(values));
 	}
 	
 	public Select orWhereIn(String name, Collection<?> values)
 	{
-		return orWhere(newWhere().setName(name).setOpType(OP_IN).setValues(values));
+		return orWhere(newWhere().setName(name).setOpType(String.format(OP_IN, param(values.size()))).setValues(values));
 	}
 	
 	public Select orWhereIn(String table, String name, Object...values)
 	{
-		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_IN).addValues(values));
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(String.format(OP_IN, param(values.length))).addValues(values));
 	}
 	
 	public Select orWhereIn(String table, String name, Collection<?> values)
 	{
-		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_IN).setValues(values));
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(String.format(OP_IN, param(values.size()))).setValues(values));
 	}
 	
 	public Select orWhereNotIn(String name, Object...values)
 	{
-		return orWhere(newWhere().setName(name).setOpType(OP_NOT_IN).addValues(values));
+		return orWhere(newWhere().setName(name).setOpType(String.format(OP_NOT_IN, param(values.length))).addValues(values));
 	}
 	
 	public Select orWhereNotIn(String name, Collection<?> values)
 	{
-		return orWhere(newWhere().setName(name).setOpType(OP_NOT_IN).setValues(values));
+		return orWhere(newWhere().setName(name).setOpType(String.format(OP_NOT_IN, param(values.size()))).setValues(values));
 	}
 	
 	public Select orWhereNotIn(String table, String name, Object...values)
 	{
-		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_NOT_IN).addValues(values));
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(String.format(OP_NOT_IN, param(values.length))).addValues(values));
 	}
 	
 	public Select orWhereNotIn(String table, String name, Collection<?> values)
 	{
-		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_NOT_IN).setValues(values));
+		return orWhere(newWhere().setTable(table).setName(name).setOpType(String.format(OP_NOT_IN, param(values.size()))).setValues(values));
 	}
 	
 	public Select orWhereLike(String name, Object value)
@@ -794,42 +794,42 @@ public abstract class Select extends Sql implements SqlFactory
 	
 	public Select havingIn(String name, Object...values)
 	{
-		return having(newHaving().setName(name).setOpType(OP_IN).addValues(values));
+		return having(newHaving().setName(name).setOpType(String.format(OP_IN, param(values.length))).addValues(values));
 	}
 	
 	public Select havingIn(String name, Collection<?> values)
 	{
-		return having(newHaving().setName(name).setOpType(OP_IN).setValues(values));
+		return having(newHaving().setName(name).setOpType(String.format(OP_IN, param(values.size()))).setValues(values));
 	}
 	
 	public Select havingIn(String table, String name, Object...values)
 	{
-		return having(newHaving().setTable(table).setName(name).setOpType(OP_IN).addValues(values));
+		return having(newHaving().setTable(table).setName(name).setOpType(String.format(OP_IN, param(values.length))).addValues(values));
 	}
 	
 	public Select havingIn(String table, String name, Collection<?> values)
 	{
-		return having(newHaving().setTable(table).setName(name).setOpType(OP_IN).setValues(values));
+		return having(newHaving().setTable(table).setName(name).setOpType(String.format(OP_IN, param(values.size()))).setValues(values));
 	}
 	
 	public Select havingNotIn(String name, Object...values)
 	{
-		return having(newHaving().setName(name).setOpType(OP_NOT_IN).addValues(values));
+		return having(newHaving().setName(name).setOpType(String.format(OP_NOT_IN, param(values.length))).addValues(values));
 	}
 	
 	public Select havingNotIn(String name, Collection<?> values)
 	{
-		return having(newHaving().setName(name).setOpType(OP_NOT_IN).setValues(values));
+		return having(newHaving().setName(name).setOpType(String.format(OP_NOT_IN, param(values.size()))).setValues(values));
 	}
 	
 	public Select havingNotIn(String table, String name, Object...values)
 	{
-		return having(newHaving().setTable(table).setName(name).setOpType(OP_NOT_IN).addValues(values));
+		return having(newHaving().setTable(table).setName(name).setOpType(String.format(OP_NOT_IN, param(values.length))).addValues(values));
 	}
 	
 	public Select havingNotIn(String table, String name, Collection<?> values)
 	{
-		return having(newHaving().setTable(table).setName(name).setOpType(OP_NOT_IN).setValues(values));
+		return having(newHaving().setTable(table).setName(name).setOpType(String.format(OP_NOT_IN, param(values.size()))).setValues(values));
 	}
 	
 	public Select havingLike(String name, Object value)

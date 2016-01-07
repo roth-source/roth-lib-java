@@ -62,6 +62,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			@Override
 			public void run()
 			{
+				System.out.println("Closing Connections");
 				close();
 			}
 		}));
@@ -455,10 +456,13 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			}
 			else
 			{
-				Object value = resultSet.getValue(1, klass);
-				if(value != null && value.getClass().isAssignableFrom(klass))
+				while(resultSet.next())
 				{
-					callback.call((T) value);
+					Object value = resultSet.getValue(1, klass);
+					if(value != null && value.getClass().isAssignableFrom(klass))
+					{
+						callback.call((T) value);
+					}
 				}
 			}
 		}
@@ -489,10 +493,13 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			}
 			else
 			{
-				Object value = resultSet.getValue(1, klass);
-				if(value != null && value.getClass().isAssignableFrom(klass))
+				while(resultSet.next())
 				{
-					models.add((T) value);
+					Object value = resultSet.getValue(1, klass);
+					if(value != null && value.getClass().isAssignableFrom(klass))
+					{
+						models.add((T) value);
+					}
 				}
 			}
 		}
