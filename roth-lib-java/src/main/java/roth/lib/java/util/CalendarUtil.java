@@ -148,7 +148,7 @@ public class CalendarUtil
 	public static Calendar month(Calendar calendar, boolean clone)
 	{
 		Calendar clonedCalendar = clone ? (Calendar) calendar.clone() : calendar;
-		clonedCalendar.set(Calendar.DAY_OF_MONTH, 0);
+		clonedCalendar.set(Calendar.DAY_OF_MONTH, 1);
 		clonedCalendar.set(Calendar.HOUR_OF_DAY, 0);
 		clonedCalendar.set(Calendar.MINUTE, 0);
 		clonedCalendar.set(Calendar.SECOND, 0);
