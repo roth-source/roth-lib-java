@@ -4,17 +4,17 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 
 import roth.lib.java.Generic;
+import roth.lib.java.http.HttpClient;
+import roth.lib.java.http.HttpHeader;
+import roth.lib.java.http.HttpHeaders;
+import roth.lib.java.http.HttpMethod;
+import roth.lib.java.http.HttpRequest;
+import roth.lib.java.http.HttpResponse;
+import roth.lib.java.http.HttpUrl;
 import roth.lib.java.inputter.Inputter;
 import roth.lib.java.inputter.MapperInputter;
 import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
-import roth.lib.java.net.http.HttpClient;
-import roth.lib.java.net.http.HttpHeader;
-import roth.lib.java.net.http.HttpHeaders;
-import roth.lib.java.net.http.HttpMethod;
-import roth.lib.java.net.http.HttpRequest;
-import roth.lib.java.net.http.HttpResponse;
-import roth.lib.java.net.http.HttpUrl;
 import roth.lib.java.outputter.MapperOutputter;
 import roth.lib.java.outputter.Outputter;
 import roth.lib.java.reflector.MapperReflector;
@@ -181,22 +181,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> T get(HttpUrl url, Type type, HttpHeader... headers)
 	{
-		return get(url, null, type, headers);
-	}
-	
-	protected <T extends ApiResponse> T get(HttpUrl url, ApiRequest apiRequest, HttpHeader... headers)
-	{
-		return get(url, apiRequest, (Type) null, headers);
-	}
-	
-	protected <T extends ApiResponse> T get(HttpUrl url, ApiRequest apiRequest, Generic<T> generic, HttpHeader... headers)
-	{
-		return get(url, apiRequest, generic.getType(), headers);
-	}
-	
-	protected <T extends ApiResponse> T get(HttpUrl url, ApiRequest apiRequest, Type type, HttpHeader... headers)
-	{
-		return connect(url, apiRequest, type, HttpMethod.GET, false, headers);
+		return connect(url, null, type, HttpMethod.GET, false, headers);
 	}
 	
 	protected <T extends ApiResponse> T post(HttpUrl url, HttpHeader... headers)
@@ -397,24 +382,9 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected <T extends ApiResponse> HttpResponse<T> getResponse(HttpUrl url, Type type, HttpHeader... headers)
 	{
-		return getResponse(url, null, type, headers);
+		return connectResponse(url, null, type, HttpMethod.GET, false, headers);
 	}
 	
-	protected <T extends ApiResponse> HttpResponse<T> getResponse(HttpUrl url, ApiRequest apiRequest, HttpHeader... headers)
-	{
-		return getResponse(url, apiRequest, (Type) null, headers);
-	}
-	
-	protected <T extends ApiResponse> HttpResponse<T> getResponse(HttpUrl url, ApiRequest apiRequest, Generic<T> generic, HttpHeader... headers)
-	{
-		return getResponse(url, apiRequest, generic.getType(), headers);
-	}
-	
-	protected <T extends ApiResponse> HttpResponse<T> getResponse(HttpUrl url, ApiRequest apiRequest, Type type, HttpHeader... headers)
-	{
-		return connectResponse(url, apiRequest, type, HttpMethod.GET, false, headers);
-	}
-
 	protected <T extends ApiResponse> HttpResponse<T> postResponse(HttpUrl url, HttpHeader... headers)
 	{
 		return postResponse(url, (Type) null, headers);

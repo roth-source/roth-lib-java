@@ -291,20 +291,24 @@ public class EntityReflector
 				}
 			}
 			
-			Field attributesField = getAttributesReflector().getField();
-			if(attributesField != null)
+			AttributesReflector attributesReflector = getAttributesReflector();
+			if(attributesReflector != null)
 			{
-				try
+				Field attributesField = attributesReflector.getField();
+				if(attributesField != null)
 				{
-					Object attributesObject = attributesField.get(value);
-					if(attributesObject instanceof Map)
+					try
 					{
-						((Map<String, String>) attributesObject).putAll(attributeMap);
+						Object attributesObject = attributesField.get(value);
+						if(attributesObject instanceof Map)
+						{
+							((Map<String, String>) attributesObject).putAll(attributeMap);
+						}
 					}
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
 				}
 			}
 		}

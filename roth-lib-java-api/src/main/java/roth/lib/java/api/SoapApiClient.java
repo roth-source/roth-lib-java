@@ -1,6 +1,6 @@
 package roth.lib.java.api;
 
-import roth.lib.java.net.http.HttpResponse;
+import roth.lib.java.http.HttpResponse;
 import roth.lib.java.xml.soap.SoapBody;
 import roth.lib.java.xml.soap.SoapEnvelope;
 import roth.lib.java.xml.soap.SoapException;

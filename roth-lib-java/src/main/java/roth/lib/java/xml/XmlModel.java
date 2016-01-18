@@ -5,7 +5,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import roth.lib.java.annotation.Attributes;
+import roth.lib.java.annotation.Entity;
 
+@Entity
 @SuppressWarnings("serial")
 public class XmlModel implements Serializable
 {

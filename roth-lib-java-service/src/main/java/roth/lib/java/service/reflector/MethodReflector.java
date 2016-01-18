@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
-import roth.lib.java.net.http.HttpMethod;
+import roth.lib.java.http.HttpMethod;
 import roth.lib.java.service.HttpService;
 import roth.lib.java.service.annotation.ServiceMethod;
 import roth.lib.java.util.AnnotationUtil;

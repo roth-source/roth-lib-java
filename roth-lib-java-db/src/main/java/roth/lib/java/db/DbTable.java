@@ -84,6 +84,16 @@ public abstract class DbTable<T> implements SqlFactory
 		return newDelete().setTable(tableName());
 	}
 	
+	public T findById(String id)
+	{
+		return id != null ? findBy(getDb().toIdWheres(klass, id)) : null;
+	}
+	
+	public T findById(Integer id)
+	{
+		return id != null ? findBy(getDb().toIdWheres(klass, id)) : null;
+	}
+	
 	public T findBy(Where... wheres)
 	{
 		return findBy(newWheres().andConditions(wheres));

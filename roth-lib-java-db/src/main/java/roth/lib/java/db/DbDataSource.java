@@ -321,6 +321,22 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			e.printStackTrace();
 		}
 	}
+
+	public Wheres toIdWheres(Class<?> klass, Object...values)
+	{
+		Wheres wheres = newWheres();
+		if(values != null)
+		{
+			EntityReflector entityReflector = getMapperReflector().getEntityReflector(klass);
+			int i = 0;
+			for(PropertyReflector idReflector : entityReflector.getIdReflectors(getMapperType()))
+			{
+				String propertyName = idReflector.getPropertyName(getMapperType());
+				wheres.andWhere(newWhere().setOpType(OP_EQ).setName(propertyName).addValues(values[i++]));
+			}
+		}
+		return wheres;
+	}
 	
 	public Wheres toIdWheres(DbModel model)
 	{
