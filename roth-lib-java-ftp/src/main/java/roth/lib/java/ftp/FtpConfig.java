@@ -1,5 +1,7 @@
 package roth.lib.java.ftp;
 
+import org.apache.commons.net.ftp.FTP;
+
 public class FtpConfig
 {
 	protected static Integer PORT = 21;
@@ -14,6 +16,9 @@ public class FtpConfig
 	protected String account;
 	protected String protocol;
 	protected boolean implicit = true;
+	protected boolean passive = true;
+	protected int type = FTP.BINARY_FILE_TYPE;
+	protected int mode = FTP.STREAM_TRANSFER_MODE;
 	
 	public FtpConfig(String host)
 	{
@@ -66,6 +71,21 @@ public class FtpConfig
 		return implicit;
 	}
 	
+	public boolean isPassive()
+	{
+		return passive;
+	}
+	
+	public int getType()
+	{
+		return type;
+	}
+	
+	public int getMode()
+	{
+		return mode;
+	}
+	
 	public FtpConfig setHost(String host)
 	{
 		this.host = host;
@@ -111,6 +131,24 @@ public class FtpConfig
 	public FtpConfig setImplicit(boolean implicit)
 	{
 		this.implicit = implicit;
+		return this;
+	}
+	
+	public FtpConfig setPassive(boolean passive)
+	{
+		this.passive = passive;
+		return this;
+	}
+	
+	public FtpConfig setType(int type)
+	{
+		this.type = type;
+		return this;
+	}
+	
+	public FtpConfig setMode(int mode)
+	{
+		this.mode = mode;
 		return this;
 	}
 	

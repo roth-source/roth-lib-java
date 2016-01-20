@@ -3,11 +3,14 @@ package roth.lib.java.ssh;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.Vector;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
 
 public class Sftp implements AutoCloseable
 {
@@ -21,13 +24,20 @@ public class Sftp implements AutoCloseable
 		this.ssh = ssh;
 	}
 	
-	public ChannelSftp openChannelSftp() throws JSchException
+	public ChannelSftp openChannelSftp()
 	{
-		ssh.connect();
-		if(channelSftp == null || channelSftp.isClosed())
+		try
 		{
-			channelSftp = (ChannelSftp) ssh.session.openChannel(SFTP);
-			channelSftp.connect();
+			ssh.connect();
+			if(channelSftp == null || channelSftp.isClosed())
+			{
+				channelSftp = (ChannelSftp) ssh.session.openChannel(SFTP);
+				channelSftp.connect();
+			}
+		}
+		catch(JSchException e)
+		{
+			throw new SshException(e);
 		}
 		return channelSftp;
 	}
@@ -47,9 +57,9 @@ public class Sftp implements AutoCloseable
 				}
 			}
 		}
-		catch(Exception e)
+		catch(SftpException e)
 		{
-			e.printStackTrace();
+			throw new SshException(e);
 		}
 		return lines;
 	}
@@ -71,25 +81,29 @@ public class Sftp implements AutoCloseable
 	{
 		try(FileInputStream input = new FileInputStream(source);)
 		{
-			openChannelSftp();
-			channelSftp.put(input, dest);
+			put(input, dest);
 		}
-		catch(Exception e)
+		catch(IOException e)
 		{
 			e.printStackTrace();
 		}
 	}
 	
-	public void put(String source, String dest)
+	public void put(byte[] bytes, String dest)
+	{
+		put(new ByteArrayInputStream(bytes), dest);
+	}
+	
+	public void put(InputStream input, String dest)
 	{
 		try
 		{
 			openChannelSftp();
-			channelSftp.put(new ByteArrayInputStream(source.getBytes()), dest);
+			channelSftp.put(input, dest);
 		}
-		catch(Exception e)
+		catch(SftpException e)
 		{
-			e.printStackTrace();
+			throw new SshException(e);
 		}
 	}
 	
