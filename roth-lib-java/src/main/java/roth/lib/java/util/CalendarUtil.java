@@ -195,6 +195,17 @@ public class CalendarUtil
 		return clonedCalendar;
 	}
 	
+	public static Calendar hour(int hour)
+	{
+		return hour(hour(), hour);
+	}
+	
+	public static Calendar hour(Calendar calendar, int hour)
+	{
+		calendar.set(Calendar.HOUR, hour);
+		return calendar;
+	}
+	
 	public static Calendar minute()
 	{
 		return minute(now(), false);
@@ -211,6 +222,18 @@ public class CalendarUtil
 		clonedCalendar.set(Calendar.SECOND, 0);
 		clonedCalendar.set(Calendar.MILLISECOND, 0);
 		return clonedCalendar;
+	}
+	
+	public static Calendar minute(int hour, int minute)
+	{
+		return minute(minute(), hour, minute);
+	}
+	
+	public static Calendar minute(Calendar calendar, int hour, int minute)
+	{
+		calendar.set(Calendar.HOUR, hour);
+		calendar.set(Calendar.MINUTE, minute);
+		return calendar;
 	}
 	
 	public static Calendar second()

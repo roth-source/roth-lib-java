@@ -370,6 +370,16 @@ public class XmlMapper extends Mapper
 					model = readEntity(reader, (OpenTag) tag, type);
 					break;
 				}
+				else if(tag instanceof EmptyTag)
+				{
+					EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
+					Class<T> klass = getTypeClass(type);
+					Constructor<T> constructor = klass.getDeclaredConstructor();
+					constructor.setAccessible(true);
+					model = constructor.newInstance();
+					entityReflector.setAttributeMap(model, getMapperType(), ((EmptyTag) tag).getAttributeMap());
+					break;
+				}
 				else if(tag instanceof CloseTag)
 				{
 					break;

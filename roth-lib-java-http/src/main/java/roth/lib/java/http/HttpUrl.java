@@ -63,7 +63,7 @@ public class HttpUrl
 	protected InetAddress inetAddress;
 	protected int port;
 	protected String path = "/";
-	protected LinkedHashMap<String, String> parameterMap = new LinkedHashMap<String, String>();
+	protected LinkedHashMap<String, String> paramMap = new LinkedHashMap<String, String>();
 	protected String hash;
 	
 	public HttpUrl()
@@ -142,7 +142,7 @@ public class HttpUrl
 			{
 				throw new HttpUrlException("invalid port");
 			}
-			String path = UrlUtil.decode(matcher.group(PATH));
+			String path = matcher.group(PATH);
 			this.path = path != null ? path : "/";
 			String parameters = matcher.group(PARAM);
 			if(parameters != null)
@@ -153,11 +153,11 @@ public class HttpUrl
 					
 						String name = UrlUtil.decode(parameterMatcher.group(NAME));
 						String value = UrlUtil.decode(parameterMatcher.group(VALUE));
-						this.parameterMap.put(name, value);
+						this.paramMap.put(name, value);
 					
 				}
 			}
-			String hash = UrlUtil.decode(matcher.group(HASH));
+			String hash = matcher.group(HASH);
 			this.hash = hash;
 		}
 		else
@@ -191,9 +191,9 @@ public class HttpUrl
 		return path;
 	}
 	
-	public LinkedHashMap<String, String> getParameterMap()
+	public LinkedHashMap<String, String> getParamMap()
 	{
-		return parameterMap;
+		return paramMap;
 	}
 	
 	public String getHash()
@@ -257,15 +257,21 @@ public class HttpUrl
 		return this;
 	}
 	
-	public HttpUrl setParameter(String name, String value)
+	public HttpUrl addParam(String name, String value)
 	{
-		this.parameterMap.put(name, value);
+		this.paramMap.put(name, value);
 		return this;
 	}
 	
-	public HttpUrl setParameters(Map<String, String> parameterMap)
+	public HttpUrl addParams(Map<String, String> paramMap)
 	{
-		this.parameterMap.putAll(parameterMap);
+		this.paramMap.putAll(paramMap);
+		return this;
+	}
+	
+	public HttpUrl setParams(LinkedHashMap<String, String> paramMap)
+	{
+		this.paramMap = paramMap;
 		return this;
 	}
 	
@@ -295,12 +301,12 @@ public class HttpUrl
 	public String toResourcePath()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder.append(UrlUtil.encode(path));
-		if(!parameterMap.isEmpty())
+		builder.append(path);
+		if(!paramMap.isEmpty())
 		{
 			builder.append("?");
 			String seperator = "";
-			for(Entry<String, String> parameterEntry : parameterMap.entrySet())
+			for(Entry<String, String> parameterEntry : paramMap.entrySet())
 			{
 				builder.append(seperator);
 				builder.append(UrlUtil.encode(parameterEntry.getKey()));
@@ -318,7 +324,7 @@ public class HttpUrl
 		if(hash != null)
 		{
 			builder.append("#");
-			builder.append(UrlUtil.encode(hash));
+			builder.append(hash);
 		}
 		return builder.toString();
 	}

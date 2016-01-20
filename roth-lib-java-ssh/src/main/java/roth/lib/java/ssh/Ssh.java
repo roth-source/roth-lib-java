@@ -49,18 +49,41 @@ public class Ssh implements AutoCloseable
 		}
 	}
 	
-	public void connect() throws JSchException
+	public Ssh connect()
 	{
 		if(session == null || !session.isConnected())
 		{
-			session = jsch.getSession(config.getUsername(), config.getHost(), config.getPort());
-			if(config.hasPassword())
+			try
 			{
-				session.setPassword(config.getPassword());
+				session = jsch.getSession(config.getUsername(), config.getHost(), config.getPort());
+				if(config.hasPassword())
+				{
+					session.setPassword(config.getPassword());
+				}
+				session.setConfig(new Hashtable<String, String>(config.getConfig()));
+				session.connect();
 			}
-			session.setConfig(new Hashtable<String, String>(config.getConfig()));
-			session.connect();
+			catch(JSchException e)
+			{
+				throw new SshException(e);
+			}
 		}
+		return this;
+	}
+	
+	public JSch getJSch()
+	{
+		return jsch;
+	}
+	
+	public Session getSession()
+	{
+		return session;
+	}
+	
+	public ChannelExec getChannelExec()
+	{
+		return channelExec;
 	}
 	
 	public Sftp sftp()
@@ -68,12 +91,19 @@ public class Ssh implements AutoCloseable
 		return new Sftp(this);
 	}
 	
-	public ChannelExec openChannelExec() throws JSchException
+	public ChannelExec openChannelExec()
 	{
 		connect();
 		if(channelExec == null || channelExec.isClosed())
 		{
-			channelExec = (ChannelExec) session.openChannel(EXEC);
+			try
+			{
+				channelExec = (ChannelExec) session.openChannel(EXEC);
+			}
+			catch(JSchException e)
+			{
+				throw new SshException(e);
+			}
 		}
 		return channelExec;
 	}
@@ -131,7 +161,7 @@ public class Ssh implements AutoCloseable
 				output.flush();
 			}
 		}
-		catch(Exception e)
+		catch(JSchException | IOException e)
 		{
 			throw new SshException(e);
 		}
