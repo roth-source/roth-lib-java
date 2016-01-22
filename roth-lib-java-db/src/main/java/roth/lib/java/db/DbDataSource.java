@@ -948,6 +948,11 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	
 	protected int executeInsert(String sql, Collection<Object> values, DbModel model)
 	{
+		return executeInsert(sql, values, (DbModel) null, 0);
+	}
+	
+	protected int executeInsert(String sql, Collection<Object> values, DbModel model, int attempt)
+	{
 		int result = 0;
 		try(DbConnection connection = getConnection())
 		{
@@ -959,12 +964,19 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			catch(SQLException e)
 			{
 				connection.rollback();
-				throw new DbException(e);
+				throw e;
 			}
 		}
 		catch(SQLException e)
 		{
-			throw new DbException(e);
+			if(isDeadLockException(e) && attempt++ < getDeadLockRetries())
+			{
+				result = executeInsert(sql, values, model, attempt);
+			}
+			else
+			{
+				throw new DbException(e);
+			}
 		}
 		return result;
 	}
@@ -1009,7 +1021,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		}
 		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values, generatedColumns))
 		{
-			result = executeInsert(preparedStatement, 0);
+			result = preparedStatement.executeUpdate();
 			if(model != null)
 			{
 				model.persisted();
@@ -1021,27 +1033,6 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 						setGeneratedFields(resultSet, generatedColumns, model);
 					}
 				}
-			}
-		}
-		return result;
-	}
-	
-	protected int executeInsert(DbPreparedStatement preparedStatement, int attempt) throws SQLException
-	{
-		int result = 0;
-		try
-		{
-			result = preparedStatement.executeUpdate();
-		}
-		catch(Exception e)
-		{
-			if(isDeadLockException(e) && attempt++ < getDeadLockRetries())
-			{
-				result = executeInsert(preparedStatement, attempt);
-			}
-			else
-			{
-				throw e;
 			}
 		}
 		return result;
@@ -1079,6 +1070,11 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	
 	protected int executeUpdate(String sql, Collection<Object> values, DbModel model)
 	{
+		return executeUpdate(sql, values, model, 0);
+	}
+	
+	protected int executeUpdate(String sql, Collection<Object> values, DbModel model, int attempt)
+	{
 		int result = 0;
 		try(DbConnection connection = getConnection())
 		{
@@ -1090,12 +1086,19 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			catch(SQLException e)
 			{
 				connection.rollback();
-				throw new DbException(e);
+				throw e;
 			}
 		}
 		catch(SQLException e)
 		{
-			throw new DbException(e);
+			if(isDeadLockException(e) && attempt++ < getDeadLockRetries())
+			{
+				result = executeUpdate(sql, values, model, attempt);
+			}
+			else
+			{
+				throw new DbException(e);
+			}
 		}
 		return result;
 	}
@@ -1135,32 +1138,11 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		int result = 0;
 		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
 		{
-			result = executeUpdate(preparedStatement, 0);
+			result = preparedStatement.executeUpdate();
 			if(model != null)
 			{
 				model.persisted();
 				model.resetDirty();
-			}
-		}
-		return result;
-	}
-	
-	protected int executeUpdate(DbPreparedStatement preparedStatement, int attempt) throws SQLException
-	{
-		int result = 0;
-		try
-		{
-			result = preparedStatement.executeUpdate();
-		}
-		catch(Exception e)
-		{
-			if(isDeadLockException(e) && attempt++ < getDeadLockRetries())
-			{
-				result = executeUpdate(preparedStatement, attempt);
-			}
-			else
-			{
-				throw e;
 			}
 		}
 		return result;
@@ -1198,6 +1180,11 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	
 	protected int executeDelete(String sql, Collection<Object> values, DbModel model)
 	{
+		return executeDelete(sql, values, model, 0);
+	}
+	
+	protected int executeDelete(String sql, Collection<Object> values, DbModel model, int attempt)
+	{
 		int result = 0;
 		try(DbConnection connection = getConnection())
 		{
@@ -1209,12 +1196,19 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			catch(SQLException e)
 			{
 				connection.rollback();
-				throw new DbException(e);
+				throw e;
 			}
 		}
 		catch(SQLException e)
 		{
-			throw new DbException(e);
+			if(isDeadLockException(e) && attempt++ < getDeadLockRetries())
+			{
+				result = executeDelete(sql, values, model, attempt);
+			}
+			else
+			{
+				throw new DbException(e);
+			}
 		}
 		return result;
 	}
@@ -1254,32 +1248,11 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		int result = 0;
 		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
 		{
-			result = executeDelete(preparedStatement, 0);
+			result = preparedStatement.executeUpdate();
 			if(model != null)
 			{
 				model.deleted();
 				model.resetDirty();
-			}
-		}
-		return result;
-	}
-	
-	protected int executeDelete(DbPreparedStatement preparedStatement, int attempt) throws SQLException
-	{
-		int result = 0;
-		try
-		{
-			result = preparedStatement.executeUpdate();
-		}
-		catch(Exception e)
-		{
-			if(isDeadLockException(e) && attempt++ < getDeadLockRetries())
-			{
-				result = executeDelete(preparedStatement, attempt);
-			}
-			else
-			{
-				throw e;
 			}
 		}
 		return result;
