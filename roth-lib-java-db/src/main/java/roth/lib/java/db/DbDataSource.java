@@ -43,6 +43,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	protected Properties properties;
 	protected int maxConnections = 20;
 	protected int loginTimeout = 60;
+	protected int deadLockRetries = 3;
 	protected PrintWriter logWriter;
 	protected ConcurrentLinkedDeque<DbConnection> availableConnections = new ConcurrentLinkedDeque<DbConnection>();
 	protected ConcurrentLinkedDeque<DbConnection> usedConnections = new ConcurrentLinkedDeque<DbConnection>();
@@ -122,6 +123,8 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		this.mapperReflector = MapperReflector.get();
 	}
 	
+	protected abstract boolean isDeadLockException(Exception e);
+	
 	public MapperType getMapperType()
 	{
 		return mapperType;
@@ -156,6 +159,11 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	public void setMaxConnections(int maxConnections)
 	{
 		this.maxConnections = maxConnections;
+	}
+	
+	public void setDeadLockRetries(int deadLockRetries)
+	{
+		this.deadLockRetries = deadLockRetries;
 	}
 	
 	@Override
@@ -256,6 +264,11 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	public int getLoginTimeout()
 	{
 		return loginTimeout;
+	}
+	
+	public int getDeadLockRetries()
+	{
+		return deadLockRetries;
 	}
 	
 	@Override
@@ -996,7 +1009,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		}
 		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values, generatedColumns))
 		{
-			result = preparedStatement.executeUpdate();
+			result = executeInsert(preparedStatement, 0);
 			if(model != null)
 			{
 				model.persisted();
@@ -1008,6 +1021,27 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 						setGeneratedFields(resultSet, generatedColumns, model);
 					}
 				}
+			}
+		}
+		return result;
+	}
+	
+	protected int executeInsert(DbPreparedStatement preparedStatement, int attempt) throws SQLException
+	{
+		int result = 0;
+		try
+		{
+			result = preparedStatement.executeUpdate();
+		}
+		catch(Exception e)
+		{
+			if(isDeadLockException(e) && attempt++ < getDeadLockRetries())
+			{
+				result = executeInsert(preparedStatement, attempt);
+			}
+			else
+			{
+				throw e;
 			}
 		}
 		return result;
@@ -1101,11 +1135,32 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		int result = 0;
 		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
 		{
-			result = preparedStatement.executeUpdate();
+			result = executeUpdate(preparedStatement, 0);
 			if(model != null)
 			{
 				model.persisted();
 				model.resetDirty();
+			}
+		}
+		return result;
+	}
+	
+	protected int executeUpdate(DbPreparedStatement preparedStatement, int attempt) throws SQLException
+	{
+		int result = 0;
+		try
+		{
+			result = preparedStatement.executeUpdate();
+		}
+		catch(Exception e)
+		{
+			if(isDeadLockException(e) && attempt++ < getDeadLockRetries())
+			{
+				result = executeUpdate(preparedStatement, attempt);
+			}
+			else
+			{
+				throw e;
 			}
 		}
 		return result;
@@ -1199,11 +1254,32 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		int result = 0;
 		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
 		{
-			result = preparedStatement.executeUpdate();
+			result = executeDelete(preparedStatement, 0);
 			if(model != null)
 			{
 				model.deleted();
 				model.resetDirty();
+			}
+		}
+		return result;
+	}
+	
+	protected int executeDelete(DbPreparedStatement preparedStatement, int attempt) throws SQLException
+	{
+		int result = 0;
+		try
+		{
+			result = preparedStatement.executeUpdate();
+		}
+		catch(Exception e)
+		{
+			if(isDeadLockException(e) && attempt++ < getDeadLockRetries())
+			{
+				result = executeDelete(preparedStatement, attempt);
+			}
+			else
+			{
+				throw e;
 			}
 		}
 		return result;

@@ -34,4 +34,19 @@ public class MysqlDb extends DbDataSource implements MysqlDbWrapper, MysqlSqlFac
 		super(MapperType.MYSQL, driver, url, username, password, properties);
 	}
 	
+	@Override
+	protected boolean isDeadLockException(Exception e)
+	{
+		boolean deadLockExcepione = false;
+		if(e instanceof com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException)
+		{
+			deadLockExcepione = true;
+		}
+		else if(e instanceof com.mysql.jdbc.exceptions.MySQLTransactionRollbackException)
+		{
+			deadLockExcepione = true;
+		}
+		return deadLockExcepione;
+	}
+	
 }

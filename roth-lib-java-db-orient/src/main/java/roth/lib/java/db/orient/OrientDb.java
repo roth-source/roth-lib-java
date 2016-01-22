@@ -34,4 +34,10 @@ public class OrientDb extends DbDataSource implements OrientDbWrapper, OrientSql
 		super(MapperType.ORIENT, driver, url, username, password, properties);
 	}
 	
+	@Override
+	protected boolean isDeadLockException(Exception e)
+	{
+		return false;
+	}
+	
 }
