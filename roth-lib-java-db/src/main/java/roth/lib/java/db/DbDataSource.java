@@ -948,7 +948,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	
 	protected int executeInsert(String sql, Collection<Object> values, DbModel model)
 	{
-		return executeInsert(sql, values, (DbModel) null, 0);
+		return executeInsert(sql, values, model, 0);
 	}
 	
 	protected int executeInsert(String sql, Collection<Object> values, DbModel model, int attempt)
@@ -964,6 +964,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			catch(SQLException e)
 			{
 				connection.rollback();
+				connection.close();
 				throw e;
 			}
 		}
@@ -1086,6 +1087,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			catch(SQLException e)
 			{
 				connection.rollback();
+				connection.close();
 				throw e;
 			}
 		}
@@ -1196,6 +1198,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			catch(SQLException e)
 			{
 				connection.rollback();
+				connection.close();
 				throw e;
 			}
 		}
