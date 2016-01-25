@@ -13,3 +13,6 @@ dev/
 # SYSTEM
 .DS_Store
 Thumbs.db
+
+# CUSTOM
+war/
