@@ -9,6 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Random;
 
+import roth.lib.java.time.Time;
+
 public class IdUtil
 {
 	protected static final int DEFAULT_LENGTH 		= 14;
@@ -143,7 +145,7 @@ public class IdUtil
 	
 	public static void main(String[] args)
 	{
-		System.out.println(CalendarUtil.format());
+		System.out.println(new Time());
 		LinkedHashSet<String> set = new LinkedHashSet<String>();
 		int count = 0;
 		for(int i = 0; i < 10000000; i++)
@@ -154,7 +156,7 @@ public class IdUtil
 				System.err.println(++count + ":" + uuid);
 			}
 		}
-		System.out.println(CalendarUtil.format());
+		System.out.println(new Time());
 	}
 	
 }
