@@ -500,7 +500,7 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 	}
 	
 	@Override
-	protected Time clone()
+	public Time clone()
 	{
 		return new Time((Calendar) calendar.clone());
 	}

@@ -104,7 +104,7 @@ public class Minute extends Time
 	}
 	
 	@Override
-	protected Minute clone()
+	public Minute clone()
 	{
 		return new Minute((Calendar) calendar.clone());
 	}

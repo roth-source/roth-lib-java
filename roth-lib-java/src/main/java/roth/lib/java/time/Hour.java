@@ -100,7 +100,7 @@ public class Hour extends Time
 	}
 	
 	@Override
-	protected Hour clone()
+	public Hour clone()
 	{
 		return new Hour((Calendar) calendar.clone());
 	}

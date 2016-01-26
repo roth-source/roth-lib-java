@@ -106,7 +106,7 @@ public class Millisecond extends Time
 	}
 	
 	@Override
-	protected Millisecond clone()
+	public Millisecond clone()
 	{
 		return new Millisecond((Calendar) calendar.clone());
 	}

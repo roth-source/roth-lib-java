@@ -104,7 +104,7 @@ public class Second extends Time
 	}
 	
 	@Override
-	protected Second clone()
+	public Second clone()
 	{
 		return new Second((Calendar) calendar.clone());
 	}

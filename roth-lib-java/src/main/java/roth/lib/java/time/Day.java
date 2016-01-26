@@ -98,7 +98,7 @@ public class Day extends Time
 	}
 	
 	@Override
-	protected Day clone()
+	public Day clone()
 	{
 		return new Day((Calendar) calendar.clone());
 	}

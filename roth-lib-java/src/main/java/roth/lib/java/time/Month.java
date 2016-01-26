@@ -92,7 +92,7 @@ public class Month extends Time
 	}
 	
 	@Override
-	protected Month clone()
+	public Month clone()
 	{
 		return new Month((Calendar) calendar.clone());
 	}

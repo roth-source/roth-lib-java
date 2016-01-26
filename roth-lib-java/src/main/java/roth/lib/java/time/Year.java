@@ -88,7 +88,7 @@ public class Year extends Time
 	}
 	
 	@Override
-	protected Year clone()
+	public Year clone()
 	{
 		return new Year((Calendar) calendar.clone());
 	}
