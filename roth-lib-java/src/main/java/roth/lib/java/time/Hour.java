@@ -99,4 +99,10 @@ public class Hour extends Time
 		return true;
 	}
 	
+	@Override
+	protected Hour clone()
+	{
+		return new Hour((Calendar) calendar.clone());
+	}
+	
 }

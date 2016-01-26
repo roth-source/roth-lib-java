@@ -8,7 +8,7 @@ import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
 @SuppressWarnings("serial")
-public class Time implements Serializable, Comparable<Time>
+public class Time implements Serializable, Comparable<Time>, Cloneable
 {
 	public static LinkedList<Day> HOLIDAYS = new LinkedList<Day>();
 	
@@ -497,6 +497,12 @@ public class Time implements Serializable, Comparable<Time>
 			return false;
 		}
 		return true;
+	}
+	
+	@Override
+	protected Time clone()
+	{
+		return new Time((Calendar) calendar.clone());
 	}
 	
 }

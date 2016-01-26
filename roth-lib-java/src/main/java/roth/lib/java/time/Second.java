@@ -103,4 +103,10 @@ public class Second extends Time
 		return true;
 	}
 	
+	@Override
+	protected Second clone()
+	{
+		return new Second((Calendar) calendar.clone());
+	}
+	
 }

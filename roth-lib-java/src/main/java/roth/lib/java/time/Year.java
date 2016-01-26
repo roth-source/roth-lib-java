@@ -87,4 +87,10 @@ public class Year extends Time
 		return true;
 	}
 	
+	@Override
+	protected Year clone()
+	{
+		return new Year((Calendar) calendar.clone());
+	}
+	
 }
