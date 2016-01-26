@@ -15,6 +15,12 @@ public class Hour extends Time
 		this(new GregorianCalendar());
 	}
 	
+	public Hour(int hour)
+	{
+		this();
+		setHour(hour);
+	}
+	
 	public Hour(int year, int month, int day, int hour)
 	{
 		this();

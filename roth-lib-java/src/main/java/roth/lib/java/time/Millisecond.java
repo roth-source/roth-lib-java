@@ -14,6 +14,36 @@ public class Millisecond extends Time
 		super();
 	}
 	
+	public Millisecond(int millisecond)
+	{
+		this();
+		setMillisecond(millisecond);
+	}
+	
+	public Millisecond(int second, int millisecond)
+	{
+		this();
+		setSecond(second);
+		setMillisecond(millisecond);
+	}
+	
+	public Millisecond(int minute, int second, int millisecond)
+	{
+		this();
+		setMinute(minute);
+		setSecond(second);
+		setMillisecond(millisecond);
+	}
+	
+	public Millisecond(int hour, int minute, int second, int millisecond)
+	{
+		this();
+		setHour(hour);
+		setMinute(minute);
+		setSecond(second);
+		setMillisecond(millisecond);
+	}
+	
 	public Millisecond(int year, int month, int day, int hour, int minute, int second, int millisecond)
 	{
 		this();
@@ -23,6 +53,7 @@ public class Millisecond extends Time
 		setHour(hour);
 		setMinute(minute);
 		setSecond(second);
+		setMillisecond(millisecond);
 	}
 	
 	public Millisecond(Date date)

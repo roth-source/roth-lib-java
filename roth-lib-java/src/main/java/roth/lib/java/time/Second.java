@@ -15,6 +15,27 @@ public class Second extends Time
 		this(new GregorianCalendar());
 	}
 	
+	public Second(int second)
+	{
+		this();
+		setSecond(second);
+	}
+	
+	public Second(int minute, int second)
+	{
+		this();
+		setMinute(minute);
+		setSecond(second);
+	}
+	
+	public Second(int hour, int minute, int second)
+	{
+		this();
+		setHour(hour);
+		setMinute(minute);
+		setSecond(second);
+	}
+	
 	public Second(int year, int month, int day, int hour, int minute, int second)
 	{
 		this();

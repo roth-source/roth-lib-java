@@ -15,6 +15,19 @@ public class Minute extends Time
 		this(new GregorianCalendar());
 	}
 	
+	public Minute(int minute)
+	{
+		this();
+		setMinute(minute);
+	}
+	
+	public Minute(int hour, int minute)
+	{
+		this();
+		setHour(hour);
+		setMinute(minute);
+	}
+	
 	public Minute(int year, int month, int day, int hour, int minute)
 	{
 		this();
