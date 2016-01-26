@@ -72,11 +72,6 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 		return this;
 	}
 	
-	public void setTimeFormat(String timeFormat)
-	{
-		getMapperConfig().setTimeFormat(timeFormat);
-	}
-	
 	protected MimeType getRequestContentType()
 	{
 		MimeType contentType = null;

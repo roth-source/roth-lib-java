@@ -8,7 +8,7 @@ public abstract class Serializer<T>
 		
 	}
 	
-	public boolean isEscapable()
+	public boolean isEscapable(Object value, String timeFormat)
 	{
 		return false;
 	}
@@ -16,9 +16,17 @@ public abstract class Serializer<T>
 	@SuppressWarnings("unchecked")
 	public String serialize(Object value, String timeFormat)
 	{
-		return serialize((T) value);
+		return serializeValue((T) value, timeFormat);
 	}
 	
-	public abstract String serialize(T value);
+	public String serializeValue(T value, String timeFormat)
+	{
+		return serializeValue((T) value);
+	}
+	
+	public String serializeValue(T value)
+	{
+		return null;
+	}
 	
 }

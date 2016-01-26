@@ -9,15 +9,15 @@ import roth.lib.java.mapper.MapperConfig;
 
 public class FormTest
 {
-	protected static MapperConfig mapperConfig = new MapperConfig().setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
+	protected static MapperConfig mapperConfig = new MapperConfig().setSerializeNulls(true);
 	
 	public static void main(String[] args)
 	{
-		serializeModel();
+		//serializeModel();
 		//serializeMap();
 		//deserializeModel();
 		//deserializeMap();
-		//prettyPrint();
+		prettyPrint();
 	}
 	
 	protected static void serializeModel()

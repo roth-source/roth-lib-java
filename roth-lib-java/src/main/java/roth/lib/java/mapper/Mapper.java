@@ -19,7 +19,10 @@ import roth.lib.java.Callback;
 import roth.lib.java.Characters;
 import roth.lib.java.Generic;
 import roth.lib.java.Model;
+import roth.lib.java.deserializer.Deserializer;
 import roth.lib.java.reflector.MapperReflector;
+import roth.lib.java.reflector.PropertyReflector;
+import roth.lib.java.serializer.Serializer;
 
 public abstract class Mapper implements Characters
 {
@@ -29,7 +32,6 @@ public abstract class Mapper implements Characters
 	protected MapperConfig mapperConfig;
 	protected String context;
 	protected LinkedList<Callback<?>> callbacks = new LinkedList<Callback<?>>();
-	protected String timeFormat;
 	protected int tabs;
 	
 	protected Mapper(MapperType mapperType, MapperReflector mapperReflector, MapperConfig mapperConfig)
@@ -74,14 +76,44 @@ public abstract class Mapper implements Characters
 		return callbacks;
 	}
 	
-	public String getTimeFormat()
-	{
-		return timeFormat != null ? timeFormat : mapperConfig.getTimeFormat();
-	}
-	
 	public int getTabs()
 	{
 		return tabs;
+	}
+	
+	public String getTimeFormat(PropertyReflector propertyReflector)
+	{
+		return propertyReflector != null ? propertyReflector.getTimeFormat() : null;
+	}
+	
+	public Serializer<?> getSerializer(Class<?> klass)
+	{
+		Serializer<?> serializer = mapperConfig.getSerializer(klass);
+		if(serializer == null)
+		{
+			serializer = mapperReflector.getSerializer(klass);
+		}
+		return serializer;
+	}
+	
+	public boolean isSerializable(Class<?> klass)
+	{
+		boolean serializable = mapperConfig.isSerializable(klass);
+		if(!serializable)
+		{
+			serializable = mapperReflector.isSerializable(klass);
+		}
+		return serializable;
+	}
+	
+	public Deserializer<?> getDeserializer(Class<?> klass)
+	{
+		Deserializer<?> deserializer = mapperConfig.getDeserializer(klass);
+		if(deserializer == null)
+		{
+			deserializer = mapperReflector.getDeserializer(klass);
+		}
+		return deserializer;
 	}
 	
 	public Mapper setPrettyPrint(boolean prettyPrint)
@@ -117,12 +149,6 @@ public abstract class Mapper implements Characters
 	public Mapper setCallbacks(Callback<?>... callbacks)
 	{
 		this.callbacks = new LinkedList<Callback<?>>(Arrays.asList(callbacks));
-		return this;
-	}
-	
-	public Mapper setTimeFormat(String timeFormat)
-	{
-		this.timeFormat = timeFormat;
 		return this;
 	}
 	

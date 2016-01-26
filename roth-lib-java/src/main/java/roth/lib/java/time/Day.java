@@ -50,6 +50,7 @@ public class Day extends Time
 		return format(DEFAULT_PATTERN);
 	}
 	
+	@Override
 	public String format(String pattern)
 	{
 		return new SimpleDateFormat(pattern != null ? pattern : DEFAULT_PATTERN).format(toDate());

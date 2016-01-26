@@ -1,9 +1,10 @@
 package roth.lib.java.deserializer;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-public class CalendarDeserializer extends TemporalDeserializer<GregorianCalendar>
+public class CalendarDeserializer extends TemporalDeserializer<Calendar>
 {
 	
 	public CalendarDeserializer()
@@ -12,16 +13,26 @@ public class CalendarDeserializer extends TemporalDeserializer<GregorianCalendar
 	}
 	
 	@Override
-	public GregorianCalendar deserialize(String value, SimpleDateFormat simpleDateFormat)
+	public GregorianCalendar deserialize(String value, String timeFormat)
 	{
-		GregorianCalendar object = null;
-		Long time = getTime(value, simpleDateFormat);
-		if(time != null)
+		GregorianCalendar calendar = null;
+		try
 		{
-			object = new GregorianCalendar();
-			object.setTimeInMillis(time);
+			calendar = new GregorianCalendar();
+			if(timeFormat != null && !timeFormat.isEmpty() && !"timestamp".equalsIgnoreCase(timeFormat))
+			{
+				calendar.setTime(new SimpleDateFormat(timeFormat).parse(value));
+			}
+			else
+			{
+				calendar.setTimeInMillis(Long.parseLong(value));
+			}
 		}
-		return object;
+		catch(Exception e)
+		{
+			calendar = null;
+		}
+		return calendar;
 	}
 	
 }

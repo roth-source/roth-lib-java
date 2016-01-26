@@ -9,7 +9,7 @@ public class UnescapedSerializer extends Serializer<Object>
 	}
 	
 	@Override
-	public String serialize(Object object)
+	public String serializeValue(Object object)
 	{
 		return object != null ? object.toString() : null;
 	}

@@ -12,26 +12,28 @@ public class DateSerializer extends TemporalSerializer<Date>
 	}
 	
 	@Override
-	public String serialize(Date date)
+	public String serializeValue(Date date, String timeFormat)
 	{
-		return serialize(date, simpleDateFormat);
-	}
-	
-	@Override
-	public String serialize(Date date, SimpleDateFormat simpleDateFormat)
-	{
-		if(date != null)
+		String value = null;
+		try
 		{
-			if(simpleDateFormat != null)
+			if(date != null)
 			{
-				return simpleDateFormat.format(date);
-			}
-			else
-			{
-				return String.valueOf(date.getTime());
+				if(isEscapable(date, timeFormat))
+				{
+					value = new SimpleDateFormat(timeFormat).format(date);
+				}
+				else
+				{
+					value = String.valueOf(date.getTime());
+				}
 			}
 		}
-		return null;
+		catch(Exception e)
+		{
+			
+		}
+		return value;
 	}
 	
 }

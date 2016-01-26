@@ -11,10 +11,42 @@ import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
 import roth.lib.java.json.JsonMapper;
 import roth.lib.java.mapper.MapperConfig;
+import roth.lib.java.time.Day;
+import roth.lib.java.time.Hour;
+import roth.lib.java.time.Millisecond;
+import roth.lib.java.time.Minute;
+import roth.lib.java.time.Month;
+import roth.lib.java.time.Second;
+import roth.lib.java.time.Time;
+import roth.lib.java.time.Year;
 
 @Entity
 public class JsonModel
 {
+	@Property(name = "test_Time")
+	private Time testTime = new Time();
+	
+	@Property(name = "test_year")
+	private Year testYear = new Year();
+	
+	@Property(name = "test_month")
+	private Month testMonth = new Month();
+	
+	@Property(name = "test_day")
+	private Day testDay = new Day();
+	
+	@Property(name = "test_hour")
+	private Hour testHour = new Hour();
+	
+	@Property(name = "test_minute")
+	private Minute testMinute = new Minute();
+	
+	@Property(name = "test_second")
+	private Second testSecond = new Second();
+	
+	@Property(name = "test_millisecond")
+	private Millisecond testMillisecond = new Millisecond();
+	
 	
 	@Property(name = "null_primitive_boolean")
 	private boolean nullPrimitiveBoolean;
@@ -562,7 +594,7 @@ public class JsonModel
 	@Override
 	public String toString()
 	{
-		MapperConfig mapperConfig = new MapperConfig().setSerializeNulls(true).setTimeFormat("yyyy-MM-dd HH:mm:ss");
+		MapperConfig mapperConfig = new MapperConfig().setSerializeNulls(true);
 		return new JsonMapper(mapperConfig).setPrettyPrint(true).serialize(this);
 	}
 	

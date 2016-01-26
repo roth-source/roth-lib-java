@@ -12,26 +12,28 @@ public class CalendarSerializer extends TemporalSerializer<Calendar>
 	}
 	
 	@Override
-	public String serialize(Calendar calendar)
+	public String serializeValue(Calendar calendar, String timeFormat)
 	{
-		return serialize(calendar, simpleDateFormat);
-	}
-	
-	@Override
-	public String serialize(Calendar calendar, SimpleDateFormat simpleDateFormat)
-	{
-		if(calendar != null)
+		String value = null;
+		try
 		{
-			if(simpleDateFormat != null)
+			if(calendar != null)
 			{
-				return simpleDateFormat.format(calendar.getTime());
-			}
-			else
-			{
-				return String.valueOf(calendar.getTimeInMillis());
+				if(isEscapable(calendar, timeFormat))
+				{
+					value = new SimpleDateFormat(timeFormat).format(calendar.getTime());
+				}
+				else
+				{
+					value = String.valueOf(calendar.getTimeInMillis());
+				}
 			}
 		}
-		return null;
+		catch(Exception e)
+		{
+			
+		}
+		return value;
 	}
 	
 }

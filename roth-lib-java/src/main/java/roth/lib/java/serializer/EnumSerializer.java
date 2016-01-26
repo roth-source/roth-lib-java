@@ -9,7 +9,7 @@ public class EnumSerializer extends EscapedSerializer<Enum<?>>
 	}
 	
 	@Override
-	public String serialize(Enum<?> object)
+	public String serializeValue(Enum<?> object)
 	{
 		return object != null ? object.toString() : null;
 	}

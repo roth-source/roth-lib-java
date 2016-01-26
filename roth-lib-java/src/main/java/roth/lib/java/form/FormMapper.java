@@ -71,13 +71,14 @@ public class FormMapper extends Mapper
 						if(propertyName != null)
 						{
 							Object fieldValue = getFieldValue(propertyReflector.getField(), value);
-							Serializer<?> serializer = getMapperConfig().getSerializer(propertyClass);
+							Serializer<?> serializer = getSerializer(propertyClass);
 							if(serializer != null)
 							{
 								String serializedValue = null;
 								if(fieldValue != null)
 								{
-									serializedValue = serializer.serialize(fieldValue, propertyReflector.getTimeFormat());
+									String timeFormat = getTimeFormat(propertyReflector);
+									serializedValue = serializer.serialize(fieldValue, timeFormat);
 								}
 								else if(getMapperConfig().isSerializeNulls())
 								{
@@ -127,14 +128,15 @@ public class FormMapper extends Mapper
 					String propertyName = propertyReflector.getPropertyName(getMapperType());
 					if(propertyName != null)
 					{
-						Serializer<?> serializer = getMapperConfig().getSerializer(propertyClass);
+						Serializer<?> serializer = getSerializer(propertyClass);
 						if(serializer != null)
 						{
 							String serializedValue = null;
 							Object fieldValue = getFieldValue(propertyReflector.getField(), value);
 							if(fieldValue != null)
 							{
-								serializedValue = serializer.serialize(fieldValue, propertyReflector.getTimeFormat());
+								String timeFormat = getTimeFormat(propertyReflector);
+								serializedValue = serializer.serialize(fieldValue, timeFormat);
 							}
 							else if(getMapperConfig().isSerializeNulls())
 							{
@@ -181,7 +183,7 @@ public class FormMapper extends Mapper
 				String serializedValue = null;
 				if(fieldValue != null)
 				{
-					Serializer<?> serializer = getMapperConfig().getSerializer(fieldValue.getClass());
+					Serializer<?> serializer = getSerializer(fieldValue.getClass());
 					if(serializer != null)
 					{
 						serializedValue = serializer.serialize(fieldValue, null);
@@ -273,10 +275,11 @@ public class FormMapper extends Mapper
 	{
 		if(propertyReflector != null)
 		{
-			Deserializer<?> deserializer = getMapperConfig().getDeserializer(propertyReflector.getFieldClass());
+			Deserializer<?> deserializer = getDeserializer(propertyReflector.getFieldClass());
 			if(deserializer != null)
 			{
-				propertyReflector.getField().set(model, deserializer.deserialize(value, propertyReflector.getTimeFormat(), propertyReflector.getFieldClass()));
+				String timeFormat = getTimeFormat(propertyReflector);
+				propertyReflector.getField().set(model, deserializer.deserialize(value, timeFormat, propertyReflector.getFieldClass()));
 			}
 		}
 	}
@@ -341,14 +344,15 @@ public class FormMapper extends Mapper
 				String propertyName = propertyReflector.getPropertyName(getMapperType());
 				if(propertyName != null)
 				{
-					Serializer<?> serializer = getMapperConfig().getSerializer(propertyClass);
+					Serializer<?> serializer = getSerializer(propertyClass);
 					if(serializer != null)
 					{
 						String serializedValue = null;
 						Object fieldValue = getFieldValue(propertyReflector.getField(), value);
 						if(fieldValue != null)
 						{
-							serializedValue = serializer.serialize(fieldValue, propertyReflector.getTimeFormat());
+							String timeFormat = getTimeFormat(propertyReflector);
+							serializedValue = serializer.serialize(fieldValue, timeFormat);
 						}
 						else if(getMapperConfig().isSerializeNulls())
 						{

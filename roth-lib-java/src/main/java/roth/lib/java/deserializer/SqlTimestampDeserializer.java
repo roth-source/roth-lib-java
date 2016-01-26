@@ -1,11 +1,12 @@
 package roth.lib.java.deserializer;
 
-import roth.lib.java.time.Time;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 
-public class TimeDeserializer extends TemporalDeserializer<Time>
+public class SqlTimestampDeserializer extends TemporalDeserializer<Time>
 {
 	
-	public TimeDeserializer()
+	public SqlTimestampDeserializer()
 	{
 		
 	}
@@ -18,7 +19,7 @@ public class TimeDeserializer extends TemporalDeserializer<Time>
 		{
 			if(timeFormat != null && !timeFormat.isEmpty() && !"timestamp".equalsIgnoreCase(timeFormat))
 			{
-				time = Time.parse(value, timeFormat);
+				time = new Time(new SimpleDateFormat(timeFormat).parse(value).getTime());
 			}
 			else
 			{

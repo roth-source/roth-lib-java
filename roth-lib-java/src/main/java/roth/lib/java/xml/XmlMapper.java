@@ -132,7 +132,6 @@ public class XmlMapper extends Mapper
 		{
 			if(!hasContext() || !propertyReflector.isExcluded(getContext()))
 			{
-				setTimeFormat(propertyReflector.getTimeFormat());
 				String propertyName = propertyReflector.getPropertyName(getMapperType());
 				Object propertyValue = getFieldValue(propertyReflector.getField(), value);
 				writeProperty(writer, propertyName, propertyValue, propertyReflector);
@@ -198,10 +197,11 @@ public class XmlMapper extends Mapper
 				}
 				writeCloseTag(writer, name);
 			}
-			else if(getMapperConfig().isSerializable(value.getClass()))
+			else if(isSerializable(value.getClass()))
 			{
-				Serializer<?> serializer = getMapperConfig().getSerializer(value.getClass());
-				String serializedValue = serializer.serialize(value, getTimeFormat());
+				Serializer<?> serializer = getSerializer(value.getClass());
+				String timeFormat = getTimeFormat(propertyReflector);
+				String serializedValue = serializer.serialize(value, timeFormat);
 				if(serializedValue != null)
 				{
 					writeNewLine(writer);
@@ -285,10 +285,11 @@ public class XmlMapper extends Mapper
 			}
 			else
 			{
-				Serializer<?> serializer = getMapperConfig().getSerializer(key.getClass());
+				Serializer<?> serializer = getSerializer(key.getClass());
 				if(serializer != null)
 				{
-					name = serializer.serialize(key, getTimeFormat());
+					String timeFormat = getTimeFormat(propertyReflector);
+					name = serializer.serialize(key, timeFormat);
 				}
 			}
 			if(name != null)
@@ -406,7 +407,7 @@ public class XmlMapper extends Mapper
 			{
 				if(tag instanceof OpenTag)
 				{
-					map = readMap(reader, String.class);
+					map = readMap(reader, String.class, null);
 					break;
 				}
 				else if(tag instanceof CloseTag)
@@ -442,7 +443,6 @@ public class XmlMapper extends Mapper
 				PropertyReflector propertyReflector = entityReflector.getPropertyReflector(propertyOpenTag.getName(), getMapperType(), getMapperReflector());
 				if(propertyReflector != null)
 				{
-					setTimeFormat(propertyReflector.getTimeFormat());
 					Field field = propertyReflector.getField();
 					Type fieldType = propertyReflector.getFieldType();
 					Class<?> fieldClass = propertyReflector.getFieldClass();
@@ -457,13 +457,13 @@ public class XmlMapper extends Mapper
 						String elementsName = propertyReflector.getElementsName();
 						if(elementsName != null)
 						{
-							Object value = readCollection(reader, fieldType);
+							Object value = readCollection(reader, fieldType, propertyReflector);
 							field.set(model, value);
 							setDeserializedName(model, propertyReflector.getFieldName());
 						}
 						else
 						{
-							Object value = readCollectionElement(reader, propertyOpenTag, fieldType);
+							Object value = readCollectionElement(reader, propertyOpenTag, fieldType, propertyReflector);
 							if(value != null)
 							{
 								Collection collection = (Collection) field.get(model);
@@ -481,24 +481,25 @@ public class XmlMapper extends Mapper
 					}
 					else if(isArray(fieldType))
 					{
-						Object value = readArray(reader, fieldType);
+						Object value = readArray(reader, fieldType, propertyReflector);
 						field.set(model, value);
 						setDeserializedName(model, propertyReflector.getFieldName());
 					}
 					else if(isMap(fieldType))
 					{
-						Object value = readMap(reader, fieldType);
+						Object value = readMap(reader, fieldType, propertyReflector);
 						field.set(model, value);
 						setDeserializedName(model, propertyReflector.getFieldName());
 					}
-					else if(getMapperConfig().isSerializable(getTypeClass(fieldType)))
+					else if(isSerializable(getTypeClass(fieldType)))
 					{
 						String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
 						readTag(reader);
-						Deserializer<?> deserializer = getMapperConfig().getDeserializer(fieldClass);
+						Deserializer<?> deserializer = getDeserializer(fieldClass);
 						if(deserializer != null)
 						{
-							field.set(model, deserializer.deserialize(value, getTimeFormat(), fieldClass));
+							String timeFormat = getTimeFormat(propertyReflector);
+							field.set(model, deserializer.deserialize(value, timeFormat, fieldClass));
 							setDeserializedName(model, propertyReflector.getFieldName());
 						}
 					}
@@ -522,7 +523,7 @@ public class XmlMapper extends Mapper
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T, K, E> T readMap(Reader reader, Type type) throws Exception
+	protected <T, K, E> T readMap(Reader reader, Type type, PropertyReflector propertyReflector) throws Exception
 	{
 		Map<K, E> map = null;
 		Class<T> klass = getTypeClass(type);
@@ -548,10 +549,11 @@ public class XmlMapper extends Mapper
 			{
 				OpenTag fieldOpenTag = (OpenTag) tag;
 				K key = null;
-				Deserializer<?> keyDeserializer = getMapperConfig().getDeserializer(keyClass);
+				Deserializer<?> keyDeserializer = getDeserializer(keyClass);
 				if(keyDeserializer != null)
 				{
-					key = (K) keyDeserializer.deserialize(fieldOpenTag.getName(), getTimeFormat());
+					String timeFormat = getTimeFormat(propertyReflector);
+					key = (K) keyDeserializer.deserialize(fieldOpenTag.getName(), timeFormat);
 				}
 				if(getMapperReflector().isEntity(elementType))
 				{
@@ -563,7 +565,7 @@ public class XmlMapper extends Mapper
 				}
 				else if(isCollection(elementType))
 				{
-					E value = readCollection(reader, elementType);
+					E value = readCollection(reader, elementType, propertyReflector);
 					if(value != null)
 					{
 						map.put(key, value);
@@ -571,7 +573,7 @@ public class XmlMapper extends Mapper
 				}
 				else if(isArray(elementType))
 				{
-					E value = readArray(reader, elementType);
+					E value = readArray(reader, elementType, propertyReflector);
 					if(value != null)
 					{
 						map.put(key, value);
@@ -579,20 +581,21 @@ public class XmlMapper extends Mapper
 				}
 				else if(isMap(elementType))
 				{
-					E value = readMap(reader, elementType);
+					E value = readMap(reader, elementType, propertyReflector);
 					if(value != null)
 					{
 						map.put(key, value);
 					}
 				}
-				else if(getMapperConfig().isSerializable(elementClass))
+				else if(isSerializable(elementClass))
 				{
 					String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
 					readTag(reader);
-					Deserializer<E> deserializer = (Deserializer<E>) getMapperConfig().getDeserializer(elementClass);
+					Deserializer<E> deserializer = (Deserializer<E>) getDeserializer(elementClass);
 					if(deserializer != null)
 					{
-						E deserializedValue = deserializer.deserialize(value, getTimeFormat(), elementClass);
+						String timeFormat = getTimeFormat(propertyReflector);
+						E deserializedValue = deserializer.deserialize(value, timeFormat, elementClass);
 						if(deserializedValue != null)
 						{
 							map.put(key, deserializedValue);
@@ -614,11 +617,11 @@ public class XmlMapper extends Mapper
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T, E> T readArray(Reader reader, Type type) throws Exception
+	protected <T, E> T readArray(Reader reader, Type type, PropertyReflector propertyReflector) throws Exception
 	{
 		Type elementType = getElementType(type);
 		Class<E> elementClass = getTypeClass(elementType);
-		LinkedList<E> collection = readCollection(reader, type);
+		LinkedList<E> collection = readCollection(reader, type, propertyReflector);
 		E[] array = (E[]) Array.newInstance(elementClass, collection.size());
 		for(int i = 0; i < collection.size(); i++)
 		{
@@ -628,7 +631,7 @@ public class XmlMapper extends Mapper
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T, E> T readCollection(Reader reader, Type type) throws Exception
+	protected <T, E> T readCollection(Reader reader, Type type, PropertyReflector propertyReflector) throws Exception
 	{
 		Collection<E> collection = null;
 		Class<T> klass = getTypeClass(type);
@@ -661,7 +664,7 @@ public class XmlMapper extends Mapper
 				}
 				else if(isCollection(elementType))
 				{
-					E value = readCollection(reader, elementType);
+					E value = readCollection(reader, elementType, propertyReflector);
 					if(value != null)
 					{
 						collection.add(value);
@@ -669,7 +672,7 @@ public class XmlMapper extends Mapper
 				}
 				else if(isArray(elementType))
 				{
-					E value = readArray(reader, elementType);
+					E value = readArray(reader, elementType, propertyReflector);
 					if(value != null)
 					{
 						collection.add(value);
@@ -677,20 +680,21 @@ public class XmlMapper extends Mapper
 				}
 				else if(isMap(elementType))
 				{
-					E value = readMap(reader, elementType);
+					E value = readMap(reader, elementType, propertyReflector);
 					if(value != null)
 					{
 						collection.add(value);
 					}
 				}
-				else if(getMapperConfig().isSerializable(elementClass))
+				else if(isSerializable(elementClass))
 				{
 					String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
 					readTag(reader);
-					Deserializer<E> deserializer = (Deserializer<E>) getMapperConfig().getDeserializer(elementClass);
+					Deserializer<E> deserializer = (Deserializer<E>) getDeserializer(elementClass);
 					if(deserializer != null)
 					{
-						E deserializedValue = deserializer.deserialize(value, getTimeFormat(), elementClass);
+						String timeFormat = getTimeFormat(propertyReflector);
+						E deserializedValue = deserializer.deserialize(value, timeFormat, elementClass);
 						if(deserializedValue != null)
 						{
 							collection.add(deserializedValue);
@@ -712,7 +716,7 @@ public class XmlMapper extends Mapper
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T, E> E readCollectionElement(Reader reader, OpenTag tag, Type type) throws Exception
+	protected <T, E> E readCollectionElement(Reader reader, OpenTag tag, Type type, PropertyReflector propertyReflector) throws Exception
 	{
 		E element = null;
 		Type elementType = getElementType(type);
@@ -723,24 +727,25 @@ public class XmlMapper extends Mapper
 		}
 		else if(isCollection(elementType))
 		{
-			element = readCollection(reader, elementType);
+			element = readCollection(reader, elementType, propertyReflector);
 		}
 		else if(isArray(elementType))
 		{
-			element = readArray(reader, elementType);
+			element = readArray(reader, elementType, propertyReflector);
 		}
 		else if(isMap(elementType))
 		{
-			element = readMap(reader, elementType);
+			element = readMap(reader, elementType, propertyReflector);
 		}
-		else if(getMapperConfig().isSerializable(elementClass))
+		else if(isSerializable(elementClass))
 		{
 			String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
 			readTag(reader);
-			Deserializer<E> deserializer = (Deserializer<E>) getMapperConfig().getDeserializer(elementClass);
+			Deserializer<E> deserializer = (Deserializer<E>) getDeserializer(elementClass);
 			if(deserializer != null)
 			{
-				element = deserializer.deserialize(value, getTimeFormat(), elementClass);
+				String timeFormat = getTimeFormat(propertyReflector);
+				element = deserializer.deserialize(value, timeFormat, elementClass);
 			}
 		}
 		else

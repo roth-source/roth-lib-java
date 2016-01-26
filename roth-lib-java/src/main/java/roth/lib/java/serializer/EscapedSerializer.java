@@ -9,13 +9,13 @@ public class EscapedSerializer<T> extends Serializer<T>
 	}
 	
 	@Override
-	public boolean isEscapable()
+	public boolean isEscapable(Object value, String timeFormat)
 	{
 		return true;
 	}
 	
 	@Override
-	public String serialize(T object)
+	public String serializeValue(T object)
 	{
 		return object != null ? object.toString() : null;
 	}

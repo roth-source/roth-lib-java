@@ -377,6 +377,11 @@ public class Time implements Serializable, Comparable<Time>
 		return new Millisecond(calendar);
 	}
 	
+	public static Time parse(String value, String pattern)
+	{
+		return new Time(parseCalendar(value, pattern));
+	}
+	
 	public static Calendar parseCalendar(String value, String pattern)
 	{
 		Calendar calendar = null;
@@ -400,6 +405,11 @@ public class Time implements Serializable, Comparable<Time>
 	public String toString()
 	{
 		return String.valueOf(toTimestamp());
+	}
+	
+	public String format(String pattern)
+	{
+		return new SimpleDateFormat(pattern).format(toDate());
 	}
 	
 	public boolean isWeekend()

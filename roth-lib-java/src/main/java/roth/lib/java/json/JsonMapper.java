@@ -32,7 +32,6 @@ import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertiesReflector;
 import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.serializer.Serializer;
-import roth.lib.java.serializer.TemporalSerializer;
 
 public class JsonMapper extends Mapper
 {
@@ -71,7 +70,7 @@ public class JsonMapper extends Mapper
 				LinkedList<?> values = asCollection(value);
 				if(!values.isEmpty())
 				{
-					writeArray(writer, values);
+					writeArray(writer, values, null);
 				}
 				else
 				{
@@ -105,7 +104,7 @@ public class JsonMapper extends Mapper
 		if(map == null) throw new IllegalArgumentException("Map cannot be null");
 		try
 		{
-			writeMap(writer, map);
+			writeMap(writer, map, null);
 			writer.flush();
 		}
 		catch(IOException e)
@@ -130,7 +129,6 @@ public class JsonMapper extends Mapper
 		{
 			if(!propertyReflector.isAttribute() || !hasContext() || !propertyReflector.isExcluded(getContext()))
 			{
-				setTimeFormat(propertyReflector.getTimeFormat());
 				String propertyName = propertyReflector.getPropertyName(getMapperType());
 				Object propertyValue = getFieldValue(propertyReflector.getField(), value);
 				seperator = writeProperty(writer, propertyName, propertyValue, seperator, propertyReflector);
@@ -182,7 +180,7 @@ public class JsonMapper extends Mapper
 					writeNewLine(writer);
 					writePropertyName(writer, name);
 					writeNewLine(writer);
-					writeArray(writer, values);
+					writeArray(writer, values, propertyReflector);
 				}
 				else if(getMapperConfig().isSerializeEmptyArray())
 				{
@@ -202,7 +200,7 @@ public class JsonMapper extends Mapper
 					writeNewLine(writer);
 					writePropertyName(writer, name);
 					writeNewLine(writer);
-					writeMap(writer, valueMap);
+					writeMap(writer, valueMap, propertyReflector);
 				}
 				else if(getMapperConfig().isSerializeEmptyMap())
 				{
@@ -213,15 +211,12 @@ public class JsonMapper extends Mapper
 					writer.write(RIGHT_BRACE);
 				}
 			}
-			else if(getMapperConfig().isSerializable(value.getClass()))
+			else if(isSerializable(value.getClass()))
 			{
-				Serializer<?> serializer = getMapperConfig().getSerializer(value.getClass());
-				boolean escapable = serializer.isEscapable();
-				if(!escapable && serializer instanceof TemporalSerializer && getTimeFormat() != null)
-				{
-					escapable = true;
-				}
-				String serializedValue = serializer.serialize(value, getTimeFormat());
+				Serializer<?> serializer = getSerializer(value.getClass());
+				String timeFormat = getTimeFormat(propertyReflector);
+				boolean escapable = serializer.isEscapable(value, timeFormat);
+				String serializedValue = serializer.serialize(value, timeFormat);
 				if(serializedValue != null)
 				{
 					seperator = writeSeperator(writer, seperator);
@@ -250,7 +245,7 @@ public class JsonMapper extends Mapper
 		writer.write(COLON);
 	}
 	
-	protected void writeArray(Writer writer, Collection<?> values) throws IOException
+	protected void writeArray(Writer writer, Collection<?> values, PropertyReflector propertyReflector) throws IOException
 	{
 		writer.write(LEFT_BRACKET);
 		String seperator = BLANK;
@@ -282,7 +277,7 @@ public class JsonMapper extends Mapper
 						incrementTabs();
 						seperator = writeSeperator(writer, seperator);
 						writeNewLine(writer);
-						writeArray(writer, arrayValues);
+						writeArray(writer, arrayValues, propertyReflector);
 						decrementTabs();
 					}
 					else if(getMapperConfig().isSerializeEmptyArray())
@@ -303,7 +298,7 @@ public class JsonMapper extends Mapper
 						incrementTabs();
 						seperator = writeSeperator(writer, seperator);
 						writeNewLine(writer);
-						writeMap(writer, valueMap);
+						writeMap(writer, valueMap, propertyReflector);
 						decrementTabs();
 					}
 					else if(getMapperConfig().isSerializeEmptyMap())
@@ -316,15 +311,12 @@ public class JsonMapper extends Mapper
 						decrementTabs();
 					}
 				}
-				else if(getMapperConfig().isSerializable(value.getClass()))
+				else if(isSerializable(value.getClass()))
 				{
-					Serializer<?> serializer = getMapperConfig().getSerializer(value.getClass());
-					boolean escapable = serializer.isEscapable();
-					if(!escapable && serializer instanceof TemporalSerializer && getTimeFormat() != null)
-					{
-						escapable = true;
-					}
-					String serializedValue = serializer.serialize(value, getTimeFormat());
+					Serializer<?> serializer = getSerializer(value.getClass());
+					String timeFormat = getTimeFormat(propertyReflector);
+					boolean escapable = serializer.isEscapable(value, timeFormat);
+					String serializedValue = serializer.serialize(value, timeFormat);
 					if(serializedValue != null)
 					{
 						incrementTabs();
@@ -348,7 +340,7 @@ public class JsonMapper extends Mapper
 		writer.write(RIGHT_BRACKET);
 	}
 	
-	protected void writeMap(Writer writer, Map<?, ?> valueMap) throws IOException
+	protected void writeMap(Writer writer, Map<?, ?> valueMap, PropertyReflector propertyReflector) throws IOException
 	{
 		writer.write(LEFT_BRACE);
 		String seperator = BLANK;
@@ -362,10 +354,11 @@ public class JsonMapper extends Mapper
 			}
 			else
 			{
-				Serializer<?> serializer = getMapperConfig().getSerializer(key.getClass());
+				Serializer<?> serializer = getSerializer(key.getClass());
 				if(serializer != null)
 				{
-					name = serializer.serialize(key, getTimeFormat());
+					String timeFormat = getTimeFormat(propertyReflector);
+					name = serializer.serialize(key, timeFormat);
 				}
 			}
 			if(name != null)
@@ -472,12 +465,12 @@ public class JsonMapper extends Mapper
 			if(isArray(type))
 			{
 				readUntil(reader, LEFT_BRACKET);
-				model = readArray(reader, type);
+				model = readArray(reader, type, null);
 			}
 			else if(isCollection(type))
 			{
 				readUntil(reader, LEFT_BRACKET);
-				model = readCollection(reader, type);
+				model = readCollection(reader, type, null);
 			}
 			else
 			{
@@ -500,7 +493,7 @@ public class JsonMapper extends Mapper
 		try
 		{
 			readUntil(reader, LEFT_BRACE);
-			map = (LinkedHashMap<String, Object>) readMap(reader, LinkedHashMap.class);
+			map = (LinkedHashMap<String, Object>) readMap(reader, LinkedHashMap.class, null);
 		}
 		catch(Exception e)
 		{
@@ -549,11 +542,11 @@ public class JsonMapper extends Mapper
 						{
 							Field field = propertyReflector.getField();
 							Class<?> fieldClass = propertyReflector.getFieldClass();
-							Deserializer<?> deserializer = getMapperConfig().getDeserializer(fieldClass);
+							Deserializer<?> deserializer = getDeserializer(fieldClass);
 							if(deserializer != null)
 							{
-								setTimeFormat(propertyReflector.getTimeFormat());
-								field.set(model, deserializer.deserialize(value, getTimeFormat(), fieldClass));
+								String timeFormat = getTimeFormat(propertyReflector);
+								field.set(model, deserializer.deserialize(value, timeFormat, fieldClass));
 								setDeserializedName(model, propertyReflector.getFieldName());
 							}
 						}
@@ -605,11 +598,11 @@ public class JsonMapper extends Mapper
 							Class<?> fieldClass = propertyReflector.getFieldClass();
 							if(!NULL.equalsIgnoreCase(value))
 							{
-								Deserializer<?> deserializer = getMapperConfig().getDeserializer(fieldClass);
+								Deserializer<?> deserializer = getDeserializer(fieldClass);
 								if(deserializer != null)
 								{
-									setTimeFormat(propertyReflector.getTimeFormat());
-									field.set(model, deserializer.deserialize(value, getTimeFormat(), fieldClass));
+									String timeFormat = getTimeFormat(propertyReflector);
+									field.set(model, deserializer.deserialize(value, timeFormat, fieldClass));
 									setDeserializedName(model, propertyReflector.getFieldName());
 								}
 							}
@@ -646,7 +639,6 @@ public class JsonMapper extends Mapper
 						PropertyReflector propertyReflector = entityReflector.getPropertyReflector(name, getMapperType(), getMapperReflector());
 						if(propertyReflector != null)
 						{
-							setTimeFormat(propertyReflector.getTimeFormat());
 							Field field = propertyReflector.getField();
 							Type fieldType = propertyReflector.getFieldType();
 							if(getMapperReflector().isEntity(fieldType))
@@ -657,14 +649,14 @@ public class JsonMapper extends Mapper
 							}
 							else
 							{
-								Object value = readMap(reader, fieldType);
+								Object value = readMap(reader, fieldType, propertyReflector);
 								field.set(model, value);
 								setDeserializedName(model, propertyReflector.getFieldName());
 							}
 						}
 						else
 						{
-							LinkedHashMap<String, Object> value = readMap(reader, LinkedHashMap.class);
+							LinkedHashMap<String, Object> value = readMap(reader, LinkedHashMap.class, null);
 							PropertiesReflector propertiesReflector = entityReflector.getPropertiesReflector();
 							if(propertiesReflector != null)
 							{
@@ -683,16 +675,15 @@ public class JsonMapper extends Mapper
 						PropertyReflector propertyReflector = entityReflector.getPropertyReflector(name, getMapperType(), getMapperReflector());
 						if(propertyReflector != null)
 						{
-							setTimeFormat(propertyReflector.getTimeFormat());
 							Field field = propertyReflector.getField();
 							Type fieldType = propertyReflector.getFieldType();
-							Object value = readArray(reader, fieldType);
+							Object value = readArray(reader, fieldType, propertyReflector);
 							field.set(model, value);
 							setDeserializedName(model, propertyReflector.getFieldName());
 						}
 						else
 						{
-							LinkedList<Object> value = readCollection(reader, LinkedList.class);
+							LinkedList<Object> value = readCollection(reader, LinkedList.class, null);
 							PropertiesReflector propertiesReflector = entityReflector.getPropertiesReflector();
 							if(propertiesReflector != null)
 							{
@@ -715,7 +706,7 @@ public class JsonMapper extends Mapper
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T, K, E> T readMap(Reader reader, Type type) throws Exception
+	protected <T, K, E> T readMap(Reader reader, Type type, PropertyReflector propertyReflector) throws Exception
 	{
 		Map<K, E> map = null;
 		Class<T> klass = getTypeClass(type);
@@ -757,10 +748,10 @@ public class JsonMapper extends Mapper
 					if(name == null)
 					{
 						name = readEscaped(reader, c);
-						Deserializer<?> deserializer = getMapperConfig().getDeserializer(keyClass);
+						Deserializer<?> deserializer = getDeserializer(keyClass);
 						if(deserializer != null)
 						{
-							key = (K) deserializer.deserialize(name, getTimeFormat());
+							key = (K) deserializer.deserialize(name, null);
 						}
 					}
 					else
@@ -830,7 +821,7 @@ public class JsonMapper extends Mapper
 						}
 						else
 						{
-							E value = readMap(reader, elementType);
+							E value = readMap(reader, elementType, propertyReflector);
 							map.put(key, value);
 						}
 						key = null;
@@ -843,7 +834,7 @@ public class JsonMapper extends Mapper
 				{
 					if(name != null)
 					{
-						E value = readArray(reader, elementType);
+						E value = readArray(reader, elementType, propertyReflector);
 						map.put(key, value);
 						key = null;
 						name = null;
@@ -862,16 +853,16 @@ public class JsonMapper extends Mapper
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T, E> T readArray(Reader reader, Type type) throws Exception
+	protected <T, E> T readArray(Reader reader, Type type, PropertyReflector propertyReflector) throws Exception
 	{
 		if(isCollection(type))
 		{
-			return readCollection(reader, type);
+			return readCollection(reader, type, propertyReflector);
 		}
 		else if(isArray(type))
 		{
 			Type elementType = getElementType(type);
-			LinkedList<E> collection = readCollection(reader, type);
+			LinkedList<E> collection = readCollection(reader, type, propertyReflector);
 			E[] array = (E[]) Array.newInstance(getTypeClass(elementType), collection.size());
 			for(int i = 0; i < collection.size(); i++)
 			{
@@ -883,7 +874,7 @@ public class JsonMapper extends Mapper
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T, E> T readCollection(Reader reader, Type type) throws Exception
+	protected <T, E> T readCollection(Reader reader, Type type, PropertyReflector propertyReflector) throws Exception
 	{
 		Collection<E> collection = null;
 		Class<T> klass = getTypeClass(type);
@@ -922,10 +913,11 @@ public class JsonMapper extends Mapper
 					String value = readEscaped(reader, c);
 					if(value != null && !value.trim().isEmpty() && !NULL.equalsIgnoreCase(value))
 					{
-						Deserializer<?> deserializer = getMapperConfig().getDeserializer(elementClass);
+						Deserializer<?> deserializer = getDeserializer(elementClass);
 						if(deserializer != null)
 						{
-							Object object = deserializer.deserialize(value, getTimeFormat(), elementClass);
+							String timeFormat = getTimeFormat(propertyReflector);
+							Object object = deserializer.deserialize(value, timeFormat, elementClass);
 							if(object != null && elementClass.isAssignableFrom(object.getClass()))
 							{
 								collection.add((E) object);
@@ -957,10 +949,11 @@ public class JsonMapper extends Mapper
 					String value = builder.toString();
 					if(value != null && !value.trim().isEmpty() && !NULL.equalsIgnoreCase(value))
 					{
-						Deserializer<?> deserializer = getMapperConfig().getDeserializer(elementClass);
+						Deserializer<?> deserializer = getDeserializer(elementClass);
 						if(deserializer != null)
 						{
-							Object object = deserializer.deserialize(value, getTimeFormat(), elementClass);
+							String timeFormat = getTimeFormat(propertyReflector);
+							Object object = deserializer.deserialize(value, timeFormat, elementClass);
 							if(object != null && elementClass.isAssignableFrom(object.getClass()))
 							{
 								collection.add((E) object);
@@ -993,11 +986,11 @@ public class JsonMapper extends Mapper
 					Object value = null;
 					if(getMapperReflector().isEntity(elementType))
 					{
-						value = readEntity(reader, elementClass);;
+						value = readEntity(reader, elementClass);
 					}
 					else
 					{
-						value = readMap(reader, elementClass);;
+						value = readMap(reader, elementClass, propertyReflector);
 					}
 					if(value != null && elementClass.isAssignableFrom(value.getClass()))
 					{
@@ -1008,7 +1001,7 @@ public class JsonMapper extends Mapper
 				}
 				case LEFT_BRACKET:
 				{
-					Object value = readCollection(reader, elementClass);
+					Object value = readCollection(reader, elementClass, propertyReflector);
 					if(value != null && elementClass.isAssignableFrom(value.getClass()))
 					{
 						collection.add((E) value);
