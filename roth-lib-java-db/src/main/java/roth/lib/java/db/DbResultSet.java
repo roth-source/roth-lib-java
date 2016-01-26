@@ -21,6 +21,13 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Map;
 
+import roth.lib.java.time.Day;
+import roth.lib.java.time.Hour;
+import roth.lib.java.time.Millisecond;
+import roth.lib.java.time.Minute;
+import roth.lib.java.time.Month;
+import roth.lib.java.time.Second;
+import roth.lib.java.time.Year;
 import roth.lib.java.util.EnumUtil;
 
 public abstract class DbResultSet implements ResultSet, DbWrapper
@@ -1174,7 +1181,39 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 	@SuppressWarnings("unchecked")
 	public <T> T getObject(int columnIndex, Class<T> type) throws SQLException
 	{
-		if(Calendar.class.isAssignableFrom(type))
+		if(Year.class.isAssignableFrom(type))
+		{
+			return (T) getYear(columnIndex);
+		}
+		else if(Month.class.isAssignableFrom(type))
+		{
+			return (T) getMonth(columnIndex);
+		}
+		else if(Day.class.isAssignableFrom(type))
+		{
+			return (T) getDay(columnIndex);
+		}
+		else if(Hour.class.isAssignableFrom(type))
+		{
+			return (T) getHour(columnIndex);
+		}
+		else if(Minute.class.isAssignableFrom(type))
+		{
+			return (T) getMinute(columnIndex);
+		}
+		else if(Second.class.isAssignableFrom(type))
+		{
+			return (T) getSecond(columnIndex);
+		}
+		else if(Millisecond.class.isAssignableFrom(type))
+		{
+			return (T) getMillisecond(columnIndex);
+		}
+		else if(roth.lib.java.time.Time.class.isAssignableFrom(type))
+		{
+			return (T) getRothTime(columnIndex);
+		}
+		else if(Calendar.class.isAssignableFrom(type))
 		{
 			return (T) getCalendar(columnIndex);
 		}
@@ -1193,7 +1232,39 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 	@SuppressWarnings("unchecked")
 	public <T> T getObject(String columnLabel, Class<T> type) throws SQLException
 	{
-		if(Calendar.class.isAssignableFrom(type))
+		if(Year.class.isAssignableFrom(type))
+		{
+			return (T) getYear(columnLabel);
+		}
+		else if(Month.class.isAssignableFrom(type))
+		{
+			return (T) getMonth(columnLabel);
+		}
+		else if(Day.class.isAssignableFrom(type))
+		{
+			return (T) getDay(columnLabel);
+		}
+		else if(Hour.class.isAssignableFrom(type))
+		{
+			return (T) getHour(columnLabel);
+		}
+		else if(Minute.class.isAssignableFrom(type))
+		{
+			return (T) getMinute(columnLabel);
+		}
+		else if(Second.class.isAssignableFrom(type))
+		{
+			return (T) getSecond(columnLabel);
+		}
+		else if(Millisecond.class.isAssignableFrom(type))
+		{
+			return (T) getMillisecond(columnLabel);
+		}
+		else if(roth.lib.java.time.Time.class.isAssignableFrom(type))
+		{
+			return (T) getRothTime(columnLabel);
+		}
+		else if(Calendar.class.isAssignableFrom(type))
 		{
 			return (T) getCalendar(columnLabel);
 		}
@@ -1208,15 +1279,175 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 		}
 	}
 	
-	protected Calendar getCalendar(Timestamp timestamp)
+	protected Year getYear(Date date)
 	{
+		Year year = null;
+		if(date != null)
+		{
+			year = new Year(date); 
+		}
+		return year;
+	}
+	
+	public Year getYear(int columnIndex) throws SQLException
+	{
+		return getYear(resultSet.getDate(columnIndex));
+	}
+	
+	public Year getYear(String columnLabel) throws SQLException
+	{
+		return getYear(resultSet.getDate(columnLabel));
+	}
+	
+	protected Month getMonth(Date date)
+	{
+		Month month = null;
+		if(date != null)
+		{
+			month = new Month(date); 
+		}
+		return month;
+	}
+	
+	public Month getMonth(int columnIndex) throws SQLException
+	{
+		return getMonth(resultSet.getDate(columnIndex));
+	}
+	
+	public Month getMonth(String columnLabel) throws SQLException
+	{
+		return getMonth(resultSet.getDate(columnLabel));
+	}
+	
+	protected Day getDay(Date date)
+	{
+		Day day = null;
+		if(date != null)
+		{
+			day = new Day(date); 
+		}
+		return day;
+	}
+	
+	public Day getDay(int columnIndex) throws SQLException
+	{
+		return getDay(resultSet.getDate(columnIndex));
+	}
+	
+	public Day getDay(String columnLabel) throws SQLException
+	{
+		return getDay(resultSet.getDate(columnLabel));
+	}
+	
+	protected Hour getHour(Timestamp timestamp)
+	{
+		Hour hour = null;
 		if(timestamp != null)
 		{
-			Calendar calendar = new GregorianCalendar();
-			calendar.setTime(timestamp);
-			return calendar;
+			hour = new Hour(timestamp); 
 		}
-		return null;
+		return hour;
+	}
+	
+	public Hour getHour(int columnIndex) throws SQLException
+	{
+		return getHour(resultSet.getTimestamp(columnIndex));
+	}
+	
+	public Hour getHour(String columnLabel) throws SQLException
+	{
+		return getHour(resultSet.getTimestamp(columnLabel));
+	}
+	
+	protected Minute getMinute(Timestamp timestamp)
+	{
+		Minute minute = null;
+		if(timestamp != null)
+		{
+			minute = new Minute(timestamp); 
+		}
+		return minute;
+	}
+	
+	public Minute getMinute(int columnIndex) throws SQLException
+	{
+		return getMinute(resultSet.getTimestamp(columnIndex));
+	}
+	
+	public Minute getMinute(String columnLabel) throws SQLException
+	{
+		return getMinute(resultSet.getTimestamp(columnLabel));
+	}
+	
+	protected Second getSecond(Timestamp timestamp)
+	{
+		Second second = null;
+		if(timestamp != null)
+		{
+			second = new Second(timestamp); 
+		}
+		return second;
+	}
+	
+	public Second getSecond(int columnIndex) throws SQLException
+	{
+		return getSecond(resultSet.getTimestamp(columnIndex));
+	}
+	
+	public Second getSecond(String columnLabel) throws SQLException
+	{
+		return getSecond(resultSet.getTimestamp(columnLabel));
+	}
+	
+	protected Millisecond getMillisecond(Timestamp timestamp)
+	{
+		Millisecond millisecond = null;
+		if(timestamp != null)
+		{
+			millisecond = new Millisecond(timestamp); 
+		}
+		return millisecond;
+	}
+	
+	public Millisecond getMillisecond(int columnIndex) throws SQLException
+	{
+		return getMillisecond(resultSet.getTimestamp(columnIndex));
+	}
+	
+	public Millisecond getMillisecond(String columnLabel) throws SQLException
+	{
+		return getMillisecond(resultSet.getTimestamp(columnLabel));
+	}
+	
+	protected roth.lib.java.time.Time getRothTime(Timestamp timestamp)
+	{
+		roth.lib.java.time.Time time = null;
+		if(timestamp != null)
+		{
+			time = new roth.lib.java.time.Time(timestamp); 
+		}
+		return time;
+	}
+	
+	public roth.lib.java.time.Time getRothTime(int columnIndex) throws SQLException
+	{
+		return getRothTime(resultSet.getTimestamp(columnIndex));
+	}
+	
+	public roth.lib.java.time.Time getRothTime(String columnLabel) throws SQLException
+	{
+		return getRothTime(resultSet.getTimestamp(columnLabel));
+	}
+	
+	protected Calendar getCalendar(Timestamp timestamp)
+	{
+		Calendar calendar = null;
+		if(timestamp != null)
+		{
+			calendar = new GregorianCalendar();
+			calendar.setTime(timestamp);
+		}
+		return calendar;
 	}
 	
 	public Calendar getCalendar(int columnIndex) throws SQLException
@@ -1392,6 +1623,38 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 		{
 			value = getEnum(columnLabel, klass);
 		}
+		else if(Year.class.isAssignableFrom(klass))
+		{
+			value = getYear(columnLabel);
+		}
+		else if(Month.class.isAssignableFrom(klass))
+		{
+			value = getMonth(columnLabel);
+		}
+		else if(Day.class.isAssignableFrom(klass))
+		{
+			value = getDay(columnLabel);
+		}
+		else if(Hour.class.isAssignableFrom(klass))
+		{
+			value = getHour(columnLabel);
+		}
+		else if(Minute.class.isAssignableFrom(klass))
+		{
+			value = getMinute(columnLabel);
+		}
+		else if(Second.class.isAssignableFrom(klass))
+		{
+			value = getSecond(columnLabel);
+		}
+		else if(Millisecond.class.isAssignableFrom(klass))
+		{
+			value = getMillisecond(columnLabel);
+		}
+		else if(roth.lib.java.time.Time.class.isAssignableFrom(klass))
+		{
+			value = getRothTime(columnLabel);
+		}
 		else if(Calendar.class.isAssignableFrom(klass))
 		{
 			value = getCalendar(columnLabel);
@@ -1485,6 +1748,38 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 		else if(Enum.class.isAssignableFrom(klass))
 		{
 			value = getEnum(columnIndex, klass);
+		}
+		else if(Year.class.isAssignableFrom(klass))
+		{
+			value = getYear(columnIndex);
+		}
+		else if(Month.class.isAssignableFrom(klass))
+		{
+			value = getMonth(columnIndex);
+		}
+		else if(Day.class.isAssignableFrom(klass))
+		{
+			value = getDay(columnIndex);
+		}
+		else if(Hour.class.isAssignableFrom(klass))
+		{
+			value = getHour(columnIndex);
+		}
+		else if(Minute.class.isAssignableFrom(klass))
+		{
+			value = getMinute(columnIndex);
+		}
+		else if(Second.class.isAssignableFrom(klass))
+		{
+			value = getSecond(columnIndex);
+		}
+		else if(Millisecond.class.isAssignableFrom(klass))
+		{
+			value = getMillisecond(columnIndex);
+		}
+		else if(roth.lib.java.time.Time.class.isAssignableFrom(klass))
+		{
+			value = getRothTime(columnIndex);
 		}
 		else if(Calendar.class.isAssignableFrom(klass))
 		{

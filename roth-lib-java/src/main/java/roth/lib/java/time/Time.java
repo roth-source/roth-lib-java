@@ -342,6 +342,21 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 		return calendar.getTimeInMillis();
 	}
 	
+	public java.sql.Date toSqlDate()
+	{
+		return new java.sql.Date(calendar.getTimeInMillis());
+	}
+	
+	public java.sql.Time toSqlTime()
+	{
+		return new java.sql.Time(calendar.getTimeInMillis());
+	}
+	
+	public java.sql.Timestamp toSqlTimestamp()
+	{
+		return new java.sql.Timestamp(calendar.getTimeInMillis());
+	}
+	
 	public Year toYear()
 	{
 		return new Year(calendar);

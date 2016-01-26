@@ -18,6 +18,10 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
+import roth.lib.java.time.Day;
+import roth.lib.java.time.Month;
+import roth.lib.java.time.Year;
+
 public abstract class DbPreparedStatement extends DbStatement implements PreparedStatement
 {
 	protected PreparedStatement preparedStatement;
@@ -152,7 +156,15 @@ public abstract class DbPreparedStatement extends DbStatement implements Prepare
 	@Override
 	public void setObject(int parameterIndex, Object object, int targetSqlType) throws SQLException
 	{
-		if(object instanceof Calendar)
+		if(object instanceof Year || object instanceof Month || object instanceof Day)
+		{
+			object = ((roth.lib.java.time.Time) object).toSqlDate();
+		}
+		else if(object instanceof roth.lib.java.time.Time)
+		{
+			object = ((roth.lib.java.time.Time) object).toSqlTimestamp();
+		}
+		else if(object instanceof Calendar)
 		{
 			object = new Timestamp(((Calendar) object).getTimeInMillis());
 		}
@@ -166,7 +178,15 @@ public abstract class DbPreparedStatement extends DbStatement implements Prepare
 	@Override
 	public void setObject(int parameterIndex, Object object) throws SQLException
 	{
-		if(object instanceof Calendar)
+		if(object instanceof Year || object instanceof Month || object instanceof Day)
+		{
+			object = ((roth.lib.java.time.Time) object).toSqlDate();
+		}
+		else if(object instanceof roth.lib.java.time.Time)
+		{
+			object = ((roth.lib.java.time.Time) object).toSqlTimestamp();
+		}
+		else if(object instanceof Calendar)
 		{
 			object = new Timestamp(((Calendar) object).getTimeInMillis());
 		}
