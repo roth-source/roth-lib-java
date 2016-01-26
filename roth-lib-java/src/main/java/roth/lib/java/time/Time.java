@@ -443,10 +443,30 @@ public class Time implements Serializable, Comparable<Time>
 		return time;
 	}
 	
+	public boolean isAfterNow()
+	{
+		return isAfter(new Time());
+	}
+	
+	public boolean isAfter(Time time)
+	{
+		return time != null ? calendar.after(time.calendar) : false;
+	}
+	
+	public boolean isBeforeNow()
+	{
+		return isBefore(new Time());
+	}
+	
+	public boolean isBefore(Time time)
+	{
+		return time != null ? calendar.before(time.calendar) : false;
+	}
+	
 	@Override
 	public int compareTo(Time time)
 	{
-		return calendar.compareTo(time.calendar);
+		return time != null ? calendar.compareTo(time.calendar) : -1;
 	}
 	
 	@Override
