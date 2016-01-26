@@ -42,6 +42,90 @@ public class Month extends Time
 		setMillisecond(0);
 	}
 	
+	public Month addYear(int year)
+	{
+		super.addYear(year);
+		return this;
+	}
+	
+	public Month subtractYear(int year)
+	{
+		super.subtractYear(year);
+		return this;
+	}
+	
+	public Month addMonth(int month)
+	{
+		super.addMonth(month);
+		return this;
+	}
+	
+	public Month subtractMonth(int month)
+	{
+		super.subtractMonth(month);
+		return this;
+	}
+	
+	public Month addDay(int day)
+	{
+		super.addDay(day);
+		return this;
+	}
+	
+	public Month subtractDay(int day)
+	{
+		super.subtractDay(day);
+		return this;
+	}
+	
+	public Month addHour(int hour)
+	{
+		super.addHour(hour);
+		return this;
+	}
+	
+	public Month subtractHour(int hour)
+	{
+		super.subtractHour(hour);
+		return this;
+	}
+	
+	public Month addMinute(int minute)
+	{
+		super.addMinute(minute);
+		return this;
+	}
+	
+	public Month subtractMinute(int minute)
+	{
+		super.subtractMinute(minute);
+		return this;
+	}
+	
+	public Month addSecond(int second)
+	{
+		super.addSecond(second);
+		return this;
+	}
+	
+	public Month subtractSecond(int second)
+	{
+		super.subtractSecond(second);
+		return this;
+	}
+	
+	public Month addMillisecond(int millisecond)
+	{
+		super.addMillisecond(millisecond);
+		return this;
+	}
+	
+	public Month subtractMillisecond(int millisecond)
+	{
+		super.subtractMillisecond(millisecond);
+		return this;
+	}
+	
 	@Override
 	public String toString()
 	{

@@ -42,6 +42,90 @@ public class Minute extends Time
 		setMillisecond(0);
 	}
 	
+	public Minute addYear(int year)
+	{
+		super.addYear(year);
+		return this;
+	}
+	
+	public Minute subtractYear(int year)
+	{
+		super.subtractYear(year);
+		return this;
+	}
+	
+	public Minute addMonth(int month)
+	{
+		super.addMonth(month);
+		return this;
+	}
+	
+	public Minute subtractMonth(int month)
+	{
+		super.subtractMonth(month);
+		return this;
+	}
+	
+	public Minute addDay(int day)
+	{
+		super.addDay(day);
+		return this;
+	}
+	
+	public Minute subtractDay(int day)
+	{
+		super.subtractDay(day);
+		return this;
+	}
+	
+	public Minute addHour(int hour)
+	{
+		super.addHour(hour);
+		return this;
+	}
+	
+	public Minute subtractHour(int hour)
+	{
+		super.subtractHour(hour);
+		return this;
+	}
+	
+	public Minute addMinute(int minute)
+	{
+		super.addMinute(minute);
+		return this;
+	}
+	
+	public Minute subtractMinute(int minute)
+	{
+		super.subtractMinute(minute);
+		return this;
+	}
+	
+	public Minute addSecond(int second)
+	{
+		super.addSecond(second);
+		return this;
+	}
+	
+	public Minute subtractSecond(int second)
+	{
+		super.subtractSecond(second);
+		return this;
+	}
+	
+	public Minute addMillisecond(int millisecond)
+	{
+		super.addMillisecond(millisecond);
+		return this;
+	}
+	
+	public Minute subtractMillisecond(int millisecond)
+	{
+		super.subtractMillisecond(millisecond);
+		return this;
+	}
+	
 	@Override
 	public String toString()
 	{

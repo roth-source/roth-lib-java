@@ -42,6 +42,90 @@ public class Second extends Time
 		setMillisecond(0);
 	}
 	
+	public Second addYear(int year)
+	{
+		super.addYear(year);
+		return this;
+	}
+	
+	public Second subtractYear(int year)
+	{
+		super.subtractYear(year);
+		return this;
+	}
+	
+	public Second addMonth(int month)
+	{
+		super.addMonth(month);
+		return this;
+	}
+	
+	public Second subtractMonth(int month)
+	{
+		super.subtractMonth(month);
+		return this;
+	}
+	
+	public Second addDay(int day)
+	{
+		super.addDay(day);
+		return this;
+	}
+	
+	public Second subtractDay(int day)
+	{
+		super.subtractDay(day);
+		return this;
+	}
+	
+	public Second addHour(int hour)
+	{
+		super.addHour(hour);
+		return this;
+	}
+	
+	public Second subtractHour(int hour)
+	{
+		super.subtractHour(hour);
+		return this;
+	}
+	
+	public Second addMinute(int minute)
+	{
+		super.addMinute(minute);
+		return this;
+	}
+	
+	public Second subtractMinute(int minute)
+	{
+		super.subtractMinute(minute);
+		return this;
+	}
+	
+	public Second addSecond(int second)
+	{
+		super.addSecond(second);
+		return this;
+	}
+	
+	public Second subtractSecond(int second)
+	{
+		super.subtractSecond(second);
+		return this;
+	}
+	
+	public Second addMillisecond(int millisecond)
+	{
+		super.addMillisecond(millisecond);
+		return this;
+	}
+	
+	public Second subtractMillisecond(int millisecond)
+	{
+		super.subtractMillisecond(millisecond);
+		return this;
+	}
+	
 	@Override
 	public String toString()
 	{

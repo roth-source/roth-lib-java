@@ -42,7 +42,89 @@ public class Day extends Time
 		setMillisecond(0);
 	}
 	
+	public Day addYear(int year)
+	{
+		super.addYear(year);
+		return this;
+	}
 	
+	public Day subtractYear(int year)
+	{
+		super.subtractYear(year);
+		return this;
+	}
+	
+	public Day addMonth(int month)
+	{
+		super.addMonth(month);
+		return this;
+	}
+	
+	public Day subtractMonth(int month)
+	{
+		super.subtractMonth(month);
+		return this;
+	}
+	
+	public Day addDay(int day)
+	{
+		super.addDay(day);
+		return this;
+	}
+	
+	public Day subtractDay(int day)
+	{
+		super.subtractDay(day);
+		return this;
+	}
+	
+	public Day addHour(int hour)
+	{
+		super.addHour(hour);
+		return this;
+	}
+	
+	public Day subtractHour(int hour)
+	{
+		super.subtractHour(hour);
+		return this;
+	}
+	
+	public Day addMinute(int minute)
+	{
+		super.addMinute(minute);
+		return this;
+	}
+	
+	public Day subtractMinute(int minute)
+	{
+		super.subtractMinute(minute);
+		return this;
+	}
+	
+	public Day addSecond(int second)
+	{
+		super.addSecond(second);
+		return this;
+	}
+	
+	public Day subtractSecond(int second)
+	{
+		super.subtractSecond(second);
+		return this;
+	}
+	
+	public Day addMillisecond(int millisecond)
+	{
+		super.addMillisecond(millisecond);
+		return this;
+	}
+	
+	public Day subtractMillisecond(int millisecond)
+	{
+		super.subtractMillisecond(millisecond);
+		return this;
+	}
 	
 	@Override
 	public String toString()

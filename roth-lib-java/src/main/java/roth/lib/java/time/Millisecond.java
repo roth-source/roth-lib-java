@@ -40,6 +40,90 @@ public class Millisecond extends Time
 		super(calendar);
 	}
 	
+	public Millisecond addYear(int year)
+	{
+		super.addYear(year);
+		return this;
+	}
+	
+	public Millisecond subtractYear(int year)
+	{
+		super.subtractYear(year);
+		return this;
+	}
+	
+	public Millisecond addMonth(int month)
+	{
+		super.addMonth(month);
+		return this;
+	}
+	
+	public Millisecond subtractMonth(int month)
+	{
+		super.subtractMonth(month);
+		return this;
+	}
+	
+	public Millisecond addDay(int day)
+	{
+		super.addDay(day);
+		return this;
+	}
+	
+	public Millisecond subtractDay(int day)
+	{
+		super.subtractDay(day);
+		return this;
+	}
+	
+	public Millisecond addHour(int hour)
+	{
+		super.addHour(hour);
+		return this;
+	}
+	
+	public Millisecond subtractHour(int hour)
+	{
+		super.subtractHour(hour);
+		return this;
+	}
+	
+	public Millisecond addMinute(int minute)
+	{
+		super.addMinute(minute);
+		return this;
+	}
+	
+	public Millisecond subtractMinute(int minute)
+	{
+		super.subtractMinute(minute);
+		return this;
+	}
+	
+	public Millisecond addSecond(int second)
+	{
+		super.addSecond(second);
+		return this;
+	}
+	
+	public Millisecond subtractSecond(int second)
+	{
+		super.subtractSecond(second);
+		return this;
+	}
+	
+	public Millisecond addMillisecond(int millisecond)
+	{
+		super.addMillisecond(millisecond);
+		return this;
+	}
+	
+	public Millisecond subtractMillisecond(int millisecond)
+	{
+		super.subtractMillisecond(millisecond);
+		return this;
+	}
+	
 	@Override
 	public String toString()
 	{

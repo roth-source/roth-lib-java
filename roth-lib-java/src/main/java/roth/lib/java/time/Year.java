@@ -42,6 +42,90 @@ public class Year extends Time
 		setMillisecond(0);
 	}
 	
+	public Year addYear(int year)
+	{
+		super.addYear(year);
+		return this;
+	}
+	
+	public Year subtractYear(int year)
+	{
+		super.subtractYear(year);
+		return this;
+	}
+	
+	public Year addMonth(int month)
+	{
+		super.addMonth(month);
+		return this;
+	}
+	
+	public Year subtractMonth(int month)
+	{
+		super.subtractMonth(month);
+		return this;
+	}
+	
+	public Year addDay(int day)
+	{
+		super.addDay(day);
+		return this;
+	}
+	
+	public Year subtractDay(int day)
+	{
+		super.subtractDay(day);
+		return this;
+	}
+	
+	public Year addHour(int hour)
+	{
+		super.addHour(hour);
+		return this;
+	}
+	
+	public Year subtractHour(int hour)
+	{
+		super.subtractHour(hour);
+		return this;
+	}
+	
+	public Year addMinute(int minute)
+	{
+		super.addMinute(minute);
+		return this;
+	}
+	
+	public Year subtractMinute(int minute)
+	{
+		super.subtractMinute(minute);
+		return this;
+	}
+	
+	public Year addSecond(int second)
+	{
+		super.addSecond(second);
+		return this;
+	}
+	
+	public Year subtractSecond(int second)
+	{
+		super.subtractSecond(second);
+		return this;
+	}
+	
+	public Year addMillisecond(int millisecond)
+	{
+		super.addMillisecond(millisecond);
+		return this;
+	}
+	
+	public Year subtractMillisecond(int millisecond)
+	{
+		super.subtractMillisecond(millisecond);
+		return this;
+	}
+	
 	@Override
 	public String toString()
 	{
