@@ -55,87 +55,87 @@ public class Minute extends Time
 		setMillisecond(0);
 	}
 	
-	public Minute addYear(int year)
+	public Minute addYears(int years)
 	{
-		super.addYear(year);
+		super.addYears(years);
 		return this;
 	}
 	
-	public Minute subtractYear(int year)
+	public Minute subtractYears(int years)
 	{
-		super.subtractYear(year);
+		super.subtractYears(years);
 		return this;
 	}
 	
-	public Minute addMonth(int month)
+	public Minute addMonths(int months)
 	{
-		super.addMonth(month);
+		super.addMonths(months);
 		return this;
 	}
 	
-	public Minute subtractMonth(int month)
+	public Minute subtractMonths(int months)
 	{
-		super.subtractMonth(month);
+		super.subtractMonths(months);
 		return this;
 	}
 	
-	public Minute addDay(int day)
+	public Minute addDays(int days)
 	{
-		super.addDay(day);
+		super.addDays(days);
 		return this;
 	}
 	
-	public Minute subtractDay(int day)
+	public Minute subtractDays(int days)
 	{
-		super.subtractDay(day);
+		super.subtractDays(days);
 		return this;
 	}
 	
-	public Minute addHour(int hour)
+	public Minute addHours(int hours)
 	{
-		super.addHour(hour);
+		super.addHours(hours);
 		return this;
 	}
 	
-	public Minute subtractHour(int hour)
+	public Minute subtractHours(int hours)
 	{
-		super.subtractHour(hour);
+		super.subtractHours(hours);
 		return this;
 	}
 	
-	public Minute addMinute(int minute)
+	public Minute addMinutes(int minutes)
 	{
-		super.addMinute(minute);
+		super.addMinutes(minutes);
 		return this;
 	}
 	
-	public Minute subtractMinute(int minute)
+	public Minute subtractMinutes(int minutes)
 	{
-		super.subtractMinute(minute);
+		super.subtractMinutes(minutes);
 		return this;
 	}
 	
-	public Minute addSecond(int second)
+	public Minute addSeconds(int seconds)
 	{
-		super.addSecond(second);
+		super.addSeconds(seconds);
 		return this;
 	}
 	
-	public Minute subtractSecond(int second)
+	public Minute subtractSeconds(int seconds)
 	{
-		super.subtractSecond(second);
+		super.subtractSeconds(seconds);
 		return this;
 	}
 	
-	public Minute addMillisecond(int millisecond)
+	public Minute addMilliseconds(int milliseconds)
 	{
-		super.addMillisecond(millisecond);
+		super.addMilliseconds(milliseconds);
 		return this;
 	}
 	
-	public Minute subtractMillisecond(int millisecond)
+	public Minute subtractMilliseconds(int milliseconds)
 	{
-		super.subtractMillisecond(millisecond);
+		super.subtractMilliseconds(milliseconds);
 		return this;
 	}
 	

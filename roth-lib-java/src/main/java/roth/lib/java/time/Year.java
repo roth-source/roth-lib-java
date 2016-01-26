@@ -42,87 +42,87 @@ public class Year extends Time
 		setMillisecond(0);
 	}
 	
-	public Year addYear(int year)
+	public Year addYears(int years)
 	{
-		super.addYear(year);
+		super.addYears(years);
 		return this;
 	}
 	
-	public Year subtractYear(int year)
+	public Year subtractYears(int years)
 	{
-		super.subtractYear(year);
+		super.subtractYears(years);
 		return this;
 	}
 	
-	public Year addMonth(int month)
+	public Year addMonths(int months)
 	{
-		super.addMonth(month);
+		super.addMonths(months);
 		return this;
 	}
 	
-	public Year subtractMonth(int month)
+	public Year subtractMonths(int months)
 	{
-		super.subtractMonth(month);
+		super.subtractMonths(months);
 		return this;
 	}
 	
-	public Year addDay(int day)
+	public Year addDays(int days)
 	{
-		super.addDay(day);
+		super.addDays(days);
 		return this;
 	}
 	
-	public Year subtractDay(int day)
+	public Year subtractDays(int days)
 	{
-		super.subtractDay(day);
+		super.subtractDays(days);
 		return this;
 	}
 	
-	public Year addHour(int hour)
+	public Year addHours(int hours)
 	{
-		super.addHour(hour);
+		super.addHours(hours);
 		return this;
 	}
 	
-	public Year subtractHour(int hour)
+	public Year subtractHours(int hours)
 	{
-		super.subtractHour(hour);
+		super.subtractHours(hours);
 		return this;
 	}
 	
-	public Year addMinute(int minute)
+	public Year addMinutes(int minutes)
 	{
-		super.addMinute(minute);
+		super.addMinutes(minutes);
 		return this;
 	}
 	
-	public Year subtractMinute(int minute)
+	public Year subtractMinutes(int minutes)
 	{
-		super.subtractMinute(minute);
+		super.subtractMinutes(minutes);
 		return this;
 	}
 	
-	public Year addSecond(int second)
+	public Year addSeconds(int seconds)
 	{
-		super.addSecond(second);
+		super.addSeconds(seconds);
 		return this;
 	}
 	
-	public Year subtractSecond(int second)
+	public Year subtractSeconds(int seconds)
 	{
-		super.subtractSecond(second);
+		super.subtractSeconds(seconds);
 		return this;
 	}
 	
-	public Year addMillisecond(int millisecond)
+	public Year addMilliseconds(int milliseconds)
 	{
-		super.addMillisecond(millisecond);
+		super.addMilliseconds(milliseconds);
 		return this;
 	}
 	
-	public Year subtractMillisecond(int millisecond)
+	public Year subtractMilliseconds(int milliseconds)
 	{
-		super.subtractMillisecond(millisecond);
+		super.subtractMilliseconds(milliseconds);
 		return this;
 	}
 	

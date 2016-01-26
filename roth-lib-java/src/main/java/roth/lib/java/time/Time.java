@@ -243,87 +243,87 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 		}
 	}
 	
-	public Time addYear(int year)
+	public Time addYears(int years)
 	{
-		calendar.add(Calendar.YEAR, year);
+		calendar.add(Calendar.YEAR, years);
 		return this;
 	}
 	
-	public Time subtractYear(int year)
+	public Time subtractYears(int years)
 	{
-		calendar.add(Calendar.YEAR, year * -1);
+		calendar.add(Calendar.YEAR, years * -1);
 		return this;
 	}
 	
-	public Time addMonth(int month)
+	public Time addMonths(int months)
 	{
-		calendar.add(Calendar.MONTH, month);
+		calendar.add(Calendar.MONTH, months);
 		return this;
 	}
 	
-	public Time subtractMonth(int month)
+	public Time subtractMonths(int months)
 	{
-		calendar.add(Calendar.MONTH, month * -1);
+		calendar.add(Calendar.MONTH, months * -1);
 		return this;
 	}
 	
-	public Time addDay(int day)
+	public Time addDays(int days)
 	{
-		calendar.add(Calendar.DAY_OF_MONTH, day);
+		calendar.add(Calendar.DAY_OF_MONTH, days);
 		return this;
 	}
 	
-	public Time subtractDay(int day)
+	public Time subtractDays(int days)
 	{
-		calendar.add(Calendar.DAY_OF_MONTH, day * -1);
+		calendar.add(Calendar.DAY_OF_MONTH, days * -1);
 		return this;
 	}
 	
-	public Time addHour(int hour)
+	public Time addHours(int hours)
 	{
-		calendar.add(Calendar.HOUR_OF_DAY, hour);
+		calendar.add(Calendar.HOUR_OF_DAY, hours);
 		return this;
 	}
 	
-	public Time subtractHour(int hour)
+	public Time subtractHours(int hours)
 	{
-		calendar.add(Calendar.HOUR_OF_DAY, hour * -1);
+		calendar.add(Calendar.HOUR_OF_DAY, hours * -1);
 		return this;
 	}
 	
-	public Time addMinute(int minute)
+	public Time addMinutes(int minutes)
 	{
-		calendar.add(Calendar.MINUTE, minute);
+		calendar.add(Calendar.MINUTE, minutes);
 		return this;
 	}
 	
-	public Time subtractMinute(int minute)
+	public Time subtractMinutes(int minutes)
 	{
-		calendar.add(Calendar.MINUTE, minute * -1);
+		calendar.add(Calendar.MINUTE, minutes * -1);
 		return this;
 	}
 	
-	public Time addSecond(int second)
+	public Time addSeconds(int seconds)
 	{
-		calendar.add(Calendar.SECOND, second);
+		calendar.add(Calendar.SECOND, seconds);
 		return this;
 	}
 	
-	public Time subtractSecond(int second)
+	public Time subtractSeconds(int seconds)
 	{
-		calendar.add(Calendar.SECOND, second * -1);
+		calendar.add(Calendar.SECOND, seconds * -1);
 		return this;
 	}
 	
-	public Time addMillisecond(int millisecond)
+	public Time addMilliseconds(int milliseconds)
 	{
-		calendar.add(Calendar.MILLISECOND, millisecond);
+		calendar.add(Calendar.MILLISECOND, milliseconds);
 		return this;
 	}
 	
-	public Time subtractMillisecond(int millisecond)
+	public Time subtractMilliseconds(int milliseconds)
 	{
-		calendar.add(Calendar.MILLISECOND, millisecond * -1);
+		calendar.add(Calendar.MILLISECOND, milliseconds * -1);
 		return this;
 	}
 	
@@ -438,7 +438,7 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 		Time time = new Time();
 		while(time.isWeekendOrHoliday())
 		{
-			time.addDay(1);
+			time.addDays(1);
 		}
 		return time;
 	}

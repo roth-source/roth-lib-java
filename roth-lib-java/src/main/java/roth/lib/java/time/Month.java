@@ -42,87 +42,87 @@ public class Month extends Time
 		setMillisecond(0);
 	}
 	
-	public Month addYear(int year)
+	public Month addYears(int years)
 	{
-		super.addYear(year);
+		super.addYears(years);
 		return this;
 	}
 	
-	public Month subtractYear(int year)
+	public Month subtractYears(int years)
 	{
-		super.subtractYear(year);
+		super.subtractYears(years);
 		return this;
 	}
 	
-	public Month addMonth(int month)
+	public Month addMonths(int months)
 	{
-		super.addMonth(month);
+		super.addMonths(months);
 		return this;
 	}
 	
-	public Month subtractMonth(int month)
+	public Month subtractMonths(int months)
 	{
-		super.subtractMonth(month);
+		super.subtractMonths(months);
 		return this;
 	}
 	
-	public Month addDay(int day)
+	public Month addDays(int days)
 	{
-		super.addDay(day);
+		super.addDays(days);
 		return this;
 	}
 	
-	public Month subtractDay(int day)
+	public Month subtractDays(int days)
 	{
-		super.subtractDay(day);
+		super.subtractDays(days);
 		return this;
 	}
 	
-	public Month addHour(int hour)
+	public Month addHours(int hours)
 	{
-		super.addHour(hour);
+		super.addHours(hours);
 		return this;
 	}
 	
-	public Month subtractHour(int hour)
+	public Month subtractHours(int hours)
 	{
-		super.subtractHour(hour);
+		super.subtractHours(hours);
 		return this;
 	}
 	
-	public Month addMinute(int minute)
+	public Month addMinutes(int minutes)
 	{
-		super.addMinute(minute);
+		super.addMinutes(minutes);
 		return this;
 	}
 	
-	public Month subtractMinute(int minute)
+	public Month subtractMinutes(int minutes)
 	{
-		super.subtractMinute(minute);
+		super.subtractMinutes(minutes);
 		return this;
 	}
 	
-	public Month addSecond(int second)
+	public Month addSeconds(int seconds)
 	{
-		super.addSecond(second);
+		super.addSeconds(seconds);
 		return this;
 	}
 	
-	public Month subtractSecond(int second)
+	public Month subtractSeconds(int seconds)
 	{
-		super.subtractSecond(second);
+		super.subtractSeconds(seconds);
 		return this;
 	}
 	
-	public Month addMillisecond(int millisecond)
+	public Month addMilliseconds(int milliseconds)
 	{
-		super.addMillisecond(millisecond);
+		super.addMilliseconds(milliseconds);
 		return this;
 	}
 	
-	public Month subtractMillisecond(int millisecond)
+	public Month subtractMilliseconds(int milliseconds)
 	{
-		super.subtractMillisecond(millisecond);
+		super.subtractMilliseconds(milliseconds);
 		return this;
 	}
 	
