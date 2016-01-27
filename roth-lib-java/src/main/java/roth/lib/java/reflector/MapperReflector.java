@@ -46,7 +46,6 @@ import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
 import roth.lib.java.serializer.CalendarSerializer;
 import roth.lib.java.serializer.DateSerializer;
-import roth.lib.java.serializer.EnumSerializer;
 import roth.lib.java.serializer.EscapedSerializer;
 import roth.lib.java.serializer.Serializer;
 import roth.lib.java.serializer.TimeSerializer;
@@ -80,6 +79,8 @@ public class MapperReflector
 	{
 		UnescapedSerializer unescapedSerializer = new UnescapedSerializer();
 		EscapedSerializer<?> escapedSerializer = new EscapedSerializer<Object>();
+		serializerMap.put(Enum.class, escapedSerializer);
+		serializerMap.put(String.class, escapedSerializer);
 		serializerMap.put(boolean.class, unescapedSerializer);
 		serializerMap.put(byte.class, unescapedSerializer);
 		serializerMap.put(short.class, unescapedSerializer);
@@ -90,9 +91,7 @@ public class MapperReflector
 		serializerMap.put(char.class, escapedSerializer);
 		serializerMap.put(Number.class, unescapedSerializer);
 		serializerMap.put(Character.class, escapedSerializer);
-		serializerMap.put(String.class, escapedSerializer);
 		serializerMap.put(DataUrl.class, escapedSerializer);
-		serializerMap.put(Enum.class, new EnumSerializer());
 		serializerMap.put(Time.class, new TimeSerializer());
 		serializerMap.put(Date.class, new DateSerializer());
 		serializerMap.put(Calendar.class, new CalendarSerializer());
@@ -101,6 +100,7 @@ public class MapperReflector
 	protected void initDeserializers()
 	{
 		deserializerMap.put(Enum.class, new EnumDeserializer());
+		deserializerMap.put(String.class, new StringDeserializer());
 		deserializerMap.put(boolean.class, new BooleanDeserializer(false));
 		deserializerMap.put(Boolean.class,  new BooleanDeserializer(true));
 		deserializerMap.put(byte.class, new ByteDeserializer(false));
@@ -119,7 +119,6 @@ public class MapperReflector
 		deserializerMap.put(BigInteger.class, new BigIntegerDeserializer());
 		deserializerMap.put(char.class, new CharacterDeserializer(false));
 		deserializerMap.put(Character.class, new CharacterDeserializer(true));
-		deserializerMap.put(String.class, new StringDeserializer());
 		deserializerMap.put(Year.class, new YearDeserializer());
 		deserializerMap.put(Month.class, new MonthDeserializer());
 		deserializerMap.put(Day.class, new DayDeserializer());

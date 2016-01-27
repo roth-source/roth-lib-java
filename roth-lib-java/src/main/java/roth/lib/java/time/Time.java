@@ -481,6 +481,12 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 	}
 	
 	@Override
+	public int hashCode()
+	{
+		return calendar.hashCode();
+	}
+	
+	@Override
 	public boolean equals(Object object)
 	{
 		if(this == object)

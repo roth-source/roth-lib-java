@@ -47,6 +47,11 @@ public abstract class HttpService
 		return !errors.isEmpty();
 	}
 	
+	public void clearErrors()
+	{
+		errors.clear();
+	}
+	
 	public ServletContext getServletContext()
 	{
 		return servletContext;

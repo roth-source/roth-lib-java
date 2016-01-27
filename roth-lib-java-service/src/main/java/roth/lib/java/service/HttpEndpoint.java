@@ -164,6 +164,8 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 													boolean authorized = service.isAuthorized(methodReflector, methodRequest);
 													if(authorized)
 													{
+														errors.addAll(service.getErrors());
+														service.clearErrors();
 														if(errors.isEmpty())
 														{
 															service.setResponseContentType(responseContentType);
@@ -179,6 +181,8 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 																	errors.add(service.exception(HttpErrorType.SERVICE_EXCEPTION.error(), e.getCause()));
 																}
 															}
+															errors.addAll(service.getErrors());
+															service.clearErrors();
 														}
 													}
 													else
