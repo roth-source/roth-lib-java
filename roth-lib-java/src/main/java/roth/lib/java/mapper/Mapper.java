@@ -10,16 +10,14 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 import roth.lib.java.Callback;
 import roth.lib.java.Characters;
 import roth.lib.java.Generic;
 import roth.lib.java.Model;
 import roth.lib.java.deserializer.Deserializer;
+import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
 import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.serializer.Serializer;
@@ -31,7 +29,7 @@ public abstract class Mapper implements Characters
 	protected MapperReflector mapperReflector;
 	protected MapperConfig mapperConfig;
 	protected String context;
-	protected LinkedList<Callback<?>> callbacks = new LinkedList<Callback<?>>();
+	protected List<Callback<?>> callbacks = new List<Callback<?>>();
 	protected int tabs;
 	
 	protected Mapper(MapperType mapperType, MapperReflector mapperReflector, MapperConfig mapperConfig)
@@ -71,7 +69,7 @@ public abstract class Mapper implements Characters
 		return context;
 	}
 	
-	public LinkedList<Callback<?>> getCallbacks()
+	public List<Callback<?>> getCallbacks()
 	{
 		return callbacks;
 	}
@@ -140,7 +138,7 @@ public abstract class Mapper implements Characters
 		return this;
 	}
 	
-	public Mapper setCallbacks(LinkedList<Callback<?>> callbacks)
+	public Mapper setCallbacks(List<Callback<?>> callbacks)
 	{
 		this.callbacks = callbacks;
 		return this;
@@ -148,7 +146,7 @@ public abstract class Mapper implements Characters
 	
 	public Mapper setCallbacks(Callback<?>... callbacks)
 	{
-		this.callbacks = new LinkedList<Callback<?>>(Arrays.asList(callbacks));
+		this.callbacks = new List<Callback<?>>(Arrays.asList(callbacks));
 		return this;
 	}
 	
@@ -194,19 +192,19 @@ public abstract class Mapper implements Characters
 	
 	// SERIALIZE FROM MAP OVERLOADING
 	
-	public String serialize(Map<String, ?> map)
+	public String serialize(java.util.Map<String, ?> map)
 	{
 		Writer writer = new StringWriter();
 		serialize(map, writer);
 		return writer.toString();
 	}
 	
-	public void serialize(Map<String, ?> map, OutputStream output)
+	public void serialize(java.util.Map<String, ?> map, OutputStream output)
 	{
 		serialize(map, new OutputStreamWriter(output, UTF_8));
 	}
 	
-	public abstract void serialize(Map<String, ?> map, Writer writer);
+	public abstract void serialize(java.util.Map<String, ?> map, Writer writer);
 	
 	
 	
@@ -270,17 +268,17 @@ public abstract class Mapper implements Characters
 	
 	// DESERIALIZE TO MAP OVERLOADING
 	
-	public LinkedHashMap<String, Object> deserialize(String data)
+	public Map<String, Object> deserialize(String data)
 	{
 		return deserialize(new StringReader(data));
 	}
 	
-	public LinkedHashMap<String, Object> deserialize(InputStream input)
+	public Map<String, Object> deserialize(InputStream input)
 	{
 		return deserialize(new InputStreamReader(input, UTF_8));
 	}
 	
-	public abstract LinkedHashMap<String, Object> deserialize(Reader reader);
+	public abstract Map<String, Object> deserialize(Reader reader);
 	
 	
 	
@@ -308,7 +306,7 @@ public abstract class Mapper implements Characters
 		StringBuilder builder = new StringBuilder();
 		try
 		{
-			List<Character> untilList = Arrays.asList(untils);
+			List<Character> untilList = List.fromArray(untils);
 			int b;
 			char c;
 			while((b = reader.read()) > -1)

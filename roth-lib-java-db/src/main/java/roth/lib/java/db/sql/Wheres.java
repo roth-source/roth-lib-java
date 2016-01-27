@@ -1,6 +1,6 @@
 package roth.lib.java.db.sql;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public abstract class Wheres extends Conditions
@@ -19,7 +19,7 @@ public abstract class Wheres extends Conditions
 	}
 	
 	@Override
-	public Wheres setConditions(LinkedList<Condition> conditions)
+	public Wheres setConditions(List<Condition> conditions)
 	{
 		this.conditions = conditions;
 		return this;

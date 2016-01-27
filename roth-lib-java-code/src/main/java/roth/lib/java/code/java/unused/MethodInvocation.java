@@ -1,6 +1,6 @@
 package roth.lib.java.code.java.unused;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 import roth.lib.java.code.java.JavaCode;
 import roth.lib.java.code.java.JavaExpression;
@@ -10,9 +10,9 @@ import roth.lib.java.code.java.JavaGeneric;
 public class MethodInvocation extends JavaCode implements JavaExpression
 {
 	public String selected;
-	public LinkedList<JavaGeneric> generics = new LinkedList<JavaGeneric>();
+	public List<JavaGeneric> generics = new List<JavaGeneric>();
 	public String method;
-	public LinkedList<JavaExpression> arguments = new LinkedList<JavaExpression>();
+	public List<JavaExpression> arguments = new List<JavaExpression>();
 	
 	public MethodInvocation()
 	{

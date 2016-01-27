@@ -1,56 +1,56 @@
 package roth.lib.java.code.java;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public class JavaInterface extends JavaEntity
 {
-	protected LinkedList<JavaDefinition> definitions = new LinkedList<JavaDefinition>();
-	protected LinkedList<JavaType> superTypes = new LinkedList<JavaType>();
-	protected LinkedList<JavaField> staticFields = new LinkedList<JavaField>();
-	protected LinkedList<JavaMethod> methods = new LinkedList<JavaMethod>();
+	protected List<JavaDefinition> definitions = new List<JavaDefinition>();
+	protected List<JavaType> superTypes = new List<JavaType>();
+	protected List<JavaField> staticFields = new List<JavaField>();
+	protected List<JavaMethod> methods = new List<JavaMethod>();
 	
 	public JavaInterface()
 	{
 		
 	}
 	
-	public LinkedList<JavaDefinition> getDefinitions()
+	public List<JavaDefinition> getDefinitions()
 	{
 		return definitions;
 	}
 	
-	public LinkedList<JavaType> getSuperTypes()
+	public List<JavaType> getSuperTypes()
 	{
 		return superTypes;
 	}
 	
-	public LinkedList<JavaField> getStaticFields()
+	public List<JavaField> getStaticFields()
 	{
 		return staticFields;
 	}
 	
-	public LinkedList<JavaMethod> getMethods()
+	public List<JavaMethod> getMethods()
 	{
 		return methods;
 	}
 	
-	public void setDefinitions(LinkedList<JavaDefinition> definitions)
+	public void setDefinitions(List<JavaDefinition> definitions)
 	{
 		this.definitions.addAll(definitions);
 	}
 	
-	public void setSuperTypes(LinkedList<JavaType> superTypes)
+	public void setSuperTypes(List<JavaType> superTypes)
 	{
 		this.superTypes.addAll(superTypes);
 	}
 	
-	public void setStaticFields(LinkedList<JavaField> staticFields)
+	public void setStaticFields(List<JavaField> staticFields)
 	{
 		this.staticFields.addAll(staticFields);
 	}
 	
-	public void setMethods(LinkedList<JavaMethod> methods)
+	public void setMethods(List<JavaMethod> methods)
 	{
 		this.methods.addAll(methods);
 	}

@@ -1,12 +1,12 @@
 package roth.lib.java.xml.tag;
 
-import java.util.LinkedHashMap;
+import roth.lib.java.lang.Map;
 import java.util.Map.Entry;
 
 public class EmptyTag extends Tag
 {
 	protected String name;
-	protected LinkedHashMap<String, String> attributeMap = new LinkedHashMap<String, String>();
+	protected Map<String, String> attributeMap = new Map<String, String>();
 
 	public EmptyTag(OpenTag openTag)
 	{
@@ -24,7 +24,7 @@ public class EmptyTag extends Tag
 		return name;
 	}
 	
-	public LinkedHashMap<String, String> getAttributeMap()
+	public Map<String, String> getAttributeMap()
 	{
 		return attributeMap;
 	}

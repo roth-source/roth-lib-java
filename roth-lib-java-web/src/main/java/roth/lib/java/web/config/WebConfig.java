@@ -5,13 +5,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import roth.lib.java.json.JsonMapper;
+import roth.lib.java.lang.Map;
+import roth.lib.java.lang.Set;
 
 public class WebConfig
 {
@@ -161,7 +161,7 @@ public class WebConfig
 			System.out.println("Syncing langs");
 			if(textDir.exists() && textDir.isDirectory())
 			{
-				LinkedHashSet<String> langs = new LinkedHashSet<String>();
+				Set<String> langs = new Set<String>();
 				for(File file : textDir.listFiles())
 				{
 					if(file.isFile() && !file.isHidden())
@@ -178,15 +178,15 @@ public class WebConfig
 			}
 			
 			System.out.println("Syncing endpoint map");
-			LinkedHashMap<String, LinkedHashSet<String>> endpointMap = config.getEndpointMap();
+			Map<String, Set<String>> endpointMap = config.getEndpointMap();
 			if(endpointMap == null)
 			{
-				endpointMap = new LinkedHashMap<String, LinkedHashSet<String>>();
+				endpointMap = new Map<String, Set<String>>();
 			}
-			LinkedHashSet<String> localEndpoints = endpointMap.get(LOCAL_ENV);
+			Set<String> localEndpoints = endpointMap.get(LOCAL_ENV);
 			if(localEndpoints == null || localEndpoints.isEmpty())
 			{
-				localEndpoints = new LinkedHashSet<String>();
+				localEndpoints = new Set<String>();
 				localEndpoints.add(LOCAL_DEFAULT);
 				endpointMap.put(LOCAL_ENV, localEndpoints);
 			}
@@ -195,7 +195,7 @@ public class WebConfig
 			System.out.println("Syncing layout map");
 			if(layoutDir.exists() && layoutDir.isDirectory())
 			{
-				LinkedHashSet<String> layouts = new LinkedHashSet<String>();
+				Set<String> layouts = new Set<String>();
 				for(File file : layoutDir.listFiles())
 				{
 					if(file.isFile() && !file.isHidden())
@@ -227,14 +227,14 @@ public class WebConfig
 			System.out.println("Syncing module map");
 			if(pageDir.exists() && pageDir.isDirectory())
 			{
-				LinkedHashSet<String> modules = new LinkedHashSet<String>();
+				Set<String> modules = new Set<String>();
 				for(File dir : pageDir.listFiles())
 				{
 					if(dir.isDirectory() && !dir.isHidden())
 					{
 						String moduleName = dir.getName();
 						Module module = config.getModuleMap().get(moduleName);
-						LinkedHashSet<String> pages = new LinkedHashSet<String>();
+						Set<String> pages = new Set<String>();
 						for(File file : dir.listFiles())
 						{
 							if(file.isFile() && !file.isHidden())
@@ -299,22 +299,22 @@ public class WebConfig
 			}
 			
 			System.out.println("Syncing services");
-			LinkedHashSet<String> services = new LinkedHashSet<String>();
+			Set<String> services = new Set<String>();
 			for(File methodsDir : serviceDir.listFiles())
 			{
 				if(methodsDir.isDirectory() && !methodsDir.isHidden())
 				{
 					String service = methodsDir.getName();
 					services.add(service);
-					LinkedHashMap<String, Scenario> methodMap = dev.getServiceMap().get(service);
-					LinkedHashSet<String> methods = new LinkedHashSet<String>();
+					Map<String, Scenario> methodMap = dev.getServiceMap().get(service);
+					Set<String> methods = new Set<String>();
 					for(File scenariosDir : methodsDir.listFiles())
 					{
 						if(scenariosDir.isDirectory() && !scenariosDir.isHidden())
 						{
 							if(methodMap == null)
 							{
-								methodMap = new LinkedHashMap<String, Scenario>();
+								methodMap = new Map<String, Scenario>();
 								dev.getServiceMap().put(service, methodMap);
 							}
 							String method = scenariosDir.getName();
@@ -325,8 +325,8 @@ public class WebConfig
 								scenario = new Scenario();
 								methodMap.put(method, scenario);
 							}
-							LinkedHashSet<String> requests = new LinkedHashSet<String>();
-							LinkedHashSet<String> responses = new LinkedHashSet<String>();
+							Set<String> requests = new Set<String>();
+							Set<String> responses = new Set<String>();
 							for(File file : scenariosDir.listFiles())
 							{
 								if(file.isFile() && !file.isHidden())
@@ -382,7 +382,7 @@ public class WebConfig
 					}
 				}
 			}
-			Iterator<Entry<String, LinkedHashMap<String, Scenario>>> iterator = dev.getServiceMap().entrySet().iterator();
+			Iterator<Entry<String, Map<String, Scenario>>> iterator = dev.getServiceMap().entrySet().iterator();
 			while(iterator.hasNext())
 			{
 				if(!services.contains(iterator.next().getKey()))
@@ -400,7 +400,7 @@ public class WebConfig
 	public static void main(String[] args) throws Exception
 	{
 		WebConfig staticConfig = new WebConfig();
-		LinkedHashMap<String, String> argMap = parseArgMap(args);
+		Map<String, String> argMap = parseArgMap(args);
 		if(argMap.containsKey(PROJECT_DIR))
 		{
 			staticConfig.setProjectDir(new File(argMap.get(PROJECT_DIR)));
@@ -436,9 +436,9 @@ public class WebConfig
 		staticConfig.sync();
 	}
 	
-	protected static LinkedHashMap<String, String> parseArgMap(String[] args)
+	protected static Map<String, String> parseArgMap(String[] args)
 	{
-		LinkedHashMap<String, String> argMap = new LinkedHashMap<String, String>();
+		Map<String, String> argMap = new Map<String, String>();
 		for(String arg : Arrays.asList(args))
 		{
 			if(arg.startsWith("-"))

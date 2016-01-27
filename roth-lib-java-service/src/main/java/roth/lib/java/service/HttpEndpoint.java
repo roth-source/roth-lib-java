@@ -6,11 +6,8 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import roth.lib.java.lang.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,6 +20,7 @@ import javax.servlet.http.HttpSession;
 
 import roth.lib.java.Characters;
 import roth.lib.java.http.HttpMethod;
+import roth.lib.java.lang.List;
 import roth.lib.java.mapper.Mapper;
 import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
@@ -52,16 +50,16 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 	protected static String CONTENT_TYPE 						= "Content-Type";
 	protected static String ACCEPT		 						= "Accept";
 	protected static String ALLOWED_METHODS 					= "GET, POST";
-	protected static List<HttpMethod> SUPPORTED_METHODS			= Arrays.asList(HttpMethod.GET, HttpMethod.POST);
-	protected static List<String> LOCALHOSTS 					= Arrays.asList("localhost", "127.0.0.1");
+	protected static List<HttpMethod> SUPPORTED_METHODS			= List.fromArray(HttpMethod.GET, HttpMethod.POST);
+	protected static List<String> LOCALHOSTS 					= List.fromArray("localhost", "127.0.0.1");
 	protected static String ENDPOINT 							= "_endpoint";
 	protected static String SERVICE 							= "service";
 	protected static String METHOD 								= "method";
 	protected static Pattern SERVICE_METHOD_PATTERN 			= Pattern.compile("(?:^|/)(?<" + SERVICE + ">\\w+)/(?<" + METHOD + ">\\w+)(?:/|$)");
 	
-	protected static LinkedHashMap<String, ServiceReflector> serviceReflectorMap = new LinkedHashMap<String, ServiceReflector>();
-	protected static LinkedHashMap<String, Filterer> filtererMap = new LinkedHashMap<String, Filterer>();
-	protected static LinkedHashMap<String, Validator> validatorMap = new LinkedHashMap<String, Validator>();
+	protected static Map<String, ServiceReflector> serviceReflectorMap = new Map<String, ServiceReflector>();
+	protected static Map<String, Filterer> filtererMap = new Map<String, Filterer>();
+	protected static Map<String, Validator> validatorMap = new Map<String, Validator>();
 	
 	protected MapperReflector mapperReflector = MapperReflector.get();
 	protected MapperConfig mapperConfig = MapperConfig.get();
@@ -94,7 +92,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 	{
 		Object methodResponse = null;
 		String debugRequest = "";
-		LinkedList<HttpError> errors = new LinkedList<HttpError>();
+		List<HttpError> errors = new List<HttpError>();
 		MimeType requestContentType = getRequestContentType(request, response);
 		MimeType responseContentType = getResponseContentType(request, response);
 		Mapper responseMapper = getResponseMapper(request, response, responseContentType);
@@ -426,7 +424,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 			{
 				acceptHeader = acceptHeader.substring(0, index);
 			}
-			List<String> acceptTypes = Arrays.asList(acceptHeader.split(","));
+			List<String> acceptTypes = List.fromArray(acceptHeader.split(","));
 			accepts: for(String acceptType : acceptTypes)
 			{
 				contentType = MimeType.fromString(acceptType);
@@ -495,14 +493,14 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		return mapper;
 	}
 	
-	protected LinkedList<HttpError> validate(HttpServletRequest request, HttpServletResponse response, Object value, MapperType mapperType)
+	protected List<HttpError> validate(HttpServletRequest request, HttpServletResponse response, Object value, MapperType mapperType)
 	{
 		return validate(request, response, value, mapperType, BLANK);
 	}
 	
-	protected LinkedList<HttpError> validate(HttpServletRequest request, HttpServletResponse response, Object value, MapperType mapperType, String path)
+	protected List<HttpError> validate(HttpServletRequest request, HttpServletResponse response, Object value, MapperType mapperType, String path)
 	{
-		LinkedList<HttpError> errors = new LinkedList<HttpError>();
+		List<HttpError> errors = new List<HttpError>();
 		if(value != null)
 		{
 			EntityReflector entityReflector = getMapperReflector().getEntityReflector(value.getClass());

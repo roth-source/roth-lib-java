@@ -1,6 +1,6 @@
 package roth.lib.java.web.config;
 
-import java.util.LinkedHashMap;
+import roth.lib.java.lang.Map;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
@@ -10,19 +10,19 @@ import roth.lib.java.annotation.Property;
 public class Module extends Page
 {
 	@Property(name = "page")
-	protected LinkedHashMap<String, Page> pageMap = new LinkedHashMap<String, Page>();
+	protected Map<String, Page> pageMap = new Map<String, Page>();
 	
 	public Module()
 	{
 		properties.remove("params");
 	}
 
-	public LinkedHashMap<String, Page> getPageMap()
+	public Map<String, Page> getPageMap()
 	{
 		return pageMap;
 	}
 
-	public void setPageMap(LinkedHashMap<String, Page> pageMap)
+	public void setPageMap(Map<String, Page> pageMap)
 	{
 		this.pageMap = pageMap;
 	}

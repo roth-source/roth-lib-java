@@ -2,16 +2,16 @@ package roth.lib.java.code.java;
 
 import static roth.lib.java.code.java.JavaTag.THROWS;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public class JavaConstructor extends JavaAnnotatedCommentedCode implements JavaMember
 {
-	protected LinkedList<JavaAnnotation> annotations = new LinkedList<JavaAnnotation>();
+	protected List<JavaAnnotation> annotations = new List<JavaAnnotation>();
 	protected JavaAccess access;
 	protected String name;
-	protected LinkedList<JavaParameter> parameters = new LinkedList<JavaParameter>();
-	protected LinkedList<JavaType> throwTypes = new LinkedList<JavaType>();
+	protected List<JavaParameter> parameters = new List<JavaParameter>();
+	protected List<JavaType> throwTypes = new List<JavaType>();
 	protected JavaBlock block;
 	
 	public JavaConstructor()
@@ -19,7 +19,7 @@ public class JavaConstructor extends JavaAnnotatedCommentedCode implements JavaM
 		
 	}
 	
-	public LinkedList<JavaAnnotation> getAnnotations()
+	public List<JavaAnnotation> getAnnotations()
 	{
 		return annotations;
 	}
@@ -34,12 +34,12 @@ public class JavaConstructor extends JavaAnnotatedCommentedCode implements JavaM
 		return name;
 	}
 	
-	public LinkedList<JavaParameter> getParameters()
+	public List<JavaParameter> getParameters()
 	{
 		return parameters;
 	}
 	
-	public LinkedList<JavaType> getThrowTypes()
+	public List<JavaType> getThrowTypes()
 	{
 		return throwTypes;
 	}
@@ -49,7 +49,7 @@ public class JavaConstructor extends JavaAnnotatedCommentedCode implements JavaM
 		return block;
 	}
 	
-	public void setAnnotations(LinkedList<JavaAnnotation> annotations)
+	public void setAnnotations(List<JavaAnnotation> annotations)
 	{
 		this.annotations.addAll(annotations);
 	}
@@ -64,12 +64,12 @@ public class JavaConstructor extends JavaAnnotatedCommentedCode implements JavaM
 		this.name = name;
 	}
 	
-	public void setParameters(LinkedList<JavaParameter> parameters)
+	public void setParameters(List<JavaParameter> parameters)
 	{
 		this.parameters.addAll(parameters);
 	}
 	
-	public void setThrowTypes(LinkedList<JavaType> throwTypes)
+	public void setThrowTypes(List<JavaType> throwTypes)
 	{
 		this.throwTypes.addAll(throwTypes);
 	}

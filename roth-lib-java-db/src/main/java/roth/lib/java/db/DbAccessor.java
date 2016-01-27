@@ -1,8 +1,8 @@
 package roth.lib.java.db;
 
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Map;
+import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
 
 import roth.lib.java.Callback;
 import roth.lib.java.db.sql.Select;
@@ -37,22 +37,22 @@ public abstract class DbAccessor
 		return getDb().query(sql, valueMap, klass);
 	}
 	
-	public <T> LinkedList<T> findAllBy(Select select, Class<T> klass)
+	public <T> List<T> findAllBy(Select select, Class<T> klass)
 	{
 		return getDb().queryAll(select, klass);
 	}
 	
-	public <T> LinkedList<T> findAllBy(String sql, Class<T> klass)
+	public <T> List<T> findAllBy(String sql, Class<T> klass)
 	{
 		return getDb().queryAll(sql, klass);
 	}
 	
-	public <T> LinkedList<T> findAllBy(String sql, Collection<Object> values, Class<T> klass)
+	public <T> List<T> findAllBy(String sql, Collection<Object> values, Class<T> klass)
 	{
 		return getDb().queryAll(sql, values, klass);
 	}
 	
-	public <T> LinkedList<T> findAllBy(String sql, Map<String, Object> valueMap, Class<T> klass)
+	public <T> List<T> findAllBy(String sql, Map<String, Object> valueMap, Class<T> klass)
 	{
 		return getDb().queryAll(sql, valueMap, klass);
 	}

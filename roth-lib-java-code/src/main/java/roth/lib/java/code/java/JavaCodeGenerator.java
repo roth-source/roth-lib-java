@@ -1,7 +1,7 @@
 package roth.lib.java.code.java;
 
 import java.io.File;
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 public class JavaCodeGenerator
 {
@@ -9,16 +9,16 @@ public class JavaCodeGenerator
 	public static void main(String[] args)
 	{
 		File dir = new File(System.getProperty("user.dir"));
-		LinkedList<File> files = getFiles(dir);
+		List<File> files = getFiles(dir);
 		for(File file : files)
 		{
 			System.out.println(file.getAbsolutePath());
 		}
 	}
 	
-	public static LinkedList<File> getFiles(File dir)
+	public static List<File> getFiles(File dir)
 	{
-		LinkedList<File> files = new LinkedList<File>();
+		List<File> files = new List<File>();
 		for(File file : dir.listFiles())
 		{
 			if(file.isDirectory())

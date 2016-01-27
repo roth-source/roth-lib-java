@@ -2,8 +2,8 @@ package roth.lib.java.db;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Map;
+import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,7 +14,7 @@ public class DbNamedQuery implements Characters
 	protected static Pattern NAMED_PATTERN = Pattern.compile(":(\\w+)");
 	
 	protected String sql = "";
-	protected LinkedList<Object> values = new LinkedList<Object>();
+	protected List<Object> values = new List<Object>(true);
 	
 	public DbNamedQuery(String sql, Map<String, Object> valueMap)
 	{
@@ -69,7 +69,7 @@ public class DbNamedQuery implements Characters
 		return sql;
 	}
 	
-	public LinkedList<Object> getValues()
+	public List<Object> getValues()
 	{
 		return values;
 	}

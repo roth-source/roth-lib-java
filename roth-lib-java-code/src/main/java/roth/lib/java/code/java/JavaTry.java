@@ -1,13 +1,13 @@
 package roth.lib.java.code.java;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public class JavaTry extends JavaCode implements JavaStatement
 {
-	protected LinkedList<JavaVariable> resources = new LinkedList<JavaVariable>();
+	protected List<JavaVariable> resources = new List<JavaVariable>();
 	protected JavaBlock block;
-	protected LinkedList<JavaCatch> catches = new LinkedList<JavaCatch>();
+	protected List<JavaCatch> catches = new List<JavaCatch>();
 	protected JavaBlock finallyBlock;
 	
 	public JavaTry()

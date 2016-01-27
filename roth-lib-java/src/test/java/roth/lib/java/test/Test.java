@@ -1,11 +1,10 @@
 package roth.lib.java.test;
 
 import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import roth.lib.java.lang.Map;
 
 import roth.lib.java.json.JsonMapper;
+import roth.lib.java.lang.List;
 import roth.lib.java.mapper.Mapper;
 
 public class Test
@@ -20,16 +19,16 @@ public class Test
 		model.put("active", true);
 		model.put("email", "jared@asdf.com");
 		model.put("emails", Arrays.asList("a@a.com", "b@b.com", "c@c.com"));
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		Map<String, String> map = new Map<String, String>();
 		map.put("name1", "value1");
 		map.put("name2", "value2");
 		map.put("name3", "value3");
 		model.put("map", map);
 		model.put("maps", Arrays.asList(map, map));
-		LinkedList<List<String>> arrays = new LinkedList<List<String>>();
-		arrays.add(Arrays.asList("a@a.com", "b@b.com", "c@c.com"));
-		arrays.add(Arrays.asList("a@a.com", "b@b.com", "c@c.com"));
-		arrays.add(Arrays.asList("a@a.com", "b@b.com", "c@c.com"));
+		List<List<String>> arrays = new List<List<String>>();
+		arrays.add(List.fromArray("a@a.com", "b@b.com", "c@c.com"));
+		arrays.add(List.fromArray("a@a.com", "b@b.com", "c@c.com"));
+		arrays.add(List.fromArray("a@a.com", "b@b.com", "c@c.com"));
 		model.put("arrays", arrays);
 		
 		Mapper mapper = new JsonMapper().setPrettyPrint(true);

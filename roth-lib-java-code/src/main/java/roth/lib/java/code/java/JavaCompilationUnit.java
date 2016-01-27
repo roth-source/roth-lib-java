@@ -1,14 +1,14 @@
 package roth.lib.java.code.java;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public class JavaCompilationUnit extends JavaCode
 {
 	protected JavaDocComment docComment;
 	protected JavaPackage _package;
-	protected LinkedList<JavaImport> imports = new LinkedList<JavaImport>();
-	protected LinkedList<JavaEntity> entities = new LinkedList<JavaEntity>();
+	protected List<JavaImport> imports = new List<JavaImport>();
+	protected List<JavaEntity> entities = new List<JavaEntity>();
 	
 	public JavaCompilationUnit()
 	{
@@ -35,22 +35,22 @@ public class JavaCompilationUnit extends JavaCode
 		this._package = _package;
 	}
 	
-	public LinkedList<JavaImport> getImports()
+	public List<JavaImport> getImports()
 	{
 		return imports;
 	}
 	
-	public void setImports(LinkedList<JavaImport> imports)
+	public void setImports(List<JavaImport> imports)
 	{
 		this.imports = imports;
 	}
 	
-	public LinkedList<JavaEntity> getEntities()
+	public List<JavaEntity> getEntities()
 	{
 		return entities;
 	}
 	
-	public void setEntities(LinkedList<JavaEntity> entities)
+	public void setEntities(List<JavaEntity> entities)
 	{
 		this.entities = entities;
 	}

@@ -1,19 +1,18 @@
 package roth.lib.java.db.sql;
 
-import java.util.Arrays;
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public abstract class Orders extends Sql
 {
-	protected LinkedList<Order> orders = new LinkedList<Order>();
+	protected List<Order> orders = new List<Order>();
 	
 	protected Orders()
 	{
 		
 	}
 	
-	public Orders setOrders(LinkedList<Order> orders)
+	public Orders setOrders(List<Order> orders)
 	{
 		this.orders = orders;
 		return this;
@@ -21,7 +20,7 @@ public abstract class Orders extends Sql
 	
 	public Orders addOrders(Order... orders)
 	{
-		this.orders.addAll(Arrays.asList(orders));
+		this.orders.addAll(orders);
 		return this;
 	}
 	

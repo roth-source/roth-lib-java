@@ -1,12 +1,12 @@
 package roth.lib.java.code.java;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public abstract class JavaEntity extends JavaAnnotatedCommentedCode implements JavaMember
 {
 	protected JavaAccess access;
-	protected LinkedList<JavaModifier> modifiers = new LinkedList<JavaModifier>();
+	protected List<JavaModifier> modifiers = new List<JavaModifier>();
 	protected String name;
 	
 	protected JavaEntity()
@@ -19,7 +19,7 @@ public abstract class JavaEntity extends JavaAnnotatedCommentedCode implements J
 		return access;
 	}
 	
-	public LinkedList<JavaModifier> getModifiers()
+	public List<JavaModifier> getModifiers()
 	{
 		return modifiers;
 	}
@@ -34,7 +34,7 @@ public abstract class JavaEntity extends JavaAnnotatedCommentedCode implements J
 		this.access = access;
 	}
 	
-	public void setModifiers(LinkedList<JavaModifier> modifiers)
+	public void setModifiers(List<JavaModifier> modifiers)
 	{
 		this.modifiers.addAll(modifiers);
 	}

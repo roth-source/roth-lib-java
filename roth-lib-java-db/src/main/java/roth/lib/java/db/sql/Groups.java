@@ -1,19 +1,18 @@
 package roth.lib.java.db.sql;
 
-import java.util.Arrays;
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public abstract class Groups extends Sql
 {
-	protected LinkedList<Group> groups = new LinkedList<Group>();
+	protected List<Group> groups = new List<Group>();
 	
 	protected Groups()
 	{
 		
 	}
 	
-	public Groups setGroups(LinkedList<Group> groups)
+	public Groups setGroups(List<Group> groups)
 	{
 		this.groups = groups;
 		return this;
@@ -21,7 +20,7 @@ public abstract class Groups extends Sql
 	
 	public Groups addGroups(Group... groups)
 	{
-		this.groups.addAll(Arrays.asList(groups));
+		this.groups.addAll(groups);
 		return this;
 	}
 	

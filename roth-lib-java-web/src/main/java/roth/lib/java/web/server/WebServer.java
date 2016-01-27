@@ -2,7 +2,7 @@ package roth.lib.java.web.server;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
+import roth.lib.java.lang.Map;
 import java.util.List;
 
 import org.eclipse.jetty.http.HttpVersion;
@@ -231,7 +231,7 @@ public class WebServer
 	public static void main(String[] args)
 	{
 		WebServer devServer = new WebServer();
-		LinkedHashMap<String, String> argMap = parseArgMap(args);
+		Map<String, String> argMap = parseArgMap(args);
 		if(argMap.containsKey(PORT))
 		{
 			try
@@ -266,9 +266,9 @@ public class WebServer
 		devServer.start();
 	}
 	
-	protected static LinkedHashMap<String, String> parseArgMap(String[] args)
+	protected static Map<String, String> parseArgMap(String[] args)
 	{
-		LinkedHashMap<String, String> argMap = new LinkedHashMap<String, String>();
+		Map<String, String> argMap = new Map<String, String>();
 		for(String arg : Arrays.asList(args))
 		{
 			if(arg.startsWith("-"))

@@ -1,12 +1,12 @@
 package roth.lib.java.code.java;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public class JavaField extends JavaAnnotatedCommentedCode implements JavaMember
 {
 	protected JavaAccess access;
-	protected LinkedList<JavaModifier> modifiers = new LinkedList<JavaModifier>();
+	protected List<JavaModifier> modifiers = new List<JavaModifier>();
 	protected JavaType type;
 	protected String name;
 	protected String assignment;
@@ -22,7 +22,7 @@ public class JavaField extends JavaAnnotatedCommentedCode implements JavaMember
 		return access;
 	}
 	
-	public LinkedList<JavaModifier> getModifiers()
+	public List<JavaModifier> getModifiers()
 	{
 		return modifiers;
 	}
@@ -52,7 +52,7 @@ public class JavaField extends JavaAnnotatedCommentedCode implements JavaMember
 		this.access = access;
 	}
 	
-	public void setModifiers(LinkedList<JavaModifier> modifiers)
+	public void setModifiers(List<JavaModifier> modifiers)
 	{
 		this.modifiers.addAll(modifiers);
 	}

@@ -1,19 +1,18 @@
 package roth.lib.java.db.sql;
 
-import java.util.Arrays;
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public abstract class Joins extends Sql
 {
-	protected LinkedList<Join> joins = new LinkedList<Join>();
+	protected List<Join> joins = new List<Join>();
 	
 	public Joins()
 	{
 		
 	}
 	
-	public Joins setJoins(LinkedList<Join> joins)
+	public Joins setJoins(List<Join> joins)
 	{
 		this.joins = joins;
 		return this;
@@ -21,14 +20,14 @@ public abstract class Joins extends Sql
 	
 	public Joins addJoins(Join... joins)
 	{
-		this.joins.addAll(Arrays.asList(joins));
+		this.joins.addAll(joins);
 		return this;
 	}
 	
 	@Override
-	public LinkedList<Object> getValues()
+	public List<Object> getValues()
 	{
-		LinkedList<Object> values = new LinkedList<Object>();
+		List<Object> values = new List<Object>(true);
 		for(Join join : joins)
 		{
 			values.addAll(join.getValues());

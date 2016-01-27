@@ -1,19 +1,19 @@
 package roth.lib.java.db.sql;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Map;
+import roth.lib.java.lang.Map;
 import java.util.Map.Entry;
+
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public abstract class Update extends Sql
 {
 	protected String table;
-	protected LinkedList<Set> sets = new LinkedList<Set>();
+	protected List<Set> sets = new List<Set>();
 	protected Wheres wheres;
 	
-	protected LinkedList<Wheres> nestedWheres = new LinkedList<Wheres>();
+	protected List<Wheres> nestedWheres = new List<Wheres>();
 	
 	public Update()
 	{
@@ -28,13 +28,13 @@ public abstract class Update extends Sql
 	
 	public Update setSets(Collection<Set> sets)
 	{
-		this.sets = new LinkedList<Set>(sets);
+		this.sets = new List<Set>(sets);
 		return this;
 	}
 	
 	public Update addSets(Set...sets)
 	{
-		this.sets.addAll(Arrays.asList(sets));
+		this.sets.addAll(sets);
 		return this;
 	}
 	
@@ -53,8 +53,8 @@ public abstract class Update extends Sql
 		{
 			throw new IllegalArgumentException("names is different size than values");
 		}
-		LinkedList<String> nameList = new LinkedList<String>(names);
-		LinkedList<Object> valueList = new LinkedList<Object>(values);
+		List<String> nameList = new List<String>(names);
+		List<Object> valueList = new List<Object>(true, values);
 		for(int i = 0; i < nameList.size(); i++)
 		{
 			sets.add(newSet().setName(nameList.get(i)).setValue(valueList.get(i)));
@@ -77,8 +77,8 @@ public abstract class Update extends Sql
 		{
 			throw new IllegalArgumentException("sqls is different size than values");
 		}
-		LinkedList<String> sqlList = new LinkedList<String>(sqls);
-		LinkedList<Object> valueList = new LinkedList<Object>(values);
+		List<String> sqlList = new List<String>(sqls);
+		List<Object> valueList = new List<Object>(true, values);
 		for(int i = 0; i < sqlList.size(); i++)
 		{
 			sets.add(newSet().setSql(sqlList.get(i)).setValue(valueList.get(i)));
@@ -500,9 +500,9 @@ public abstract class Update extends Sql
 		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_IS_NOT_NULL));
 	}
 	
-	public LinkedList<Object> getValues()
+	public List<Object> getValues()
 	{
-		LinkedList<Object> values = new LinkedList<Object>();
+		List<Object> values = new List<Object>(true);
 		for(Set set : sets)
 		{
 			values.add(set.value);

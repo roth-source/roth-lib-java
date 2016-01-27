@@ -2,12 +2,11 @@ package roth.lib.java.http;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import roth.lib.java.lang.Map;
 import roth.lib.java.util.UrlUtil;
 
 public class HttpUrl
@@ -63,7 +62,7 @@ public class HttpUrl
 	protected InetAddress inetAddress;
 	protected int port;
 	protected String path = "/";
-	protected LinkedHashMap<String, String> paramMap = new LinkedHashMap<String, String>();
+	protected Map<String, String> paramMap = new Map<String, String>();
 	protected String hash;
 	
 	public HttpUrl()
@@ -191,7 +190,7 @@ public class HttpUrl
 		return path;
 	}
 	
-	public LinkedHashMap<String, String> getParamMap()
+	public Map<String, String> getParamMap()
 	{
 		return paramMap;
 	}
@@ -269,7 +268,7 @@ public class HttpUrl
 		return this;
 	}
 	
-	public HttpUrl setParams(LinkedHashMap<String, String> paramMap)
+	public HttpUrl setParams(Map<String, String> paramMap)
 	{
 		this.paramMap = paramMap;
 		return this;

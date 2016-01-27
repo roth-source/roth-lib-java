@@ -1,25 +1,24 @@
 package roth.lib.java.xml;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import roth.lib.java.annotation.Attributes;
 import roth.lib.java.annotation.Entity;
+import roth.lib.java.lang.Map;
 
 @Entity
 @SuppressWarnings("serial")
 public class XmlModel implements Serializable
 {
 	@Attributes
-	protected LinkedHashMap<String, String> attributeMap = new LinkedHashMap<String, String>();
+	protected Map<String, String> attributeMap = new Map<String, String>();
 	
 	public XmlModel()
 	{
 		
 	}
 	
-	public LinkedHashMap<String, String> getAttributeMap()
+	public Map<String, String> getAttributeMap()
 	{
 		return attributeMap;
 	}

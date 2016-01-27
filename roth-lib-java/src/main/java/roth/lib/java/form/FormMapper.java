@@ -9,11 +9,10 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import roth.lib.java.deserializer.Deserializer;
+import roth.lib.java.lang.Map;
 import roth.lib.java.mapper.Mapper;
 import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
@@ -170,7 +169,7 @@ public class FormMapper extends Mapper
 	}
 	
 	@Override
-	public void serialize(Map<String, ?> map, Writer writer)
+	public void serialize(java.util.Map<String, ?> map, Writer writer)
 	{
 		if(map == null) throw new IllegalArgumentException("Map cannot be null");
 		try
@@ -285,9 +284,9 @@ public class FormMapper extends Mapper
 	}
 	
 	@Override
-	public LinkedHashMap<String, Object> deserialize(Reader reader)
+	public Map<String, Object> deserialize(Reader reader)
 	{
-		LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+		Map<String, Object> map = new Map<String, Object>();
 		try
 		{
 			int b;
@@ -332,9 +331,9 @@ public class FormMapper extends Mapper
 		return map;
 	}
 	
-	public LinkedHashMap<String, String> convert(Object value)
+	public Map<String, String> convert(Object value)
 	{
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		Map<String, String> map = new Map<String, String>();
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(value.getClass());
 		for(PropertyReflector propertyReflector : entityReflector.getPropertyReflectors(getMapperType()))
 		{

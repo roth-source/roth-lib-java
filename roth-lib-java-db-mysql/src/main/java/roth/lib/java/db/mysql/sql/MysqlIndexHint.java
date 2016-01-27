@@ -1,7 +1,7 @@
 package roth.lib.java.db.mysql.sql;
 
 import java.util.Arrays;
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 import roth.lib.java.db.sql.Sql;
 
@@ -9,7 +9,7 @@ import roth.lib.java.db.sql.Sql;
 public class MysqlIndexHint extends Sql implements MysqlSqlFactory
 {
 	protected String indexHintType = FORCE;
-	protected LinkedList<String> names = new LinkedList<String>();
+	protected List<String> names = new List<String>();
 	
 	protected MysqlIndexHint()
 	{
@@ -22,7 +22,7 @@ public class MysqlIndexHint extends Sql implements MysqlSqlFactory
 		return this;
 	}
 	
-	public MysqlIndexHint setNames(LinkedList<String> names)
+	public MysqlIndexHint setNames(List<String> names)
 	{
 		this.names = names;
 		return this;

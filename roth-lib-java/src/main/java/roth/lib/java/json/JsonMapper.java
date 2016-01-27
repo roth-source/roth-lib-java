@@ -18,12 +18,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import roth.lib.java.lang.Map;
 import java.util.Map.Entry;
 
 import roth.lib.java.deserializer.Deserializer;
+import roth.lib.java.lang.List;
 import roth.lib.java.mapper.Mapper;
 import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
@@ -67,7 +66,7 @@ public class JsonMapper extends Mapper
 		{
 			if(isArray(value.getClass()) || isCollection(value.getClass()))
 			{
-				LinkedList<?> values = asCollection(value);
+				List<?> values = asCollection(value);
 				if(!values.isEmpty())
 				{
 					writeArray(writer, values, null);
@@ -99,7 +98,7 @@ public class JsonMapper extends Mapper
 	}
 	
 	@Override
-	public void serialize(Map<String, ?> map, Writer writer)
+	public void serialize(java.util.Map<String, ?> map, Writer writer)
 	{
 		if(map == null) throw new IllegalArgumentException("Map cannot be null");
 		try
@@ -173,7 +172,7 @@ public class JsonMapper extends Mapper
 			}
 			else if(isArray(value.getClass()) || isCollection(value.getClass()))
 			{
-				LinkedList<?> values = asCollection(value);
+				List<?> values = asCollection(value);
 				if(!values.isEmpty())
 				{
 					seperator = writeSeperator(writer, seperator);
@@ -193,7 +192,7 @@ public class JsonMapper extends Mapper
 			}
 			else if(isMap(value.getClass()))
 			{
-				LinkedHashMap<?, ?> valueMap = asMap(value);
+				Map<?, ?> valueMap = asMap(value);
 				if(!valueMap.isEmpty())
 				{
 					seperator = writeSeperator(writer, seperator);
@@ -271,7 +270,7 @@ public class JsonMapper extends Mapper
 				}
 				else if(isArray(value.getClass()) || isCollection(value.getClass()))
 				{
-					LinkedList<?> arrayValues = asCollection(value);
+					List<?> arrayValues = asCollection(value);
 					if(!arrayValues.isEmpty())
 					{
 						incrementTabs();
@@ -292,7 +291,7 @@ public class JsonMapper extends Mapper
 				}
 				else if(isMap(value.getClass()))
 				{
-					LinkedHashMap<?, ?> valueMap = asMap(value);
+					java.util.Map<?, ?> valueMap = asMap(value);
 					if(!valueMap.isEmpty())
 					{
 						incrementTabs();
@@ -340,7 +339,7 @@ public class JsonMapper extends Mapper
 		writer.write(RIGHT_BRACKET);
 	}
 	
-	protected void writeMap(Writer writer, Map<?, ?> valueMap, PropertyReflector propertyReflector) throws IOException
+	protected void writeMap(Writer writer, java.util.Map<?, ?> valueMap, PropertyReflector propertyReflector) throws IOException
 	{
 		writer.write(LEFT_BRACE);
 		String seperator = BLANK;
@@ -487,13 +486,13 @@ public class JsonMapper extends Mapper
 	
 	@Override
 	@SuppressWarnings("unchecked")
-	public LinkedHashMap<String, Object> deserialize(Reader reader)
+	public Map<String, Object> deserialize(Reader reader)
 	{
-		LinkedHashMap<String, Object> map;
+		Map<String, Object> map;
 		try
 		{
 			readUntil(reader, LEFT_BRACE);
-			map = (LinkedHashMap<String, Object>) readMap(reader, LinkedHashMap.class, null);
+			map = (Map<String, Object>) readMap(reader, Map.class, null);
 		}
 		catch(Exception e)
 		{
@@ -656,7 +655,7 @@ public class JsonMapper extends Mapper
 						}
 						else
 						{
-							LinkedHashMap<String, Object> value = readMap(reader, LinkedHashMap.class, null);
+							Map<String, Object> value = readMap(reader, Map.class, null);
 							PropertiesReflector propertiesReflector = entityReflector.getPropertiesReflector();
 							if(propertiesReflector != null)
 							{
@@ -683,7 +682,7 @@ public class JsonMapper extends Mapper
 						}
 						else
 						{
-							LinkedList<Object> value = readCollection(reader, LinkedList.class, null);
+							List<Object> value = readCollection(reader, List.class, null);
 							PropertiesReflector propertiesReflector = entityReflector.getPropertiesReflector();
 							if(propertiesReflector != null)
 							{
@@ -713,9 +712,9 @@ public class JsonMapper extends Mapper
 		Type keyType = getKeyType(type);
 		Class<K> keyClass = getTypeClass(keyType);
 		Type elementType = getElementType(type);
-		if(klass.isAssignableFrom(LinkedHashMap.class))
+		if(klass.isAssignableFrom(Map.class))
 		{
-			map = new LinkedHashMap<K, E>();
+			map = new Map<K, E>();
 		}
 		else
 		{
@@ -862,7 +861,7 @@ public class JsonMapper extends Mapper
 		else if(isArray(type))
 		{
 			Type elementType = getElementType(type);
-			LinkedList<E> collection = readCollection(reader, type, propertyReflector);
+			List<E> collection = readCollection(reader, type, propertyReflector);
 			E[] array = (E[]) Array.newInstance(getTypeClass(elementType), collection.size());
 			for(int i = 0; i < collection.size(); i++)
 			{
@@ -880,9 +879,9 @@ public class JsonMapper extends Mapper
 		Class<T> klass = getTypeClass(type);
 		Type elementType = getElementType(type);
 		Class<E> elementClass = getTypeClass(elementType);
-		if(klass.isAssignableFrom(LinkedList.class) || isArray(klass))
+		if(klass.isAssignableFrom(List.class) || isArray(klass))
 		{
-			collection = new LinkedList<E>();
+			collection = new List<E>();
 		}
 		else
 		{

@@ -1,11 +1,11 @@
 package roth.lib.java.db.sql;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public abstract class Values extends Sql
 {
-	protected LinkedList<Object> values = new LinkedList<Object>();
+	protected List<Object> values = new List<Object>(true);
 	
 	protected Values()
 	{
@@ -13,7 +13,7 @@ public abstract class Values extends Sql
 	}
 	
 	@Override
-	public LinkedList<Object> getValues()
+	public List<Object> getValues()
 	{
 		return values;
 	}

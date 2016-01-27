@@ -1,12 +1,12 @@
 package roth.lib.java.code.java;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public class JavaSwitch extends JavaCode implements JavaStatement
 {
 	protected JavaExpression selector;
-	protected LinkedList<JavaCase> cases = new LinkedList<JavaCase>();
+	protected List<JavaCase> cases = new List<JavaCase>();
 	
 	public JavaSwitch()
 	{

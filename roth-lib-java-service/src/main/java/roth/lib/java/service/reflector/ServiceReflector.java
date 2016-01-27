@@ -1,7 +1,7 @@
 package roth.lib.java.service.reflector;
 
 import java.lang.reflect.Method;
-import java.util.LinkedHashMap;
+import roth.lib.java.lang.Map;
 
 import roth.lib.java.service.HttpService;
 import roth.lib.java.service.annotation.ServiceMethod;
@@ -11,7 +11,7 @@ public class ServiceReflector
 {
 	protected Class<? extends HttpService> klass;
 	protected String name;
-	protected LinkedHashMap<String, MethodReflector> methodReflectorMap = new LinkedHashMap<String, MethodReflector>();
+	protected Map<String, MethodReflector> methodReflectorMap = new Map<String, MethodReflector>();
 	
 	public ServiceReflector(Class<? extends HttpService> klass, String name)
 	{
@@ -52,7 +52,7 @@ public class ServiceReflector
 		return name;
 	}
 	
-	public LinkedHashMap<String, MethodReflector> getMethodReflectorMap()
+	public Map<String, MethodReflector> getMethodReflectorMap()
 	{
 		return methodReflectorMap;
 	}

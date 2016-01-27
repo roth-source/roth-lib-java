@@ -1,8 +1,8 @@
 package roth.lib.java.db.sql;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
+
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public abstract class On extends Values
@@ -50,13 +50,13 @@ public abstract class On extends Values
 	
 	public On setValues(Collection<?> values)
 	{
-		this.values = new LinkedList<Object>(values);
+		this.values = new List<Object>(true, values);
 		return this;
 	}
 	
 	public On addValues(Object...values)
 	{
-		this.values.addAll(Arrays.asList(values));
+		this.values.addAll(true, values);
 		return this;
 	}
 	

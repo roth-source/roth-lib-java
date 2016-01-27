@@ -1,7 +1,7 @@
 package roth.lib.java.service;
 
 import java.io.Serializable;
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
@@ -14,7 +14,7 @@ public class HttpServiceResponse implements Serializable
 	protected HttpServiceDev dev;
 	
 	@Property(name = "errors")
-	protected LinkedList<HttpError> errors;
+	protected List<HttpError> errors;
 	
 	public HttpServiceResponse()
 	{
@@ -36,11 +36,11 @@ public class HttpServiceResponse implements Serializable
 		return this;
 	}
 	
-	public LinkedList<HttpError> getErrors()
+	public List<HttpError> getErrors()
 	{
 		if(errors == null)
 		{
-			errors = new LinkedList<HttpError>();
+			errors = new List<HttpError>();
 		}
 		return errors;
 	}
@@ -57,7 +57,7 @@ public class HttpServiceResponse implements Serializable
 		return this;
 	}
 	
-	public HttpServiceResponse setErrors(LinkedList<HttpError> errors)
+	public HttpServiceResponse setErrors(List<HttpError> errors)
 	{
 		getErrors().addAll(errors);
 		return this;

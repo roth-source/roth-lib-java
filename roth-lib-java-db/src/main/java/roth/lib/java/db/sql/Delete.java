@@ -1,7 +1,7 @@
 package roth.lib.java.db.sql;
 
 import java.util.Collection;
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public abstract class Delete extends Sql
@@ -9,7 +9,7 @@ public abstract class Delete extends Sql
 	protected String table;
 	protected Wheres wheres;
 	
-	protected LinkedList<Wheres> nestedWheres = new LinkedList<Wheres>();
+	protected List<Wheres> nestedWheres = new List<Wheres>();
 	
 	public Delete()
 	{
@@ -418,9 +418,9 @@ public abstract class Delete extends Sql
 		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_IS_NOT_NULL));
 	}
 	
-	public LinkedList<Object> getValues()
+	public List<Object> getValues()
 	{
-		LinkedList<Object> values = new LinkedList<Object>();
+		List<Object> values = new List<Object>(true);
 		if(wheres != null)
 		{
 			values.addAll(wheres.getValues());

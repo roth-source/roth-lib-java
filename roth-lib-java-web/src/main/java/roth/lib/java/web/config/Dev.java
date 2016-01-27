@@ -1,7 +1,7 @@
 package roth.lib.java.web.config;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
+import roth.lib.java.lang.Map;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
@@ -11,19 +11,19 @@ import roth.lib.java.annotation.Property;
 public class Dev implements Serializable
 {
 	@Property(name = "service")
-	protected LinkedHashMap<String, LinkedHashMap<String, Scenario>> serviceMap = new LinkedHashMap<String, LinkedHashMap<String, Scenario>>();
+	protected Map<String, Map<String, Scenario>> serviceMap = new Map<String, Map<String, Scenario>>();
 	
 	public Dev()
 	{
 		
 	}
 	
-	public LinkedHashMap<String, LinkedHashMap<String, Scenario>> getServiceMap()
+	public Map<String, Map<String, Scenario>> getServiceMap()
 	{
 		return serviceMap;
 	}
 	
-	public void setServiceMap(LinkedHashMap<String, LinkedHashMap<String, Scenario>> serviceMap)
+	public void setServiceMap(Map<String, Map<String, Scenario>> serviceMap)
 	{
 		this.serviceMap = serviceMap;
 	}

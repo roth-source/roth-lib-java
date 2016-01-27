@@ -6,8 +6,8 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import roth.lib.java.lang.Map;
+import roth.lib.java.lang.List;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -88,7 +88,7 @@ public class WebDependencies
 			engine.eval(ResourceUtil.toString(ROTH_LIB_JS_ENV));
 			engine.eval(FileUtil.toString(envFile));
 			String json = (String) ((Invocable) engine).invokeFunction(GET_DEPENDENCIES);
-			LinkedList<Dependency> dependencies = mapper.deserialize(json, new Generic<LinkedList<Dependency>>(){});
+			List<Dependency> dependencies = mapper.deserialize(json, new Generic<List<Dependency>>(){});
 			download(dependencies);
 		}
 		else
@@ -97,7 +97,7 @@ public class WebDependencies
 		}
 	}
 	
-	public void download(LinkedList<Dependency> dependencies)
+	public void download(List<Dependency> dependencies)
 	{
 		for(Dependency dependency : dependencies)
 		{
@@ -146,7 +146,7 @@ public class WebDependencies
 	public static void main(String[] args) throws Exception
 	{
 		WebDependencies staticDependencies = new WebDependencies();
-		LinkedHashMap<String, String> argMap = parseArgMap(args);
+		Map<String, String> argMap = parseArgMap(args);
 		if(argMap.containsKey(PROJECT_DIR))
 		{
 			staticDependencies.setProjectDir(new File(argMap.get(PROJECT_DIR)));
@@ -162,9 +162,9 @@ public class WebDependencies
 		staticDependencies.download();
 	}
 	
-	protected static LinkedHashMap<String, String> parseArgMap(String[] args)
+	protected static Map<String, String> parseArgMap(String[] args)
 	{
-		LinkedHashMap<String, String> argMap = new LinkedHashMap<String, String>();
+		Map<String, String> argMap = new Map<String, String>();
 		for(String arg : Arrays.asList(args))
 		{
 			if(arg.startsWith("-"))

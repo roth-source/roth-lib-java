@@ -1,9 +1,9 @@
 package roth.lib.java.db.sql;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
+
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public abstract class Sql implements Serializable, SqlFactory
@@ -17,9 +17,9 @@ public abstract class Sql implements Serializable, SqlFactory
 	
 	public abstract String toString();
 	
-	public LinkedList<Object> getValues()
+	public List<Object> getValues()
 	{
-		return new LinkedList<Object>();
+		return new List<Object>(true);
 	}
 	
 	public static String tick(String value)
@@ -96,9 +96,9 @@ public abstract class Sql implements Serializable, SqlFactory
 		return builder.toString();
 	}
 	
-	public static LinkedList<Object> asList(Object...values)
+	public static List<Object> asList(Object...values)
 	{
-		return new LinkedList<Object>(Arrays.asList(values));
+		return new List<Object>(true, values);
 	}
 	
 }

@@ -1,7 +1,8 @@
 package roth.lib.java.util;
 
 import java.io.File;
-import java.util.LinkedList;
+
+import roth.lib.java.lang.List;
 
 public class ClassLoaderUtil
 {
@@ -11,9 +12,9 @@ public class ClassLoaderUtil
 		
 	}
 	
-	public static LinkedList<Class<?>> getClasses()
+	public static List<Class<?>> getClasses()
 	{
-		LinkedList<Class<?>> classes = new LinkedList<Class<?>>();
+		List<Class<?>> classes = new List<Class<?>>();
 		for(String path : System.getProperty("java.class.path").split(File.pathSeparator))
 		{
 			if(!path.toLowerCase().endsWith(".jar"))
@@ -24,9 +25,9 @@ public class ClassLoaderUtil
 		return classes;
 	}
 	
-	protected static LinkedList<Class<?>> getClasses(File dir)
+	protected static List<Class<?>> getClasses(File dir)
 	{
-		LinkedList<Class<?>> classes = new LinkedList<Class<?>>();
+		List<Class<?>> classes = new List<Class<?>>();
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		for(String className : getClassNames(dir))
 		{
@@ -42,14 +43,14 @@ public class ClassLoaderUtil
 		return classes;
 	}
 	
-	protected static LinkedList<String> getClassNames(File dir)
+	protected static List<String> getClassNames(File dir)
 	{
 		return getClassNames(dir, "");
 	}
 	
-	protected static LinkedList<String> getClassNames(File dir, String path)
+	protected static List<String> getClassNames(File dir, String path)
 	{
-		LinkedList<String> classNames = new LinkedList<String>();
+		List<String> classNames = new List<String>();
 		for(File file : dir.listFiles())
 		{
 			if(file.isFile() && file.getName().endsWith(".class"))

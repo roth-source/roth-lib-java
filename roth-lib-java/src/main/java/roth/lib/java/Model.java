@@ -1,19 +1,20 @@
 package roth.lib.java;
 
 import java.io.Serializable;
-import java.util.LinkedHashSet;
+
+import roth.lib.java.lang.Set;
 
 @SuppressWarnings("serial")
 public abstract class Model implements Serializable
 {
-	protected transient LinkedHashSet<String> deserializedNames = new LinkedHashSet<String>();
+	protected transient Set<String> deserializedNames = new Set<String>();
 	
 	public Model()
 	{
 		
 	}
 	
-	public LinkedHashSet<String> getDeserializedNames()
+	public Set<String> getDeserializedNames()
 	{
 		return deserializedNames;
 	}

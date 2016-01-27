@@ -11,9 +11,9 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+
+import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
 
 public class ReflectionUtil
 {
@@ -86,22 +86,22 @@ public class ReflectionUtil
 		return fieldType;
 	}
 	
-	public static LinkedList<Method> getMethods(Type type, Class<?> stopClass)
+	public static List<Method> getMethods(Type type, Class<?> stopClass)
 	{
 		if(type == null)
 		{
-			return new LinkedList<Method>();
+			return new List<Method>();
 		}
 		else
 		{
 			Class<?> klass = getTypeClass(type);
 			if(stopClass.equals(klass))
 			{
-				return new LinkedList<Method>();
+				return new List<Method>();
 			}
 			else
 			{
-				LinkedList<Method> methods = getMethods(klass.getSuperclass(), stopClass);
+				List<Method> methods = getMethods(klass.getSuperclass(), stopClass);
 				for(Method method : Arrays.asList(klass.getDeclaredMethods()))
 				{
 					if(!Modifier.isStatic(method.getModifiers()))
@@ -114,16 +114,16 @@ public class ReflectionUtil
 		}
 	}
 	
-	public static LinkedList<Field> getFields(Type type)
+	public static List<Field> getFields(Type type)
 	{
 		if(type == null)
 		{
-			return new LinkedList<Field>();
+			return new List<Field>();
 		}
 		else
 		{
 			Class<?> klass = getTypeClass(type);
-			LinkedList<Field> fields = getFields(klass.getSuperclass());
+			List<Field> fields = getFields(klass.getSuperclass());
 			for(Field field : Arrays.asList(klass.getDeclaredFields()))
 			{
 				if(!Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers()))
@@ -204,14 +204,14 @@ public class ReflectionUtil
 		return elementType;
 	}
 	
-	public static LinkedList<?> asCollection(Object value)
+	public static List<?> asCollection(Object value)
 	{
-		return (value instanceof Collection) ? new LinkedList<Object>((Collection<?>) value) : new LinkedList<Object>(Arrays.asList((Object[]) value));
+		return (value instanceof Collection) ? new List<Object>((Collection<?>) value) : new List<Object>(Arrays.asList((Object[]) value));
 	}
 	
-	public static LinkedHashMap<?, ?> asMap(Object value)
+	public static Map<?, ?> asMap(Object value)
 	{
-		return (value instanceof Map) ? new LinkedHashMap<Object, Object>((Map<?, ?>) value) : new LinkedHashMap<Object, Object>();
+		return (value instanceof Map) ? new Map<Object, Object>((Map<?, ?>) value) : new Map<Object, Object>();
 	}
 	
 	public static <T extends Annotation> boolean hasAnnotation(Class<?> klass, Method method, Class<T> annotationClass)

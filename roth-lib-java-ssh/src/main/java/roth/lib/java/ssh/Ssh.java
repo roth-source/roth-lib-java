@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Hashtable;
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -108,9 +108,9 @@ public class Ssh implements AutoCloseable
 		return channelExec;
 	}
 	
-	public LinkedList<String> exec(String command)
+	public List<String> exec(String command)
 	{
-		LinkedList<String> lines = new LinkedList<String>();
+		List<String> lines = new List<String>();
 		try
 		{
 			openChannelExec();

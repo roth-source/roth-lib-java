@@ -1,13 +1,13 @@
 package roth.lib.java.code.java;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public class JavaFor extends JavaCode implements JavaStatement
 {
-	protected LinkedList<JavaStatement> initializers = new LinkedList<JavaStatement>();
+	protected List<JavaStatement> initializers = new List<JavaStatement>();
 	protected JavaExpression condition;
-	protected LinkedList<JavaExpressionStatement> steps = new LinkedList<JavaExpressionStatement>();
+	protected List<JavaExpressionStatement> steps = new List<JavaExpressionStatement>();
 	protected JavaBlock block;
 	
 	public JavaFor()

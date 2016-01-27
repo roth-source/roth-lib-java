@@ -1,5 +1,7 @@
 package roth.lib.java.service;
 
+import roth.lib.java.lang.List;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +17,7 @@ public abstract class HttpService
 	public static String X_CSRF_TOKEN			= "X-Csrf-Token";
 	public static String CSRF_TOKEN				= "csrfToken";
 	
+	protected List<HttpError> errors = new List<HttpError>();
 	protected ServletContext servletContext;
 	protected HttpServletRequest httpServletRequest;
 	protected HttpServletResponse httpServletResponse;
@@ -33,6 +36,16 @@ public abstract class HttpService
 	public abstract boolean isAjaxAuthenticated(MethodReflector methodReflector);
 	public abstract boolean isApiAuthenticated(MethodReflector methodReflector);
 	public abstract boolean isAuthorized(MethodReflector methodReflector, Object request);
+	
+	public List<HttpError> getErrors()
+	{
+		return errors;
+	}
+	
+	public boolean hasErrors()
+	{
+		return !errors.isEmpty();
+	}
 	
 	public ServletContext getServletContext()
 	{

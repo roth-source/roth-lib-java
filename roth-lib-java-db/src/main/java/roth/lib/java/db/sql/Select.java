@@ -1,7 +1,7 @@
 package roth.lib.java.db.sql;
 
 import java.util.Collection;
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public abstract class Select extends Sql implements SqlFactory
@@ -15,8 +15,8 @@ public abstract class Select extends Sql implements SqlFactory
 	protected Orders orders;
 	protected Page page;
 	
-	protected LinkedList<Wheres> nestedWheres = new LinkedList<Wheres>();
-	protected LinkedList<Havings> nestedHavings = new LinkedList<Havings>();
+	protected List<Wheres> nestedWheres = new List<Wheres>();
+	protected List<Havings> nestedHavings = new List<Havings>();
 	
 	protected Select()
 	{
@@ -1133,9 +1133,9 @@ public abstract class Select extends Sql implements SqlFactory
 	}
 	
 	@Override
-	public LinkedList<Object> getValues()
+	public List<Object> getValues()
 	{
-		LinkedList<Object> values = new LinkedList<Object>();
+		List<Object> values = new List<Object>(true);
 		if(joins != null)
 		{
 			values.addAll(joins.getValues());

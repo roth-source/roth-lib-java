@@ -1,15 +1,15 @@
 package roth.lib.java.db.sql;
 
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Map;
+import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
 import java.util.Map.Entry;
 
 @SuppressWarnings("serial")
 public abstract class Insert extends Values
 {
 	protected String table;
-	protected LinkedList<String> names =  new LinkedList<String>();
+	protected List<String> names =  new List<String>();
 	
 	public Insert()
 	{
@@ -24,14 +24,14 @@ public abstract class Insert extends Values
 	
 	public Insert setValues(Collection<Object> values)
 	{
-		this.values = new LinkedList<Object>(values);
+		this.values = new List<Object>(true, values);
 		return this;
 	}
 	
 	public Insert setNameValues(Map<String, Object> nameValues)
 	{
-		names = new LinkedList<String>();
-		values = new LinkedList<Object>();
+		names = new List<String>();
+		values = new List<Object>(true);
 		for(Entry<String, Object> nameValueEntry : nameValues.entrySet())
 		{
 			names.add(nameValueEntry.getKey());
@@ -46,8 +46,8 @@ public abstract class Insert extends Values
 		{
 			throw new IllegalArgumentException("names is different size than values");
 		}
-		this.names = new LinkedList<String>(names);
-		this.values = new LinkedList<Object>(values);
+		this.names = new List<String>(names);
+		this.values = new List<Object>(true, values);
 		return this;
 	}
 	

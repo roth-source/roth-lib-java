@@ -9,7 +9,7 @@ public class CalendarUtil
 	public static String DAY_FORMAT = "yyyy-MM-dd";
 	public static String MINUTE_FORMAT = "yyyy-MM-dd HH:mm";
 	
-	public static LinkedList<Calendar> HOLIDAYS = new LinkedList<Calendar>();
+	public static List<Calendar> HOLIDAYS = new List<Calendar>();
 	
 	static
 	{

@@ -34,7 +34,7 @@ public class GenericTest
 		/*
 		Generic<?> generic = new Generic<GenericModelOne<GenericModelTwo<GenericModelA, GenericModelB>>>(){};
 		Type type = generic.getType();
-		LinkedList<PropertyFieldReflector> propertyFields = mapper.getPropertyFieldAccessors(type);
+		List<PropertyFieldReflector> propertyFields = mapper.getPropertyFieldAccessors(type);
 		for(PropertyFieldReflector propertyField : propertyFields)
 		{
 			Type fieldType = propertyField.getFieldType();

@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 import java.util.Vector;
 
 import com.jcraft.jsch.ChannelSftp;
@@ -42,9 +42,9 @@ public class Sftp implements AutoCloseable
 		return channelSftp;
 	}
 	
-	public LinkedList<String> ls(String path)
+	public List<String> ls(String path)
 	{
-		LinkedList<String> lines = new LinkedList<String>();
+		List<String> lines = new List<String>();
 		try
 		{
 			openChannelSftp();

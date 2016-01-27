@@ -5,12 +5,13 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.LinkedList;
+
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public class Time implements Serializable, Comparable<Time>, Cloneable
 {
-	public static LinkedList<Day> HOLIDAYS = new LinkedList<Day>();
+	public static List<Day> HOLIDAYS = new List<Day>();
 	
 	static
 	{

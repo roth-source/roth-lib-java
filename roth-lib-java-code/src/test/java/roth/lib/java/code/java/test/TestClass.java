@@ -31,14 +31,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import roth.lib.java.lang.Map;
+
+import javax.naming.NamingException;
 
 import javafx.util.converter.CharacterStringConverter;
 import roth.lib.java.code.java.JavaCompilationUnit;
-
-import javax.naming.NamingException;
+import roth.lib.java.lang.List;
 
 /**
  * Class comments
@@ -46,7 +45,7 @@ import javax.naming.NamingException;
  *
  */
 @SuppressWarnings({"serial", "restriction"})
-public abstract class TestClass<T extends LinkedList<? extends String[]>> extends Object implements Serializable
+public abstract class TestClass<T extends List<? extends String[]>> extends Object implements Serializable
 {
 	/**
 	 * public member doc comment
@@ -133,7 +132,7 @@ public abstract class TestClass<T extends LinkedList<? extends String[]>> extend
 	 */
 	public static List<String> getList()
 	{
-		return new LinkedList<String>();
+		return new List<String>();
 	}
 	
 	/**

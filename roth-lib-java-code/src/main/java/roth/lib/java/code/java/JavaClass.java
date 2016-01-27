@@ -4,30 +4,30 @@ import static roth.lib.java.code.java.JavaTag.CLASS;
 import static roth.lib.java.code.java.JavaTag.EXTENDS;
 import static roth.lib.java.code.java.JavaTag.IMPLEMENTS;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public class JavaClass extends JavaEntity
 {
-	protected LinkedList<JavaDefinition> definitions = new LinkedList<JavaDefinition>();
+	protected List<JavaDefinition> definitions = new List<JavaDefinition>();
 	protected JavaType superType;
-	protected LinkedList<JavaType> interfaceTypes = new LinkedList<JavaType>();
-	protected LinkedList<JavaField> staticFields = new LinkedList<JavaField>();
-	protected LinkedList<JavaInitializer> staticInitializers = new LinkedList<JavaInitializer>();
-	protected LinkedList<JavaMethod> staticMethods = new LinkedList<JavaMethod>();
-	protected LinkedList<JavaEntity> staticEntities = new LinkedList<JavaEntity>();
-	protected LinkedList<JavaField> fields = new LinkedList<JavaField>();
-	protected LinkedList<JavaInitializer> initializers = new LinkedList<JavaInitializer>();
-	protected LinkedList<JavaConstructor> constructors = new LinkedList<JavaConstructor>();
-	protected LinkedList<JavaMethod> methods = new LinkedList<JavaMethod>();
-	protected LinkedList<JavaEntity> entities = new LinkedList<JavaEntity>();
+	protected List<JavaType> interfaceTypes = new List<JavaType>();
+	protected List<JavaField> staticFields = new List<JavaField>();
+	protected List<JavaInitializer> staticInitializers = new List<JavaInitializer>();
+	protected List<JavaMethod> staticMethods = new List<JavaMethod>();
+	protected List<JavaEntity> staticEntities = new List<JavaEntity>();
+	protected List<JavaField> fields = new List<JavaField>();
+	protected List<JavaInitializer> initializers = new List<JavaInitializer>();
+	protected List<JavaConstructor> constructors = new List<JavaConstructor>();
+	protected List<JavaMethod> methods = new List<JavaMethod>();
+	protected List<JavaEntity> entities = new List<JavaEntity>();
 	
 	public JavaClass()
 	{
 		
 	}
 	
-	public LinkedList<JavaDefinition> getDefinitions()
+	public List<JavaDefinition> getDefinitions()
 	{
 		return definitions;
 	}
@@ -37,57 +37,57 @@ public class JavaClass extends JavaEntity
 		return superType;
 	}
 	
-	public LinkedList<JavaType> getInterfaceTypes()
+	public List<JavaType> getInterfaceTypes()
 	{
 		return interfaceTypes;
 	}
 	
-	public LinkedList<JavaField> getStaticFields()
+	public List<JavaField> getStaticFields()
 	{
 		return staticFields;
 	}
 	
-	public LinkedList<JavaInitializer> getStaticInitializers()
+	public List<JavaInitializer> getStaticInitializers()
 	{
 		return staticInitializers;
 	}
 	
-	public LinkedList<JavaMethod> getStaticMethods()
+	public List<JavaMethod> getStaticMethods()
 	{
 		return staticMethods;
 	}
 	
-	public LinkedList<JavaEntity> getStaticEntities()
+	public List<JavaEntity> getStaticEntities()
 	{
 		return staticEntities;
 	}
 	
-	public LinkedList<JavaField> getFields()
+	public List<JavaField> getFields()
 	{
 		return fields;
 	}
 	
-	public LinkedList<JavaInitializer> getInitializers()
+	public List<JavaInitializer> getInitializers()
 	{
 		return initializers;
 	}
 	
-	public LinkedList<JavaConstructor> getConstructors()
+	public List<JavaConstructor> getConstructors()
 	{
 		return constructors;
 	}
 	
-	public LinkedList<JavaMethod> getMethods()
+	public List<JavaMethod> getMethods()
 	{
 		return methods;
 	}
 	
-	public LinkedList<JavaEntity> getEntities()
+	public List<JavaEntity> getEntities()
 	{
 		return entities;
 	}
 	
-	public void setDefinitions(LinkedList<JavaDefinition> definitions)
+	public void setDefinitions(List<JavaDefinition> definitions)
 	{
 		this.definitions.addAll(definitions);
 	}
@@ -97,52 +97,52 @@ public class JavaClass extends JavaEntity
 		this.superType = superType;
 	}
 	
-	public void setInterfaceTypes(LinkedList<JavaType> interfaceTypes)
+	public void setInterfaceTypes(List<JavaType> interfaceTypes)
 	{
 		this.interfaceTypes.addAll(interfaceTypes);
 	}
 	
-	public void setStaticFields(LinkedList<JavaField> staticFields)
+	public void setStaticFields(List<JavaField> staticFields)
 	{
 		this.staticFields.addAll(staticFields);
 	}
 	
-	public void setStaticInitializers(LinkedList<JavaInitializer> staticInitializers)
+	public void setStaticInitializers(List<JavaInitializer> staticInitializers)
 	{
 		this.staticInitializers.addAll(staticInitializers);
 	}
 	
-	public void setStaticMethods(LinkedList<JavaMethod> staticMethods)
+	public void setStaticMethods(List<JavaMethod> staticMethods)
 	{
 		this.staticMethods.addAll(staticMethods);
 	}
 	
-	public void setStaticEntities(LinkedList<JavaEntity> staticEntities)
+	public void setStaticEntities(List<JavaEntity> staticEntities)
 	{
 		this.staticEntities.addAll(staticEntities);
 	}
 	
-	public void setFields(LinkedList<JavaField> fields)
+	public void setFields(List<JavaField> fields)
 	{
 		this.fields.addAll(fields);
 	}
 	
-	public void setInitializers(LinkedList<JavaInitializer> initializers)
+	public void setInitializers(List<JavaInitializer> initializers)
 	{
 		this.initializers.addAll(initializers);
 	}
 	
-	public void setConstructors(LinkedList<JavaConstructor> constructors)
+	public void setConstructors(List<JavaConstructor> constructors)
 	{
 		this.constructors.addAll(constructors);
 	}
 	
-	public void setMethods(LinkedList<JavaMethod> methods)
+	public void setMethods(List<JavaMethod> methods)
 	{
 		this.methods.addAll(methods);
 	}
 	
-	public void setEntities(LinkedList<JavaEntity> entities)
+	public void setEntities(List<JavaEntity> entities)
 	{
 		this.entities.addAll(entities);
 	}

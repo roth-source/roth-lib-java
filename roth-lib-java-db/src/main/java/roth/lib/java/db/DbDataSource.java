@@ -9,9 +9,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.logging.Logger;
@@ -27,6 +24,8 @@ import roth.lib.java.db.sql.Sql;
 import roth.lib.java.db.sql.SqlFactory;
 import roth.lib.java.db.sql.Update;
 import roth.lib.java.db.sql.Wheres;
+import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
 import roth.lib.java.mapper.MapperType;
 import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.MapperReflector;
@@ -289,9 +288,9 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return false;
 	}
 	
-	public LinkedList<String> getGeneratedColumns(Type type)
+	public List<String> getGeneratedColumns(Type type)
 	{
-		LinkedList<String> generatedColumns = new LinkedList<String>();
+		List<String> generatedColumns = new List<String>();
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
 		if(entityReflector != null)
 		{
@@ -303,7 +302,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return generatedColumns;
 	}
 	
-	public void setGeneratedFields(DbResultSet resultSet, LinkedList<String> generatedColumns, DbModel model)
+	public void setGeneratedFields(DbResultSet resultSet, List<String> generatedColumns, DbModel model)
 	{
 		try
 		{
@@ -398,7 +397,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	public Insert toInsert(DbModel model)
 	{
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(model.getClass());
-		LinkedHashMap<String, Object> nameValues = new LinkedHashMap<String, Object>();
+		Map<String, Object> nameValues = new Map<String, Object>();
 		for(PropertyReflector propertyReflector : entityReflector.getPropertyReflectors(getMapperType()))
 		{
 			String column = propertyReflector.getPropertyName(getMapperType());
@@ -423,7 +422,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	public Update toUpdate(DbModel model)
 	{
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(model.getClass());
-		LinkedHashMap<String, Object> nameValues = new LinkedHashMap<String, Object>();
+		Map<String, Object> nameValues = new Map<String, Object>();
 		if(model.isDirty())
 		{
 			for(String name : model.getDirtyNames())
@@ -502,9 +501,9 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T> LinkedList<T> fromDb(DbResultSet resultSet, Class<T> klass)
+	public <T> List<T> fromDb(DbResultSet resultSet, Class<T> klass)
 	{
-		LinkedList<T> models = new LinkedList<T>();
+		List<T> models = new List<T>();
 		try
 		{
 			ResultSetMetaData metaData = resultSet.getMetaData();
@@ -571,14 +570,14 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return model;
 	}
 	
-	public LinkedList<LinkedHashMap<String, Object>> fromDb(DbResultSet resultSet)
+	public List<Map<String, Object>> fromDb(DbResultSet resultSet)
 	{
-		LinkedList<LinkedHashMap<String, Object>> dataMaps = new LinkedList<LinkedHashMap<String, Object>>();
+		List<Map<String, Object>> dataMaps = new List<Map<String, Object>>();
 		try
 		{
 			while(resultSet.next())
 			{
-				LinkedHashMap<String, Object> dataMap = new LinkedHashMap<String, Object>();
+				Map<String, Object> dataMap = new Map<String, Object>();
 				try
 				{
 					ResultSetMetaData metaData = resultSet.getMetaData();
@@ -610,7 +609,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return prepareStatement(connection, sql.toString(), sql.getValues());
 	}
 	
-	public DbPreparedStatement prepareStatement(DbConnection connection, Sql sql,  LinkedList<String> generated) throws SQLException
+	public DbPreparedStatement prepareStatement(DbConnection connection, Sql sql,  List<String> generated) throws SQLException
 	{
 		return prepareStatement(connection, sql.toString(), sql.getValues(), generated);
 	}
@@ -620,7 +619,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return prepareStatement(connection, sql, values, null);
 	}
 	
-	public DbPreparedStatement prepareStatement(DbConnection connection, String sql, Collection<Object> values, LinkedList<String> generatedColumns) throws SQLException
+	public DbPreparedStatement prepareStatement(DbConnection connection, String sql, Collection<Object> values, List<String> generatedColumns) throws SQLException
 	{
 		if(generatedColumns != null && !generatedColumns.isEmpty())
 		{
@@ -692,29 +691,29 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	
 	public <T> T query(String sql, Map<String, Object> valueMap, Class<T> klass)
 	{
-		LinkedList<T> models = queryAll(sql, valueMap, klass);
+		List<T> models = queryAll(sql, valueMap, klass);
 		return !models.isEmpty() ? models.get(0) : null;
 	}
 	
 	public <T> T query(String sql, Collection<Object> values, Class<T> klass)
 	{
-		LinkedList<T> models = queryAll(sql, values, klass);
+		List<T> models = queryAll(sql, values, klass);
 		return !models.isEmpty() ? models.get(0) : null;
 	}
 	
-	public <T> LinkedList<T> queryAll(Select select, Class<T> klass)
+	public <T> List<T> queryAll(Select select, Class<T> klass)
 	{
 		return queryAll(select.toString(), select.getValues(), klass);
 	}
 	
-	public <T> LinkedList<T> queryAll(String sql, Class<T> klass)
+	public <T> List<T> queryAll(String sql, Class<T> klass)
 	{
 		return queryAll(sql, (Collection<Object>) null, klass);
 	}
 	
-	public <T> LinkedList<T> queryAll(String sql, Map<String, Object> valueMap, Class<T> klass)
+	public <T> List<T> queryAll(String sql, Map<String, Object> valueMap, Class<T> klass)
 	{
-		LinkedList<T> models = new LinkedList<T>();
+		List<T> models = new List<T>();
 		try(DbConnection connection = getConnection())
 		{
 			models = queryAll(sql, valueMap, klass, connection); 
@@ -726,9 +725,9 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return models;
 	}
 	
-	public <T> LinkedList<T> queryAll(String sql, Collection<Object> values, Class<T> klass)
+	public <T> List<T> queryAll(String sql, Collection<Object> values, Class<T> klass)
 	{
-		LinkedList<T> models = new LinkedList<T>();
+		List<T> models = new List<T>();
 		try(DbConnection connection = getConnection())
 		{
 			models = queryAll(sql, values, klass, connection); 
@@ -740,29 +739,29 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return models;
 	}
 	
-	public <T> LinkedList<T> queryAll(Select select, Class<T> klass, DbConnection connection) throws SQLException
+	public <T> List<T> queryAll(Select select, Class<T> klass, DbConnection connection) throws SQLException
 	{
 		return queryAll(select.toString(), select.getValues(), klass, connection);
 	}
 	
-	public <T> LinkedList<T> queryAll(String sql, Class<T> klass, DbConnection connection) throws SQLException
+	public <T> List<T> queryAll(String sql, Class<T> klass, DbConnection connection) throws SQLException
 	{
 		return queryAll(sql, (Collection<Object>) null, klass, connection);
 	}
 	
-	public <T> LinkedList<T> queryAll(String sql, Map<String, Object> valueMap, Class<T> klass, DbConnection connection) throws SQLException
+	public <T> List<T> queryAll(String sql, Map<String, Object> valueMap, Class<T> klass, DbConnection connection) throws SQLException
 	{
 		DbNamedQuery namedQuery = namedQuery(sql, valueMap);
 		return queryAll(namedQuery.getSql(), namedQuery.getValues(), klass, connection);
 	}
 	
-	public <T> LinkedList<T> queryAll(String sql, Collection<Object> values, Class<T> klass, DbConnection connection) throws SQLException
+	public <T> List<T> queryAll(String sql, Collection<Object> values, Class<T> klass, DbConnection connection) throws SQLException
 	{
 		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
 		{
 			try(DbResultSet resultSet = preparedStatement.executeQuery())
 			{
-				LinkedList<T> result = fromDb(resultSet, klass);
+				List<T> result = fromDb(resultSet, klass);
 				connection.commit();
 				return result;
 			}
@@ -831,37 +830,37 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		}
 	}
 	
-	public LinkedHashMap<String, Object> query(Select select)
+	public Map<String, Object> query(Select select)
 	{
 		select.limit(1);
 		return query(select.toString(), select.getValues());
 	}
 	
-	public LinkedHashMap<String, Object> query(String sql)
+	public Map<String, Object> query(String sql)
 	{
 		return query(sql, (Collection<Object>) null);
 	}
 	
-	public LinkedHashMap<String, Object> query(String sql, Map<String, Object> valueMap)
+	public Map<String, Object> query(String sql, Map<String, Object> valueMap)
 	{
-		LinkedList<LinkedHashMap<String, Object>> maps = queryAll(sql, valueMap);
+		List<Map<String, Object>> maps = queryAll(sql, valueMap);
 		return !maps.isEmpty() ? maps.get(0) : null;
 	}
 	
-	public LinkedHashMap<String, Object> query(String sql, Collection<Object> values)
+	public Map<String, Object> query(String sql, Collection<Object> values)
 	{
-		LinkedList<LinkedHashMap<String, Object>> maps = queryAll(sql, values);
+		List<Map<String, Object>> maps = queryAll(sql, values);
 		return !maps.isEmpty() ? maps.get(0) : null;
 	}
 	
-	public LinkedList<LinkedHashMap<String, Object>> queryAll(Select select)
+	public List<Map<String, Object>> queryAll(Select select)
 	{
 		return queryAll(select.toString(), select.getValues());
 	}
 	
-	public LinkedList<LinkedHashMap<String, Object>> queryAll(String sql, Map<String, Object> valueMap)
+	public List<Map<String, Object>> queryAll(String sql, Map<String, Object> valueMap)
 	{
-		LinkedList<LinkedHashMap<String, Object>> maps = new LinkedList<LinkedHashMap<String, Object>>();
+		List<Map<String, Object>> maps = new List<Map<String, Object>>();
 		try(DbConnection connection = getConnection())
 		{
 			maps = queryAll(sql, valueMap, connection); 
@@ -873,9 +872,9 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return maps;
 	}
 	
-	public LinkedList<LinkedHashMap<String, Object>> queryAll(String sql, Collection<Object> values)
+	public List<Map<String, Object>> queryAll(String sql, Collection<Object> values)
 	{
-		LinkedList<LinkedHashMap<String, Object>> maps = new LinkedList<LinkedHashMap<String, Object>>();
+		List<Map<String, Object>> maps = new List<Map<String, Object>>();
 		try(DbConnection connection = getConnection())
 		{
 			maps = queryAll(sql, values, connection); 
@@ -887,29 +886,29 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return maps;
 	}
 	
-	public LinkedList<LinkedHashMap<String, Object>> queryAll(Select select, DbConnection connection) throws SQLException
+	public List<Map<String, Object>> queryAll(Select select, DbConnection connection) throws SQLException
 	{
 		return queryAll(select.toString(), select.getValues(), connection);
 	}
 	
-	public LinkedList<LinkedHashMap<String, Object>> queryAll(String sql, DbConnection connection) throws SQLException
+	public List<Map<String, Object>> queryAll(String sql, DbConnection connection) throws SQLException
 	{
 		return queryAll(sql, (Collection<Object>) null, connection);
 	}
 	
-	public LinkedList<LinkedHashMap<String, Object>> queryAll(String sql, Map<String, Object> valueMap, DbConnection connection) throws SQLException
+	public List<Map<String, Object>> queryAll(String sql, Map<String, Object> valueMap, DbConnection connection) throws SQLException
 	{
 		DbNamedQuery namedQuery = namedQuery(sql, valueMap);
 		return queryAll(namedQuery.getSql(), namedQuery.getValues(), connection);
 	}
 	
-	public LinkedList<LinkedHashMap<String, Object>> queryAll(String sql, Collection<Object> values, DbConnection connection) throws SQLException
+	public List<Map<String, Object>> queryAll(String sql, Collection<Object> values, DbConnection connection) throws SQLException
 	{
 		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
 		{
 			try(DbResultSet resultSet = preparedStatement.executeQuery())
 			{
-				 LinkedList<LinkedHashMap<String, Object>> result = fromDb(resultSet);
+				 List<Map<String, Object>> result = fromDb(resultSet);
 				 connection.commit();
 				 return result;
 			}
@@ -1015,7 +1014,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	protected int executeInsert(String sql, Collection<Object> values, DbModel model, DbConnection connection) throws SQLException
 	{
 		int result = 0;
-		LinkedList<String> generatedColumns = new LinkedList<String>();
+		List<String> generatedColumns = new List<String>();
 		if(model != null)
 		{
 			generatedColumns = getGeneratedColumns(model.getClass());

@@ -1,6 +1,6 @@
 package roth.lib.java.mapper;
 
-import java.util.LinkedHashMap;
+import roth.lib.java.lang.Map;
 import java.util.Map.Entry;
 
 import roth.lib.java.deserializer.Deserializer;
@@ -13,8 +13,8 @@ public class MapperConfig
 	protected boolean serializeNulls = false;
 	protected boolean serializeEmptyArray = true;
 	protected boolean serializeEmptyMap = true;
-	protected LinkedHashMap<Class<?>, Serializer<?>> serializerMap = new LinkedHashMap<Class<?>, Serializer<?>>();
-	protected LinkedHashMap<Class<?>, Deserializer<?>> deserializerMap = new LinkedHashMap<Class<?>, Deserializer<?>>();
+	protected Map<Class<?>, Serializer<?>> serializerMap = new Map<Class<?>, Serializer<?>>();
+	protected Map<Class<?>, Deserializer<?>> deserializerMap = new Map<Class<?>, Deserializer<?>>();
 	
 	public MapperConfig()
 	{

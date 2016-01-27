@@ -2,10 +2,9 @@ package roth.lib.java.reflector;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import roth.lib.java.annotation.Properties;
+import roth.lib.java.lang.Map;
 import roth.lib.java.util.ReflectionUtil;
 
 public class PropertiesReflector
@@ -62,7 +61,7 @@ public class PropertiesReflector
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> getMap(Object value)
 	{
-		Map<String, Object> map = new LinkedHashMap<String, Object>();
+		Map<String, Object> map = new Map<String, Object>();
 		try
 		{
 			Object fieldValue = getField().get(value);

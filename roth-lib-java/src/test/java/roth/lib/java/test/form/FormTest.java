@@ -2,7 +2,7 @@ package roth.lib.java.test.form;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.LinkedHashMap;
+import roth.lib.java.lang.Map;
 
 import roth.lib.java.form.FormMapper;
 import roth.lib.java.mapper.MapperConfig;
@@ -28,7 +28,7 @@ public class FormTest
 	
 	protected static void serializeMap()
 	{
-		LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+		Map<String, Object> map = new Map<String, Object>();
 		map.put("test_boolean", true);
 		map.put("test_byte", 123);
 		map.put("test_short", 12345);
@@ -53,7 +53,7 @@ public class FormTest
 	protected static void deserializeMap()
 	{
 		String data = "test_boolean=true&test_byte=123&test_short=12345&test_integer=12345678&test_long=123456789&test_float=1.2345679&test_double=1.2345679&test_character=a&test_string=test&test_date=2015-01-12+14%3A05%3A01&test_calendar=2015-01-12+14%3A05%3A01";
-		LinkedHashMap<String, Object> map = new FormMapper(mapperConfig).setPrettyPrint(true).deserialize(data);
+		Map<String, Object> map = new FormMapper(mapperConfig).setPrettyPrint(true).deserialize(data);
 		System.out.println(map);
 	}
 	

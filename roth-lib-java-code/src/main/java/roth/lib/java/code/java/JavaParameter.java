@@ -1,11 +1,11 @@
 package roth.lib.java.code.java;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public class JavaParameter extends JavaCode
 {
-	protected LinkedList<JavaAnnotation> annotations = new LinkedList<JavaAnnotation>();
+	protected List<JavaAnnotation> annotations = new List<JavaAnnotation>();
 	protected boolean _final;
 	protected JavaType type;
 	protected boolean varargs;
@@ -16,7 +16,7 @@ public class JavaParameter extends JavaCode
 		
 	}
 	
-	public LinkedList<JavaAnnotation> getAnnotations()
+	public List<JavaAnnotation> getAnnotations()
 	{
 		return annotations;
 	}
@@ -41,7 +41,7 @@ public class JavaParameter extends JavaCode
 		return name;
 	}
 	
-	public void setAnnotations(LinkedList<JavaAnnotation> annotations)
+	public void setAnnotations(List<JavaAnnotation> annotations)
 	{
 		this.annotations = annotations;
 	}

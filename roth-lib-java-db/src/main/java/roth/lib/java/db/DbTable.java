@@ -2,9 +2,6 @@ package roth.lib.java.db;
 
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
 
 import roth.lib.java.Callback;
 import roth.lib.java.db.sql.Column;
@@ -17,6 +14,8 @@ import roth.lib.java.db.sql.SqlFactory;
 import roth.lib.java.db.sql.Update;
 import roth.lib.java.db.sql.Where;
 import roth.lib.java.db.sql.Wheres;
+import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
 
 public abstract class DbTable<T> implements SqlFactory
 {
@@ -154,97 +153,97 @@ public abstract class DbTable<T> implements SqlFactory
 		return getDb().query(sql, valueMap, klass);
 	}
 	
-	public LinkedList<T> findAll()
+	public List<T> findAll()
 	{
 		return findAllBy(select());
 	}
 	
-	public LinkedList<T> findAllBy(Order order)
+	public List<T> findAllBy(Order order)
 	{
 		return findAllBy(select().order(order));
 	}
 	
-	public LinkedList<T> findAllBy(Where... wheres)
+	public List<T> findAllBy(Where... wheres)
 	{
 		return findAllBy(newWheres().andConditions(wheres));
 	}
 	
-	public LinkedList<T> findAllBy(Wheres wheres)
+	public List<T> findAllBy(Wheres wheres)
 	{
 		return findAllBy(select().wheres(wheres));
 	}
 	
-	public LinkedList<T> findAllBy(Where where, Order order)
+	public List<T> findAllBy(Where where, Order order)
 	{
 		return findAllBy(newWheres().andWhere(where), order);
 	}
 	
-	public LinkedList<T> findAllBy(Wheres wheres, Order order)
+	public List<T> findAllBy(Wheres wheres, Order order)
 	{
 		return findAllBy(select().wheres(wheres).order(order));
 	}
 	
-	public LinkedList<T> findAll(Columns columns)
+	public List<T> findAll(Columns columns)
 	{
 		return findAllBy(select(columns));
 	}
 	
-	public LinkedList<T> findAllBy(Where where, Columns columns)
+	public List<T> findAllBy(Where where, Columns columns)
 	{
 		return findAllBy(newWheres().andWhere(where), columns);
 	}
 	
-	public LinkedList<T> findAllBy(Wheres wheres, Columns columns)
+	public List<T> findAllBy(Wheres wheres, Columns columns)
 	{
 		return findAllBy(select(columns).wheres(wheres));
 	}
 	
-	public LinkedList<T> findAllBy(Where where, Columns columns, Order order)
+	public List<T> findAllBy(Where where, Columns columns, Order order)
 	{
 		return findAllBy(newWheres().andWhere(where), columns, order);
 	}
 	
-	public LinkedList<T> findAllBy(Wheres wheres, Columns columns, Order order)
+	public List<T> findAllBy(Wheres wheres, Columns columns, Order order)
 	{
 		return findAllBy(select(columns).wheres(wheres).order(order));
 	}
 	
-	public LinkedList<T> findAllBy(Select select)
+	public List<T> findAllBy(Select select)
 	{
 		return findAllBy(select, klass);
 	}
 	
-	public LinkedList<T> findAllBy(String sql)
+	public List<T> findAllBy(String sql)
 	{
 		return findAllBy(sql, klass);
 	}
 	
-	public LinkedList<T> findAllBy(String sql, Collection<Object> values)
+	public List<T> findAllBy(String sql, Collection<Object> values)
 	{
 		return findAllBy(sql, values, klass);
 	}
 	
-	public LinkedList<T> findAllBy(String sql, Map<String, Object> valueMap)
+	public List<T> findAllBy(String sql, Map<String, Object> valueMap)
 	{
 		return findAllBy(sql, valueMap, klass);
 	}
 	
-	public <C> LinkedList<C> findAllBy(Select select, Class<C> klass)
+	public <C> List<C> findAllBy(Select select, Class<C> klass)
 	{
 		return getDb().queryAll(select, klass);
 	}
 	
-	public <C> LinkedList<C> findAllBy(String sql, Class<C> klass)
+	public <C> List<C> findAllBy(String sql, Class<C> klass)
 	{
 		return getDb().queryAll(sql, klass);
 	}
 	
-	public <C> LinkedList<C> findAllBy(String sql, Collection<Object> values, Class<C> klass)
+	public <C> List<C> findAllBy(String sql, Collection<Object> values, Class<C> klass)
 	{
 		return getDb().queryAll(sql, values, klass);
 	}
 	
-	public <C> LinkedList<C> findAllBy(String sql, Map<String, Object> valueMap, Class<C> klass)
+	public <C> List<C> findAllBy(String sql, Map<String, Object> valueMap, Class<C> klass)
 	{
 		return getDb().queryAll(sql, valueMap, klass);
 	}
@@ -383,7 +382,7 @@ public abstract class DbTable<T> implements SqlFactory
 	{
 		int count = 0;
 		select.columns(newColumns().addColumns(newColumn().setSql("count(*)").setAlias("count")));
-		LinkedHashMap<String, Object> results = getDb().query(select);
+		Map<String, Object> results = getDb().query(select);
 		Object object = results.get("count");
 		if(object instanceof Number)
 		{

@@ -1,26 +1,26 @@
 package roth.lib.java.db.sql;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public abstract class Conditions extends Condition
 {
-	protected LinkedList<Condition> conditions = new LinkedList<Condition>();
+	protected List<Condition> conditions = new List<Condition>();
 	
 	public boolean isEmpty()
 	{
 		return conditions.isEmpty();
 	}
 	
-	public abstract Conditions setConditions(LinkedList<Condition> conditions);
+	public abstract Conditions setConditions(List<Condition> conditions);
 	public abstract Conditions andConditions(Condition...conditions);
 	public abstract Conditions orConditions(Condition...conditions);
 	public abstract String toString(boolean nested);
 	
 	@Override
-	public LinkedList<Object> getValues()
+	public List<Object> getValues()
 	{
-		LinkedList<Object> values = new LinkedList<Object>();
+		List<Object> values = new List<Object>(true);
 		for(Condition condition : conditions)
 		{
 			values.addAll(condition.getValues());

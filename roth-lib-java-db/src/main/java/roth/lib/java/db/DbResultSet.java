@@ -3,6 +3,7 @@ package roth.lib.java.db;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URL;
 import java.sql.Array;
 import java.sql.Blob;
@@ -317,6 +318,16 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 	public Reader getCharacterStream(String columnLabel) throws SQLException
 	{
 		return resultSet.getCharacterStream(columnLabel);
+	}
+	
+	public BigInteger getBigInteger(int columnIndex) throws SQLException
+	{
+		return resultSet.getBigDecimal(columnIndex).toBigInteger();
+	}
+	
+	public BigInteger getBigInteger(String columnLabel) throws SQLException
+	{
+		return resultSet.getBigDecimal(columnLabel).toBigInteger();
 	}
 	
 	@Override
@@ -1217,6 +1228,10 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 		{
 			return (T) getCalendar(columnIndex);
 		}
+		else if(BigInteger.class.isAssignableFrom(type))
+		{
+			return (T) getBigInteger(columnIndex);
+		}
 		else if(Enum.class.isAssignableFrom(type))
 		{
 			return (T) getEnum(columnIndex, type);
@@ -1267,6 +1282,10 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 		else if(Calendar.class.isAssignableFrom(type))
 		{
 			return (T) getCalendar(columnLabel);
+		}
+		else if(BigInteger.class.isAssignableFrom(type))
+		{
+			return (T) getBigInteger(columnLabel);
 		}
 		else if(Enum.class.isAssignableFrom(type))
 		{
@@ -1691,6 +1710,10 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 		{
 			value = getLongWrapper(columnLabel);
 		}
+		else if(BigInteger.class.isAssignableFrom(klass))
+		{
+			value = getBigInteger(columnLabel);
+		}
 		else if(Float.class.isAssignableFrom(klass))
 		{
 			value = getFloatWrapper(columnLabel);
@@ -1824,6 +1847,10 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 		else if(Double.class.isAssignableFrom(klass))
 		{
 			value = getDoubleWrapper(columnIndex);
+		}
+		else if(BigInteger.class.isAssignableFrom(klass))
+		{
+			value = getBigInteger(columnIndex);
 		}
 		else if(BigDecimal.class.isAssignableFrom(klass))
 		{

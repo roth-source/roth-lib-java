@@ -2,20 +2,20 @@ package roth.lib.java.db;
 
 import java.lang.reflect.Field;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Objects;
 
 import roth.lib.java.Model;
 import roth.lib.java.db.sql.SqlFactory;
+import roth.lib.java.lang.Map;
+import roth.lib.java.lang.Set;
 import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.PropertyReflector;
 
 @SuppressWarnings({"serial","unchecked"})
 public abstract class DbModel extends Model implements SqlFactory
 {
-	protected transient LinkedHashMap<String, Object> dirtyIdMap = new LinkedHashMap<String, Object>();
-	protected transient LinkedHashSet<String> dirtyNames = new LinkedHashSet<String>();
+	protected transient Map<String, Object> dirtyIdMap = new Map<String, Object>();
+	protected transient Set<String> dirtyNames = new Set<String>();
 	protected transient State state = State.NEW;
 	
 	protected DbModel()
@@ -195,12 +195,12 @@ public abstract class DbModel extends Model implements SqlFactory
 		return !dirtyNames.isEmpty();
 	}
 	
-	public LinkedHashSet<String> getDirtyNames()
+	public Set<String> getDirtyNames()
 	{
 		return dirtyNames;
 	}
 	
-	public LinkedHashMap<String, Object> getDirtyIdMap()
+	public Map<String, Object> getDirtyIdMap()
 	{
 		return dirtyIdMap;
 	}

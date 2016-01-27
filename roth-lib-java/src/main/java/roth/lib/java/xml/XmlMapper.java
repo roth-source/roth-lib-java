@@ -19,12 +19,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import roth.lib.java.deserializer.Deserializer;
+import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
 import roth.lib.java.mapper.Mapper;
 import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
@@ -102,12 +101,12 @@ public class XmlMapper extends Mapper
 	}
 	
 	@Override
-	public void serialize(Map<String, ?> map, Writer writer)
+	public void serialize(java.util.Map<String, ?> map, Writer writer)
 	{
 		serialize(map, "root", writer);
 	}
 	
-	public void serialize(Map<String, ?> map, String rootName, Writer writer)
+	public void serialize(java.util.Map<String, ?> map, String rootName, Writer writer)
 	{
 		if(map == null) throw new IllegalArgumentException("Map cannot be null");
 		try
@@ -167,7 +166,7 @@ public class XmlMapper extends Mapper
 			}
 			else if(isArray(value.getClass()) || isCollection(value.getClass()))
 			{
-				LinkedList<?> values = asCollection(value);
+				List<?> values = asCollection(value);
 				String elementsName = propertyReflector != null ? propertyReflector.getElementsName() : null;
 				if(elementsName != null)
 				{
@@ -187,7 +186,7 @@ public class XmlMapper extends Mapper
 			}
 			else if(isMap(value.getClass()))
 			{
-				LinkedHashMap<?, ?> valueMap = asMap(value);
+				Map<?, ?> valueMap = asMap(value);
 				writeNewLine(writer);
 				writeOpenTag(writer, name);
 				if(!valueMap.isEmpty())
@@ -226,7 +225,7 @@ public class XmlMapper extends Mapper
 		writeOpenTag(writer, name, null);
 	}
 	
-	protected void writeOpenTag(Writer writer, String name, Map<String, String> attributeMap) throws IOException
+	protected void writeOpenTag(Writer writer, String name, java.util.Map<String, String> attributeMap) throws IOException
 	{
 		writer.write(LEFT_ANGLE_BRACKET);
 		writer.write(name);
@@ -273,7 +272,7 @@ public class XmlMapper extends Mapper
 		}
 	}
 	
-	protected void writeMap(Writer writer, Map<?, ?> valueMap, PropertyReflector propertyReflector) throws IOException
+	protected void writeMap(Writer writer, java.util.Map<?, ?> valueMap, PropertyReflector propertyReflector) throws IOException
 	{
 		for(Entry<?, ?> valueEntry : valueMap.entrySet())
 		{
@@ -396,9 +395,9 @@ public class XmlMapper extends Mapper
 	}
 	
 	@Override
-	public LinkedHashMap<String, Object> deserialize(Reader reader)
+	public Map<String, Object> deserialize(Reader reader)
 	{
-		LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+		Map<String, Object> map = new Map<String, Object>();
 		try
 		{
 			readUntil(reader, LEFT_ANGLE_BRACKET);
@@ -531,9 +530,9 @@ public class XmlMapper extends Mapper
 		Class<K> keyClass = getTypeClass(keyType);
 		Type elementType = getElementType(type);
 		Class<E> elementClass = getTypeClass(elementType);
-		if(klass.isAssignableFrom(LinkedHashMap.class))
+		if(klass.isAssignableFrom(Map.class))
 		{
-			map = new LinkedHashMap<K, E>();
+			map = new Map<K, E>();
 		}
 		else
 		{
@@ -621,7 +620,7 @@ public class XmlMapper extends Mapper
 	{
 		Type elementType = getElementType(type);
 		Class<E> elementClass = getTypeClass(elementType);
-		LinkedList<E> collection = readCollection(reader, type, propertyReflector);
+		List<E> collection = readCollection(reader, type, propertyReflector);
 		E[] array = (E[]) Array.newInstance(elementClass, collection.size());
 		for(int i = 0; i < collection.size(); i++)
 		{
@@ -637,9 +636,9 @@ public class XmlMapper extends Mapper
 		Class<T> klass = getTypeClass(type);
 		Type elementType = getElementType(type);
 		Class<E> elementClass = getTypeClass(elementType);
-		if(klass.isAssignableFrom(LinkedList.class) || isArray(klass))
+		if(klass.isAssignableFrom(List.class) || isArray(klass))
 		{
-			collection = new LinkedList<E>();
+			collection = new List<E>();
 		}
 		else
 		{

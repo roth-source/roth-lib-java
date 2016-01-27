@@ -1,11 +1,11 @@
 package roth.lib.java.code.java;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public class JavaBlock extends JavaCode implements JavaStatement
 {
-	protected LinkedList<JavaStatement> statements = new LinkedList<JavaStatement>();
+	protected List<JavaStatement> statements = new List<JavaStatement>();
 	
 	public JavaBlock()
 	{

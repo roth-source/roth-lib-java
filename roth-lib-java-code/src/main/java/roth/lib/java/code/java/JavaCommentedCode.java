@@ -1,23 +1,23 @@
 package roth.lib.java.code.java;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public abstract class JavaCommentedCode extends JavaInlineCommentedCode
 {
-	protected LinkedList<JavaComment> comments = new LinkedList<JavaComment>();
+	protected List<JavaComment> comments = new List<JavaComment>();
 	
 	protected JavaCommentedCode()
 	{
 		
 	}
 	
-	public LinkedList<JavaComment> getComments()
+	public List<JavaComment> getComments()
 	{
 		return comments;
 	}
 	
-	public void setComments(LinkedList<JavaComment> comments)
+	public void setComments(List<JavaComment> comments)
 	{
 		this.comments.addAll(comments);
 	}

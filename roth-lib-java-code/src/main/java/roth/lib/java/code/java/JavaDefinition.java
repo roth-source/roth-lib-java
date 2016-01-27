@@ -1,12 +1,12 @@
 package roth.lib.java.code.java;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public class JavaDefinition extends JavaCode
 {
 	protected String name;
-	protected LinkedList<JavaType> boundTypes = new LinkedList<JavaType>();
+	protected List<JavaType> boundTypes = new List<JavaType>();
 	
 	public JavaDefinition()
 	{
@@ -23,12 +23,12 @@ public class JavaDefinition extends JavaCode
 		this.name = name;
 	}
 	
-	public LinkedList<JavaType> getBoundTypes()
+	public List<JavaType> getBoundTypes()
 	{
 		return boundTypes;
 	}
 	
-	public void setBoundTypes(LinkedList<JavaType> boundTypes)
+	public void setBoundTypes(List<JavaType> boundTypes)
 	{
 		this.boundTypes = boundTypes;
 	}

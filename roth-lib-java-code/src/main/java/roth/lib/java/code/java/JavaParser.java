@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,9 +35,9 @@ public class JavaParser implements Characters
 		if(unitToken != null)
 		{
 			compilationUnit = new JavaCompilationUnit();
-			LinkedList<JavaComment> comments = new LinkedList<JavaComment>();
-			LinkedList<JavaToken> queuedTokens = new LinkedList<JavaToken>();
-			LinkedList<JavaToken> tokens = unitToken.getTokens();
+			List<JavaComment> comments = new List<JavaComment>();
+			List<JavaToken> queuedTokens = new List<JavaToken>();
+			List<JavaToken> tokens = unitToken.getTokens();
 			JavaToken token = null;
 			while((token = tokens.pollFirst()) != null)
 			{
@@ -132,7 +132,7 @@ public class JavaParser implements Characters
 		return comment;
 	}
 	
-	protected JavaInlineComment parseInlineComment(LinkedList<JavaToken> tokens)
+	protected JavaInlineComment parseInlineComment(List<JavaToken> tokens)
 	{
 		JavaInlineComment inlineComment = null;
 		int peeks = 0;
@@ -175,7 +175,7 @@ public class JavaParser implements Characters
 		return inlineComment;
 	}
 	
-	protected JavaPackage parsePackage(LinkedList<JavaToken> tokens)
+	protected JavaPackage parsePackage(List<JavaToken> tokens)
 	{
 		JavaPackage _package = new JavaPackage();
 		StringBuilder builder = new StringBuilder();
@@ -196,7 +196,7 @@ public class JavaParser implements Characters
 		return _package;
 	}
 	
-	protected JavaImport parseImport(LinkedList<JavaToken> tokens)
+	protected JavaImport parseImport(List<JavaToken> tokens)
 	{
 		JavaImport _import = new JavaImport();
 		StringBuilder builder = new StringBuilder();
@@ -221,12 +221,12 @@ public class JavaParser implements Characters
 		return _import;
 	}
 	
-	protected JavaEntity parseEntity(LinkedList<JavaToken> tokens)
+	protected JavaEntity parseEntity(List<JavaToken> tokens)
 	{
 		JavaEntity entity = null;
-		LinkedList<JavaAnnotation> annotations = new LinkedList<JavaAnnotation>();
+		List<JavaAnnotation> annotations = new List<JavaAnnotation>();
 		JavaAccess access = null;
-		LinkedList<JavaModifier> modifiers = new LinkedList<JavaModifier>();
+		List<JavaModifier> modifiers = new List<JavaModifier>();
 		JavaToken token = null;
 		while((token = tokens.pollFirst()) != null)
 		{
@@ -295,7 +295,7 @@ public class JavaParser implements Characters
 		return entity;
 	}
 	
-	protected void parseClass(JavaClass klass, LinkedList<JavaToken> tokens)
+	protected void parseClass(JavaClass klass, List<JavaToken> tokens)
 	{
 		JavaToken token = null;
 		while((token = tokens.pollFirst()) != null)
@@ -325,14 +325,14 @@ public class JavaParser implements Characters
 		}
 	}
 	
-	protected void parseClassMembers(JavaClass klass, LinkedList<JavaToken> tokens)
+	protected void parseClassMembers(JavaClass klass, List<JavaToken> tokens)
 	{
 		boolean reset = false;
-		LinkedList<JavaComment> comments = new LinkedList<JavaComment>();
-		LinkedList<JavaAnnotation> annotations = new LinkedList<JavaAnnotation>();
+		List<JavaComment> comments = new List<JavaComment>();
+		List<JavaAnnotation> annotations = new List<JavaAnnotation>();
 		JavaAccess access = null;
-		LinkedList<JavaModifier> modifiers = new LinkedList<JavaModifier>();
-		LinkedList<JavaDefinition> definitions = new LinkedList<JavaDefinition>();
+		List<JavaModifier> modifiers = new List<JavaModifier>();
+		List<JavaDefinition> definitions = new List<JavaDefinition>();
 		JavaType type = null;
 		String name = null;
 		JavaToken previousToken = null;
@@ -529,7 +529,7 @@ public class JavaParser implements Characters
 		}
 	}
 	
-	protected void parseInterface(JavaInterface _interface, LinkedList<JavaToken> tokens)
+	protected void parseInterface(JavaInterface _interface, List<JavaToken> tokens)
 	{
 		JavaToken token = null;
 		while((token = tokens.pollFirst()) != null)
@@ -555,12 +555,12 @@ public class JavaParser implements Characters
 		}
 	}
 	
-	protected void parseInterfaceMembers(JavaInterface _interface, LinkedList<JavaToken> tokens)
+	protected void parseInterfaceMembers(JavaInterface _interface, List<JavaToken> tokens)
 	{
 		
 	}
 	
-	protected void parseEnum(JavaEnum _enum, LinkedList<JavaToken> tokens)
+	protected void parseEnum(JavaEnum _enum, List<JavaToken> tokens)
 	{
 		JavaToken token = null;
 		while((token = tokens.pollFirst()) != null)
@@ -578,12 +578,12 @@ public class JavaParser implements Characters
 		}
 	}
 	
-	protected void parseEnumMembers(JavaEnum _enum, LinkedList<JavaToken> tokens)
+	protected void parseEnumMembers(JavaEnum _enum, List<JavaToken> tokens)
 	{
 		
 	}
 	
-	protected void parseAnnotationInterface(JavaAnnotationInterface annotationInterface, LinkedList<JavaToken> tokens)
+	protected void parseAnnotationInterface(JavaAnnotationInterface annotationInterface, List<JavaToken> tokens)
 	{
 		JavaToken token = null;
 		while((token = tokens.pollFirst()) != null)
@@ -601,12 +601,12 @@ public class JavaParser implements Characters
 		}
 	}
 	
-	protected void parseAnnotationInterfaceMembers(JavaAnnotationInterface annotationInterface, LinkedList<JavaToken> tokens)
+	protected void parseAnnotationInterfaceMembers(JavaAnnotationInterface annotationInterface, List<JavaToken> tokens)
 	{
 		
 	}
 	
-	protected void parseConstructor(JavaConstructor constructor, LinkedList<JavaToken> tokens)
+	protected void parseConstructor(JavaConstructor constructor, List<JavaToken> tokens)
 	{
 		JavaToken token = null;
 		while((token = peekAfterSpace(tokens)) != null)
@@ -632,7 +632,7 @@ public class JavaParser implements Characters
 		}
 	}
 	
-	protected void parseMethod(JavaMethod method, LinkedList<JavaToken> tokens)
+	protected void parseMethod(JavaMethod method, List<JavaToken> tokens)
 	{
 		JavaToken token = null;
 		while((token = peekAfterSpace(tokens)) != null)
@@ -658,7 +658,7 @@ public class JavaParser implements Characters
 		}
 	}
 	
-	protected String parseName(LinkedList<JavaToken> tokens)
+	protected String parseName(List<JavaToken> tokens)
 	{
 		StringBuilder builder = new StringBuilder();
 		JavaToken token = peekAfterSpace(tokens);
@@ -670,7 +670,7 @@ public class JavaParser implements Characters
 		return builder.toString();
 	}
 	
-	protected String parseQualifiedName(LinkedList<JavaToken> tokens)
+	protected String parseQualifiedName(List<JavaToken> tokens)
 	{
 		StringBuilder builder = new StringBuilder();
 		JavaToken token = peekAfterSpace(tokens);
@@ -696,9 +696,9 @@ public class JavaParser implements Characters
 		return builder.toString();
 	}
 	
-	protected LinkedList<JavaType> parseTypes(LinkedList<JavaToken> tokens)
+	protected List<JavaType> parseTypes(List<JavaToken> tokens)
 	{
-		LinkedList<JavaType> types = new LinkedList<JavaType>();
+		List<JavaType> types = new List<JavaType>();
 		JavaToken token = null;
 		JavaType type = null;
 		while((type = parseType(tokens)) != null)
@@ -717,7 +717,7 @@ public class JavaParser implements Characters
 		return types;
 	}
 	
-	protected JavaType parseType(LinkedList<JavaToken> tokens)
+	protected JavaType parseType(List<JavaToken> tokens)
 	{
 		JavaType type = new JavaType();
 		type.setName(parseQualifiedName(tokens));
@@ -742,9 +742,9 @@ public class JavaParser implements Characters
 		return type;
 	}
 	
-	protected LinkedList<JavaGeneric> parseGenerics(LinkedList<JavaToken> tokens)
+	protected List<JavaGeneric> parseGenerics(List<JavaToken> tokens)
 	{
-		LinkedList<JavaGeneric> generics = new LinkedList<JavaGeneric>();
+		List<JavaGeneric> generics = new List<JavaGeneric>();
 		JavaToken token = null;
 		JavaGeneric generic = null;
 		while((generic = parseGeneric(tokens)) != null)
@@ -759,7 +759,7 @@ public class JavaParser implements Characters
 		return generics;
 	}
 	
-	protected JavaGeneric parseGeneric(LinkedList<JavaToken> tokens)
+	protected JavaGeneric parseGeneric(List<JavaToken> tokens)
 	{
 		JavaGeneric generic = null;
 		JavaToken token = peekAfterSpace(tokens);
@@ -775,7 +775,7 @@ public class JavaParser implements Characters
 		return generic;
 	}
 	
-	protected JavaWildcard parseWildcard(LinkedList<JavaToken> tokens)
+	protected JavaWildcard parseWildcard(List<JavaToken> tokens)
 	{
 		JavaWildcard wildcard = null;
 		JavaToken token = peekAfterSpace(tokens);
@@ -796,19 +796,19 @@ public class JavaParser implements Characters
 		return wildcard;
 	}
 	
-	protected JavaValueExpression parseValueExpression(LinkedList<JavaToken> tokens)
+	protected JavaValueExpression parseValueExpression(List<JavaToken> tokens)
 	{
 		JavaValueExpression valueExpression = new JavaValueExpression();
 		valueExpression.getBuilder().append(parseValue(tokens, JavaTag.END));
 		return valueExpression;
 	}
 	
-	protected String parseValue(LinkedList<JavaToken> tokens, JavaTag... untils)
+	protected String parseValue(List<JavaToken> tokens, JavaTag... untils)
 	{
 		return parseValue(tokens, Arrays.asList(untils));
 	}
 	
-	protected String parseValue(LinkedList<JavaToken> tokens, Collection<JavaTag> untils)
+	protected String parseValue(List<JavaToken> tokens, Collection<JavaTag> untils)
 	{
 		StringBuilder builder = new StringBuilder();
 		JavaToken token = null;
@@ -831,7 +831,7 @@ public class JavaParser implements Characters
 		return builder.toString();
 	}
 	
-	protected JavaToken peekAfterSpace(LinkedList<JavaToken> tokens)
+	protected JavaToken peekAfterSpace(List<JavaToken> tokens)
 	{
 		JavaToken token = tokens.peekFirst();
 		if(tagEquals(JavaTag.SPACE, token))
@@ -852,7 +852,7 @@ public class JavaParser implements Characters
 		return tag != null && token != null && tag.equals(token.getTag());
 	}
 	
-	protected JavaAnnotation parseAnnotation(LinkedList<JavaToken> tokens)
+	protected JavaAnnotation parseAnnotation(List<JavaToken> tokens)
 	{
 		JavaAnnotation annotation = new JavaAnnotation();
 		annotation.setType(parseType(tokens));
@@ -865,15 +865,15 @@ public class JavaParser implements Characters
 		return annotation;
 	}
 	
-	protected JavaExpression parseInitializer(LinkedList<JavaToken> tokens)
+	protected JavaExpression parseInitializer(List<JavaToken> tokens)
 	{
 		
 		return parseValueExpression(tokens);
 	}
 	
-	protected LinkedList<JavaDefinition> parseDefinitions(LinkedList<JavaToken> tokens)
+	protected List<JavaDefinition> parseDefinitions(List<JavaToken> tokens)
 	{
-		LinkedList<JavaDefinition> definitions = new LinkedList<JavaDefinition>();
+		List<JavaDefinition> definitions = new List<JavaDefinition>();
 		JavaToken token = null;
 		JavaDefinition definition = null;
 		while((definition = parseDefinition(tokens)) != null)
@@ -888,7 +888,7 @@ public class JavaParser implements Characters
 		return definitions;
 	}
 	
-	protected JavaDefinition parseDefinition(LinkedList<JavaToken> tokens)
+	protected JavaDefinition parseDefinition(List<JavaToken> tokens)
 	{
 		JavaDefinition definition = null;
 		JavaToken token = peekAfterSpace(tokens);
@@ -915,9 +915,9 @@ public class JavaParser implements Characters
 		return definition;
 	}
 	
-	protected LinkedList<JavaParameter> parseParameters(LinkedList<JavaToken> tokens)
+	protected List<JavaParameter> parseParameters(List<JavaToken> tokens)
 	{
-		LinkedList<JavaParameter> parameters = new LinkedList<JavaParameter>();
+		List<JavaParameter> parameters = new List<JavaParameter>();
 		JavaParameter parameter = null;
 		JavaToken token = null;
 		while((token = tokens.pollFirst()) != null)
@@ -966,7 +966,7 @@ public class JavaParser implements Characters
 		return parameters;
 	}
 	
-	protected JavaBlock parseBlock(LinkedList<JavaToken> tokens)
+	protected JavaBlock parseBlock(List<JavaToken> tokens)
 	{
 		JavaBlock block = new JavaBlock();
 		

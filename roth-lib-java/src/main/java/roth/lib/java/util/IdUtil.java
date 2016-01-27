@@ -5,10 +5,10 @@ import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Random;
 
+import roth.lib.java.lang.Map;
+import roth.lib.java.lang.Set;
 import roth.lib.java.time.Time;
 
 public class IdUtil
@@ -17,7 +17,7 @@ public class IdUtil
 	protected static final int TIME_LENGTH 			= 7;
 	protected static final int RANDOM_MIN_LENGTH 	= 1;
 	protected static final int RANDOM_MAX_LENGTH 	= 10;
-	protected static final LinkedHashMap<Integer, BigDecimal> MAX_VALUES = new LinkedHashMap<Integer, BigDecimal>();
+	protected static final Map<Integer, BigDecimal> MAX_VALUES = new Map<Integer, BigDecimal>();
 	
 	static
 	{
@@ -146,7 +146,7 @@ public class IdUtil
 	public static void main(String[] args)
 	{
 		System.out.println(new Time());
-		LinkedHashSet<String> set = new LinkedHashSet<String>();
+		Set<String> set = new Set<String>();
 		int count = 0;
 		for(int i = 0; i < 10000000; i++)
 		{

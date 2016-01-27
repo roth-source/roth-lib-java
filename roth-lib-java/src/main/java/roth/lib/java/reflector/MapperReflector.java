@@ -6,8 +6,6 @@ import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 
 import roth.lib.java.DataUrl;
@@ -41,6 +39,8 @@ import roth.lib.java.deserializer.TimeDeserializer;
 import roth.lib.java.deserializer.YearDeserializer;
 import roth.lib.java.form.FormMapper;
 import roth.lib.java.json.JsonMapper;
+import roth.lib.java.lang.Map;
+import roth.lib.java.lang.Set;
 import roth.lib.java.mapper.Mapper;
 import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
@@ -66,9 +66,9 @@ public class MapperReflector
 {
 	protected static MapperReflector instance;
 	
-	protected LinkedHashMap<Class<?>, Serializer<?>> serializerMap = new LinkedHashMap<Class<?>, Serializer<?>>();
-	protected LinkedHashMap<Class<?>, Deserializer<?>> deserializerMap = new LinkedHashMap<Class<?>, Deserializer<?>>();
-	protected LinkedHashSet<String> nonEntityTypes = new LinkedHashSet<String>();
+	protected Map<Class<?>, Serializer<?>> serializerMap = new Map<Class<?>, Serializer<?>>();
+	protected Map<Class<?>, Deserializer<?>> deserializerMap = new Map<Class<?>, Deserializer<?>>();
+	protected Set<String> nonEntityTypes = new Set<String>();
 	
 	public MapperReflector()
 	{

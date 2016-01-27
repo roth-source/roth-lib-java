@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import roth.lib.java.lang.Map;
+import roth.lib.java.lang.List;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
@@ -149,28 +149,28 @@ public class JsonModel
 	private String[] testStringArray;
 	
 	@Property(name = "null_string_list")
-	private LinkedList<String> nullStringList;
+	private List<String> nullStringList;
 	
 	@Property(name = "empty_string_list")
-	private LinkedList<String> emptyStringList = new LinkedList<String>();
+	private List<String> emptyStringList = new List<String>();
 	
 	@Property(name = "test_string_list")
-	private LinkedList<String> testStringList = new LinkedList<String>(Arrays.asList(new String[]{"one", "two", "three"}));
+	private List<String> testStringList = new List<String>(Arrays.asList(new String[]{"one", "two", "three"}));
 	
 	@Property(name = "null_string_map")
-	private LinkedHashMap<String, String> nullStringMap;
+	private Map<String, String> nullStringMap;
 	
 	@Property(name = "empty_string_map")
-	private LinkedHashMap<String, String> emptyStringMap = new LinkedHashMap<String, String>();
+	private Map<String, String> emptyStringMap = new Map<String, String>();
 	
 	@Property(name = "test_string_map")
-	private LinkedHashMap<String, String> testStringMap = new LinkedHashMap<String, String>();
+	private Map<String, String> testStringMap = new Map<String, String>();
 	
 	@Property(name = "test_model_list")
-	private LinkedList<JsonSubModel> testModelList = new LinkedList<JsonSubModel>(Arrays.asList(new JsonSubModel[]{new JsonSubModel(), new JsonSubModel()}));
+	private List<JsonSubModel> testModelList = new List<JsonSubModel>(Arrays.asList(new JsonSubModel[]{new JsonSubModel(), new JsonSubModel()}));
 	
 	@Property(name = "test_model_map")
-	private LinkedHashMap<String, JsonSubModel> testModelMap = new LinkedHashMap<String, JsonSubModel>();
+	private Map<String, JsonSubModel> testModelMap = new Map<String, JsonSubModel>();
 	
 	public JsonModel()
 	{
@@ -346,42 +346,42 @@ public class JsonModel
 		return testStringArray;
 	}
 
-	public LinkedList<String> getNullStringList()
+	public List<String> getNullStringList()
 	{
 		return nullStringList;
 	}
 
-	public LinkedList<String> getEmptyStringList()
+	public List<String> getEmptyStringList()
 	{
 		return emptyStringList;
 	}
 
-	public LinkedList<String> getTestStringList()
+	public List<String> getTestStringList()
 	{
 		return testStringList;
 	}
 
-	public LinkedHashMap<String, String> getNullStringMap()
+	public Map<String, String> getNullStringMap()
 	{
 		return nullStringMap;
 	}
 
-	public LinkedHashMap<String, String> getEmptyStringMap()
+	public Map<String, String> getEmptyStringMap()
 	{
 		return emptyStringMap;
 	}
 
-	public LinkedHashMap<String, String> getTestStringMap()
+	public Map<String, String> getTestStringMap()
 	{
 		return testStringMap;
 	}
 
-	public LinkedList<JsonSubModel> getTestModelList()
+	public List<JsonSubModel> getTestModelList()
 	{
 		return testModelList;
 	}
 
-	public LinkedHashMap<String, JsonSubModel> getTestModelMap()
+	public Map<String, JsonSubModel> getTestModelMap()
 	{
 		return testModelMap;
 	}
@@ -551,42 +551,42 @@ public class JsonModel
 		this.testStringArray = testStringArray;
 	}
 
-	public void setNullStringList(LinkedList<String> nullStringList)
+	public void setNullStringList(List<String> nullStringList)
 	{
 		this.nullStringList = nullStringList;
 	}
 
-	public void setEmptyStringList(LinkedList<String> emptyStringList)
+	public void setEmptyStringList(List<String> emptyStringList)
 	{
 		this.emptyStringList = emptyStringList;
 	}
 
-	public void setTestStringList(LinkedList<String> testStringList)
+	public void setTestStringList(List<String> testStringList)
 	{
 		this.testStringList = testStringList;
 	}
 
-	public void setNullStringMap(LinkedHashMap<String, String> nullStringMap)
+	public void setNullStringMap(Map<String, String> nullStringMap)
 	{
 		this.nullStringMap = nullStringMap;
 	}
 
-	public void setEmptyStringMap(LinkedHashMap<String, String> emptyStringMap)
+	public void setEmptyStringMap(Map<String, String> emptyStringMap)
 	{
 		this.emptyStringMap = emptyStringMap;
 	}
 
-	public void setTestStringMap(LinkedHashMap<String, String> testStringMap)
+	public void setTestStringMap(Map<String, String> testStringMap)
 	{
 		this.testStringMap = testStringMap;
 	}
 
-	public void setTestModelList(LinkedList<JsonSubModel> testModelList)
+	public void setTestModelList(List<JsonSubModel> testModelList)
 	{
 		this.testModelList = testModelList;
 	}
 
-	public void setTestModelMap(LinkedHashMap<String, JsonSubModel> testModelMap)
+	public void setTestModelMap(Map<String, JsonSubModel> testModelMap)
 	{
 		this.testModelMap = testModelMap;
 	}

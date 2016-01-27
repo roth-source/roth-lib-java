@@ -1,7 +1,7 @@
 package roth.lib.java.test;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
+import roth.lib.java.lang.Map;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Properties;
@@ -15,7 +15,7 @@ public class TestModel implements Serializable
 	protected String name;
 	
 	@Properties
-	protected LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+	protected Map<String, Object> map = new Map<String, Object>();
 	
 	public TestModel()
 	{
@@ -27,7 +27,7 @@ public class TestModel implements Serializable
 		return name;
 	}
 	
-	public LinkedHashMap<String, Object> getMap()
+	public Map<String, Object> getMap()
 	{
 		return map;
 	}
@@ -38,7 +38,7 @@ public class TestModel implements Serializable
 		return this;
 	}
 	
-	public TestModel setMap(LinkedHashMap<String, Object> map)
+	public TestModel setMap(Map<String, Object> map)
 	{
 		this.map = map;
 		return this;

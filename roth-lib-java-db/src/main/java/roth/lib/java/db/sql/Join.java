@@ -1,7 +1,6 @@
 package roth.lib.java.db.sql;
 
-import java.util.Arrays;
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public abstract class Join extends Sql
@@ -11,7 +10,7 @@ public abstract class Join extends Sql
 	protected Select select;
 	protected String table;
 	protected String alias;
-	protected LinkedList<On> ons = new LinkedList<On>();
+	protected List<On> ons = new List<On>();
 	
 	protected Join()
 	{
@@ -48,7 +47,7 @@ public abstract class Join extends Sql
 		return this;
 	}
 	
-	public Join setOns(LinkedList<On> ons)
+	public Join setOns(List<On> ons)
 	{
 		this.ons = ons;
 		return this;
@@ -56,12 +55,12 @@ public abstract class Join extends Sql
 	
 	public Join addOns(On...ons)
 	{
-		this.ons.addAll(Arrays.asList(ons));
+		this.ons.addAll(ons);
 		return this;
 	}
 	
 	@Override
-	public LinkedList<Object> getValues()
+	public List<Object> getValues()
 	{
 		if(select != null)
 		{
@@ -69,7 +68,7 @@ public abstract class Join extends Sql
 		}
 		else
 		{
-			LinkedList<Object> values = new LinkedList<Object>();
+			List<Object> values = new List<Object>(true);
 			for(On on : ons)
 			{
 				values.addAll(on.getValues());

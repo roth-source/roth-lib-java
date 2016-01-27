@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -172,12 +172,12 @@ public class Ftp implements AutoCloseable
 	}
 	
 	// LIST Returns information of a file or directory if specified, else information of the current working directory is returned.
-	public LinkedList<FTPFile> ls()
+	public List<FTPFile> ls()
 	{
 		try
 		{
 			connect();
-			return new LinkedList<FTPFile>(Arrays.asList(client.listFiles()));
+			return new List<FTPFile>(Arrays.asList(client.listFiles()));
 		}
 		catch(IOException e)
 		{
@@ -185,12 +185,12 @@ public class Ftp implements AutoCloseable
 		}
 	}
 	
-	public LinkedList<FTPFile> ls(String path)
+	public List<FTPFile> ls(String path)
 	{
 		try
 		{
 			connect();
-			return new LinkedList<FTPFile>(Arrays.asList(client.listFiles(path)));
+			return new List<FTPFile>(Arrays.asList(client.listFiles(path)));
 		}
 		catch(IOException e)
 		{

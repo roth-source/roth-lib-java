@@ -1,6 +1,6 @@
 package roth.lib.java.code.java;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 import roth.lib.java.Characters;
 
@@ -8,7 +8,7 @@ public class JavaToken implements Characters
 {
 	protected JavaTag tag;
 	protected StringBuilder builder = new StringBuilder();
-	protected LinkedList<JavaToken> tokens = new LinkedList<JavaToken>();
+	protected List<JavaToken> tokens = new List<JavaToken>();
 	
 	public JavaToken(JavaTag tag)
 	{
@@ -47,7 +47,7 @@ public class JavaToken implements Characters
 		return token;
 	}
 	
-	public LinkedList<JavaToken> getTokens()
+	public List<JavaToken> getTokens()
 	{
 		return tokens;
 	}

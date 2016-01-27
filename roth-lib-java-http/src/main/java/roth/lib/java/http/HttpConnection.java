@@ -11,12 +11,12 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.HttpURLConnection;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
 
 import roth.lib.java.Characters;
 import roth.lib.java.inputter.Inputter;
+import roth.lib.java.lang.List;
 
 public class HttpConnection implements Characters
 {
@@ -183,7 +183,7 @@ public class HttpConnection implements Characters
 	protected HttpHeaders getResponseHeaders()
 	{
 		HttpHeaders headers = new HttpHeaders();
-		for(Entry<String, List<String>> headerEntry : connection.getHeaderFields().entrySet())
+		for(Entry<String, java.util.List<String>> headerEntry : connection.getHeaderFields().entrySet())
 		{
 			String name = headerEntry.getKey();
 			if(name != null)

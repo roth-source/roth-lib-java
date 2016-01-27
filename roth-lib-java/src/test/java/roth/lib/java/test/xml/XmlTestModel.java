@@ -1,14 +1,13 @@
 package roth.lib.java.test.xml;
 
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import roth.lib.java.lang.Map;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
+import roth.lib.java.lang.List;
 import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.xml.XmlMapper;
 import roth.lib.java.xml.XmlModel;
@@ -137,30 +136,30 @@ public class XmlTestModel extends XmlModel
 	private String[] testStringArray;
 	
 	@Property(name = "null-string-list", elementsName = "nullElement")
-	private LinkedList<String> nullStringList;
+	private List<String> nullStringList;
 	
 	@Property(name = "empty-string-list")
-	private LinkedList<String> emptyStringList = new LinkedList<String>();
+	private List<String> emptyStringList = new List<String>();
 	
 	@Property(name = "test-string-list", elementsName = "element")
-	//private LinkedList<String> testStringList = new LinkedList<String>(Arrays.asList(new String[]{"one", "two", "three"}));
-	private LinkedList<String> testStringList;
+	//private List<String> testStringList = new List<String>(Arrays.asList(new String[]{"one", "two", "three"}));
+	private List<String> testStringList;
 	
 	@Property(name = "null-string-map")
-	private LinkedHashMap<String, String> nullStringMap;
+	private Map<String, String> nullStringMap;
 	
 	@Property(name = "empty-string-map")
-	private LinkedHashMap<String, String> emptyStringMap = new LinkedHashMap<String, String>();
+	private Map<String, String> emptyStringMap = new Map<String, String>();
 	
 	@Property(name = "test-string-map")
-	private LinkedHashMap<String, String> testStringMap = new LinkedHashMap<String, String>();
+	private Map<String, String> testStringMap = new Map<String, String>();
 	
 	@Property(name = "test-model-list", elementsName = "element")
-	//private LinkedList<XmlSubModel> testModelList = new LinkedList<XmlSubModel>(Arrays.asList(new XmlSubModel[]{new XmlSubModel(), new XmlSubModel()}));
-	private LinkedList<XmlSubModel> testModelList;
+	//private List<XmlSubModel> testModelList = new List<XmlSubModel>(Arrays.asList(new XmlSubModel[]{new XmlSubModel(), new XmlSubModel()}));
+	private List<XmlSubModel> testModelList;
 	
 	@Property(name = "test-model-map")
-	private LinkedHashMap<String, XmlSubModel> testModelMap = new LinkedHashMap<String, XmlSubModel>();
+	private Map<String, XmlSubModel> testModelMap = new Map<String, XmlSubModel>();
 	
 	public XmlTestModel()
 	{
@@ -188,8 +187,8 @@ public class XmlTestModel extends XmlModel
 		testCalendar = new GregorianCalendar();
 		testModel = new XmlSubModel();
 		testStringArray = new String[]{"one", "two", "three"};
-		testStringList = new LinkedList<String>(Arrays.asList(new String[]{"one", "two", "three"}));
-		testModelList = new LinkedList<XmlSubModel>(Arrays.asList(new XmlSubModel[]{new XmlSubModel(), new XmlSubModel()}));
+		testStringList = List.fromArray("one", "two", "three");
+		testModelList = List.fromArray(new XmlSubModel(), new XmlSubModel());
 		testStringMap.put("one", "value one");
 		testStringMap.put("two", "value two");
 		testStringMap.put("three", "value three");

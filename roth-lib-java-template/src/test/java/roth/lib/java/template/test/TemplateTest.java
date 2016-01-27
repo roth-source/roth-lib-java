@@ -1,6 +1,6 @@
 package roth.lib.java.template.test;
 
-import java.util.LinkedHashMap;
+import roth.lib.java.lang.Map;
 
 import roth.lib.java.template.Template;
 import roth.lib.java.util.ResourceUtil;
@@ -16,7 +16,7 @@ public class TemplateTest
 	protected static void test() throws Exception
 	{
 		String html = ResourceUtil.toString("template.html");
-		LinkedHashMap<String, Object> data = new LinkedHashMap<String, Object>();
+		Map<String, Object> data = new Map<String, Object>();
 		data.put("from", "From");
 		data.put("width", 600);
 		data.put("showResident", true);

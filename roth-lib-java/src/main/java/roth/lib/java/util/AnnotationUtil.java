@@ -1,8 +1,6 @@
 package roth.lib.java.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import roth.lib.java.lang.List;
 
 public class AnnotationUtil
 {
@@ -19,7 +17,7 @@ public class AnnotationUtil
 	
 	public static List<String> validate(String[] values)
 	{
-		return values != null ? Arrays.asList(values) : new ArrayList<String>();
+		return values != null ? new List<String>(values) : new List<String>();
 	}
 	
 }

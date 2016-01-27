@@ -4,7 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
+
+import roth.lib.java.lang.List;
 
 public class ResourceUtil
 {
@@ -41,14 +42,14 @@ public class ResourceUtil
 		}
 	}
 	
-	public static LinkedList<String> listPaths(String path)
+	public static List<String> listPaths(String path)
 	{
 		return listPaths(path, ResourceUtil.class.getClassLoader());
 	}
 	
-	public static LinkedList<String> listPaths(String path, ClassLoader classLoader)
+	public static List<String> listPaths(String path, ClassLoader classLoader)
 	{
-		LinkedList<String> paths = new LinkedList<String>();
+		List<String> paths = new List<String>();
 		if(classLoader.getResource(path) != null)
 		{
 			try(BufferedReader reader = new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream(path)));)

@@ -1,23 +1,23 @@
 package roth.lib.java.code.java;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public class JavaAnnotatedCommentedCode extends JavaCommentedCode
 {
-	protected LinkedList<JavaAnnotation> annotations = new LinkedList<JavaAnnotation>();
+	protected List<JavaAnnotation> annotations = new List<JavaAnnotation>();
 	
 	protected JavaAnnotatedCommentedCode()
 	{
 		
 	}
 
-	public LinkedList<JavaAnnotation> getAnnotations()
+	public List<JavaAnnotation> getAnnotations()
 	{
 		return annotations;
 	}
 	
-	public void setAnnotations(LinkedList<JavaAnnotation> annotations)
+	public void setAnnotations(List<JavaAnnotation> annotations)
 	{
 		this.annotations.addAll(annotations);
 	}

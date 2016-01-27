@@ -1,23 +1,23 @@
 package roth.lib.java.code.java;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public abstract class JavaComment extends JavaCode implements JavaStatement
 {
-	protected LinkedList<String> lines = new LinkedList<String>();
+	protected List<String> lines = new List<String>();
 	
 	protected JavaComment()
 	{
 		
 	}
 	
-	public LinkedList<String> getLines()
+	public List<String> getLines()
 	{
 		return lines;
 	}
 	
-	public void setLines(LinkedList<String> lines)
+	public void setLines(List<String> lines)
 	{
 		this.lines = lines;
 	}

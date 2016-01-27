@@ -1,69 +1,69 @@
 package roth.lib.java.web.config;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
+import roth.lib.java.lang.Map;
+import roth.lib.java.lang.Set;
 
 @Entity
 @SuppressWarnings("serial")
 public class Config implements Serializable
 {
 	@Property(name = "langs")
-	protected LinkedHashSet<String> langs = new LinkedHashSet<String>();
+	protected Set<String> langs = new Set<String>();
 	
 	@Property(name = "endpoint")
-	protected LinkedHashMap<String, LinkedHashSet<String>> endpointMap = new LinkedHashMap<String, LinkedHashSet<String>>();
+	protected Map<String, Set<String>> endpointMap = new Map<String, Set<String>>();
 	
 	@Property(name = "layout")
-	protected LinkedHashMap<String, Layout> layoutMap = new LinkedHashMap<String, Layout>();
+	protected Map<String, Layout> layoutMap = new Map<String, Layout>();
 	
 	@Property(name = "module")
-	protected LinkedHashMap<String, Module> moduleMap = new LinkedHashMap<String, Module>();
+	protected Map<String, Module> moduleMap = new Map<String, Module>();
 	
 	public Config()
 	{
 		
 	}
 	
-	public LinkedHashSet<String> getLangs()
+	public Set<String> getLangs()
 	{
 		return langs;
 	}
 	
-	public LinkedHashMap<String, LinkedHashSet<String>> getEndpointMap()
+	public Map<String, Set<String>> getEndpointMap()
 	{
 		return endpointMap;
 	}
 	
-	public LinkedHashMap<String, Layout> getLayoutMap()
+	public Map<String, Layout> getLayoutMap()
 	{
 		return layoutMap;
 	}
 
-	public LinkedHashMap<String, Module> getModuleMap()
+	public Map<String, Module> getModuleMap()
 	{
 		return moduleMap;
 	}
 
-	public void setEndpointMap(LinkedHashMap<String, LinkedHashSet<String>> endpointMap)
+	public void setEndpointMap(Map<String, Set<String>> endpointMap)
 	{
 		this.endpointMap = endpointMap;
 	}
 
-	public void setLangs(LinkedHashSet<String> langs)
+	public void setLangs(Set<String> langs)
 	{
 		this.langs = langs;
 	}
 
-	public void setLayoutMap(LinkedHashMap<String, Layout> layoutMap)
+	public void setLayoutMap(Map<String, Layout> layoutMap)
 	{
 		this.layoutMap = layoutMap;
 	}
 
-	public void setModuleMap(LinkedHashMap<String, Module> moduleMap)
+	public void setModuleMap(Map<String, Module> moduleMap)
 	{
 		this.moduleMap = moduleMap;
 	}

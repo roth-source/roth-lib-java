@@ -1,6 +1,6 @@
 package roth.lib.java.ssh;
 
-import java.util.LinkedHashMap;
+import roth.lib.java.lang.Map;
 
 public class SshConfig
 {
@@ -13,7 +13,7 @@ public class SshConfig
 	protected String username;
 	protected String password;
 	protected String key;
-	protected LinkedHashMap<String, String> config = new LinkedHashMap<String, String>();
+	protected Map<String, String> config = new Map<String, String>();
 	
 	public SshConfig(String host)
 	{
@@ -59,7 +59,7 @@ public class SshConfig
 		return key != null ? key : KEY;
 	}
 	
-	public LinkedHashMap<String, String> getConfig()
+	public Map<String, String> getConfig()
 	{
 		return config;
 	}
@@ -94,7 +94,7 @@ public class SshConfig
 		return this;
 	}
 	
-	public SshConfig setConfig(LinkedHashMap<String, String> config)
+	public SshConfig setConfig(Map<String, String> config)
 	{
 		this.config = config;
 		return this;

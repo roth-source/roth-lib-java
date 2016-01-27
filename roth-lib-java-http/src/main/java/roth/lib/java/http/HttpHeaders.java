@@ -1,19 +1,17 @@
 package roth.lib.java.http;
 
 import java.net.HttpCookie;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import roth.lib.java.lang.Map;
 import java.util.Map.Entry;
 
 import roth.lib.java.Characters;
 import roth.lib.java.http.type.AuthorizationType;
 import roth.lib.java.http.type.EncodingType;
 import roth.lib.java.http.util.HeaderUtil;
+import roth.lib.java.lang.List;
 import roth.lib.java.type.MimeType;
 
 public class HttpHeaders implements Characters
@@ -50,27 +48,27 @@ public class HttpHeaders implements Characters
 	public static final String VIA					= "Via";
 	public static final String WARNING				= "Warning";
 	
-	protected LinkedHashMap<String, List<String>> headersMap = new LinkedHashMap<String, List<String>>();
+	protected Map<String, List<String>> headersMap = new Map<String, List<String>>();
 	
 	protected HttpHeaders()
 	{
 		
 	}
 	
-	public LinkedHashMap<String, List<String>> getHeadersMap()
+	public Map<String, List<String>> getHeadersMap()
 	{
 		return headersMap;
 	}
 	
 	public HttpHeaders setHeader(String name, String value)
 	{
-		headersMap.put(name, Arrays.asList(value));
+		headersMap.put(name, List.fromArray(value));
 		return this;
 	}
 	
 	public HttpHeaders setHeader(String name, Collection<String> values)
 	{
-		headersMap.put(name, new LinkedList<String>(values));
+		headersMap.put(name, new List<String>(values));
 		return this;
 	}
 	
@@ -78,7 +76,7 @@ public class HttpHeaders implements Characters
 	{
 		if(header != null)
 		{
-			headersMap.put(header.getName(), Arrays.asList(header.getValue()));
+			headersMap.put(header.getName(), List.fromArray(header.getValue()));
 		}
 		return this;
 	}
@@ -89,7 +87,7 @@ public class HttpHeaders implements Characters
 		{
 			for(HttpHeader header : headers)
 			{
-				headersMap.put(header.getName(), Arrays.asList(header.getValue()));
+				headersMap.put(header.getName(), List.fromArray(header.getValue()));
 			}
 		}
 		return this;

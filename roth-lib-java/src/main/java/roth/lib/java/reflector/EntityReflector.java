@@ -2,14 +2,13 @@ package roth.lib.java.reflector;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
 
 import roth.lib.java.annotation.Attributes;
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Properties;
 import roth.lib.java.annotation.Property;
+import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
 import roth.lib.java.mapper.MapperType;
 import roth.lib.java.util.AnnotationUtil;
 import roth.lib.java.util.ReflectionUtil;
@@ -18,7 +17,7 @@ public class EntityReflector
 {
 	protected Type type;
 	protected Entity entity;
-	protected LinkedList<PropertyReflector> propertyReflectors;
+	protected List<PropertyReflector> propertyReflectors;
 	protected PropertiesReflector propertiesReflector;
 	protected AttributesReflector attributesReflector;
 	
@@ -32,7 +31,7 @@ public class EntityReflector
 	{
 		if(propertyReflectors == null)
 		{
-			propertyReflectors = new LinkedList<PropertyReflector>();
+			propertyReflectors = new List<PropertyReflector>();
 			for(Field field : ReflectionUtil.getFields(type))
 			{
 				Property property = field.getDeclaredAnnotation(Property.class);
@@ -80,10 +79,10 @@ public class EntityReflector
 		return AnnotationUtil.validate(entity.propertyName());
 	}
 	
-	public LinkedList<PropertyReflector> getPropertyReflectors(MapperType mapperType)
+	public List<PropertyReflector> getPropertyReflectors(MapperType mapperType)
 	{
 		init();
-		LinkedList<PropertyReflector> propertyReflectors = new LinkedList<PropertyReflector>();
+		List<PropertyReflector> propertyReflectors = new List<PropertyReflector>();
 		for(PropertyReflector propertyReflector : this.propertyReflectors)
 		{
 			if(!propertyReflector.isAttribute() && propertyReflector.isProperty(mapperType))
@@ -94,10 +93,10 @@ public class EntityReflector
 		return propertyReflectors;
 	}
 	
-	public LinkedList<PropertyReflector> getAttributeReflectors(MapperType mapperType)
+	public List<PropertyReflector> getAttributeReflectors(MapperType mapperType)
 	{
 		init();
-		LinkedList<PropertyReflector> attributeReflectors = new LinkedList<PropertyReflector>();
+		List<PropertyReflector> attributeReflectors = new List<PropertyReflector>();
 		for(PropertyReflector propertyReflector : this.propertyReflectors)
 		{
 			if(propertyReflector.isAttribute() && propertyReflector.isProperty(mapperType))
@@ -108,10 +107,10 @@ public class EntityReflector
 		return attributeReflectors;
 	}
 	
-	public LinkedList<PropertyReflector> getIdReflectors(MapperType mapperType)
+	public List<PropertyReflector> getIdReflectors(MapperType mapperType)
 	{
 		init();
-		LinkedList<PropertyReflector> idReflectors = new LinkedList<PropertyReflector>();
+		List<PropertyReflector> idReflectors = new List<PropertyReflector>();
 		for(PropertyReflector propertyReflector : this.propertyReflectors)
 		{
 			if(propertyReflector.isId() && propertyReflector.isProperty(mapperType))
@@ -122,10 +121,10 @@ public class EntityReflector
 		return idReflectors;
 	}
 	
-	public LinkedList<PropertyReflector> getGeneratedReflectors(MapperType mapperType)
+	public List<PropertyReflector> getGeneratedReflectors(MapperType mapperType)
 	{
 		init();
-		LinkedList<PropertyReflector> generatedReflectors = new LinkedList<PropertyReflector>();
+		List<PropertyReflector> generatedReflectors = new List<PropertyReflector>();
 		for(PropertyReflector propertyReflector : this.propertyReflectors)
 		{
 			if(propertyReflector.isGenerated() && propertyReflector.isProperty(mapperType))
@@ -230,9 +229,9 @@ public class EntityReflector
 	}
 	
 	@SuppressWarnings("unchecked")
-	public LinkedHashMap<String, String> getAttributeMap(Object value, MapperType mapperType)
+	public Map<String, String> getAttributeMap(Object value, MapperType mapperType)
 	{
-		LinkedHashMap<String, String> attributeMap = new LinkedHashMap<String, String>();
+		Map<String, String> attributeMap = new Map<String, String>();
 		if(value != null)
 		{
 			AttributesReflector attributesReflector = getAttributesReflector();
@@ -271,11 +270,11 @@ public class EntityReflector
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void setAttributeMap(Object value, MapperType mapperType, LinkedHashMap<String, String> attributeMap)
+	public void setAttributeMap(Object value, MapperType mapperType, Map<String, String> attributeMap)
 	{
 		if(value != null && attributeMap != null && !attributeMap.isEmpty())
 		{
-			attributeMap = new LinkedHashMap<String, String>(attributeMap);
+			attributeMap = new Map<String, String>(attributeMap);
 			for(PropertyReflector attributeReflector : getAttributeReflectors(mapperType))
 			{
 				String attributeName = attributeReflector.getPropertyName(mapperType);

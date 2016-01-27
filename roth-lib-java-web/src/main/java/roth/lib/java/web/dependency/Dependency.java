@@ -1,6 +1,6 @@
 package roth.lib.java.web.dependency;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
@@ -18,7 +18,7 @@ public class Dependency
 	protected String external;
 	
 	@Property(name = "assets")
-	protected LinkedList<Dependency> assets = new LinkedList<Dependency>();
+	protected List<Dependency> assets = new List<Dependency>();
 	
 	public Dependency()
 	{
@@ -40,7 +40,7 @@ public class Dependency
 		return external;
 	}
 	
-	public LinkedList<Dependency> getAssets()
+	public List<Dependency> getAssets()
 	{
 		return assets;
 	}
@@ -60,7 +60,7 @@ public class Dependency
 		this.external = external;
 	}
 	
-	public void setAssets(LinkedList<Dependency> assets)
+	public void setAssets(List<Dependency> assets)
 	{
 		this.assets = assets;
 	}

@@ -1,6 +1,6 @@
 package roth.lib.java.db.sql;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public abstract class Havings extends Conditions
@@ -19,7 +19,7 @@ public abstract class Havings extends Conditions
 	}
 	
 	@Override
-	public Havings setConditions(LinkedList<Condition> conditions)
+	public Havings setConditions(List<Condition> conditions)
 	{
 		this.conditions = conditions;
 		return this;

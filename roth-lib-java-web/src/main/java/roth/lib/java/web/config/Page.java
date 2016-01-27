@@ -1,8 +1,8 @@
 package roth.lib.java.web.config;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import roth.lib.java.lang.Map;
+import roth.lib.java.lang.List;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Properties;
@@ -12,12 +12,12 @@ import roth.lib.java.annotation.Properties;
 public class Page implements Serializable
 {
 	@Properties(first = true)
-	protected LinkedHashMap<String, Object> properties = new LinkedHashMap<String, Object>();
+	protected Map<String, Object> properties = new Map<String, Object>();
 	
 	public Page()
 	{
-		LinkedList<LinkedHashMap<String, String>> params = new LinkedList<LinkedHashMap<String, String>>();
-		params.add(new LinkedHashMap<String, String>());
+		List<Map<String, String>> params = new List<Map<String, String>>();
+		params.add(new Map<String, String>());
 		properties.put("params", params);
 	}
 	

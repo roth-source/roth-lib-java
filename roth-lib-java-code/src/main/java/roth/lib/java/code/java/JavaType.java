@@ -1,13 +1,13 @@
 package roth.lib.java.code.java;
 
-import java.util.LinkedList;
+import roth.lib.java.lang.List;
 
 @SuppressWarnings("serial")
 public class JavaType extends JavaGeneric
 {
 	protected String qualifiedName;
 	protected String name;
-	protected LinkedList<JavaGeneric> generics = new LinkedList<JavaGeneric>();
+	protected List<JavaGeneric> generics = new List<JavaGeneric>();
 	protected int dimensions;
 	
 	public JavaType()
@@ -35,12 +35,12 @@ public class JavaType extends JavaGeneric
 		this.name = name;
 	}
 	
-	public LinkedList<JavaGeneric> getGenerics()
+	public List<JavaGeneric> getGenerics()
 	{
 		return generics;
 	}
 	
-	public void setGenerics(LinkedList<JavaGeneric> generics)
+	public void setGenerics(List<JavaGeneric> generics)
 	{
 		this.generics = generics;
 	}
