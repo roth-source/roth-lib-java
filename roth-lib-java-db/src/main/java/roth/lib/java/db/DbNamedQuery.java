@@ -14,7 +14,7 @@ public class DbNamedQuery implements Characters
 	protected static Pattern NAMED_PATTERN = Pattern.compile(":(\\w+)");
 	
 	protected String sql = "";
-	protected List<Object> values = new List<Object>(true);
+	protected List<Object> values = new List<Object>().allowNull();
 	
 	public DbNamedQuery(String sql, Map<String, Object> valueMap)
 	{

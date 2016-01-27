@@ -5,7 +5,7 @@ import roth.lib.java.lang.List;
 @SuppressWarnings("serial")
 public abstract class Values extends Sql
 {
-	protected List<Object> values = new List<Object>(true);
+	protected List<Object> values = new List<Object>().allowNull();
 	
 	protected Values()
 	{
