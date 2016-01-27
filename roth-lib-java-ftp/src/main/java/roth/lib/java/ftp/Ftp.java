@@ -7,14 +7,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-import roth.lib.java.lang.List;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
 
+import roth.lib.java.lang.List;
 import roth.lib.java.util.IoUtil;
 
 public class Ftp implements AutoCloseable
@@ -177,7 +176,7 @@ public class Ftp implements AutoCloseable
 		try
 		{
 			connect();
-			return new List<FTPFile>(Arrays.asList(client.listFiles()));
+			return new List<FTPFile>(client.listFiles());
 		}
 		catch(IOException e)
 		{
@@ -190,7 +189,7 @@ public class Ftp implements AutoCloseable
 		try
 		{
 			connect();
-			return new List<FTPFile>(Arrays.asList(client.listFiles(path)));
+			return new List<FTPFile>(client.listFiles(path));
 		}
 		catch(IOException e)
 		{

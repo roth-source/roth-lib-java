@@ -9,7 +9,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 
 import roth.lib.java.Callback;
 import roth.lib.java.Characters;
@@ -146,7 +145,7 @@ public abstract class Mapper implements Characters
 	
 	public Mapper setCallbacks(Callback<?>... callbacks)
 	{
-		this.callbacks = new List<Callback<?>>(Arrays.asList(callbacks));
+		this.callbacks = new List<Callback<?>>(callbacks);
 		return this;
 	}
 	

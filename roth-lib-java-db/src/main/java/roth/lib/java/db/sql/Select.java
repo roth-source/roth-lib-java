@@ -1135,7 +1135,7 @@ public abstract class Select extends Sql implements SqlFactory
 	@Override
 	public List<Object> getValues()
 	{
-		List<Object> values = new List<Object>(true);
+		List<Object> values = new List<Object>().allowNull();
 		if(joins != null)
 		{
 			values.addAll(joins.getValues());

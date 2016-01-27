@@ -16,27 +16,12 @@ public class Map<K, V> extends LinkedHashMap<K, V>
 		super();
 	}
 	
-	public Map(int initialCapacity, float loadFactor, boolean accessOrder)
-	{
-		super(initialCapacity, loadFactor, accessOrder);
-	}
-	
-	public Map(int initialCapacity, float loadFactor)
-	{
-		super(initialCapacity, loadFactor);
-	}
-	
-	public Map(int initialCapacity)
-	{
-		super(initialCapacity);
-	}
-	
 	public Map(java.util.Map<? extends K, ? extends V> m)
 	{
 		super();
 		putAll(m);
 	}
-
+	
 	@Override
 	public boolean containsValue(Object value)
 	{
@@ -70,7 +55,7 @@ public class Map<K, V> extends LinkedHashMap<K, V>
 	@Override
 	public Set<K> keySet()
 	{
-		return new Set<K>(super.keySet());
+		return new Set<K>().load(super.keySet());
 	}
 
 	@Override
@@ -82,7 +67,7 @@ public class Map<K, V> extends LinkedHashMap<K, V>
 	@Override
 	public Set<Entry<K, V>> entrySet()
 	{
-		return new Set<Entry<K, V>>(super.entrySet());
+		return new Set<Entry<K, V>>().load(super.entrySet());
 	}
 
 	@Override

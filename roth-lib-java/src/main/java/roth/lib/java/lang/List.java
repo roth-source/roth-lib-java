@@ -22,38 +22,29 @@ public class List<E> extends LinkedList<E>
 		super();
 	}
 	
-	public List(boolean allowNull)
-	{
-		super();
-		this.allowNull = allowNull;
-	}
-
 	@SafeVarargs
 	public List(E...c)
 	{
-		this(Arrays.asList(c));
+		super();
+		addAll(Arrays.asList(c));
 	}
 	
-	public List(Collection<? extends E> c)
+	public List<E> load(Collection<? extends E> c)
 	{
-		super(c);
-	}
-	
-	@SafeVarargs
-	public List(boolean allowNull, E...c)
-	{
-		this(allowNull, Arrays.asList(c));
-	}
-	
-	public List(boolean allowNull, Collection<? extends E> c)
-	{
-		super(c);
-		this.allowNull = allowNull;
+		List<E> list = new List<E>();
+		list.addAll(c);
+		return list;
 	}
 	
 	public boolean isAllowNull()
 	{
 		return allowNull;
+	}
+	
+	public List<E> allowNull()
+	{
+		this.allowNull = true;
+		return this;
 	}
 	
 	public List<E> setAllowNull(boolean allowNull)
@@ -427,9 +418,9 @@ public class List<E> extends LinkedList<E>
 	}
 
 	@Override
-	public java.util.List<E> subList(int fromIndex, int toIndex)
+	public List<E> subList(int fromIndex, int toIndex)
 	{
-		return super.subList(fromIndex, toIndex);
+		return new List<E>().load(super.subList(fromIndex, toIndex));
 	}
 
 	@Override
@@ -483,7 +474,7 @@ public class List<E> extends LinkedList<E>
 	@SafeVarargs
 	public static <E> List<E> fromArray(E...array)
 	{
-		return new List<E>(Arrays.asList(array));
+		return new List<E>(array);
 	}
 	
 }

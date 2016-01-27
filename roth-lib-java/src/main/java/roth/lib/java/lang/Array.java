@@ -22,37 +22,29 @@ public class Array<E> extends ArrayList<E>
 		super();
 	}
 	
-	public Array(boolean allowNull)
+	@SafeVarargs
+	public Array(E...c)
 	{
 		super();
-		this.allowNull = allowNull;
+		addAll(Arrays.asList(c));
 	}
 	
-	public Array(Collection<? extends E> c)
+	public Array<E> load(Collection<E> c)
 	{
-		super(c);
-	}
-	
-	@SafeVarargs
-	public Array(boolean allowNull, E...c)
-	{
-		this(allowNull, Arrays.asList(c));
-	}
-	
-	public Array(boolean allowNull, Collection<? extends E> c)
-	{
-		super(c);
-		this.allowNull = allowNull;
-	}
-	
-	public Array(int initialCapacity)
-	{
-		super(initialCapacity);
+		Array<E> array = new Array<E>();
+		array.addAll(c);
+		return array;
 	}
 	
 	public boolean isAllowNull()
 	{
 		return allowNull;
+	}
+	
+	public Array<E> allowNull()
+	{
+		this.allowNull = true;
+		return this;
 	}
 	
 	public Array<E> setAllowNull(boolean allowNull)
@@ -265,7 +257,7 @@ public class Array<E> extends ArrayList<E>
 	@Override
 	public Array<E> subList(int fromIndex, int toIndex)
 	{
-		return new Array<E>(super.subList(fromIndex, toIndex));
+		return new Array<E>().load(super.subList(fromIndex, toIndex));
 	}
 
 	@Override
@@ -325,7 +317,7 @@ public class Array<E> extends ArrayList<E>
 	@SafeVarargs
 	public static <E> Array<E> fromArray(E...array)
 	{
-		return new Array<E>(Arrays.asList(array));
+		return new Array<E>(array);
 	}
 	
 }

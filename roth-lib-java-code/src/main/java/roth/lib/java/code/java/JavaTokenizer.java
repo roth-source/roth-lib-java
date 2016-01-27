@@ -21,8 +21,8 @@ public class JavaTokenizer implements Characters
 	public static Charset UTF_8 = Charset.forName("UTF-8");
 	public static Pattern EXTENDS_PATTERN = Pattern.compile("\\s(?:extends|super)\\s");
 	public static Pattern DEFINITION_PATTERN = Pattern.compile("^[\\w\\s$,]+$");
-	public static List<Character> NUMBER_CHARACTERS = new List<Character>(Arrays.asList(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9));
-	public static List<Character> GENERIC_SPECIAL_CHARACTERS = new List<Character>(Arrays.asList(LEFT_ANGLE_BRACKET, RIGHT_ANGLE_BRACKET, EXCLAMATION, QUOTE, HASH, DOLLAR, PERCENT, AMPERSAND, SINGLE_QUOTE, LEFT_PAREN, RIGHT_PAREN, ASTERISK, PLUS, COMMA, DASH, SLASH, COLON, SEMI_COLON, EQUAL, BACKSLASH, CARET, GRAVE, LEFT_BRACE, BAR, RIGHT_BRACE, TILDE));
+	public static List<Character> NUMBER_CHARACTERS = new List<Character>(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9);
+	public static List<Character> GENERIC_SPECIAL_CHARACTERS = new List<Character>(LEFT_ANGLE_BRACKET, RIGHT_ANGLE_BRACKET, EXCLAMATION, QUOTE, HASH, DOLLAR, PERCENT, AMPERSAND, SINGLE_QUOTE, LEFT_PAREN, RIGHT_PAREN, ASTERISK, PLUS, COMMA, DASH, SLASH, COLON, SEMI_COLON, EQUAL, BACKSLASH, CARET, GRAVE, LEFT_BRACE, BAR, RIGHT_BRACE, TILDE);
 	
 	protected JavaToken unitToken = new JavaToken(JavaTag.UNIT);
 	protected int length = 10000;
@@ -469,7 +469,7 @@ public class JavaTokenizer implements Characters
 	protected Result read(String...untils)
 	{
 		Result result = null;
-		List<String> untilPeekList = new List<String>(Arrays.asList(untils));
+		List<String> untilPeekList = new List<String>(untils);
 		List<Character> untilList = new List<Character>();
 		for(String untilPeek : untilPeekList)
 		{
@@ -529,7 +529,7 @@ public class JavaTokenizer implements Characters
 	protected Result read(Collection<Character> untils)
 	{
 		Result readResult = null;
-		List<Character> untilList = new List<Character>(untils);
+		List<Character> untilList = new List<Character>().load(untils);
 		StringBuilder builder = new StringBuilder();
 		if(!untilList.isEmpty())
 		{

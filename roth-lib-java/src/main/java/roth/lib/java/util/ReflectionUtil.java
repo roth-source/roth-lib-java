@@ -204,9 +204,10 @@ public class ReflectionUtil
 		return elementType;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static List<?> asCollection(Object value)
 	{
-		return (value instanceof Collection) ? new List<Object>((Collection<?>) value) : new List<Object>(Arrays.asList((Object[]) value));
+		return (value instanceof Collection) ? new List<Object>().load((Collection<Object>) value) : new List<Object>((Object[]) value);
 	}
 	
 	public static Map<?, ?> asMap(Object value)

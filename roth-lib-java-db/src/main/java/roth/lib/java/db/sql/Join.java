@@ -68,7 +68,7 @@ public abstract class Join extends Sql
 		}
 		else
 		{
-			List<Object> values = new List<Object>(true);
+			List<Object> values = new List<Object>().allowNull();
 			for(On on : ons)
 			{
 				values.addAll(on.getValues());

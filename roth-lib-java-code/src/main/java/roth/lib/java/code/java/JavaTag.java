@@ -1,8 +1,8 @@
 package roth.lib.java.code.java;
 
-import java.util.Arrays;
-import roth.lib.java.lang.List;
 import java.util.regex.Pattern;
+
+import roth.lib.java.lang.List;
 
 public enum JavaTag
 {
@@ -104,17 +104,17 @@ public enum JavaTag
 	public static final Pattern INTEGER_PATTERN = Pattern.compile("^[-]?[\\d][xb]?[0-9a-fA-F_]*[Ll]?$");
 	public static final Pattern FLOATING_PATTERN = Pattern.compile("^[-]?[\\d_]+[\\.][\\d_]+(?:[Ee][-]?[\\d_]+)?[FfDd]?$");
 	
-	public static final List<JavaTag> GROUP_TAGS = new List<JavaTag>(Arrays.asList(UNIT, BRACES, PARENS, BRACKETS, ANGLE_BRACKETS));
-	public static final List<JavaTag> ENTITY_TAGS = new List<JavaTag>(Arrays.asList(CLASS, INTERFACE, ENUM));
-	public static final List<JavaTag> ACCESS_TAGS = new List<JavaTag>(Arrays.asList(PUBLIC, PROTECTED, PRIVATE));
-	public static final List<JavaTag> MODIFIER_TAGS = new List<JavaTag>(Arrays.asList(STATIC, FINAL, ABSTRACT, SYNCHRONIZED, VOLATILE, TRANSIENT, NATIVE, STRICTFP, DEFAULT));
-	public static final List<JavaTag> PRIMITIVE_TYPE_TAGS = new List<JavaTag>(Arrays.asList(BOOLEAN, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, CHAR, VOID));
-	public static final List<JavaTag> PRIMITIVE_LITERAL_TAGS = new List<JavaTag>(Arrays.asList(NULL, TRUE, FALSE));
-	public static final List<JavaTag> DECLARATION_TAGS = new List<JavaTag>(Arrays.asList(PACKAGE, IMPORT, EXTENDS, IMPLEMENTS, THROWS, SUPER));
-	public static final List<JavaTag> STATEMENT_TAGS = new List<JavaTag>(Arrays.asList(IF, ELSE, FOR, WHILE, DO, SWITCH, CASE, BREAK, CONTINUE, TRY, CATCH, FINALLY));
-	public static final List<JavaTag> EXPRESSION_TAGS = new List<JavaTag>(Arrays.asList(NEW, THIS, RETURN, THROW, INSTANCEOF, ASSERT));
+	public static final List<JavaTag> GROUP_TAGS = new List<JavaTag>(UNIT, BRACES, PARENS, BRACKETS, ANGLE_BRACKETS);
+	public static final List<JavaTag> ENTITY_TAGS = new List<JavaTag>(CLASS, INTERFACE, ENUM);
+	public static final List<JavaTag> ACCESS_TAGS = new List<JavaTag>(PUBLIC, PROTECTED, PRIVATE);
+	public static final List<JavaTag> MODIFIER_TAGS = new List<JavaTag>(STATIC, FINAL, ABSTRACT, SYNCHRONIZED, VOLATILE, TRANSIENT, NATIVE, STRICTFP, DEFAULT);
+	public static final List<JavaTag> PRIMITIVE_TYPE_TAGS = new List<JavaTag>(BOOLEAN, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, CHAR, VOID);
+	public static final List<JavaTag> PRIMITIVE_LITERAL_TAGS = new List<JavaTag>(NULL, TRUE, FALSE);
+	public static final List<JavaTag> DECLARATION_TAGS = new List<JavaTag>(PACKAGE, IMPORT, EXTENDS, IMPLEMENTS, THROWS, SUPER);
+	public static final List<JavaTag> STATEMENT_TAGS = new List<JavaTag>(IF, ELSE, FOR, WHILE, DO, SWITCH, CASE, BREAK, CONTINUE, TRY, CATCH, FINALLY);
+	public static final List<JavaTag> EXPRESSION_TAGS = new List<JavaTag>(NEW, THIS, RETURN, THROW, INSTANCEOF, ASSERT);
 	public static final List<JavaTag> RESERVED_TAGS = new List<JavaTag>();
-	public static final List<JavaTag> PRIMITIVE_VALUE_TAGS = new List<JavaTag>(Arrays.asList(STRING, CHARACTER, NUMBER));
+	public static final List<JavaTag> PRIMITIVE_VALUE_TAGS = new List<JavaTag>(STRING, CHARACTER, NUMBER);
 	
 	static
 	{

@@ -24,14 +24,14 @@ public abstract class Insert extends Values
 	
 	public Insert setValues(Collection<Object> values)
 	{
-		this.values = new List<Object>(true, values);
+		this.values = new List<Object>().allowNull().load(values);
 		return this;
 	}
 	
 	public Insert setNameValues(Map<String, Object> nameValues)
 	{
 		names = new List<String>();
-		values = new List<Object>(true);
+		values = new List<Object>().allowNull();
 		for(Entry<String, Object> nameValueEntry : nameValues.entrySet())
 		{
 			names.add(nameValueEntry.getKey());
@@ -46,8 +46,8 @@ public abstract class Insert extends Values
 		{
 			throw new IllegalArgumentException("names is different size than values");
 		}
-		this.names = new List<String>(names);
-		this.values = new List<Object>(true, values);
+		this.names = new List<String>().load(names);
+		this.values = new List<Object>().allowNull().load(values);
 		return this;
 	}
 	

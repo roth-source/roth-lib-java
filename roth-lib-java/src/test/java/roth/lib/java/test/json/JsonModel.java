@@ -1,15 +1,14 @@
 package roth.lib.java.test.json;
 
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import roth.lib.java.lang.Map;
-import roth.lib.java.lang.List;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
 import roth.lib.java.json.JsonMapper;
+import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
 import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.time.Day;
 import roth.lib.java.time.Hour;
@@ -155,7 +154,7 @@ public class JsonModel
 	private List<String> emptyStringList = new List<String>();
 	
 	@Property(name = "test_string_list")
-	private List<String> testStringList = new List<String>(Arrays.asList(new String[]{"one", "two", "three"}));
+	private List<String> testStringList = new List<String>("one", "two", "three");
 	
 	@Property(name = "null_string_map")
 	private Map<String, String> nullStringMap;
@@ -167,7 +166,7 @@ public class JsonModel
 	private Map<String, String> testStringMap = new Map<String, String>();
 	
 	@Property(name = "test_model_list")
-	private List<JsonSubModel> testModelList = new List<JsonSubModel>(Arrays.asList(new JsonSubModel[]{new JsonSubModel(), new JsonSubModel()}));
+	private List<JsonSubModel> testModelList = new List<JsonSubModel>(new JsonSubModel(), new JsonSubModel(), new JsonSubModel());
 	
 	@Property(name = "test_model_map")
 	private Map<String, JsonSubModel> testModelMap = new Map<String, JsonSubModel>();

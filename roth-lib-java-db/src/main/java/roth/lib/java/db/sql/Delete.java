@@ -420,7 +420,7 @@ public abstract class Delete extends Sql
 	
 	public List<Object> getValues()
 	{
-		List<Object> values = new List<Object>(true);
+		List<Object> values = new List<Object>().allowNull();
 		if(wheres != null)
 		{
 			values.addAll(wheres.getValues());

@@ -50,7 +50,7 @@ public abstract class On extends Values
 	
 	public On setValues(Collection<?> values)
 	{
-		this.values = new List<Object>(true, values);
+		this.values = new List<Object>().allowNull().load(values);
 		return this;
 	}
 	

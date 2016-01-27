@@ -50,7 +50,7 @@ public abstract class Having extends Condition
 	
 	public Having setValues(Collection<?> values)
 	{
-		this.values = new List<Object>(true, values);
+		this.values = new List<Object>().allowNull().load(values);
 		return this;
 	}
 	

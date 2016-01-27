@@ -12,27 +12,44 @@ import java.util.stream.Stream;
 @SuppressWarnings("serial")
 public class Set<E> extends LinkedHashSet<E>
 {
+	protected boolean allowNull;
 	
 	public Set()
 	{
 		super();
 	}
 	
-	public Set(int initialCapacity)
+	@SafeVarargs
+	public Set(E...c)
 	{
-		super(initialCapacity);
+		super();
+		addAll(Arrays.asList(c));
 	}
 	
-	public Set(Collection<? extends E> c)
+	public Set<E> load(Collection<E> c)
 	{
-		super(c);
+		Set<E> set = new Set<E>();
+		set.addAll(c);
+		return set;
 	}
 	
-	public Set(int initialCapacity, float loadFactor)
+	public boolean isAllowNull()
 	{
-		super(initialCapacity, loadFactor);
+		return allowNull;
 	}
-
+	
+	public Set<E> allowNull()
+	{
+		this.allowNull = true;
+		return this;
+	}
+	
+	public Set<E> setAllowNull(boolean allowNull)
+	{
+		this.allowNull = allowNull;
+		return this;
+	}
+	
 	@Override
 	public boolean removeIf(Predicate<? super E> filter)
 	{
@@ -90,7 +107,7 @@ public class Set<E> extends LinkedHashSet<E>
 	@Override
 	public boolean add(E e)
 	{
-		if(e != null)
+		if(e != null || allowNull)
 		{
 			return super.add(e);
 		}
@@ -194,7 +211,7 @@ public class Set<E> extends LinkedHashSet<E>
 	
 	public static <E> Set<E> fromArray(E[] array)
 	{
-		return new Set<E>(Arrays.asList(array));
+		return new Set<E>(array);
 	}
 	
 }

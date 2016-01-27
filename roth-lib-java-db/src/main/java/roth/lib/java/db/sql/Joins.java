@@ -27,7 +27,7 @@ public abstract class Joins extends Sql
 	@Override
 	public List<Object> getValues()
 	{
-		List<Object> values = new List<Object>(true);
+		List<Object> values = new List<Object>().allowNull();
 		for(Join join : joins)
 		{
 			values.addAll(join.getValues());

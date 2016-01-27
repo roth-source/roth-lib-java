@@ -20,7 +20,7 @@ public abstract class Conditions extends Condition
 	@Override
 	public List<Object> getValues()
 	{
-		List<Object> values = new List<Object>(true);
+		List<Object> values = new List<Object>().allowNull();
 		for(Condition condition : conditions)
 		{
 			values.addAll(condition.getValues());
