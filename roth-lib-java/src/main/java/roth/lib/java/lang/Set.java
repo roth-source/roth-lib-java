@@ -26,11 +26,16 @@ public class Set<E> extends LinkedHashSet<E>
 		addAll(Arrays.asList(c));
 	}
 	
-	public Set<E> load(Collection<E> c)
+	@SuppressWarnings("unchecked")
+	public Set<E> array(E...c)
 	{
-		Set<E> set = new Set<E>();
-		set.addAll(c);
-		return set;
+		return collection(Arrays.asList(c));
+	}
+	
+	public Set<E> collection(Collection<? extends E> c)
+	{
+		addAll(c);
+		return this;
 	}
 	
 	public boolean isAllowNull()
@@ -175,12 +180,6 @@ public class Set<E> extends LinkedHashSet<E>
 	public boolean containsAll(Collection<?> c)
 	{
 		return super.containsAll(c);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public boolean addAll(E...c)
-	{
-		return addAll(Arrays.asList(c));
 	}
 	
 	@Override

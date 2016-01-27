@@ -28,12 +28,17 @@ public class List<E> extends LinkedList<E>
 		super();
 		addAll(Arrays.asList(c));
 	}
-	
-	public List<E> load(Collection<? extends E> c)
+
+	@SuppressWarnings("unchecked")
+	public List<E> array(E...c)
 	{
-		List<E> list = new List<E>();
-		list.addAll(c);
-		return list;
+		return collection(Arrays.asList(c));
+	}
+	
+	public List<E> collection(Collection<? extends E> c)
+	{
+		addAll(c);
+		return this;
 	}
 	
 	public boolean isAllowNull()
@@ -160,12 +165,6 @@ public class List<E> extends LinkedList<E>
 	public boolean remove(Object o)
 	{
 		return super.remove(o);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public boolean addAll(E...c)
-	{
-		return addAll(Arrays.asList(c));
 	}
 	
 	@Override
@@ -420,7 +419,7 @@ public class List<E> extends LinkedList<E>
 	@Override
 	public List<E> subList(int fromIndex, int toIndex)
 	{
-		return new List<E>().load(super.subList(fromIndex, toIndex));
+		return new List<E>().collection(super.subList(fromIndex, toIndex));
 	}
 
 	@Override

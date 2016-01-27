@@ -55,7 +55,7 @@ public class Map<K, V> extends LinkedHashMap<K, V>
 	@Override
 	public Set<K> keySet()
 	{
-		return new Set<K>().load(super.keySet());
+		return new Set<K>().collection(super.keySet());
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class Map<K, V> extends LinkedHashMap<K, V>
 	@Override
 	public Set<Entry<K, V>> entrySet()
 	{
-		return new Set<Entry<K, V>>().load(super.entrySet());
+		return new Set<Entry<K, V>>().collection(super.entrySet());
 	}
 
 	@Override

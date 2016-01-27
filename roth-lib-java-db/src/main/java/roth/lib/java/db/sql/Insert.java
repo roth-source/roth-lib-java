@@ -24,7 +24,7 @@ public abstract class Insert extends Values
 	
 	public Insert setValues(Collection<Object> values)
 	{
-		this.values = new List<Object>().allowNull().load(values);
+		this.values = new List<Object>().allowNull().collection(values);
 		return this;
 	}
 	
@@ -46,8 +46,8 @@ public abstract class Insert extends Values
 		{
 			throw new IllegalArgumentException("names is different size than values");
 		}
-		this.names = new List<String>().load(names);
-		this.values = new List<Object>().allowNull().load(values);
+		this.names = new List<String>().collection(names);
+		this.values = new List<Object>().allowNull().collection(values);
 		return this;
 	}
 	

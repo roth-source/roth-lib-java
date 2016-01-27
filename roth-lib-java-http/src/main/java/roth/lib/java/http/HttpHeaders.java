@@ -68,7 +68,7 @@ public class HttpHeaders implements Characters
 	
 	public HttpHeaders setHeader(String name, Collection<String> values)
 	{
-		headersMap.put(name, new List<String>().load(values));
+		headersMap.put(name, new List<String>().collection(values));
 		return this;
 	}
 	

@@ -529,7 +529,7 @@ public class JavaTokenizer implements Characters
 	protected Result read(Collection<Character> untils)
 	{
 		Result readResult = null;
-		List<Character> untilList = new List<Character>().load(untils);
+		List<Character> untilList = new List<Character>().collection(untils);
 		StringBuilder builder = new StringBuilder();
 		if(!untilList.isEmpty())
 		{

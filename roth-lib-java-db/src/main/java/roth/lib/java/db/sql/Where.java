@@ -50,7 +50,7 @@ public abstract class Where extends Condition
 	
 	public Where setValues(Collection<?> values)
 	{
-		this.values = new List<Object>().allowNull().load(values);
+		this.values = new List<Object>().allowNull().collection(values);
 		return this;
 	}
 	

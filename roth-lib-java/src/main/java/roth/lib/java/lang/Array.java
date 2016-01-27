@@ -29,11 +29,16 @@ public class Array<E> extends ArrayList<E>
 		addAll(Arrays.asList(c));
 	}
 	
-	public Array<E> load(Collection<E> c)
+	@SuppressWarnings("unchecked")
+	public Array<E> array(E...c)
 	{
-		Array<E> array = new Array<E>();
-		array.addAll(c);
-		return array;
+		return collection(Arrays.asList(c));
+	}
+	
+	public Array<E> collection(Collection<? extends E> c)
+	{
+		addAll(c);
+		return this;
 	}
 	
 	public boolean isAllowNull()
@@ -257,7 +262,7 @@ public class Array<E> extends ArrayList<E>
 	@Override
 	public Array<E> subList(int fromIndex, int toIndex)
 	{
-		return new Array<E>().load(super.subList(fromIndex, toIndex));
+		return new Array<E>().collection(super.subList(fromIndex, toIndex));
 	}
 
 	@Override

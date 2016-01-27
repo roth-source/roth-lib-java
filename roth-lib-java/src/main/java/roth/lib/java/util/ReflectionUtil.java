@@ -207,7 +207,7 @@ public class ReflectionUtil
 	@SuppressWarnings("unchecked")
 	public static List<?> asCollection(Object value)
 	{
-		return (value instanceof Collection) ? new List<Object>().load((Collection<Object>) value) : new List<Object>((Object[]) value);
+		return (value instanceof Collection) ? new List<Object>().collection((Collection<Object>) value) : new List<Object>((Object[]) value);
 	}
 	
 	public static Map<?, ?> asMap(Object value)

@@ -28,7 +28,7 @@ public abstract class Update extends Sql
 	
 	public Update setSets(Collection<Set> sets)
 	{
-		this.sets = new List<Set>().load(sets);
+		this.sets = new List<Set>().collection(sets);
 		return this;
 	}
 	
@@ -53,8 +53,8 @@ public abstract class Update extends Sql
 		{
 			throw new IllegalArgumentException("names is different size than values");
 		}
-		List<String> nameList = new List<String>().load(names);
-		List<Object> valueList = new List<Object>().allowNull().load(values);
+		List<String> nameList = new List<String>().collection(names);
+		List<Object> valueList = new List<Object>().allowNull().collection(values);
 		for(int i = 0; i < nameList.size(); i++)
 		{
 			sets.add(newSet().setName(nameList.get(i)).setValue(valueList.get(i)));
@@ -77,8 +77,8 @@ public abstract class Update extends Sql
 		{
 			throw new IllegalArgumentException("sqls is different size than values");
 		}
-		List<String> sqlList = new List<String>().load(sqls);
-		List<Object> valueList = new List<Object>().allowNull().load(values);
+		List<String> sqlList = new List<String>().collection(sqls);
+		List<Object> valueList = new List<Object>().allowNull().collection(values);
 		for(int i = 0; i < sqlList.size(); i++)
 		{
 			sets.add(newSet().setSql(sqlList.get(i)).setValue(valueList.get(i)));
