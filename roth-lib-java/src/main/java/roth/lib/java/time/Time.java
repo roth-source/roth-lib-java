@@ -449,16 +449,6 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 		return !isWeekendOrHoliday();
 	}
 	
-	public Time getBusinessDay()
-	{
-		Time time = new Time();
-		while(time.isWeekendOrHoliday())
-		{
-			time.addDays(1);
-		}
-		return time;
-	}
-	
 	public boolean isAfterNow()
 	{
 		return isAfter(new Time());

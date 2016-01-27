@@ -139,6 +139,15 @@ public class Day extends Time
 		return this;
 	}
 	
+	public Day getBusinessDay()
+	{
+		while(isWeekendOrHoliday())
+		{
+			addDays(1);
+		}
+		return this;
+	}
+	
 	@Override
 	public String toString()
 	{
