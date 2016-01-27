@@ -19,7 +19,7 @@ public abstract class Sql implements Serializable, SqlFactory
 	
 	public List<Object> getValues()
 	{
-		return new List<Object>(true);
+		return new List<Object>().allowNull();
 	}
 	
 	public static String tick(String value)
@@ -94,11 +94,6 @@ public abstract class Sql implements Serializable, SqlFactory
 			comma = COMMA;
 		}
 		return builder.toString();
-	}
-	
-	public static List<Object> asList(Object...values)
-	{
-		return new List<Object>(true, values);
 	}
 	
 }
