@@ -616,7 +616,7 @@ public class JsonMapper extends Mapper
 							PropertiesReflector propertiesReflector = entityReflector.getPropertiesReflector();
 							if(propertiesReflector != null)
 							{
-								propertiesReflector.put(model, name, value);
+								propertiesReflector.put(model, name, !NULL.equalsIgnoreCase(value) ? value : null);
 							}
 						}
 						name = null;
