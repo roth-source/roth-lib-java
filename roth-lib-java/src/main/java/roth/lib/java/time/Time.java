@@ -160,6 +160,11 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 		return calendar.get(Calendar.MILLISECOND);
 	}
 	
+	public int getWeekday()
+	{
+		return calendar.get(Calendar.DAY_OF_WEEK);
+	}
+	
 	public Time setYear(int year)
 	{
 		calendar.set(Calendar.YEAR, year);

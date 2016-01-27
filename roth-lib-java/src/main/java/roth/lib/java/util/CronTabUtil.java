@@ -1,6 +1,6 @@
 package roth.lib.java.util;
 
-import java.util.Calendar;
+import roth.lib.java.time.Time;
 
 public class CronTabUtil
 {
@@ -12,7 +12,7 @@ public class CronTabUtil
 		
 	}
 	
-	public static boolean isNow(Calendar now, String min, String hour, String day, String month, String weekday)
+	public static boolean isNow(Time now, String min, String hour, String day, String month, String weekday)
 	{
 		boolean matches = false;
 		if(isAll(min) || isMinNow(min, now))
@@ -39,10 +39,10 @@ public class CronTabUtil
 		return ALL.equals(value);
 	}
 	
-	public static boolean isMinNow(String value, Calendar now)
+	public static boolean isMinNow(String value, Time now)
 	{
 		boolean matches = false;
-		int minNow = now.get(Calendar.MINUTE);
+		int minNow = now.getMinute();
 		String[] minValues = value.split(",");
 		for(String minValue : minValues)
 		{
@@ -57,10 +57,10 @@ public class CronTabUtil
 		return matches;
 	}
 	
-	protected static boolean isHourNow(String value, Calendar now)
+	protected static boolean isHourNow(String value, Time now)
 	{
 		boolean matches = false;
-		int hourNow = now.get(Calendar.HOUR_OF_DAY);
+		int hourNow = now.getHour();
 		String[] hourValues = value.split(",");
 		for(String hourValue : hourValues)
 		{
@@ -75,10 +75,10 @@ public class CronTabUtil
 		return matches;
 	}
 	
-	protected static boolean isDayNow(String value, Calendar now)
+	protected static boolean isDayNow(String value, Time now)
 	{
 		boolean matches = false;
-		int dayNow = now.get(Calendar.DAY_OF_MONTH);
+		int dayNow = now.getDay();
 		String[] dayValues = value.split(",");
 		for(String dayValue : dayValues)
 		{
@@ -100,10 +100,10 @@ public class CronTabUtil
 		return matches;
 	}
 	
-	public static boolean isMonthNow(String value, Calendar now)
+	public static boolean isMonthNow(String value, Time now)
 	{
 		boolean matches = false;
-		int monthNow = now.get(Calendar.MONTH) + 1;
+		int monthNow = now.getMonth();
 		String[] monthValues = value.split(",");
 		for(String monthValue : monthValues)
 		{
@@ -118,10 +118,10 @@ public class CronTabUtil
 		return matches;
 	}
 	
-	public static boolean isWeekdayNow(String value, Calendar now)
+	public static boolean isWeekdayNow(String value, Time now)
 	{
 		boolean matches = false;
-		int weekdayNow = now.get(Calendar.DAY_OF_WEEK) - 1;
+		int weekdayNow = now.getWeekday() - 1;
 		String[] weekdayValues = value.split(",");
 		for(String weekdayValue : weekdayValues)
 		{
