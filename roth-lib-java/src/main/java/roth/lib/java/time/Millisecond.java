@@ -178,49 +178,6 @@ public class Millisecond extends Time
 	}
 	
 	@Override
-	public boolean equals(Object object)
-	{
-		if(this == object)
-		{
-			return true;
-		}
-		if(object == null)
-		{
-			return false;
-		}
-		if(getClass() != object.getClass())
-		{
-			return false;
-		}
-		Year other = (Year) object;
-		if(getYear() != other.getYear())
-		{
-			return false;
-		}
-		if(getMonth() != other.getMonth())
-		{
-			return false;
-		}
-		if(getDay() != other.getDay())
-		{
-			return false;
-		}
-		if(getHour() != other.getHour())
-		{
-			return false;
-		}
-		if(getSecond() != other.getSecond())
-		{
-			return false;
-		}
-		if(getMillisecond() != other.getMillisecond())
-		{
-			return false;
-		}
-		return true;
-	}
-	
-	@Override
 	public Millisecond clone()
 	{
 		return new Millisecond((Calendar) calendar.clone());

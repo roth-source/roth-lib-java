@@ -149,29 +149,6 @@ public class Year extends Time
 	}
 	
 	@Override
-	public boolean equals(Object object)
-	{
-		if(this == object)
-		{
-			return true;
-		}
-		if(object == null)
-		{
-			return false;
-		}
-		if(getClass() != object.getClass())
-		{
-			return false;
-		}
-		Year other = (Year) object;
-		if(getYear() != other.getYear())
-		{
-			return false;
-		}
-		return true;
-	}
-	
-	@Override
 	public Year clone()
 	{
 		return new Year((Calendar) calendar.clone());

@@ -155,41 +155,6 @@ public class Hour extends Time
 	}
 	
 	@Override
-	public boolean equals(Object object)
-	{
-		if(this == object)
-		{
-			return true;
-		}
-		if(object == null)
-		{
-			return false;
-		}
-		if(getClass() != object.getClass())
-		{
-			return false;
-		}
-		Year other = (Year) object;
-		if(getYear() != other.getYear())
-		{
-			return false;
-		}
-		if(getMonth() != other.getMonth())
-		{
-			return false;
-		}
-		if(getDay() != other.getDay())
-		{
-			return false;
-		}
-		if(getHour() != other.getHour())
-		{
-			return false;
-		}
-		return true;
-	}
-	
-	@Override
 	public Hour clone()
 	{
 		return new Hour((Calendar) calendar.clone());

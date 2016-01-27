@@ -489,31 +489,14 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 	@Override
 	public boolean equals(Object object)
 	{
-		if(this == object)
+		if(object != null && object instanceof Time)
 		{
-			return true;
+			return calendar.equals(((Time) object).calendar);
 		}
-		if(object == null)
-		{
-			return false;
-		}
-		if(getClass() != object.getClass())
+		else
 		{
 			return false;
 		}
-		Time time = (Time) object;
-		if(calendar == null)
-		{
-			if(time.calendar != null)
-			{
-				return false;
-			}
-		}
-		else if(!calendar.equals(time.calendar))
-		{
-			return false;
-		}
-		return true;
 	}
 	
 	@Override
