@@ -304,7 +304,19 @@ public class MapperReflector
 	
 	public Deserializer<?> getDeserializer(Class<?> klass)
 	{
-		return deserializerMap.get(klass);
+		Deserializer<?> deserializer = deserializerMap.get(klass);
+		if(deserializer == null)
+		{
+			for(Entry<Class<?>, Deserializer<?>> deserializerEntry : deserializerMap.entrySet())
+			{
+				if(deserializerEntry.getKey().isAssignableFrom(klass))
+				{
+					deserializer = deserializerEntry.getValue();
+					break;
+				}
+			}
+		}
+		return deserializer;
 	}
 	
 	public <T> MapperReflector putSerializer(Class<T> klass, Serializer<T> serializer)
