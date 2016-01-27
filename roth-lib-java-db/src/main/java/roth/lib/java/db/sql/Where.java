@@ -56,7 +56,7 @@ public abstract class Where extends Condition
 	
 	public Where addValues(Object...values)
 	{
-		this.values.addAll(values);
+		this.values.array(values);
 		return this;
 	}
 	

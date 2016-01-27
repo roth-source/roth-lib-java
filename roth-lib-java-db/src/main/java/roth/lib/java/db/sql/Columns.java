@@ -20,7 +20,7 @@ public abstract class Columns extends Sql
 	
 	public Columns addColumns(Column... columns)
 	{
-		this.columns.addAll(columns);
+		this.columns.array(columns);
 		return this;
 	}
 	

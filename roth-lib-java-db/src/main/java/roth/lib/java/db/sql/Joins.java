@@ -20,7 +20,7 @@ public abstract class Joins extends Sql
 	
 	public Joins addJoins(Join... joins)
 	{
-		this.joins.addAll(joins);
+		this.joins.array(joins);
 		return this;
 	}
 	

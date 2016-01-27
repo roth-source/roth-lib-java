@@ -56,7 +56,7 @@ public abstract class Having extends Condition
 	
 	public Having addValues(Object...values)
 	{
-		this.values.addAll(true, values);
+		this.values.array(true, values);
 		return this;
 	}
 	

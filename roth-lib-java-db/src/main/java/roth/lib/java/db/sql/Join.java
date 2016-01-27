@@ -55,7 +55,7 @@ public abstract class Join extends Sql
 	
 	public Join addOns(On...ons)
 	{
-		this.ons.addAll(ons);
+		this.ons.array(ons);
 		return this;
 	}
 	

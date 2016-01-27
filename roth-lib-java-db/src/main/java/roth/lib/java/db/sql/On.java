@@ -56,7 +56,7 @@ public abstract class On extends Values
 	
 	public On addValues(Object...values)
 	{
-		this.values.addAll(true, values);
+		this.values.array(values);
 		return this;
 	}
 	

@@ -34,7 +34,7 @@ public abstract class Update extends Sql
 	
 	public Update addSets(Set...sets)
 	{
-		this.sets.addAll(sets);
+		this.sets.array(sets);
 		return this;
 	}
 	

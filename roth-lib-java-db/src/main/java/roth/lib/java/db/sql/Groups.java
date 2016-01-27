@@ -20,7 +20,7 @@ public abstract class Groups extends Sql
 	
 	public Groups addGroups(Group... groups)
 	{
-		this.groups.addAll(groups);
+		this.groups.array(groups);
 		return this;
 	}
 	

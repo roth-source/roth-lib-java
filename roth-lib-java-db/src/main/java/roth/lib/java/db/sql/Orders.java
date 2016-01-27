@@ -20,7 +20,7 @@ public abstract class Orders extends Sql
 	
 	public Orders addOrders(Order... orders)
 	{
-		this.orders.addAll(orders);
+		this.orders.array(orders);
 		return this;
 	}
 	
