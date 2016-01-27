@@ -15,13 +15,19 @@ public class Month extends Time
 		this(new GregorianCalendar());
 	}
 	
+	public Month(int month)
+	{
+		this();
+		setMonth(month);
+	}
+	
 	public Month(int year, int month)
 	{
 		this();
 		setYear(year);
 		setMonth(month);
 	}
-
+	
 	public Month(Date date)
 	{
 		this(toCalendar(date));

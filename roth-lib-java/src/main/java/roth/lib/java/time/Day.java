@@ -15,6 +15,19 @@ public class Day extends Time
 		this(new GregorianCalendar());
 	}
 	
+	public Day(int day)
+	{
+		this();
+		setDay(day);
+	}
+	
+	public Day(int month, int day)
+	{
+		this();
+		setMonth(month);
+		setDay(day);
+	}
+	
 	public Day(int year, int month, int day)
 	{
 		this();
