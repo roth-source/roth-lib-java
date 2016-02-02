@@ -1,0 +1,15 @@
+# FOLDERS
+bin/
+target/
+dev/
+.settings/
+
+# EXTENSIONS
+*.prefs
+*.class
+*.versionsBackup
+*.releaseBackup
+
+# SYSTEM
+.DS_Store
+Thumbs.db
