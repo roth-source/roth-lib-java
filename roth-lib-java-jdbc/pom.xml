@@ -6,17 +6,12 @@
 		<relativePath>../roth-lib-java-pom</relativePath>
 		<version>0.2.5-SNAPSHOT</version>
 	</parent>
-	<artifactId>roth-lib-java-db-mysql</artifactId>
+	<artifactId>roth-lib-java-jdbc</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>roth.lib.java</groupId>
-			<artifactId>roth-lib-java-db</artifactId>
+			<artifactId>roth-lib-java</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.36</version>
 		</dependency>
 	</dependencies>
 </project>

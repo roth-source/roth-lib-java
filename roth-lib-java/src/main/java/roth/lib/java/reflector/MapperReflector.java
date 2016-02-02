@@ -89,6 +89,7 @@ public class MapperReflector
 		serializerMap.put(float.class, unescapedSerializer);
 		serializerMap.put(double.class, unescapedSerializer);
 		serializerMap.put(char.class, escapedSerializer);
+		serializerMap.put(Boolean.class, unescapedSerializer);
 		serializerMap.put(Number.class, unescapedSerializer);
 		serializerMap.put(Character.class, escapedSerializer);
 		serializerMap.put(DataUrl.class, escapedSerializer);
@@ -306,13 +307,9 @@ public class MapperReflector
 		Deserializer<?> deserializer = deserializerMap.get(klass);
 		if(deserializer == null)
 		{
-			for(Entry<Class<?>, Deserializer<?>> deserializerEntry : deserializerMap.entrySet())
+			if(Enum.class.isAssignableFrom(klass))
 			{
-				if(deserializerEntry.getKey().isAssignableFrom(klass))
-				{
-					deserializer = deserializerEntry.getValue();
-					break;
-				}
+				deserializer = deserializerMap.get(Enum.class);
 			}
 		}
 		return deserializer;

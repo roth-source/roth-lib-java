@@ -62,7 +62,6 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			@Override
 			public void run()
 			{
-				System.out.println("Closing Connections");
 				close();
 			}
 		}));

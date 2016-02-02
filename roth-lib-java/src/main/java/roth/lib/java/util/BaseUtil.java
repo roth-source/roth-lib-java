@@ -1,6 +1,8 @@
 package roth.lib.java.util;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class BaseUtil
 {
@@ -202,7 +204,13 @@ public class BaseUtil
 	
 	public static void main(String[] args)
 	{
-		
+		int value = 238327;
+		for(int i = value; i > 3843; i--)
+		{
+			ByteBuffer buffer = ByteBuffer.allocate(4);
+			buffer.putInt(i);
+			System.out.println(Arrays.toString(Arrays.copyOfRange(buffer.array(), 1, 4)));
+		}
 	}
 	
 }

@@ -196,24 +196,27 @@ public class XmlMapper extends Mapper
 				}
 				writeCloseTag(writer, name);
 			}
-			else if(isSerializable(value.getClass()))
+			else
 			{
 				Serializer<?> serializer = getSerializer(value.getClass());
-				String timeFormat = getTimeFormat(propertyReflector);
-				String serializedValue = serializer.serialize(value, timeFormat);
-				if(serializedValue != null)
+				if(serializer != null)
 				{
-					writeNewLine(writer);
-					writeOpenTag(writer, name);
-					writeValue(writer, serializedValue);
-					writeCloseTag(writer, name);
-				}
-				else if(getMapperConfig().isSerializeNulls())
-				{
-					writeNewLine(writer);
-					writeOpenTag(writer, name);
-					writer.write(BLANK);
-					writeCloseTag(writer, name);
+					String timeFormat = getTimeFormat(propertyReflector);
+					String serializedValue = serializer.serialize(value, timeFormat);
+					if(serializedValue != null)
+					{
+						writeNewLine(writer);
+						writeOpenTag(writer, name);
+						writeValue(writer, serializedValue);
+						writeCloseTag(writer, name);
+					}
+					else if(getMapperConfig().isSerializeNulls())
+					{
+						writeNewLine(writer);
+						writeOpenTag(writer, name);
+						writer.write(BLANK);
+						writeCloseTag(writer, name);
+					}
 				}
 			}
 			decrementTabs();
@@ -490,21 +493,24 @@ public class XmlMapper extends Mapper
 						field.set(model, value);
 						setDeserializedName(model, propertyReflector.getFieldName());
 					}
-					else if(isSerializable(getTypeClass(fieldType)))
+					else
 					{
-						String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
-						readTag(reader);
 						Deserializer<?> deserializer = getDeserializer(fieldClass);
 						if(deserializer != null)
 						{
-							String timeFormat = getTimeFormat(propertyReflector);
-							field.set(model, deserializer.deserialize(value, timeFormat, fieldClass));
-							setDeserializedName(model, propertyReflector.getFieldName());
+							String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
+							readTag(reader);
+							if(deserializer != null)
+							{
+								String timeFormat = getTimeFormat(propertyReflector);
+								field.set(model, deserializer.deserialize(value, timeFormat, fieldClass));
+								setDeserializedName(model, propertyReflector.getFieldName());
+							}
 						}
-					}
-					else
-					{
-						readUnmapped(reader, propertyOpenTag);
+						else
+						{
+							readUnmapped(reader, propertyOpenTag);
+						}
 					}
 				}
 				else
@@ -586,24 +592,27 @@ public class XmlMapper extends Mapper
 						map.put(key, value);
 					}
 				}
-				else if(isSerializable(elementClass))
+				else
 				{
-					String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
-					readTag(reader);
 					Deserializer<E> deserializer = (Deserializer<E>) getDeserializer(elementClass);
 					if(deserializer != null)
 					{
-						String timeFormat = getTimeFormat(propertyReflector);
-						E deserializedValue = deserializer.deserialize(value, timeFormat, elementClass);
-						if(deserializedValue != null)
+						String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
+						readTag(reader);
+						if(deserializer != null)
 						{
-							map.put(key, deserializedValue);
+							String timeFormat = getTimeFormat(propertyReflector);
+							E deserializedValue = deserializer.deserialize(value, timeFormat, elementClass);
+							if(deserializedValue != null)
+							{
+								map.put(key, deserializedValue);
+							}
 						}
 					}
-				}
-				else
-				{
-					readUnmapped(reader, fieldOpenTag);
+					else
+					{
+						readUnmapped(reader, fieldOpenTag);
+					}
 				}
 			}
 			else if(tag instanceof CloseTag)
@@ -685,13 +694,13 @@ public class XmlMapper extends Mapper
 						collection.add(value);
 					}
 				}
-				else if(isSerializable(elementClass))
+				else
 				{
-					String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
-					readTag(reader);
 					Deserializer<E> deserializer = (Deserializer<E>) getDeserializer(elementClass);
 					if(deserializer != null)
 					{
+						String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
+						readTag(reader);
 						String timeFormat = getTimeFormat(propertyReflector);
 						E deserializedValue = deserializer.deserialize(value, timeFormat, elementClass);
 						if(deserializedValue != null)
@@ -699,10 +708,10 @@ public class XmlMapper extends Mapper
 							collection.add(deserializedValue);
 						}
 					}
-				}
-				else
-				{
-					readUnmapped(reader, fieldOpenTag);
+					else
+					{
+						readUnmapped(reader, fieldOpenTag);
+					}
 				}
 			}
 			else if(tag instanceof CloseTag)
@@ -736,20 +745,20 @@ public class XmlMapper extends Mapper
 		{
 			element = readMap(reader, elementType, propertyReflector);
 		}
-		else if(isSerializable(elementClass))
+		else
 		{
-			String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
-			readTag(reader);
 			Deserializer<E> deserializer = (Deserializer<E>) getDeserializer(elementClass);
 			if(deserializer != null)
 			{
+				String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
+				readTag(reader);
 				String timeFormat = getTimeFormat(propertyReflector);
 				element = deserializer.deserialize(value, timeFormat, elementClass);
 			}
-		}
-		else
-		{
-			readUnmapped(reader, tag);
+			else
+			{
+				readUnmapped(reader, tag);
+			}
 		}
 		return element;
 	}

@@ -210,25 +210,28 @@ public class JsonMapper extends Mapper
 					writer.write(RIGHT_BRACE);
 				}
 			}
-			else if(isSerializable(value.getClass()))
+			else
 			{
 				Serializer<?> serializer = getSerializer(value.getClass());
-				String timeFormat = getTimeFormat(propertyReflector);
-				boolean escapable = serializer.isEscapable(value, timeFormat);
-				String serializedValue = serializer.serialize(value, timeFormat);
-				if(serializedValue != null)
+				if(serializer != null)
 				{
-					seperator = writeSeperator(writer, seperator);
-					writeNewLine(writer);
-					writePropertyName(writer, name);
-					writeValue(writer, serializedValue, escapable);
-				}
-				else if(getMapperConfig().isSerializeNulls())
-				{
-					seperator = writeSeperator(writer, seperator);
-					writeNewLine(writer);
-					writePropertyName(writer, name);
-					writer.write(NULL);
+					String timeFormat = getTimeFormat(propertyReflector);
+					boolean escapable = serializer.isEscapable(value, timeFormat);
+					String serializedValue = serializer.serialize(value, timeFormat);
+					if(serializedValue != null)
+					{
+						seperator = writeSeperator(writer, seperator);
+						writeNewLine(writer);
+						writePropertyName(writer, name);
+						writeValue(writer, serializedValue, escapable);
+					}
+					else if(getMapperConfig().isSerializeNulls())
+					{
+						seperator = writeSeperator(writer, seperator);
+						writeNewLine(writer);
+						writePropertyName(writer, name);
+						writer.write(NULL);
+					}
 				}
 			}
 		}
@@ -310,27 +313,30 @@ public class JsonMapper extends Mapper
 						decrementTabs();
 					}
 				}
-				else if(isSerializable(value.getClass()))
+				else
 				{
 					Serializer<?> serializer = getSerializer(value.getClass());
-					String timeFormat = getTimeFormat(propertyReflector);
-					boolean escapable = serializer.isEscapable(value, timeFormat);
-					String serializedValue = serializer.serialize(value, timeFormat);
-					if(serializedValue != null)
+					if(serializer != null)
 					{
-						incrementTabs();
-						seperator = writeSeperator(writer, seperator);
-						writeNewLine(writer);
-						writeValue(writer, serializedValue, escapable);
-						decrementTabs();
-					}
-					else if(getMapperConfig().isSerializeNulls())
-					{
-						incrementTabs();
-						seperator = writeSeperator(writer, seperator);
-						writeNewLine(writer);
-						writer.write(NULL);
-						decrementTabs();
+						String timeFormat = getTimeFormat(propertyReflector);
+						boolean escapable = serializer.isEscapable(value, timeFormat);
+						String serializedValue = serializer.serialize(value, timeFormat);
+						if(serializedValue != null)
+						{
+							incrementTabs();
+							seperator = writeSeperator(writer, seperator);
+							writeNewLine(writer);
+							writeValue(writer, serializedValue, escapable);
+							decrementTabs();
+						}
+						else if(getMapperConfig().isSerializeNulls())
+						{
+							incrementTabs();
+							seperator = writeSeperator(writer, seperator);
+							writeNewLine(writer);
+							writer.write(NULL);
+							decrementTabs();
+						}
 					}
 				}
 			}

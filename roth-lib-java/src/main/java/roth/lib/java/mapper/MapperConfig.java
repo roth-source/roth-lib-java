@@ -77,13 +77,9 @@ public class MapperConfig
 		Deserializer<?> deserializer = deserializerMap.get(klass);
 		if(deserializer == null)
 		{
-			for(Entry<Class<?>, Deserializer<?>> deserializerEntry : deserializerMap.entrySet())
+			if(Enum.class.isAssignableFrom(klass))
 			{
-				if(deserializerEntry.getKey().isAssignableFrom(klass))
-				{
-					deserializer = deserializerEntry.getValue();
-					break;
-				}
+				deserializer = deserializerMap.get(Enum.class);
 			}
 		}
 		return deserializer;

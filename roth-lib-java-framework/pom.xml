@@ -16,7 +16,7 @@
 		</dependency>
 		<dependency>
 			<groupId>roth.lib.java</groupId>
-			<artifactId>roth-lib-java-db</artifactId>
+			<artifactId>roth-lib-java-jdbc</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

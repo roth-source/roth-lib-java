@@ -14,9 +14,8 @@
 	</scm>
 	<modules>
 		<module>../roth-lib-java</module>
-		<module>../roth-lib-java-db</module>
-		<module>../roth-lib-java-db-mysql</module>
-		<module>../roth-lib-java-db-orient</module>
+		<module>../roth-lib-java-jdbc</module>
+		<module>../roth-lib-java-jdbc-mysql</module>
 		<module>../roth-lib-java-email</module>
 		<module>../roth-lib-java-ftp</module>
 		<module>../roth-lib-java-http</module>

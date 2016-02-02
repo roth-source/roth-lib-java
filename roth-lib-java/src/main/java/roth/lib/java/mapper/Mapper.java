@@ -93,16 +93,6 @@ public abstract class Mapper implements Characters
 		return serializer;
 	}
 	
-	public boolean isSerializable(Class<?> klass)
-	{
-		boolean serializable = mapperConfig.isSerializable(klass);
-		if(!serializable)
-		{
-			serializable = mapperReflector.isSerializable(klass);
-		}
-		return serializable;
-	}
-	
 	public Deserializer<?> getDeserializer(Class<?> klass)
 	{
 		Deserializer<?> deserializer = mapperConfig.getDeserializer(klass);

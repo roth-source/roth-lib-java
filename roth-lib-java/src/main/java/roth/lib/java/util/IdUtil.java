@@ -1,15 +1,11 @@
 package roth.lib.java.util;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Random;
 
 import roth.lib.java.lang.Map;
-import roth.lib.java.lang.Set;
-import roth.lib.java.time.Time;
 
 public class IdUtil
 {
@@ -17,13 +13,13 @@ public class IdUtil
 	protected static final int TIME_LENGTH 			= 7;
 	protected static final int RANDOM_MIN_LENGTH 	= 1;
 	protected static final int RANDOM_MAX_LENGTH 	= 10;
-	protected static final Map<Integer, BigDecimal> MAX_VALUES = new Map<Integer, BigDecimal>();
+	protected static final Map<Integer, Long> MAX_VALUES = new Map<Integer, Long>();
 	
 	static
 	{
 		for(int length = RANDOM_MIN_LENGTH; length <= RANDOM_MAX_LENGTH; length++)
 		{
-			MAX_VALUES.put(length, BigDecimal.valueOf(length).pow(BaseUtil.BASE_62));
+			MAX_VALUES.put(length, (long) Math.pow(BaseUtil.BASE_62, length));
 		}
 	}
 	
@@ -57,9 +53,9 @@ public class IdUtil
 		return StringUtil.padLeftLimit(BaseUtil.encodeBase62(randomNumber(length)), length, BaseUtil.BASE_PAD);
 	}
 	
-	protected static BigInteger randomNumber(int length)
+	protected static long randomNumber(int length)
 	{
-		return MAX_VALUES.get(length).multiply(BigDecimal.valueOf(new Random().nextDouble())).toBigInteger();
+		return (long) (new Random().nextDouble() * MAX_VALUES.get(length));
 	}
 	
 	public static String uuid(char prefix)
@@ -145,7 +141,10 @@ public class IdUtil
 	
 	public static void main(String[] args)
 	{
-		System.out.println(new Time());
+		System.out.println(MAX_VALUES);
+		
+		/*
+		System.out.println(new Second());
 		Set<String> set = new Set<String>();
 		int count = 0;
 		for(int i = 0; i < 10000000; i++)
@@ -156,7 +155,8 @@ public class IdUtil
 				System.err.println(++count + ":" + uuid);
 			}
 		}
-		System.out.println(new Time());
+		System.out.println(new Second());
+		*/
 	}
 	
 }
