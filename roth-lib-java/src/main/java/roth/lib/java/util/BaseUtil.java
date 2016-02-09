@@ -22,7 +22,7 @@ public class BaseUtil
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
 	};
 	protected static final String CHARACTER_STRING = new String(CHARACTERS);
-	public static final char BASE_PAD = CHARACTERS[0];
+	protected static final char BASE_PAD = CHARACTERS[0];
 	
 	protected BaseUtil()
 	{
@@ -106,10 +106,90 @@ public class BaseUtil
 	
 	public static String encode(BigInteger number, int base)
 	{
-		return encode(number, BigInteger.valueOf(base));
+		return encode(number, null, BigInteger.valueOf(base));
+	}
+
+	public static String encodeBase16(String value, int length)
+	{
+		return encode(value, length, BASE_16);
 	}
 	
-	protected static String encode(BigInteger number, BigInteger base)
+	public static String encodeBase36(String value, int length)
+	{
+		return encode(value, length, BASE_36);
+	}
+	
+	public static String encodeBase62(String value, int length)
+	{
+		return encode(value, length, BASE_62);
+	}
+	
+	public static String encode(String value, int length, int base)
+	{
+		return encode(value.getBytes(), length, base);
+	}
+	
+	public static String encodeBase16(byte[] bytes, int length)
+	{
+		return encode(bytes, length, BASE_16);
+	}
+	
+	public static String encodeBase36(byte[] bytes, int length)
+	{
+		return encode(bytes, length, BASE_36);
+	}
+	
+	public static String encodeBase62(byte[] bytes, int length)
+	{
+		return encode(bytes, length, BASE_62);
+	}
+	
+	public static String encode(byte[] bytes, int length, int base)
+	{
+		return encode(new BigInteger(1, bytes), length, base);
+	}
+	
+	public static String encodeBase16(long number, int length)
+	{
+		return encode(number, length, BASE_16);
+	}
+	
+	public static String encodeBase36(long number, int length)
+	{
+		return encode(number, length, BASE_36);
+	}
+	
+	public static String encodeBase62(long number, int length)
+	{
+		return encode(number, length, BASE_62);
+	}
+	
+	public static String encode(long number, int length, int base)
+	{
+		return encode(BigInteger.valueOf(number), length, base);
+	}
+	
+	public static String encodeBase16(BigInteger number, int length)
+	{
+		return encode(number, length, BASE_16);
+	}
+	
+	public static String encodeBase36(BigInteger number, int length)
+	{
+		return encode(number, length, BASE_36);
+	}
+	
+	public static String encodeBase62(BigInteger number, int length)
+	{
+		return encode(number, length, BASE_62);
+	}
+	
+	public static String encode(BigInteger number, int length, int base)
+	{
+		return encode(number, length, BigInteger.valueOf(base));
+	}
+	
+	protected static String encode(BigInteger number, Integer length, BigInteger base)
 	{
 		StringBuilder builder = new StringBuilder();
 		number = number.abs();
@@ -120,7 +200,14 @@ public class BaseUtil
 			builder.append(CHARACTERS[number.mod(base).intValue()]);
 			number = number.divide(base);
 		}
-		return builder.reverse().toString();
+		if(length != null)
+		{
+			return StringUtil.padLeftLimit(builder.reverse().toString(), length, BASE_PAD);
+		}
+		else
+		{
+			return builder.reverse().toString();
+		}
 	}
 	
 	public static String decodeStringBase16(String value)

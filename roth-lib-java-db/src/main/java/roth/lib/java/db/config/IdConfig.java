@@ -3,8 +3,10 @@ package roth.lib.java.db.config;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
+import roth.lib.java.annotation.Entity;
 import roth.lib.java.util.BaseUtil;
 
+@Entity
 @SuppressWarnings("serial")
 public class IdConfig implements Serializable
 {
@@ -13,17 +15,17 @@ public class IdConfig implements Serializable
 	public static final int TIME_LENGTH 	= 8;
 	public static final int RANDOM_LENGTH 	= 8;
 	
-	@Length(min = 1, max = Integer.BYTES)
-	protected int tableLength = TABLE_LENGTH;
+	@LengthConfig(min = 1, max = Integer.BYTES)
+	protected int tableEncodedLength = TABLE_LENGTH;
 	
-	@Length(min = 1, max = Integer.BYTES)
-	protected int serverLength = SERVER_LENGTH;
+	@LengthConfig(min = 1, max = Integer.BYTES)
+	protected int serverEncodedLength = SERVER_LENGTH;
 	
-	@Length(min = 7, max = Long.BYTES)
-	protected int timeLength = TIME_LENGTH;
+	@LengthConfig(min = 7, max = Long.BYTES)
+	protected int timeEncodedLength = TIME_LENGTH;
 	
-	@Length(min = 5, max = Long.BYTES)
-	protected int randomLength = RANDOM_LENGTH;
+	@LengthConfig(min = 5, max = Long.BYTES)
+	protected int randomEncodedLength = RANDOM_LENGTH;
 	
 	public IdConfig()
 	{
@@ -34,7 +36,7 @@ public class IdConfig implements Serializable
 	{
 		for(Field field : getClass().getDeclaredFields())
 		{
-			Length length = field.getDeclaredAnnotation(Length.class);
+			LengthConfig length = field.getDeclaredAnnotation(LengthConfig.class);
 			if(length != null)
 			{
 				try
@@ -42,7 +44,7 @@ public class IdConfig implements Serializable
 					int value = (int) field.get(this);
 					if(value < length.min() || length.max() < value)
 					{
-						throw new ConfigException(value + " " + field.getName() + " is invalid");
+						throw new DbConfigException(value + " " + field.getName() + " is invalid");
 					}
 				}
 				catch(IllegalAccessException e)
@@ -53,60 +55,60 @@ public class IdConfig implements Serializable
 		}
 	}
 	
-	public int getTableLength()
+	public int getTableEncodedLength()
 	{
-		return tableLength;
+		return tableEncodedLength;
 	}
 	
-	public int getServerLength()
+	public int getServerEncodedLength()
 	{
-		return serverLength;
+		return serverEncodedLength;
 	}
 	
-	public int getTimeLength()
+	public int getTimeEncodedLength()
 	{
-		return timeLength;
+		return timeEncodedLength;
 	}
 	
-	public int getRandomLength()
+	public int getRandomEncodedLength()
 	{
-		return randomLength;
+		return randomEncodedLength;
 	}
 	
-	public int getTotalLength()
+	public int getTotalEncodedLength()
 	{
-		return tableLength + serverLength + timeLength + randomLength;
+		return tableEncodedLength + serverEncodedLength + timeEncodedLength + randomEncodedLength;
 	}
 	
-	protected long getMax(int length)
+	protected long getMaxValue(int length)
 	{
 		return (long) Math.pow(BaseUtil.BASE_62, length);
 	}
 	
-	public long getTableMax()
+	public int getTableMaxValue()
 	{
-		return getMax(tableLength);
+		return (int) getMaxValue(tableEncodedLength);
 	}
 	
-	public long getServerMax()
+	public int getServerMaxValue()
 	{
-		return getMax(serverLength);
+		return (int) getMaxValue(serverEncodedLength);
 	}
 	
-	public long getTimeMax()
+	public long getTimeMaxValue()
 	{
-		return getMax(timeLength);
+		return getMaxValue(timeEncodedLength);
 	}
 	
-	public long getRandomMax()
+	public long getRandomMaxValue()
 	{
-		return getMax(randomLength);
+		return getMaxValue(randomEncodedLength);
 	}
 	
 	public static void main(String[] args)
 	{
 		IdConfig config = new IdConfig();
-		config.timeLength = 10;
+		config.timeEncodedLength = 10;
 		config.validate();
 	}
 	
