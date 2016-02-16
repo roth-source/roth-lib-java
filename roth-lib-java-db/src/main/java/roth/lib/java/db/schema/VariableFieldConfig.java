@@ -1,4 +1,4 @@
-package roth.lib.java.db.config;
+package roth.lib.java.db.schema;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.db.type.DataType;
@@ -6,7 +6,7 @@ import roth.lib.java.db.type.VariableType;
 
 @Entity
 @SuppressWarnings("serial")
-public class VariableFieldConfig extends FieldConfig
+public class VariableFieldConfig extends FieldSchema
 {
 	protected VariableType variableType;
 	

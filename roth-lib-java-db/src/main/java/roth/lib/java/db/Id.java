@@ -4,24 +4,24 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Random;
 
-import roth.lib.java.db.config.IdConfig;
+import roth.lib.java.db.schema.IdSchema;
 import roth.lib.java.db.util.ByteUtil;
 import roth.lib.java.util.BaseUtil;
 
 public class Id
 {
-	protected IdConfig config;
+	protected IdSchema config;
 	protected int table;
 	protected int server;
 	protected long time;
 	protected long random;
 	
-	public Id(IdConfig config)
+	public Id(IdSchema config)
 	{
 		this.config = config;
 	}
 	
-	public Id(IdConfig config, int table, int server)
+	public Id(IdSchema config, int table, int server)
 	{
 		this(config);
 		setTable(table);
@@ -128,7 +128,7 @@ public class Id
 		return buffer.array();
 	}
 	
-	public static Id fromString(IdConfig config, String value)
+	public static Id fromString(IdSchema config, String value)
 	{
 		Id id = new Id(config);
 		int position = 0;
@@ -139,7 +139,7 @@ public class Id
 		return id;
 	}
 	
-	public static Id fromBytes(IdConfig config, byte[] bytes)
+	public static Id fromBytes(IdSchema config, byte[] bytes)
 	{
 		Id id = new Id(config);
 		int position = 0;
@@ -199,7 +199,7 @@ public class Id
 
 	public static void main(String[] args)
 	{
-		IdConfig config = new IdConfig();
+		IdSchema config = new IdSchema();
 		{
 			Id id = new Id(config, 10, 1);
 			String value = id.toString();

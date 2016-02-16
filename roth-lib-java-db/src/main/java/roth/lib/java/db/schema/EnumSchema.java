@@ -1,4 +1,4 @@
-package roth.lib.java.db.config;
+package roth.lib.java.db.schema;
 
 import java.io.Serializable;
 import java.util.Map.Entry;
@@ -8,18 +8,18 @@ import roth.lib.java.lang.Map;
 
 @Entity
 @SuppressWarnings("serial")
-public class EnumConfig implements Serializable
+public class EnumSchema implements Serializable
 {
 	protected String name;
 	protected Map<Integer, String> elementCodeNameMap = new Map<Integer, String>();
 	protected Map<String, Integer> elementNameCodeMap = new Map<String, Integer>();
 	
-	protected EnumConfig()
+	protected EnumSchema()
 	{
 		
 	}
 	
-	public EnumConfig(String name)
+	public EnumSchema(String name)
 	{
 		this.name = name;
 	}
@@ -34,14 +34,14 @@ public class EnumConfig implements Serializable
 		return elementNameCodeMap.get(elementName);
 	}
 	
-	public EnumConfig putElement(int elementCode, String elementName)
+	public EnumSchema putElement(int elementCode, String elementName)
 	{
 		elementCodeNameMap.put(elementCode, elementName);
 		elementNameCodeMap.put(elementName, elementCode);
 		return this;
 	}
 	
-	public EnumConfig removeElement(int elementCode)
+	public EnumSchema removeElement(int elementCode)
 	{
 		elementCodeNameMap.remove(elementCode);
 		for(Entry<String, Integer> entry : elementNameCodeMap.entrySet())
@@ -55,7 +55,7 @@ public class EnumConfig implements Serializable
 		return this;
 	}
 	
-	public EnumConfig removeElement(String elementName)
+	public EnumSchema removeElement(String elementName)
 	{
 		elementNameCodeMap.remove(elementName);
 		for(Entry<Integer, String> entry : elementCodeNameMap.entrySet())

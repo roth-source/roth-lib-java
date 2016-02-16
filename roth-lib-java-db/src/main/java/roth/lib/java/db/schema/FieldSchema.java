@@ -1,4 +1,4 @@
-package roth.lib.java.db.config;
+package roth.lib.java.db.schema;
 
 import java.io.Serializable;
 
@@ -7,7 +7,7 @@ import roth.lib.java.db.type.DataType;
 
 @Entity
 @SuppressWarnings("serial")
-public abstract class FieldConfig implements Serializable
+public abstract class FieldSchema implements Serializable
 {
 	protected String name;
 	protected DataType dataType;
@@ -16,12 +16,12 @@ public abstract class FieldConfig implements Serializable
 	protected String enumName;
 	protected Object defaultValue;
 	
-	protected FieldConfig()
+	protected FieldSchema()
 	{
 		
 	}
 	
-	public FieldConfig(String name, DataType dataType, boolean nullable)
+	public FieldSchema(String name, DataType dataType, boolean nullable)
 	{
 		setName(name);
 		setDataType(dataType);
@@ -58,37 +58,37 @@ public abstract class FieldConfig implements Serializable
 		return defaultValue;
 	}
 	
-	public FieldConfig setName(String name)
+	public FieldSchema setName(String name)
 	{
 		this.name = name;
 		return this;
 	}
 	
-	public FieldConfig setDataType(DataType dataType)
+	public FieldSchema setDataType(DataType dataType)
 	{
 		this.dataType = dataType;
 		return this;
 	}
 	
-	public FieldConfig setNullable(boolean nullable)
+	public FieldSchema setNullable(boolean nullable)
 	{
 		this.nullable = nullable;
 		return this;
 	}
 	
-	public FieldConfig setScale(Integer scale)
+	public FieldSchema setScale(Integer scale)
 	{
 		this.scale = scale;
 		return this;
 	}
 	
-	public FieldConfig setEnumName(String enumName)
+	public FieldSchema setEnumName(String enumName)
 	{
 		this.enumName = enumName;
 		return this;
 	}
 	
-	public FieldConfig setDefaultValue(Object defaultValue)
+	public FieldSchema setDefaultValue(Object defaultValue)
 	{
 		this.defaultValue = defaultValue;
 		return this;

@@ -25,10 +25,6 @@ public @interface Property
 	boolean mysql() default true;
 	String mysqlName() default "";
 	
-	// ORIENT
-	boolean orient() default true;
-	String orientName() default "";
-	
 	// SERIAL
 	boolean serial() default true;
 	String serialName() default "";
@@ -36,20 +32,28 @@ public @interface Property
 	// JSON
 	boolean json() default true;
 	String jsonName() default "";
+	Class<?> jsonSerializer() default Void.class;
+	Class<?> jsonDeserializer() default Void.class;
 	
 	// XML
 	boolean xml() default true;
 	String xmlName() default "";
 	boolean attribute() default false;
 	String elementsName() default "";
+	Class<?> xmlSerializer() default Void.class;
+	Class<?> xmlDeserializer() default Void.class;
 	
 	// FORM
 	boolean form() default true;
 	String formName() default "";
+	Class<?> formSerializer() default Void.class;
+	Class<?> formDeserializer() default Void.class;
 	
 	// TABLE
 	boolean table() default true;
 	String tableName() default "";
+	Class<?> tableSerializer() default Void.class;
+	Class<?> tableDeserializer() default Void.class;
 	
 	// VALIDATION
 	boolean required() default false;

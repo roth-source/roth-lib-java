@@ -1,11 +1,11 @@
-package roth.lib.java.db.config;
+package roth.lib.java.db.schema;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.db.type.DataType;
 
 @Entity
 @SuppressWarnings("serial")
-public class FixedFieldConfig extends FieldConfig
+public class FixedFieldConfig extends FieldSchema
 {
 	protected int offset;
 	

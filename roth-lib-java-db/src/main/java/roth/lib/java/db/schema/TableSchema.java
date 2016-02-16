@@ -1,4 +1,4 @@
-package roth.lib.java.db.config;
+package roth.lib.java.db.schema;
 
 import java.io.Serializable;
 
@@ -8,13 +8,13 @@ import roth.lib.java.lang.Map;
 
 @Entity
 @SuppressWarnings("serial")
-public class TableConfig implements Serializable
+public class TableSchema implements Serializable
 {
 	@Property(name = "name")
 	protected String name;
 	
 	@Property(name = "idConfig")
-	protected IdConfig idConfig;
+	protected IdSchema idConfig;
 	
 	@Property(name = "fixedFieldConfigMap")
 	protected Map<String, FixedFieldConfig> fixedFieldConfigMap = new Map<String, FixedFieldConfig>();
@@ -22,12 +22,12 @@ public class TableConfig implements Serializable
 	@Property(name = "variableFieldConfigMap")
 	protected Map<String, VariableFieldConfig> variableFieldConfigMap = new Map<String, VariableFieldConfig>();
 	
-	protected TableConfig()
+	protected TableSchema()
 	{
 		
 	}
 	
-	public TableConfig(String name, IdConfig idConfig)
+	public TableSchema(String name, IdSchema idConfig)
 	{
 		this.name = name;
 		this.idConfig = idConfig;
@@ -38,18 +38,18 @@ public class TableConfig implements Serializable
 		return name;
 	}
 	
-	public IdConfig getIdConfig()
+	public IdSchema getIdConfig()
 	{
 		return idConfig;
 	}
 	
-	public TableConfig setName(String name)
+	public TableSchema setName(String name)
 	{
 		this.name = name;
 		return this;
 	}
 	
-	public TableConfig setIdConfig(IdConfig idConfig)
+	public TableSchema setIdConfig(IdSchema idConfig)
 	{
 		this.idConfig = idConfig;
 		return this;
@@ -60,13 +60,13 @@ public class TableConfig implements Serializable
 		return fixedFieldConfigMap.get(fieldName);
 	}
 	
-	public TableConfig putFixedFieldConfig(String fieldName, FixedFieldConfig fixedFieldConfig)
+	public TableSchema putFixedFieldConfig(String fieldName, FixedFieldConfig fixedFieldConfig)
 	{
 		fixedFieldConfigMap.put(fieldName, fixedFieldConfig);
 		return this;
 	}
 	
-	public TableConfig removeFixedFieldConfig(String fieldName)
+	public TableSchema removeFixedFieldConfig(String fieldName)
 	{
 		fixedFieldConfigMap.remove(fieldName);
 		return this;
@@ -77,13 +77,13 @@ public class TableConfig implements Serializable
 		return variableFieldConfigMap.get(fieldName);
 	}
 	
-	public TableConfig putVariableFieldConfig(String fieldName, VariableFieldConfig variableFieldConfig)
+	public TableSchema putVariableFieldConfig(String fieldName, VariableFieldConfig variableFieldConfig)
 	{
 		variableFieldConfigMap.put(fieldName, variableFieldConfig);
 		return this;
 	}
 	
-	public TableConfig removeVariableFieldConfig(String fieldName)
+	public TableSchema removeVariableFieldConfig(String fieldName)
 	{
 		variableFieldConfigMap.remove(fieldName);
 		return this;

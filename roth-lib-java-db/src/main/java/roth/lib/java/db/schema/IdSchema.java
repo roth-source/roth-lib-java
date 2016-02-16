@@ -1,4 +1,4 @@
-package roth.lib.java.db.config;
+package roth.lib.java.db.schema;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -8,26 +8,26 @@ import roth.lib.java.util.BaseUtil;
 
 @Entity
 @SuppressWarnings("serial")
-public class IdConfig implements Serializable
+public class IdSchema implements Serializable
 {
 	public static final int TABLE_LENGTH 	= 2;
 	public static final int SERVER_LENGTH 	= 2;
 	public static final int TIME_LENGTH 	= 8;
 	public static final int RANDOM_LENGTH 	= 8;
 	
-	@LengthConfig(min = 1, max = Integer.BYTES)
+	@Length(min = 1, max = Integer.BYTES)
 	protected int tableEncodedLength = TABLE_LENGTH;
 	
-	@LengthConfig(min = 1, max = Integer.BYTES)
+	@Length(min = 1, max = Integer.BYTES)
 	protected int serverEncodedLength = SERVER_LENGTH;
 	
-	@LengthConfig(min = 7, max = Long.BYTES)
+	@Length(min = 7, max = Long.BYTES)
 	protected int timeEncodedLength = TIME_LENGTH;
 	
-	@LengthConfig(min = 5, max = Long.BYTES)
+	@Length(min = 5, max = Long.BYTES)
 	protected int randomEncodedLength = RANDOM_LENGTH;
 	
-	public IdConfig()
+	public IdSchema()
 	{
 		
 	}
@@ -36,7 +36,7 @@ public class IdConfig implements Serializable
 	{
 		for(Field field : getClass().getDeclaredFields())
 		{
-			LengthConfig length = field.getDeclaredAnnotation(LengthConfig.class);
+			Length length = field.getDeclaredAnnotation(Length.class);
 			if(length != null)
 			{
 				try
@@ -44,7 +44,7 @@ public class IdConfig implements Serializable
 					int value = (int) field.get(this);
 					if(value < length.min() || length.max() < value)
 					{
-						throw new DbConfigException(value + " " + field.getName() + " is invalid");
+						throw new DbSchemaException(value + " " + field.getName() + " is invalid");
 					}
 				}
 				catch(IllegalAccessException e)
@@ -107,7 +107,7 @@ public class IdConfig implements Serializable
 	
 	public static void main(String[] args)
 	{
-		IdConfig config = new IdConfig();
+		IdSchema config = new IdSchema();
 		config.timeEncodedLength = 10;
 		config.validate();
 	}

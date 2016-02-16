@@ -20,7 +20,7 @@ public class CurrencyUtil
 	
 	public static void main(String[] args)
 	{
-		System.out.println(format(123456789));
+		System.out.println(format(-123456789));
 	}
 	
 }

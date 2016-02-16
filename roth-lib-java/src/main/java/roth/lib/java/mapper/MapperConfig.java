@@ -1,9 +1,9 @@
 package roth.lib.java.mapper;
 
-import roth.lib.java.lang.Map;
 import java.util.Map.Entry;
 
 import roth.lib.java.deserializer.Deserializer;
+import roth.lib.java.lang.Map;
 import roth.lib.java.serializer.Serializer;
 
 public class MapperConfig

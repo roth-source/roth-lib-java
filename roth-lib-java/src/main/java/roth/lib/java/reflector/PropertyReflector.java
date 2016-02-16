@@ -5,7 +5,10 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import roth.lib.java.annotation.Property;
+import roth.lib.java.deserializer.Deserializer;
+import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
+import roth.lib.java.serializer.Serializer;
 import roth.lib.java.util.AnnotationUtil;
 import roth.lib.java.util.ReflectionUtil;
 
@@ -69,15 +72,6 @@ public class PropertyReflector
 				}
 				break;
 			}
-			case ORIENT:
-			{
-				property = isOrient();
-				if(property)
-				{
-					property = isDb();
-				}
-				break;
-			}
 			case JSON:
 			{
 				property = isJson();
@@ -132,15 +126,6 @@ public class PropertyReflector
 				}
 				break;
 			}
-			case ORIENT:
-			{
-				name = getOrientName();
-				if(name == null)
-				{
-					name = getDbName();
-				}
-				break;
-			}
 			case JSON:
 			{
 				name = getJsonName();
@@ -183,6 +168,134 @@ public class PropertyReflector
 			name = getName();
 		}
 		return name;
+	}
+	
+	public Serializer<?> getPropertySerializer(Class<?> klass, MapperType mapperType, MapperReflector mapperReflector, MapperConfig mapperConfig)
+	{
+		Serializer<?> serializer = null;
+		try
+		{
+			switch(mapperType)
+			{
+				case JSON:
+				{
+					Class<?> serializerClass = property.jsonSerializer();
+					if(!Void.class.equals(serializerClass))
+					{
+						serializer = (Serializer<?>) serializerClass.newInstance();
+					}
+					break;
+				}
+				case XML:
+				{
+					Class<?> serializerClass = property.xmlSerializer();
+					if(!Void.class.equals(serializerClass))
+					{
+						serializer = (Serializer<?>) serializerClass.newInstance();
+					}
+					break;
+				}
+				case FORM:
+				{
+					Class<?> serializerClass = property.formSerializer();
+					if(!Void.class.equals(serializerClass))
+					{
+						serializer = (Serializer<?>) serializerClass.newInstance();
+					}
+					break;
+				}
+				case TABLE:
+				{
+					Class<?> serializerClass = property.tableSerializer();
+					if(!Void.class.equals(serializerClass))
+					{
+						serializer = (Serializer<?>) serializerClass.newInstance();
+					}
+					break;
+				}
+				case MYSQL:
+				{
+					break;
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		if(serializer == null)
+		{
+			serializer = mapperConfig.getSerializer(klass);
+			if(serializer == null)
+			{
+				serializer = mapperReflector.getSerializer(klass);
+			}
+		}
+		return serializer;
+	}
+	
+	public Deserializer<?> getPropertyDeserializer(Class<?> klass, MapperType mapperType, MapperReflector mapperReflector, MapperConfig mapperConfig)
+	{
+		Deserializer<?> deserializer = null;
+		try
+		{
+			switch(mapperType)
+			{
+				case JSON:
+				{
+					Class<?> deserializerClass = property.jsonDeserializer();
+					if(!Void.class.equals(deserializerClass))
+					{
+						deserializer = (Deserializer<?>) deserializerClass.newInstance();
+					}
+					break;
+				}
+				case XML:
+				{
+					Class<?> deserializerClass = property.xmlDeserializer();
+					if(!Void.class.equals(deserializerClass))
+					{
+						deserializer = (Deserializer<?>) deserializerClass.newInstance();
+					}
+					break;
+				}
+				case FORM:
+				{
+					Class<?> deserializerClass = property.formDeserializer();
+					if(!Void.class.equals(deserializerClass))
+					{
+						deserializer = (Deserializer<?>) deserializerClass.newInstance();
+					}
+					break;
+				}
+				case TABLE:
+				{
+					Class<?> deserializerClass = property.tableDeserializer();
+					if(!Void.class.equals(deserializerClass))
+					{
+						deserializer = (Deserializer<?>) deserializerClass.newInstance();
+					}
+					break;
+				}
+				case MYSQL:
+				{
+					break;
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		if(deserializer == null)
+		{
+			deserializer = mapperConfig.getDeserializer(klass);
+			if(deserializer == null)
+			{
+				deserializer = mapperReflector.getDeserializer(klass);
+			}
+		}
+		return deserializer;
 	}
 	
 	public String getName()
@@ -246,16 +359,6 @@ public class PropertyReflector
 	public String getMysqlName()
 	{
 		return AnnotationUtil.validate(property.mysqlName());
-	}
-	
-	public boolean isOrient()
-	{
-		return property.orient();
-	}
-	
-	public String getOrientName()
-	{
-		return AnnotationUtil.validate(property.orientName());
 	}
 	
 	public boolean isSerial()
