@@ -145,21 +145,21 @@ public class WebDependencies
 	
 	public static void main(String[] args) throws Exception
 	{
-		WebDependencies staticDependencies = new WebDependencies();
+		WebDependencies webDependencies = new WebDependencies();
 		Map<String, String> argMap = parseArgMap(args);
 		if(argMap.containsKey(PROJECT_DIR))
 		{
-			staticDependencies.setProjectDir(new File(argMap.get(PROJECT_DIR)));
+			webDependencies.setProjectDir(new File(argMap.get(PROJECT_DIR)));
 		}
 		if(argMap.containsKey(WEB_APP_DIR))
 		{
-			staticDependencies.setWebAppDir(new File(staticDependencies.getProjectDir(), argMap.get(WEB_APP_DIR)));
+			webDependencies.setWebAppDir(new File(webDependencies.getProjectDir(), argMap.get(WEB_APP_DIR)));
 		}
 		if(argMap.containsKey(ENV_FILE))
 		{
-			staticDependencies.setEnvFile(new File(staticDependencies.getWebAppDir(), argMap.get(ENV_FILE)));
+			webDependencies.setEnvFile(new File(webDependencies.getWebAppDir(), argMap.get(ENV_FILE)));
 		}
-		staticDependencies.download();
+		webDependencies.download();
 	}
 	
 	protected static Map<String, String> parseArgMap(String[] args)

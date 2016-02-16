@@ -401,41 +401,41 @@ public class WebConfig
 	
 	public static void main(String[] args) throws Exception
 	{
-		WebConfig staticConfig = new WebConfig();
+		WebConfig webConfig = new WebConfig();
 		Map<String, String> argMap = parseArgMap(args);
 		if(argMap.containsKey(PROJECT_DIR))
 		{
-			staticConfig.setProjectDir(new File(argMap.get(PROJECT_DIR)));
+			webConfig.setProjectDir(new File(argMap.get(PROJECT_DIR)));
 		}
 		if(argMap.containsKey(WEB_APP_DIR))
 		{
-			staticConfig.setWebAppDir(new File(staticConfig.getProjectDir(), argMap.get(WEB_APP_DIR)));
+			webConfig.setWebAppDir(new File(webConfig.getProjectDir(), argMap.get(WEB_APP_DIR)));
 		}
 		if(argMap.containsKey(TEXT_DIR))
 		{
-			staticConfig.setTextDir(new File(staticConfig.getWebAppDir(), argMap.get(TEXT_DIR)));
+			webConfig.setTextDir(new File(webConfig.getWebAppDir(), argMap.get(TEXT_DIR)));
 		}
 		if(argMap.containsKey(LAYOUT_DIR))
 		{
-			staticConfig.setLayoutDir(new File(staticConfig.getWebAppDir(), argMap.get(LAYOUT_DIR)));
+			webConfig.setLayoutDir(new File(webConfig.getWebAppDir(), argMap.get(LAYOUT_DIR)));
 		}
 		if(argMap.containsKey(PAGE_DIR))
 		{
-			staticConfig.setPageDir(new File(staticConfig.getWebAppDir(), argMap.get(PAGE_DIR)));
+			webConfig.setPageDir(new File(webConfig.getWebAppDir(), argMap.get(PAGE_DIR)));
 		}
 		if(argMap.containsKey(SERVICE_DIR))
 		{
-			staticConfig.setServiceDir(new File(staticConfig.getWebAppDir(), argMap.get(SERVICE_DIR)));
+			webConfig.setServiceDir(new File(webConfig.getWebAppDir(), argMap.get(SERVICE_DIR)));
 		}
 		if(argMap.containsKey(CONFIG_FILE))
 		{
-			staticConfig.setConfigFile(new File(staticConfig.getWebAppDir(), argMap.get(CONFIG_FILE)));
+			webConfig.setConfigFile(new File(webConfig.getWebAppDir(), argMap.get(CONFIG_FILE)));
 		}
 		if(argMap.containsKey(DEV_FILE))
 		{
-			staticConfig.setDevFile(new File(staticConfig.getWebAppDir(), argMap.get(DEV_FILE)));
+			webConfig.setDevFile(new File(webConfig.getWebAppDir(), argMap.get(DEV_FILE)));
 		}
-		staticConfig.sync();
+		webConfig.sync();
 	}
 	
 	protected static Map<String, String> parseArgMap(String[] args)

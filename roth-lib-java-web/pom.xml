@@ -14,6 +14,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>roth.lib.java</groupId>
+			<artifactId>roth-lib-java-template</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.eclipse.jetty.aggregate</groupId>
 			<artifactId>jetty-all</artifactId>
 			<version>9.3.2.v20150730</version>

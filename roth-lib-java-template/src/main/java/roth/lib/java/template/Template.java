@@ -15,6 +15,8 @@ public class Template
 	protected static final String VERSION			= "$_version";
 	protected static final String CONFIG			= "$_config";
 	protected static final String TEMPLATE			= "$_template";
+	protected static final String PARSE				= "parse";
+	protected static final String EVAL				= "eval";
 	protected static final String RENDER			= "render";
 	protected static final String SET_VERSION		= String.format("var %s = roth.lib.js.template.version;", VERSION);
 	protected static final String SET_TEMPLATE		= String.format("var %s = new roth.lib.js.template.Template(" + CONFIG + ");", TEMPLATE);
@@ -51,12 +53,38 @@ public class Template
 		}
 	}
 	
-	public String render(String html, Object data)
+	public String parse(String source)
 	{
 		try
 		{
-			Object renderedHtml = ((Invocable) engine).invokeMethod(template, RENDER, html, data);
-			return renderedHtml != null ? renderedHtml.toString() : "";
+			Object parsedSource = ((Invocable) engine).invokeMethod(template, PARSE, source);
+			return parsedSource != null ? parsedSource.toString() : "";
+		}
+		catch(NoSuchMethodException | ScriptException e)
+		{
+			throw new TemplateException(e);
+		}
+	}
+	
+	public String eval(String parsedSource, Object data)
+	{
+		try
+		{
+			Object rendered = ((Invocable) engine).invokeMethod(template, EVAL, parsedSource, data);
+			return rendered != null ? rendered.toString() : "";
+		}
+		catch(NoSuchMethodException | ScriptException e)
+		{
+			throw new TemplateException(e);
+		}
+	}
+	
+	public String render(String source, Object data)
+	{
+		try
+		{
+			Object rendered = ((Invocable) engine).invokeMethod(template, RENDER, source, data);
+			return rendered != null ? rendered.toString() : "";
 		}
 		catch(NoSuchMethodException | ScriptException e)
 		{
