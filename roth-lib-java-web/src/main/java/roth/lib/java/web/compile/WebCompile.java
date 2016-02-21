@@ -15,29 +15,32 @@ import roth.lib.java.util.IoUtil;
 
 public class WebCompile implements Characters
 {
-	protected static Pattern LANG_PATTERN			= Pattern.compile("^\\S+_([A-Za-z]{2})\\.json");
+	protected static Pattern LANG_PATTERN			= Pattern.compile("^(?:\\S+_)?([A-Za-z]{2})\\.json");
 	
 	protected static String USER_DIR_DEFAULT		= "user.dir";
-	protected static String WEB_APP_DEFAULT			= "src/main/webapp/";
-	protected static String DEV_DEFAULT				= "dev/";
-	protected static String SCRIPT_DEFAULT			= "script/";
-	protected static String TEXT_DEFAULT			= "text/";
-	protected static String LAYOUT_DEFAULT			= "view/layout/";
-	protected static String PAGE_DEFAULT			= "view/page/";
-	protected static String COMPONENT_DEFAULT		= "view/component/";
+	protected static String WEB_APP_DEFAULT			= "src/main/webapp";
+	protected static String DEV_DEFAULT				= "dev";
+	protected static String APP_DEFAULT				= "app";
+	protected static String TARGET_DEFAULT			= "app";
+	protected static String SCRIPT_DEFAULT			= "script";
+	protected static String TEXT_DEFAULT			= "text";
+	protected static String LAYOUT_DEFAULT			= "layout";
+	protected static String PAGE_DEFAULT			= "page";
+	protected static String COMPONENT_DEFAULT		= "component";
 	protected static String SERVICE_DEFAULT			= "service";
 	protected static String CONFIG_DEFAULT			= "config";
 	protected static String WEB_DEFAULT				= "web";
 	
 	protected static String PROJECT_DIR				= "projectDir";
 	protected static String WEB_APP_DIR				= "webAppDir";
+	protected static String DEV_DIR					= "devDir";
+	protected static String APP_DIR					= "appDir";
+	protected static String TARGET_DIR				= "targetDir";
 	protected static String SCRIPT_DIR				= "scriptDir";
 	protected static String TEXT_DIR				= "textDir";
 	protected static String LAYOUT_DIR				= "layoutDir";
 	protected static String PAGE_DIR				= "pageDir";
 	protected static String COMPONENT_DIR			= "componentDir";
-	protected static String SERVICE					= "service";
-	protected static String CONFIG					= "config";
 	protected static String WEB						= "web";
 	protected static String REGISTER				= "register";
 	protected static String TEXT					= "text";
@@ -50,13 +53,13 @@ public class WebCompile implements Characters
 	protected File projectDir;
 	protected File webAppDir;
 	protected File devDir;
+	protected File appDir;
+	protected File targetDir;
 	protected String scriptDir;
 	protected String textDir;
 	protected String layoutDir;
 	protected String pageDir;
 	protected String componentDir;
-	protected String service;
-	protected String config;
 	protected String web;
 	
 	public WebCompile()
@@ -69,13 +72,13 @@ public class WebCompile implements Characters
 		projectDir = new File(System.getProperty(USER_DIR_DEFAULT));
 		webAppDir = new File(projectDir, WEB_APP_DEFAULT);
 		devDir = new File(webAppDir, DEV_DEFAULT);
+		appDir = new File(devDir, APP_DEFAULT);
+		targetDir = new File(webAppDir, TARGET_DEFAULT);
 		scriptDir = SCRIPT_DEFAULT;
 		textDir = TEXT_DEFAULT;
 		layoutDir = LAYOUT_DEFAULT;
 		pageDir = PAGE_DEFAULT;
 		componentDir = COMPONENT_DEFAULT;
-		service = SERVICE_DEFAULT;
-		config = CONFIG_DEFAULT;
 		web = WEB_DEFAULT;
 	}
 	
@@ -94,39 +97,39 @@ public class WebCompile implements Characters
 		return devDir;
 	}
 	
-	public File getScriptDir(File appDir)
+	public File getAppDir()
 	{
-		return new File(appDir, scriptDir);
+		return appDir;
 	}
 	
-	public File getTextDir(File appDir)
+	public File getTargetDir()
 	{
-		return new File(appDir, textDir);
+		return targetDir;
 	}
 	
-	public File getLayoutDir(File appDir)
+	public File getScriptDir(File moduleDir)
 	{
-		return new File(appDir, layoutDir);
+		return new File(moduleDir, scriptDir);
 	}
 	
-	public File getPageDir(File appDir)
+	public File getTextDir(File moduleDir)
 	{
-		return new File(appDir, pageDir);
+		return new File(moduleDir, textDir);
 	}
 	
-	public File getComponentDir(File appDir)
+	public File getLayoutDir(File moduleDir)
 	{
-		return new File(appDir, componentDir);
+		return new File(moduleDir, layoutDir);
 	}
 	
-	public String getService()
+	public File getPageDir(File moduleDir)
 	{
-		return service;
+		return new File(moduleDir, pageDir);
 	}
 	
-	public String getConfig()
+	public File getComponentDir(File moduleDir)
 	{
-		return config;
+		return new File(moduleDir, componentDir);
 	}
 	
 	public String getWeb()
@@ -147,6 +150,16 @@ public class WebCompile implements Characters
 	public void setDevDir(File devDir)
 	{
 		this.devDir = devDir;
+	}
+	
+	public void setAppDir(File appDir)
+	{
+		this.appDir = appDir;
+	}
+	
+	public void setTargetDir(File targetDir)
+	{
+		this.targetDir = targetDir;
 	}
 	
 	public void setScriptDir(String scriptDir)
@@ -174,16 +187,6 @@ public class WebCompile implements Characters
 		this.componentDir = componentDir;
 	}
 	
-	public void setService(String service)
-	{
-		this.service = service;
-	}
-	
-	public void setConfig(String config)
-	{
-		this.config = config;
-	}
-	
 	public void setWeb(String web)
 	{
 		this.web = web;
@@ -196,50 +199,79 @@ public class WebCompile implements Characters
 	
 	public void compile() throws Exception
 	{
-		for(File dir : devDir.listFiles())
+		for(File appDir : this.appDir.listFiles())
 		{
-			if(dir.isDirectory() && !dir.getName().equals(service) && !dir.getName().equals(config))
+			if(appDir.isDirectory())
 			{
-				compileApp(dir);
+				compileApp(appDir);
 			}
 		}
 	}
 	
-	public void compileApp(File appDir) throws Exception
+	protected void compileApp(File appDir) throws Exception
 	{
-		String app = appDir.getName() + ".js";
-		System.out.println("Compiling " + app);
-		System.out.println();
-		try(PrintWriter writer = new PrintWriter(new File(webAppDir, app)))
+		String app = appDir.getName();
+		System.out.println("--------------------------------------------------------------------");
+		System.out.println("Compiling app " + app);
+		System.out.println("--------------------------------------------------------------------");
+		System.out.println("");
+		for(File moduleDir : appDir.listFiles())
 		{
-			File scriptDir = getScriptDir(appDir);
-			System.out.println("Scripts - " + relative(webAppDir, scriptDir));
-			compileScripts(writer, scriptDir, scriptDir);
-			System.out.println();
-			
-			File textDir = getTextDir(appDir);
-			System.out.println("Texts - " + relative(webAppDir, textDir));
-			compileTexts(writer, textDir, textDir);
-			System.out.println();
-			
-			File layoutDir = getLayoutDir(appDir);
-			System.out.println("Layouts - " + relative(webAppDir, layoutDir));
-			compileViews(writer, layoutDir, layoutDir, LAYOUT);
-			System.out.println();
-			
-			File pageDir = getPageDir(appDir);
-			System.out.println("Pages - " + relative(webAppDir, pageDir));
-			compileViews(writer, pageDir, pageDir, PAGE);
-			System.out.println();
-			
-			File componentDir = getComponentDir(appDir);
-			System.out.println("Components - " + relative(webAppDir, componentDir));
-			compileViews(writer, componentDir, componentDir, COMPONENT);
-			System.out.println();
+			if(moduleDir.isDirectory())
+			{
+				File targetDir = new File(this.targetDir, app);
+				targetDir.mkdirs();
+				compileModule(moduleDir, targetDir);
+			}
 		}
+		System.out.println("");
 	}
 	
-	public void compileScripts(PrintWriter writer, File dir, File baseDir) throws Exception
+	protected void compileModule(File moduleDir, File targetDir) throws Exception
+	{
+		String module = moduleDir.getName();
+		System.out.println("Compiling module " + module);
+		try(PrintWriter writer = new PrintWriter(new File(targetDir, module + ".js")))
+		{
+			File scriptDir = getScriptDir(moduleDir);
+			if(scriptDir.exists() && scriptDir.list().length > 0)
+			{
+				System.out.println("Scripts");
+				compileScripts(writer, scriptDir, scriptDir);
+			}
+			
+			File textDir = getTextDir(moduleDir);
+			if(textDir.exists() && textDir.list().length > 0)
+			{
+				System.out.println("Texts");
+				compileTexts(writer, textDir, textDir, module);
+			}
+			
+			File layoutDir = getLayoutDir(moduleDir);
+			if(layoutDir.exists() && layoutDir.list().length > 0)
+			{
+				System.out.println("Layouts");
+				compileViews(writer, layoutDir, layoutDir, module, LAYOUT);
+			}
+			
+			File pageDir = getPageDir(moduleDir);
+			if(pageDir.exists() && pageDir.list().length > 0)
+			{
+				System.out.println("Pages");
+				compileViews(writer, pageDir, pageDir, module, PAGE);
+			}
+			
+			File componentDir = getComponentDir(moduleDir);
+			if(componentDir.exists() && componentDir.list().length > 0)
+			{
+				System.out.println("Components");
+				compileViews(writer, componentDir, componentDir, module, COMPONENT);
+			}
+		}
+		System.out.println();
+	}
+	
+	protected void compileScripts(PrintWriter writer, File dir, File baseDir) throws Exception
 	{
 		for(File file : dir.listFiles())
 		{
@@ -252,19 +284,21 @@ public class WebCompile implements Characters
 				try(FileReader reader = new FileReader(file))
 				{
 					System.out.println("- " + relative(baseDir, file));
+					writer.println();
 					IoUtil.copy(reader, writer);
+					writer.println();
 				}
 			}
 		}
 	}
 	
-	public void compileTexts(PrintWriter writer, File dir, File baseDir) throws Exception
+	protected void compileTexts(PrintWriter writer, File dir, File baseDir, String module) throws Exception
 	{
 		for(File file : dir.listFiles())
 		{
 			if(file.isDirectory())
 			{
-				compileTexts(writer, file, baseDir);
+				compileTexts(writer, file, baseDir, module);
 			}
 			else if(file.isFile() && !file.isHidden() && file.getName().endsWith(".json"))
 			{
@@ -273,7 +307,7 @@ public class WebCompile implements Characters
 				{
 					System.out.println("- " + relative(baseDir, file));
 					String lang = matcher.group(1);
-					String text = FileUtil.toString(file).replaceAll("[\\r\\n\\t]", "").replaceAll("\\\\\\\"", "\\\\\\\\\"").replaceAll("\"", "\\\\\"");
+					String text = FileUtil.toString(file).replaceAll("[\\r\\n\\t]", "");
 					writer.println();
 					writer.print(web);
 					writer.print(DOT);
@@ -281,13 +315,13 @@ public class WebCompile implements Characters
 					writer.print(DOT);
 					writer.print(TEXT);
 					writer.print(DOT);
+					writer.print(module);
+					writer.print(DOT);
 					writer.print(lang);
 					writer.print(SPACE);
 					writer.print(EQUAL);
 					writer.print(SPACE);
-					writer.print(QUOTE);
 					writer.print(text);
-					writer.print(QUOTE);
 					writer.print(SEMI_COLON);
 					writer.println();
 				}
@@ -295,13 +329,13 @@ public class WebCompile implements Characters
 		}
 	}
 	
-	public void compileViews(PrintWriter writer, File dir, File baseDir, String type) throws Exception
+	protected void compileViews(PrintWriter writer, File dir, File baseDir, String module, String type) throws Exception
 	{
 		for(File file : dir.listFiles())
 		{
 			if(file.isDirectory())
 			{
-				compileViews(writer, file, baseDir, type);
+				compileViews(writer, file, baseDir, module, type);
 			}
 			else if(file.isFile() && !file.isHidden() && file.getName().endsWith(".js"))
 			{
@@ -312,16 +346,20 @@ public class WebCompile implements Characters
 					System.out.println("- " + relative);
 					try(FileReader reader = new FileReader(file))
 					{
+						writer.println();
 						IoUtil.copy(reader, writer);
+						writer.println();
 					}
 					String name = relative.replaceFirst("\\.js$", "").replaceAll("[^a-zA-Z_0-9]", "_");
-					String source = template.parse(FileUtil.toString(htmlFile)).replaceAll("[\\r\\n\\t]", "").replaceAll("\\\\\\\"", "\\\\\\\\\"").replaceAll("\"", "\\\\\"");
+					String source = template.parse(FileUtil.toString(htmlFile)).replaceAll("[\\r\\n\\t]", "").replaceAll("\\\\n", "\\\\\\\\n").replaceAll("\\\\\\\"", "\\\\\\\\\"").replaceAll("\"", "\\\\\"");
 					writer.println();
 					writer.print(web);
 					writer.print(DOT);
 					writer.print(REGISTER);
 					writer.print(DOT);
 					writer.print(type);
+					writer.print(DOT);
+					writer.print(module);
 					writer.print(DOT);
 					writer.print(name);
 					writer.print(DOT);
@@ -351,6 +389,18 @@ public class WebCompile implements Characters
 		{
 			webCompile.setWebAppDir(new File(webCompile.getProjectDir(), argMap.get(WEB_APP_DIR)));
 		}
+		if(argMap.containsKey(DEV_DIR))
+		{
+			webCompile.setDevDir(new File(webCompile.getWebAppDir(), argMap.get(DEV_DIR)));
+		}
+		if(argMap.containsKey(APP_DIR))
+		{
+			webCompile.setAppDir(new File(webCompile.getDevDir(), argMap.get(APP_DIR)));
+		}
+		if(argMap.containsKey(TARGET_DIR))
+		{
+			webCompile.setTargetDir(new File(webCompile.getWebAppDir(), argMap.get(TARGET_DIR)));
+		}
 		if(argMap.containsKey(SCRIPT_DIR))
 		{
 			webCompile.setScriptDir(argMap.get(SCRIPT_DIR));
@@ -370,14 +420,6 @@ public class WebCompile implements Characters
 		if(argMap.containsKey(COMPONENT_DIR))
 		{
 			webCompile.setComponentDir(argMap.get(COMPONENT_DIR));
-		}
-		if(argMap.containsKey(SERVICE))
-		{
-			webCompile.setService(argMap.get(SERVICE));
-		}
-		if(argMap.containsKey(CONFIG))
-		{
-			webCompile.setConfig(argMap.get(CONFIG));
 		}
 		if(argMap.containsKey(WEB))
 		{

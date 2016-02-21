@@ -6,8 +6,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
-import roth.lib.java.lang.Map;
-import roth.lib.java.lang.List;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -15,21 +13,23 @@ import javax.script.ScriptEngineManager;
 
 import roth.lib.java.Generic;
 import roth.lib.java.json.JsonMapper;
+import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
 import roth.lib.java.util.FileUtil;
 import roth.lib.java.util.IoUtil;
 import roth.lib.java.util.ResourceUtil;
 
 public class WebDependencies
 {
-	protected static String ROTH_LIB_JS_ENV		= "roth-lib-js-env.js";
-	protected static String GET_DEPENDENCIES	= "getDependencies";
-	protected static String USER_DIR_DEFAULT	= "user.dir";
-	protected static String WEB_APP_DEFAULT		= "src/main/webapp/";
-	protected static String ENV_DEFAULT			= "env.js";
-	protected static String PROJECT_DIR			= "projectDir";
-	protected static String WEB_APP_DIR			= "webAppDir";
-	protected static String ENV_FILE			= "envFile";
-	protected static String ENGINE				= "nashorn";
+	protected static String ROTH_LIB_JS_ENV				= "roth-lib-js-env.js";
+	protected static String USER_DIR_DEFAULT			= "user.dir";
+	protected static String WEB_APP_DEFAULT				= "src/main/webapp/";
+	protected static String ENV_DEFAULT					= "script/env.js";
+	protected static String PROJECT_DIR					= "projectDir";
+	protected static String WEB_APP_DIR					= "webAppDir";
+	protected static String ENV_FILE					= "envFile";
+	protected static String ENGINE						= "nashorn";
+	protected static String GET_DEPENDENCIES_STRING 	= "getDependenciesString";
 	
 	protected File projectDir;
 	protected File webAppDir;
@@ -87,7 +87,7 @@ public class WebDependencies
 			mapper.setPrettyPrint(true);
 			engine.eval(ResourceUtil.toString(ROTH_LIB_JS_ENV));
 			engine.eval(FileUtil.toString(envFile));
-			String json = (String) ((Invocable) engine).invokeFunction(GET_DEPENDENCIES);
+			String json = (String) ((Invocable) engine).invokeFunction(GET_DEPENDENCIES_STRING);
 			List<Dependency> dependencies = mapper.deserialize(json, new Generic<List<Dependency>>(){});
 			download(dependencies);
 		}
