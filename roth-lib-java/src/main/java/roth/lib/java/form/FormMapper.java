@@ -1,8 +1,5 @@
 package roth.lib.java.form;
 
-import static roth.lib.java.util.ReflectionUtil.getFieldValue;
-import static roth.lib.java.util.ReflectionUtil.getTypeClass;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -21,6 +18,7 @@ import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.serializer.Serializer;
 import roth.lib.java.util.IoUtil;
+import roth.lib.java.util.ReflectionUtil;
 import roth.lib.java.util.UrlUtil;
 
 public class FormMapper extends Mapper
@@ -69,8 +67,8 @@ public class FormMapper extends Mapper
 						String propertyName = propertyReflector.getPropertyName();
 						if(propertyName != null)
 						{
-							Object fieldValue = getFieldValue(propertyReflector.getField(), value);
-							Serializer<?> serializer = getSerializer(propertyClass);
+							Object fieldValue = ReflectionUtil.getFieldValue(propertyReflector.getField(), value);
+							Serializer<?> serializer = getSerializer(propertyClass, propertyReflector);
 							if(serializer != null)
 							{
 								String serializedValue = null;
@@ -127,11 +125,11 @@ public class FormMapper extends Mapper
 					String propertyName = propertyReflector.getPropertyName(getMapperType());
 					if(propertyName != null)
 					{
-						Serializer<?> serializer = getSerializer(propertyClass);
+						Serializer<?> serializer = getSerializer(propertyClass, propertyReflector);
 						if(serializer != null)
 						{
 							String serializedValue = null;
-							Object fieldValue = getFieldValue(propertyReflector.getField(), value);
+							Object fieldValue = ReflectionUtil.getFieldValue(propertyReflector.getField(), value);
 							if(fieldValue != null)
 							{
 								String timeFormat = getTimeFormat(propertyReflector);
@@ -224,7 +222,7 @@ public class FormMapper extends Mapper
 		try
 		{
 			EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
-			Class<T> klass = getTypeClass(type);
+			Class<T> klass = ReflectionUtil.getTypeClass(type);
 			Constructor<T> constructor = klass.getDeclaredConstructor();
 			constructor.setAccessible(true);
 			entity = constructor.newInstance();
@@ -274,11 +272,11 @@ public class FormMapper extends Mapper
 	{
 		if(propertyReflector != null)
 		{
-			Deserializer<?> deserializer = getDeserializer(propertyReflector.getFieldClass());
+			Deserializer<?> deserializer = getDeserializer(propertyReflector.getFieldClass(), propertyReflector);
 			if(deserializer != null)
 			{
 				String timeFormat = getTimeFormat(propertyReflector);
-				propertyReflector.getField().set(model, deserializer.deserialize(value, timeFormat, propertyReflector.getFieldClass()));
+				ReflectionUtil.setFieldValue(propertyReflector.getField(), model, deserializer.deserialize(value, timeFormat, propertyReflector.getFieldClass()));
 			}
 		}
 	}
@@ -343,11 +341,11 @@ public class FormMapper extends Mapper
 				String propertyName = propertyReflector.getPropertyName(getMapperType());
 				if(propertyName != null)
 				{
-					Serializer<?> serializer = getSerializer(propertyClass);
+					Serializer<?> serializer = getSerializer(propertyClass, propertyReflector);
 					if(serializer != null)
 					{
 						String serializedValue = null;
-						Object fieldValue = getFieldValue(propertyReflector.getField(), value);
+						Object fieldValue = ReflectionUtil.getFieldValue(propertyReflector.getField(), value);
 						if(fieldValue != null)
 						{
 							String timeFormat = getTimeFormat(propertyReflector);

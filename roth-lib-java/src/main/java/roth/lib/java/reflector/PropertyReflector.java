@@ -170,7 +170,12 @@ public class PropertyReflector
 		return name;
 	}
 	
-	public Serializer<?> getSerializer(Class<?> klass, MapperType mapperType, MapperReflector mapperReflector, MapperConfig mapperConfig)
+	public Serializer<?> getSerializer(MapperType mapperType, MapperReflector mapperReflector, MapperConfig mapperConfig)
+	{
+		return getSerializer(mapperType, mapperReflector, mapperConfig, getFieldClass());
+	}
+	
+	public Serializer<?> getSerializer(MapperType mapperType, MapperReflector mapperReflector, MapperConfig mapperConfig, Class<?> klass)
 	{
 		Serializer<?> serializer = null;
 		try
@@ -234,7 +239,12 @@ public class PropertyReflector
 		return serializer;
 	}
 	
-	public Deserializer<?> getDeserializer(Class<?> klass, MapperType mapperType, MapperReflector mapperReflector, MapperConfig mapperConfig)
+	public Deserializer<?> getDeserializer(MapperType mapperType, MapperReflector mapperReflector, MapperConfig mapperConfig)
+	{
+		return getDeserializer(mapperType, mapperReflector, mapperConfig, getFieldClass());
+	}
+	
+	public Deserializer<?> getDeserializer(MapperType mapperType, MapperReflector mapperReflector, MapperConfig mapperConfig, Class<?> klass)
 	{
 		Deserializer<?> deserializer = null;
 		try

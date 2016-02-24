@@ -1,0 +1,350 @@
+package roth.lib.java.table;
+
+import java.io.Reader;
+import java.io.Writer;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
+import java.util.Collection;
+
+import roth.lib.java.deserializer.Deserializer;
+import roth.lib.java.json.JsonException;
+import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
+import roth.lib.java.mapper.Mapper;
+import roth.lib.java.mapper.MapperConfig;
+import roth.lib.java.mapper.MapperType;
+import roth.lib.java.reflector.EntityReflector;
+import roth.lib.java.reflector.MapperReflector;
+import roth.lib.java.reflector.PropertyReflector;
+import roth.lib.java.serializer.Serializer;
+import roth.lib.java.util.ReflectionUtil;
+
+public class TableMapper extends Mapper
+{
+	
+	public TableMapper()
+	{
+		this(MapperReflector.get());
+	}
+	
+	public TableMapper(MapperConfig mapperConfig)
+	{
+		this(MapperReflector.get(), mapperConfig);
+	}
+	
+	public TableMapper(MapperReflector mapperReflector)
+	{
+		this(mapperReflector, MapperConfig.get());
+	}
+	
+	public TableMapper(MapperReflector mapperReflector, MapperConfig mapperConfig)
+	{
+		super(MapperType.TABLE, mapperReflector, mapperConfig);
+	}
+	
+	@Override
+	public void serialize(java.util.Map<String, ?> map, Writer writer)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public void serialize(Object value, Writer writer)
+	{
+		if(value == null) throw new IllegalArgumentException("Value cannot be null");
+		try
+		{
+			if(ReflectionUtil.isArray(value.getClass()) || ReflectionUtil.isCollection(value.getClass()))
+			{
+				List<?> values = ReflectionUtil.asCollection(value);
+				if(!values.isEmpty())
+				{
+					EntityReflector entityReflector = getMapperReflector().getEntityReflector(values.getFirst().getClass());
+					writeHeader(writer, entityReflector);
+					writeArray(writer, values, entityReflector);
+				}
+				else
+				{
+					throw new TableException("Value array is empty");
+				}
+			}
+			else
+			{
+				EntityReflector entityReflector = getMapperReflector().getEntityReflector(value.getClass());
+				if(entityReflector != null)
+				{
+					writeHeader(writer, entityReflector);
+					writeEntity(writer, value, entityReflector);
+				}
+				else
+				{
+					throw new TableException("Value is not an entity");
+				}
+			}
+			writer.flush();
+		}
+		catch(Exception e)
+		{
+			throw new JsonException(e);
+		}
+	}
+	
+	protected void writeHeader(Writer writer, EntityReflector entityReflector) throws Exception
+	{
+		if(getMapperConfig().isSerializeHeader())
+		{
+			Character seperator = NULL;
+			for(PropertyReflector propertyReflector : entityReflector.getPropertyReflectors(getMapperType()))
+			{
+				writer.write(seperator);
+				writer.write(propertyReflector.getPropertyName(getMapperType()));
+				seperator = getMapperConfig().getDelimiter();
+			}
+			writer.write(CARRIAGE_RETURN);
+			writer.write(NEW_LINE);
+		}
+	}
+	
+	protected void writeArray(Writer writer, List<?> values, EntityReflector entityReflector) throws Exception
+	{
+		for(Object value : values)
+		{
+			writeEntity(writer, value, entityReflector);
+		}
+	}
+	
+	protected void writeEntity(Writer writer, Object value, EntityReflector entityReflector) throws Exception
+	{
+		Character seperator = NULL;
+		for(PropertyReflector propertyReflector : entityReflector.getPropertyReflectors(getMapperType()))
+		{
+			writer.write(seperator);
+			writeField(writer, ReflectionUtil.getFieldValue(propertyReflector.getField(), value), propertyReflector);
+			seperator = getMapperConfig().getDelimiter();
+		}
+		writer.write(CARRIAGE_RETURN);
+		writer.write(NEW_LINE);
+	}
+	
+	protected void writeField(Writer writer, Object value, PropertyReflector propertyReflector) throws Exception
+	{
+		String serializedValue = null;
+		if(value != null)
+		{
+			Serializer<?> serializer = propertyReflector.getSerializer(getMapperType(), getMapperReflector(), getMapperConfig());
+			if(serializer != null)
+			{
+				serializedValue = serializer.serialize(value, propertyReflector.getTimeFormat());
+			}
+		}
+		if(serializedValue != null)
+		{
+			if(isEscaped(serializedValue))
+			{
+				writer.write(getMapperConfig().getQualifier());
+				writer.write(escape(serializedValue));
+				writer.write(getMapperConfig().getQualifier());
+			}
+			else
+			{
+				writer.write(serializedValue);
+			}
+		}
+		else if(getMapperConfig().isSerializeNulls())
+		{
+			//writer.write("null");
+		}
+	}
+	
+	protected boolean isEscaped(String value)
+	{
+		boolean escaped = false;
+		List<Character> escapeCharacters = new List<Character>(getMapperConfig().getDelimiter(), getMapperConfig().getQualifier(), CARRIAGE_RETURN, NEW_LINE);
+		for(Character escapeCharacter : escapeCharacters)
+		{
+			if(value.contains(String.valueOf(escapeCharacter)))
+			{
+				escaped = true;
+				break;
+			}
+		}
+		return escaped;
+	}
+	
+	protected String escape(String value)
+	{
+		String qualifier = String.valueOf(getMapperConfig().getQualifier());
+		return value.replace(qualifier, qualifier + qualifier);
+	}
+	
+	@Override
+	public Map<String, Object> deserialize(Reader reader)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public <T> T deserialize(Reader reader, Type type)
+	{
+		T model = null;
+		try
+		{
+			if(getMapperConfig().isSerializeHeader())
+			{
+				readUntil(reader, NEW_LINE);
+			}
+			if(ReflectionUtil.isArray(type) || ReflectionUtil.isCollection(type))
+			{
+				model = readArray(reader, type);
+			}
+			else
+			{
+				model = readEntity(reader, type);
+			}
+		}
+		catch(Exception e)
+		{
+			throw new JsonException(e);
+		}
+		return model;
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected <T, E> T readArray(Reader reader, Type type) throws Exception
+	{
+		if(ReflectionUtil.isCollection(type))
+		{
+			return readCollection(reader, type);
+		}
+		else if(ReflectionUtil.isArray(type))
+		{
+			Type elementType = ReflectionUtil.getElementType(type);
+			List<E> collection = readCollection(reader, type);
+			E[] array = (E[]) Array.newInstance(ReflectionUtil.getTypeClass(elementType), collection.size());
+			int i = 0;
+			for(E element : collection)
+			{
+				array[i++] = element;
+			}
+			return (T) array;
+		}
+		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected <T, E> T readCollection(Reader reader, Type type) throws Exception
+	{
+		Collection<E> collection = null;
+		Class<T> klass = ReflectionUtil.getTypeClass(type);
+		Type elementType = ReflectionUtil.getElementType(type);
+		//Class<E> elementClass = ReflectionUtil.getTypeClass(elementType);
+		if(klass.isAssignableFrom(List.class) || ReflectionUtil.isArray(klass))
+		{
+			collection = new List<E>();
+		}
+		else
+		{
+			Constructor<T> constructor = klass.getDeclaredConstructor();
+			constructor.setAccessible(true);
+			collection = (Collection<E>) constructor.newInstance();
+		}
+		E entity = null;
+		while((entity = readEntity(reader, elementType)) != null)
+		{
+			collection.add(entity);
+		}
+		return (T) collection;
+	}
+	
+	protected <T> T readEntity(Reader reader, Type type) throws Exception
+	{
+		EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
+		List<PropertyReflector> propertyReflectors = entityReflector.getPropertyReflectors(getMapperType());
+		Class<T> klass = ReflectionUtil.getTypeClass(type);
+		Constructor<T> constructor = klass.getDeclaredConstructor();
+		constructor.setAccessible(true);
+		T model = null;
+		char delimiter = getMapperConfig().getDelimiter();
+		char qualifier = getMapperConfig().getQualifier();
+		int i = 0;
+		int b;
+		char c;
+		StringBuilder builder = new StringBuilder();
+		read: while((b = reader.read()) > -1)
+		{
+			c = (char) b;
+			switch(c)
+			{
+				case CARRIAGE_RETURN:
+				{
+					break;
+				}
+				default:
+				{
+					if(delimiter == c || NEW_LINE == c)
+					{
+						PropertyReflector propertyReflector = propertyReflectors.get(i++);
+						Deserializer<?> deserializer = propertyReflector.getDeserializer(getMapperType(), getMapperReflector(), getMapperConfig());
+						if(deserializer != null)
+						{
+							String value = builder.toString();
+							if(!value.isEmpty())
+							{
+								model = model != null ? model : constructor.newInstance();
+								Object deserializedValue = deserializer.deserialize(value, propertyReflector.getTimeFormat(), propertyReflector.getFieldClass());
+								ReflectionUtil.setFieldValue(propertyReflector.getField(), model, deserializedValue);
+							}
+						}
+						builder.setLength(0);
+						if(NEW_LINE == c)
+						{
+							break read;
+						}
+					}
+					else if(qualifier == c)
+					{
+						builder.append(readEscaped(reader, qualifier));
+					}
+					else
+					{
+						builder.append(c);
+					}
+					break;
+				}
+			}
+		}
+		return model;
+	}
+	
+	protected String readEscaped(Reader reader, char qualifier) throws Exception
+	{
+		StringBuilder builder = new StringBuilder();
+		int b;
+		char c;
+		while((b = reader.read()) > -1)
+		{
+			c = (char) b;
+			if(qualifier == c)
+			{
+				reader.mark(1);
+				b = reader.read();
+				c = (char) b;
+				if(qualifier != c)
+				{
+					reader.reset();
+					break;
+				}
+			}
+			builder.append(c);
+		}
+		return builder.toString();
+	}
+	
+	@Override
+	public String prettyPrint(Reader reader)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+}

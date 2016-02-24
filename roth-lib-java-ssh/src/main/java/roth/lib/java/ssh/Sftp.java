@@ -3,14 +3,18 @@ package roth.lib.java.ssh;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import roth.lib.java.lang.List;
+import java.io.OutputStream;
 import java.util.Vector;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
+
+import roth.lib.java.lang.List;
+import roth.lib.java.util.IoUtil;
 
 public class Sftp implements AutoCloseable
 {
@@ -40,6 +44,11 @@ public class Sftp implements AutoCloseable
 			throw new SshException(e);
 		}
 		return channelSftp;
+	}
+	
+	public List<String> ls()
+	{
+		return ls("");
 	}
 	
 	public List<String> ls(String path)
@@ -102,6 +111,67 @@ public class Sftp implements AutoCloseable
 			channelSftp.put(input, dest);
 		}
 		catch(SftpException e)
+		{
+			throw new SshException(e);
+		}
+	}
+	
+	public InputStream get(String src)
+	{
+		try
+		{
+			openChannelSftp();
+			return channelSftp.get(src);
+		}
+		catch(SftpException e)
+		{
+			throw new SshException(e);
+		}
+	}
+	
+	public byte[] getBytes(String src)
+	{
+		try
+		{
+			return IoUtil.toBytes(get(src));
+		}
+		catch(IOException e)
+		{
+			throw new SshException(e);
+		}
+	}
+	
+	public String getString(String src)
+	{
+		try
+		{
+			return IoUtil.toString(get(src));
+		}
+		catch(IOException e)
+		{
+			throw new SshException(e);
+		}
+	}
+	
+	public void get(String src, OutputStream output)
+	{
+		try
+		{
+			IoUtil.copy(get(src), output);
+		}
+		catch(IOException e)
+		{
+			throw new SshException(e);
+		}
+	}
+	
+	public void get(String src, File file)
+	{
+		try(FileOutputStream output = new FileOutputStream(file))
+		{
+			get(src, output);
+		}
+		catch(IOException e)
 		{
 			throw new SshException(e);
 		}

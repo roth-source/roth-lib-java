@@ -45,12 +45,12 @@ public class IdUtil
 	
 	protected static String time(long time)
 	{
-		return StringUtil.padLeftLimit(BaseUtil.encodeBase62(time), TIME_LENGTH, BaseUtil.BASE_PAD);
+		return StringUtil.padLeftLimit(BaseUtil.encode62(time), TIME_LENGTH, BaseUtil.BASE_PAD);
 	}
 	
 	public static String random(int length)
 	{
-		return StringUtil.padLeftLimit(BaseUtil.encodeBase62(randomNumber(length)), length, BaseUtil.BASE_PAD);
+		return StringUtil.padLeftLimit(BaseUtil.encode62(randomNumber(length)), length, BaseUtil.BASE_PAD);
 	}
 	
 	protected static long randomNumber(int length)
@@ -124,7 +124,7 @@ public class IdUtil
 	
 	public static long uuidTime(String uuid)
 	{
-		return BaseUtil.decodeBase62(uuid.substring(1, 1 + TIME_LENGTH)).longValue();
+		return BaseUtil.decode62(uuid.substring(1, 1 + TIME_LENGTH)).longValue();
 	}
 	
 	public static Date uuidDate(String uuid)

@@ -111,10 +111,10 @@ public class Id
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder.append(BaseUtil.encodeBase62(table, config.getTableEncodedLength()));
-		builder.append(BaseUtil.encodeBase62(server, config.getServerEncodedLength()));
-		builder.append(BaseUtil.encodeBase62(time, config.getTimeEncodedLength()));
-		builder.append(BaseUtil.encodeBase62(random, config.getRandomEncodedLength()));
+		builder.append(BaseUtil.encode62(table, config.getTableEncodedLength()));
+		builder.append(BaseUtil.encode62(server, config.getServerEncodedLength()));
+		builder.append(BaseUtil.encode62(time, config.getTimeEncodedLength()));
+		builder.append(BaseUtil.encode62(random, config.getRandomEncodedLength()));
 		return builder.toString();
 	}
 	
@@ -132,10 +132,10 @@ public class Id
 	{
 		Id id = new Id(config);
 		int position = 0;
-		id.setTable(BaseUtil.decodeBase62(value.substring(position, (position += config.getTableEncodedLength()))).intValue());
-		id.setServer(BaseUtil.decodeBase62(value.substring(position, (position += config.getServerEncodedLength()))).intValue());
-		id.setTime(BaseUtil.decodeBase62(value.substring(position, (position += config.getTimeEncodedLength()))).longValue());
-		id.setRandom(BaseUtil.decodeBase62(value.substring(position, (position += config.getRandomEncodedLength()))).longValue());
+		id.setTable(BaseUtil.decode62(value.substring(position, (position += config.getTableEncodedLength()))).intValue());
+		id.setServer(BaseUtil.decode62(value.substring(position, (position += config.getServerEncodedLength()))).intValue());
+		id.setTime(BaseUtil.decode62(value.substring(position, (position += config.getTimeEncodedLength()))).longValue());
+		id.setRandom(BaseUtil.decode62(value.substring(position, (position += config.getRandomEncodedLength()))).longValue());
 		return id;
 	}
 	

@@ -149,6 +149,18 @@ public class ReflectionUtil
 		return value;
 	}
 	
+	public static void setFieldValue(Field field, Object object, Object value)
+	{
+		try
+		{
+			field.set(object, value);
+		}
+		catch(IllegalAccessException e)
+		{
+			
+		}
+	}
+	
 	public static boolean isArray(Type type)
 	{
 		Class<?> klass = getTypeClass(type);

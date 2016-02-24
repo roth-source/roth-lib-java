@@ -1,5 +1,8 @@
 package roth.lib.java.mapper;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -93,12 +96,38 @@ public abstract class Mapper implements Characters
 		return serializer;
 	}
 	
-	public Deserializer<?> getDeserializer(Class<?> klass)
+	public Serializer<?> getSerializer(Class<?> klass, PropertyReflector propertyReflector)
 	{
-		Deserializer<?> deserializer = mapperConfig.getDeserializer(klass);
-		if(deserializer == null)
+		Serializer<?> serializer = null;
+		if(propertyReflector != null)
 		{
-			deserializer = mapperReflector.getDeserializer(klass);
+			serializer = propertyReflector.getSerializer(getMapperType(), getMapperReflector(), getMapperConfig(), klass);
+		}
+		else
+		{
+			serializer = getMapperConfig().getSerializer(klass);
+			if(serializer == null)
+			{
+				serializer = getMapperReflector().getSerializer(klass);
+			}
+		}
+		return serializer;
+	}
+	
+	public Deserializer<?> getDeserializer(Class<?> klass, PropertyReflector propertyReflector)
+	{
+		Deserializer<?> deserializer = null;
+		if(propertyReflector != null)
+		{
+			deserializer = propertyReflector.getDeserializer(getMapperType(), getMapperReflector(), getMapperConfig(), klass);
+		}
+		else
+		{
+			deserializer = getMapperConfig().getDeserializer(klass);
+			if(deserializer == null)
+			{
+				deserializer = getMapperReflector().getDeserializer(klass);
+			}
 		}
 		return deserializer;
 	}
@@ -167,6 +196,18 @@ public abstract class Mapper implements Characters
 		Writer writer = new StringWriter();
 		serialize(value, writer);
 		return writer.toString();
+	}
+	
+	public void serialize(Object value, File file)
+	{
+		try(FileOutputStream output = new FileOutputStream(file))
+		{
+			serialize(value, output);
+		}
+		catch(IOException e)
+		{
+			throw new MapperException(e);
+		}
 	}
 	
 	public void serialize(Object value, OutputStream output)

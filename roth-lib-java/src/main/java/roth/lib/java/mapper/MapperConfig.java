@@ -2,17 +2,21 @@ package roth.lib.java.mapper;
 
 import java.util.Map.Entry;
 
+import roth.lib.java.Characters;
 import roth.lib.java.deserializer.Deserializer;
 import roth.lib.java.lang.Map;
 import roth.lib.java.serializer.Serializer;
 
-public class MapperConfig
+public class MapperConfig implements Characters
 {
 	protected static MapperConfig instance;
 	
 	protected boolean serializeNulls = false;
 	protected boolean serializeEmptyArray = true;
 	protected boolean serializeEmptyMap = true;
+	protected boolean serializeHeader = true;
+	protected char delimiter = COMMA;
+	protected char qualifier = QUOTE;
 	protected Map<Class<?>, Serializer<?>> serializerMap = new Map<Class<?>, Serializer<?>>();
 	protected Map<Class<?>, Deserializer<?>> deserializerMap = new Map<Class<?>, Deserializer<?>>();
 	
@@ -48,6 +52,21 @@ public class MapperConfig
 	public boolean isSerializeEmptyMap()
 	{
 		return serializeEmptyMap;
+	}
+	
+	public boolean isSerializeHeader()
+	{
+		return serializeHeader;
+	}
+	
+	public char getDelimiter()
+	{
+		return delimiter;
+	}
+	
+	public char getQualifier()
+	{
+		return qualifier;
 	}
 	
 	public Serializer<?> getSerializer(Class<?> klass)
@@ -100,6 +119,24 @@ public class MapperConfig
 	public MapperConfig setSerializeEmptyMap(boolean serializeEmptyMap)
 	{
 		this.serializeEmptyMap = serializeEmptyMap;
+		return this;
+	}
+	
+	public MapperConfig setSerializeHeader(boolean serializeHeader)
+	{
+		this.serializeHeader = serializeHeader;
+		return this;
+	}
+	
+	public MapperConfig setDelimiter(Character delimiter)
+	{
+		this.delimiter = delimiter;
+		return this;
+	}
+	
+	public MapperConfig setQualifier(Character qualifier)
+	{
+		this.qualifier = qualifier;
 		return this;
 	}
 	

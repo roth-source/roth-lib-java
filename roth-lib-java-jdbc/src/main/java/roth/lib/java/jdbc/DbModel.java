@@ -5,9 +5,11 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 import roth.lib.java.Model;
+import roth.lib.java.deserializer.Deserializer;
 import roth.lib.java.jdbc.sql.SqlFactory;
 import roth.lib.java.lang.Map;
 import roth.lib.java.lang.Set;
+import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.PropertyReflector;
 
@@ -188,6 +190,33 @@ public abstract class DbModel extends Model implements SqlFactory
 			resetDeserializedNames();
 		}
 		return (T) save();
+	}
+	
+	public <T extends DbModel> T set(String name, String value)
+	{
+		DbDataSource db = getDb();
+		EntityReflector entityReflector = db.getMapperReflector().getEntityReflector(getClass());
+		PropertyReflector propertyReflector = entityReflector.getFieldReflector(name, db.getMapperType(), db.getMapperReflector());
+		if(propertyReflector != null)
+		{
+			Deserializer<?> deserializer = propertyReflector.getDeserializer(db.getMapperType(), db.getMapperReflector(), MapperConfig.get());
+			if(deserializer != null)
+			{
+				try
+				{
+					Field field = propertyReflector.getField();
+					Object oldValue = field.get(this);
+					Object newValue = deserializer.deserialize(value, propertyReflector.getTimeFormat(), propertyReflector.getFieldClass());
+					setDirty(name, oldValue, newValue);
+					field.set(this, newValue);
+				}
+				catch(IllegalArgumentException | IllegalAccessException e)
+				{
+					throw new DbException(e);
+				}
+			}
+		}
+		return (T) this;
 	}
 	
 	public boolean isDirty()

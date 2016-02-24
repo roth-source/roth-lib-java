@@ -1,15 +1,5 @@
 package roth.lib.java.json;
 
-import static roth.lib.java.util.ReflectionUtil.asCollection;
-import static roth.lib.java.util.ReflectionUtil.asMap;
-import static roth.lib.java.util.ReflectionUtil.getElementType;
-import static roth.lib.java.util.ReflectionUtil.getFieldValue;
-import static roth.lib.java.util.ReflectionUtil.getKeyType;
-import static roth.lib.java.util.ReflectionUtil.getTypeClass;
-import static roth.lib.java.util.ReflectionUtil.isArray;
-import static roth.lib.java.util.ReflectionUtil.isCollection;
-import static roth.lib.java.util.ReflectionUtil.isMap;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -18,11 +8,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import roth.lib.java.lang.Map;
 import java.util.Map.Entry;
 
 import roth.lib.java.deserializer.Deserializer;
 import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
 import roth.lib.java.mapper.Mapper;
 import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
@@ -31,6 +21,7 @@ import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertiesReflector;
 import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.serializer.Serializer;
+import roth.lib.java.util.ReflectionUtil;
 
 public class JsonMapper extends Mapper
 {
@@ -64,9 +55,9 @@ public class JsonMapper extends Mapper
 		if(value == null) throw new IllegalArgumentException("Value cannot be null");
 		try
 		{
-			if(isArray(value.getClass()) || isCollection(value.getClass()))
+			if(ReflectionUtil.isArray(value.getClass()) || ReflectionUtil.isCollection(value.getClass()))
 			{
-				List<?> values = asCollection(value);
+				List<?> values = ReflectionUtil.asCollection(value);
 				if(!values.isEmpty())
 				{
 					writeArray(writer, values, null);
@@ -129,7 +120,7 @@ public class JsonMapper extends Mapper
 			if(!propertyReflector.isAttribute() || !hasContext() || !propertyReflector.isExcluded(getContext()))
 			{
 				String propertyName = propertyReflector.getPropertyName(getMapperType());
-				Object propertyValue = getFieldValue(propertyReflector.getField(), value);
+				Object propertyValue = ReflectionUtil.getFieldValue(propertyReflector.getField(), value);
 				seperator = writeProperty(writer, propertyName, propertyValue, seperator, propertyReflector);
 			}
 		}
@@ -170,9 +161,9 @@ public class JsonMapper extends Mapper
 				writeNewLine(writer);
 				writeEntity(writer, value, entityReflector);
 			}
-			else if(isArray(value.getClass()) || isCollection(value.getClass()))
+			else if(ReflectionUtil.isArray(value.getClass()) || ReflectionUtil.isCollection(value.getClass()))
 			{
-				List<?> values = asCollection(value);
+				List<?> values = ReflectionUtil.asCollection(value);
 				if(!values.isEmpty())
 				{
 					seperator = writeSeperator(writer, seperator);
@@ -190,9 +181,9 @@ public class JsonMapper extends Mapper
 					writer.write(RIGHT_BRACKET);
 				}
 			}
-			else if(isMap(value.getClass()))
+			else if(ReflectionUtil.isMap(value.getClass()))
 			{
-				Map<?, ?> valueMap = asMap(value);
+				Map<?, ?> valueMap = ReflectionUtil.asMap(value);
 				if(!valueMap.isEmpty())
 				{
 					seperator = writeSeperator(writer, seperator);
@@ -212,7 +203,7 @@ public class JsonMapper extends Mapper
 			}
 			else
 			{
-				Serializer<?> serializer = getSerializer(value.getClass());
+				Serializer<?> serializer = getSerializer(value.getClass(), propertyReflector);
 				if(serializer != null)
 				{
 					String timeFormat = getTimeFormat(propertyReflector);
@@ -271,9 +262,9 @@ public class JsonMapper extends Mapper
 					writeEntity(writer, value, getMapperReflector().getEntityReflector(value.getClass()));
 					decrementTabs();
 				}
-				else if(isArray(value.getClass()) || isCollection(value.getClass()))
+				else if(ReflectionUtil.isArray(value.getClass()) || ReflectionUtil.isCollection(value.getClass()))
 				{
-					List<?> arrayValues = asCollection(value);
+					List<?> arrayValues = ReflectionUtil.asCollection(value);
 					if(!arrayValues.isEmpty())
 					{
 						incrementTabs();
@@ -292,9 +283,9 @@ public class JsonMapper extends Mapper
 						decrementTabs();
 					}
 				}
-				else if(isMap(value.getClass()))
+				else if(ReflectionUtil.isMap(value.getClass()))
 				{
-					java.util.Map<?, ?> valueMap = asMap(value);
+					java.util.Map<?, ?> valueMap = ReflectionUtil.asMap(value);
 					if(!valueMap.isEmpty())
 					{
 						incrementTabs();
@@ -315,7 +306,7 @@ public class JsonMapper extends Mapper
 				}
 				else
 				{
-					Serializer<?> serializer = getSerializer(value.getClass());
+					Serializer<?> serializer = getSerializer(value.getClass(), propertyReflector);
 					if(serializer != null)
 					{
 						String timeFormat = getTimeFormat(propertyReflector);
@@ -359,7 +350,7 @@ public class JsonMapper extends Mapper
 			}
 			else
 			{
-				Serializer<?> serializer = getSerializer(key.getClass());
+				Serializer<?> serializer = getSerializer(key.getClass(), propertyReflector);
 				if(serializer != null)
 				{
 					String timeFormat = getTimeFormat(propertyReflector);
@@ -467,12 +458,12 @@ public class JsonMapper extends Mapper
 		T model = null;
 		try
 		{
-			if(isArray(type))
+			if(ReflectionUtil.isArray(type))
 			{
 				readUntil(reader, LEFT_BRACKET);
 				model = readArray(reader, type, null);
 			}
-			else if(isCollection(type))
+			else if(ReflectionUtil.isCollection(type))
 			{
 				readUntil(reader, LEFT_BRACKET);
 				model = readCollection(reader, type, null);
@@ -510,7 +501,7 @@ public class JsonMapper extends Mapper
 	protected <T> T readEntity(Reader reader, Type type) throws Exception
 	{
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
-		Class<T> klass = getTypeClass(type);
+		Class<T> klass = ReflectionUtil.getTypeClass(type);
 		Constructor<T> constructor = klass.getDeclaredConstructor();
 		constructor.setAccessible(true);
 		T model = constructor.newInstance();
@@ -547,11 +538,11 @@ public class JsonMapper extends Mapper
 						{
 							Field field = propertyReflector.getField();
 							Class<?> fieldClass = propertyReflector.getFieldClass();
-							Deserializer<?> deserializer = getDeserializer(fieldClass);
+							Deserializer<?> deserializer = getDeserializer(fieldClass, propertyReflector);
 							if(deserializer != null)
 							{
 								String timeFormat = getTimeFormat(propertyReflector);
-								field.set(model, deserializer.deserialize(value, timeFormat, fieldClass));
+								ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeFormat, fieldClass));
 								setDeserializedName(model, propertyReflector.getFieldName());
 							}
 						}
@@ -603,17 +594,17 @@ public class JsonMapper extends Mapper
 							Class<?> fieldClass = propertyReflector.getFieldClass();
 							if(!NULL.equalsIgnoreCase(value))
 							{
-								Deserializer<?> deserializer = getDeserializer(fieldClass);
+								Deserializer<?> deserializer = getDeserializer(fieldClass, propertyReflector);
 								if(deserializer != null)
 								{
 									String timeFormat = getTimeFormat(propertyReflector);
-									field.set(model, deserializer.deserialize(value, timeFormat, fieldClass));
+									ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeFormat, fieldClass));
 									setDeserializedName(model, propertyReflector.getFieldName());
 								}
 							}
 							else
 							{
-								field.set(model, null);
+								ReflectionUtil.setFieldValue(field, model, null);
 								setDeserializedName(model, propertyReflector.getFieldName());
 							}
 						}
@@ -649,13 +640,13 @@ public class JsonMapper extends Mapper
 							if(getMapperReflector().isEntity(fieldType))
 							{
 								Object value = readEntity(reader, fieldType);
-								field.set(model, value);
+								ReflectionUtil.setFieldValue(field, model, value);
 								setDeserializedName(model, propertyReflector.getFieldName());
 							}
 							else
 							{
 								Object value = readMap(reader, fieldType, propertyReflector);
-								field.set(model, value);
+								ReflectionUtil.setFieldValue(field, model, value);
 								setDeserializedName(model, propertyReflector.getFieldName());
 							}
 						}
@@ -683,7 +674,7 @@ public class JsonMapper extends Mapper
 							Field field = propertyReflector.getField();
 							Type fieldType = propertyReflector.getFieldType();
 							Object value = readArray(reader, fieldType, propertyReflector);
-							field.set(model, value);
+							ReflectionUtil.setFieldValue(field, model, value);
 							setDeserializedName(model, propertyReflector.getFieldName());
 						}
 						else
@@ -714,10 +705,10 @@ public class JsonMapper extends Mapper
 	protected <T, K, E> T readMap(Reader reader, Type type, PropertyReflector propertyReflector) throws Exception
 	{
 		Map<K, E> map = null;
-		Class<T> klass = getTypeClass(type);
-		Type keyType = getKeyType(type);
-		Class<K> keyClass = getTypeClass(keyType);
-		Type elementType = getElementType(type);
+		Class<T> klass = ReflectionUtil.getTypeClass(type);
+		Type keyType = ReflectionUtil.getElementType(type);
+		Class<K> keyClass = ReflectionUtil.getTypeClass(keyType);
+		Type elementType = ReflectionUtil.getElementType(type);
 		if(klass.isAssignableFrom(Map.class))
 		{
 			map = new Map<K, E>();
@@ -753,7 +744,7 @@ public class JsonMapper extends Mapper
 					if(name == null)
 					{
 						name = readEscaped(reader, c);
-						Deserializer<?> deserializer = getDeserializer(keyClass);
+						Deserializer<?> deserializer = getDeserializer(keyClass, propertyReflector);
 						if(deserializer != null)
 						{
 							key = (K) deserializer.deserialize(name, null);
@@ -860,18 +851,19 @@ public class JsonMapper extends Mapper
 	@SuppressWarnings("unchecked")
 	protected <T, E> T readArray(Reader reader, Type type, PropertyReflector propertyReflector) throws Exception
 	{
-		if(isCollection(type))
+		if(ReflectionUtil.isCollection(type))
 		{
 			return readCollection(reader, type, propertyReflector);
 		}
-		else if(isArray(type))
+		else if(ReflectionUtil.isArray(type))
 		{
-			Type elementType = getElementType(type);
+			Type elementType = ReflectionUtil.getElementType(type);
 			List<E> collection = readCollection(reader, type, propertyReflector);
-			E[] array = (E[]) Array.newInstance(getTypeClass(elementType), collection.size());
-			for(int i = 0; i < collection.size(); i++)
+			E[] array = (E[]) Array.newInstance(ReflectionUtil.getTypeClass(elementType), collection.size());
+			int i = 0;
+			for(E element : collection)
 			{
-				array[i] = collection.get(i);
+				array[i++] = element;
 			}
 			return (T) array;
 		}
@@ -882,10 +874,10 @@ public class JsonMapper extends Mapper
 	protected <T, E> T readCollection(Reader reader, Type type, PropertyReflector propertyReflector) throws Exception
 	{
 		Collection<E> collection = null;
-		Class<T> klass = getTypeClass(type);
-		Type elementType = getElementType(type);
-		Class<E> elementClass = getTypeClass(elementType);
-		if(klass.isAssignableFrom(List.class) || isArray(klass))
+		Class<T> klass = ReflectionUtil.getTypeClass(type);
+		Type elementType = ReflectionUtil.getElementType(type);
+		Class<E> elementClass = ReflectionUtil.getTypeClass(elementType);
+		if(klass.isAssignableFrom(List.class) || ReflectionUtil.isArray(klass))
 		{
 			collection = new List<E>();
 		}
@@ -918,7 +910,7 @@ public class JsonMapper extends Mapper
 					String value = readEscaped(reader, c);
 					if(value != null && !value.trim().isEmpty() && !NULL.equalsIgnoreCase(value))
 					{
-						Deserializer<?> deserializer = getDeserializer(elementClass);
+						Deserializer<?> deserializer = getDeserializer(elementClass, propertyReflector);
 						if(deserializer != null)
 						{
 							String timeFormat = getTimeFormat(propertyReflector);
@@ -954,7 +946,7 @@ public class JsonMapper extends Mapper
 					String value = builder.toString();
 					if(value != null && !value.trim().isEmpty() && !NULL.equalsIgnoreCase(value))
 					{
-						Deserializer<?> deserializer = getDeserializer(elementClass);
+						Deserializer<?> deserializer = getDeserializer(elementClass, propertyReflector);
 						if(deserializer != null)
 						{
 							String timeFormat = getTimeFormat(propertyReflector);
