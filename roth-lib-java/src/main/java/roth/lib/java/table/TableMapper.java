@@ -1,6 +1,13 @@
 package roth.lib.java.table;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.Writer;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -8,11 +15,11 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 
 import roth.lib.java.deserializer.Deserializer;
-import roth.lib.java.json.JsonException;
 import roth.lib.java.lang.List;
 import roth.lib.java.lang.Map;
 import roth.lib.java.mapper.Mapper;
 import roth.lib.java.mapper.MapperConfig;
+import roth.lib.java.mapper.MapperException;
 import roth.lib.java.mapper.MapperType;
 import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.MapperReflector;
@@ -86,7 +93,7 @@ public class TableMapper extends Mapper
 		}
 		catch(Exception e)
 		{
-			throw new JsonException(e);
+			throw new TableException(e);
 		}
 	}
 	
@@ -135,7 +142,8 @@ public class TableMapper extends Mapper
 			Serializer<?> serializer = propertyReflector.getSerializer(getMapperType(), getMapperReflector(), getMapperConfig());
 			if(serializer != null)
 			{
-				serializedValue = serializer.serialize(value, propertyReflector.getTimeFormat());
+				String timeFormat = getTimeFormat(propertyReflector);
+				serializedValue = serializer.serialize(value, timeFormat);
 			}
 		}
 		if(serializedValue != null)
@@ -150,10 +158,6 @@ public class TableMapper extends Mapper
 			{
 				writer.write(serializedValue);
 			}
-		}
-		else if(getMapperConfig().isSerializeNulls())
-		{
-			//writer.write("null");
 		}
 	}
 	
@@ -184,9 +188,55 @@ public class TableMapper extends Mapper
 		throw new UnsupportedOperationException();
 	}
 	
+	public <T> List<T> deserializeList(String data, Class<T> klass)
+	{
+		return deserializeList(new StringReader(data), klass);
+	}
+	
+	public <T> List<T> deserializeList(File file, Class<T> klass)
+	{
+		try(FileInputStream input = new FileInputStream(file))
+		{
+			return deserializeList(input, klass);
+		}
+		catch(IOException e)
+		{
+			throw new MapperException(e);
+		}
+	}
+	
+	public <T> List<T> deserializeList(InputStream input, Class<T> klass)
+	{
+		return deserializeList(new InputStreamReader(input, UTF_8), klass);
+	}
+	
+	public <T> List<T> deserializeList(Reader reader, Class<T> klass)
+	{
+		reader = reader instanceof BufferedReader ? reader : new BufferedReader(reader); 
+		List<T> list = new List<T>();
+		try
+		{
+			if(getMapperConfig().isSerializeHeader())
+			{
+				readUntil(reader, NEW_LINE);
+			}
+			T entity = null;
+			while((entity = readEntity(reader, klass)) != null)
+			{
+				list.add(entity);
+			}
+		}
+		catch(Exception e)
+		{
+			throw new TableException(e);
+		}
+		return list;
+	}
+	
 	@Override
 	public <T> T deserialize(Reader reader, Type type)
 	{
+		reader = reader instanceof BufferedReader ? reader : new BufferedReader(reader); 
 		T model = null;
 		try
 		{
@@ -205,7 +255,7 @@ public class TableMapper extends Mapper
 		}
 		catch(Exception e)
 		{
-			throw new JsonException(e);
+			throw new TableException(e);
 		}
 		return model;
 	}
@@ -238,7 +288,6 @@ public class TableMapper extends Mapper
 		Collection<E> collection = null;
 		Class<T> klass = ReflectionUtil.getTypeClass(type);
 		Type elementType = ReflectionUtil.getElementType(type);
-		//Class<E> elementClass = ReflectionUtil.getTypeClass(elementType);
 		if(klass.isAssignableFrom(List.class) || ReflectionUtil.isArray(klass))
 		{
 			collection = new List<E>();
@@ -292,7 +341,9 @@ public class TableMapper extends Mapper
 							if(!value.isEmpty())
 							{
 								model = model != null ? model : constructor.newInstance();
-								Object deserializedValue = deserializer.deserialize(value, propertyReflector.getTimeFormat(), propertyReflector.getFieldClass());
+								String timeFormat = getTimeFormat(propertyReflector);
+								value = propertyReflector.filter(value, getMapperType());
+								Object deserializedValue = deserializer.deserialize(value, timeFormat, propertyReflector.getFieldClass());
 								ReflectionUtil.setFieldValue(propertyReflector.getField(), model, deserializedValue);
 							}
 						}

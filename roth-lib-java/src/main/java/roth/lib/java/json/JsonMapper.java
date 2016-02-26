@@ -542,6 +542,7 @@ public class JsonMapper extends Mapper
 							if(deserializer != null)
 							{
 								String timeFormat = getTimeFormat(propertyReflector);
+								value = propertyReflector.filter(value, getMapperType());
 								ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeFormat, fieldClass));
 								setDeserializedName(model, propertyReflector.getFieldName());
 							}
@@ -598,12 +599,14 @@ public class JsonMapper extends Mapper
 								if(deserializer != null)
 								{
 									String timeFormat = getTimeFormat(propertyReflector);
+									value = propertyReflector.filter(value, getMapperType());
 									ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeFormat, fieldClass));
 									setDeserializedName(model, propertyReflector.getFieldName());
 								}
 							}
 							else
 							{
+								value = propertyReflector.filter(value, getMapperType());
 								ReflectionUtil.setFieldValue(field, model, null);
 								setDeserializedName(model, propertyReflector.getFieldName());
 							}
@@ -914,6 +917,7 @@ public class JsonMapper extends Mapper
 						if(deserializer != null)
 						{
 							String timeFormat = getTimeFormat(propertyReflector);
+							value = propertyReflector.filter(value, getMapperType());
 							Object object = deserializer.deserialize(value, timeFormat, elementClass);
 							if(object != null && elementClass.isAssignableFrom(object.getClass()))
 							{
@@ -950,6 +954,7 @@ public class JsonMapper extends Mapper
 						if(deserializer != null)
 						{
 							String timeFormat = getTimeFormat(propertyReflector);
+							value = propertyReflector.filter(value, getMapperType());
 							Object object = deserializer.deserialize(value, timeFormat, elementClass);
 							if(object != null && elementClass.isAssignableFrom(object.getClass()))
 							{

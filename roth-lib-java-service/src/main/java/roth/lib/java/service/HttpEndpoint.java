@@ -7,7 +7,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.Enumeration;
-import roth.lib.java.lang.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,6 +20,7 @@ import javax.servlet.http.HttpSession;
 import roth.lib.java.Characters;
 import roth.lib.java.http.HttpMethod;
 import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
 import roth.lib.java.mapper.Mapper;
 import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
@@ -33,7 +33,6 @@ import roth.lib.java.service.reflector.ServiceReflector;
 import roth.lib.java.type.MimeType;
 import roth.lib.java.util.EnumUtil;
 import roth.lib.java.util.ReflectionUtil;
-import roth.lib.java.validate.Filterer;
 import roth.lib.java.validate.Validator;
 import roth.lib.java.validate.ValidatorException;
 
@@ -58,8 +57,6 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 	protected static Pattern SERVICE_METHOD_PATTERN 			= Pattern.compile("(?:^|/)(?<" + SERVICE + ">\\w+)/(?<" + METHOD + ">\\w+)(?:/|$)");
 	
 	protected static Map<String, ServiceReflector> serviceReflectorMap = new Map<String, ServiceReflector>();
-	protected static Map<String, Filterer> filtererMap = new Map<String, Filterer>();
-	protected static Map<String, Validator> validatorMap = new Map<String, Validator>();
 	
 	protected MapperReflector mapperReflector = MapperReflector.get();
 	protected MapperConfig mapperConfig = MapperConfig.get();
@@ -75,16 +72,6 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 				serviceReflectorMap.put(serviceName, new ServiceReflector(serviceClass, serviceName));
 			}
 		}
-	}
-	
-	public static void filterer(String name, Filterer filterer)
-	{
-		filtererMap.put(name, filterer);
-	}
-	
-	public static void validator(String name, Validator validator)
-	{
-		validatorMap.put(name, validator);
 	}
 	
 	@Override
@@ -557,17 +544,6 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 						}
 						else
 						{
-							if(propertyValue != null)
-							{
-								for(String filter : propertyReflector.getFilters())
-								{
-									Filterer filterer = filtererMap.get(filter);
-									if(filterer != null)
-									{
-										propertyValue = filterer.filter(propertyValue);
-									}
-								}
-							}
 							boolean blank = propertyValue == null;
 							if(!blank && propertyValue instanceof String)
 							{
@@ -575,20 +551,16 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 							}
 							if(!blank)
 							{
-								for(String validate : propertyReflector.getValidates())
+								for(Validator validator : propertyReflector.getValidators())
 								{
-									Validator validator = validatorMap.get(validate);
-									if(validator != null)
+									try
 									{
-										try
-										{
-											validator.validate(propertyValue, value, entityReflector);
-										}
-										catch(ValidatorException e)
-										{
-											errors.add(HttpErrorType.REQUEST_FIELD_INVALID.error().setContext(path + propertyName).setMessage(e.getMessage()));
-											break;
-										}
+										validator.validate(propertyValue, value, entityReflector);
+									}
+									catch(ValidatorException e)
+									{
+										errors.add(HttpErrorType.REQUEST_FIELD_INVALID.error().setContext(path + propertyName).setMessage(e.getMessage()));
+										break;
 									}
 								}
 							}

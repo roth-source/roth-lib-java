@@ -7,7 +7,7 @@ public class TabMapperConfig extends MapperConfig
 	
 	public TabMapperConfig()
 	{
-		
+		delimiter = TAB;
 	}
 	
 }

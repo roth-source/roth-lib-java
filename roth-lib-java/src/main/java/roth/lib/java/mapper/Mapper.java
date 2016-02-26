@@ -1,6 +1,7 @@
 package roth.lib.java.mapper;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,7 +84,7 @@ public abstract class Mapper implements Characters
 	
 	public String getTimeFormat(PropertyReflector propertyReflector)
 	{
-		return propertyReflector != null ? propertyReflector.getTimeFormat() : null;
+		return propertyReflector != null ? propertyReflector.getTimeFormat(getMapperType()) : null;
 	}
 	
 	public Serializer<?> getSerializer(Class<?> klass)
@@ -246,6 +247,18 @@ public abstract class Mapper implements Characters
 		return deserialize(new StringReader(data), generic);
 	}
 	
+	public <T> T deserialize(File file, Generic<T> generic)
+	{
+		try(FileInputStream input = new FileInputStream(file))
+		{
+			return deserialize(input, generic);
+		}
+		catch(IOException e)
+		{
+			throw new MapperException(e);
+		}
+	}
+	
 	public <T> T deserialize(InputStream input, Generic<T> generic)
 	{
 		return deserialize(new InputStreamReader(input, UTF_8), generic);
@@ -264,6 +277,18 @@ public abstract class Mapper implements Characters
 	public <T> T deserialize(String data, Class<T> klass)
 	{
 		return deserialize(new StringReader(data), klass);
+	}
+	
+	public <T> T deserialize(File file, Class<T> klass)
+	{
+		try(FileInputStream input = new FileInputStream(file))
+		{
+			return deserialize(input, klass);
+		}
+		catch(IOException e)
+		{
+			throw new MapperException(e);
+		}
 	}
 	
 	public <T> T deserialize(InputStream input, Class<T> klass)
@@ -286,6 +311,18 @@ public abstract class Mapper implements Characters
 		return deserialize(new StringReader(data), type);
 	}
 	
+	public <T> T deserialize(File file, Type type)
+	{
+		try(FileInputStream input = new FileInputStream(file))
+		{
+			return deserialize(input, type);
+		}
+		catch(IOException e)
+		{
+			throw new MapperException(e);
+		}
+	}
+	
 	public <T> T deserialize(InputStream input, Type type)
 	{
 		return deserialize(new InputStreamReader(input, UTF_8), type);
@@ -301,6 +338,18 @@ public abstract class Mapper implements Characters
 	public Map<String, Object> deserialize(String data)
 	{
 		return deserialize(new StringReader(data));
+	}
+	
+	public Map<String, Object> deserialize(File file)
+	{
+		try(FileInputStream input = new FileInputStream(file))
+		{
+			return deserialize(input);
+		}
+		catch(IOException e)
+		{
+			throw new MapperException(e);
+		}
 	}
 	
 	public Map<String, Object> deserialize(InputStream input)

@@ -2,15 +2,19 @@ package roth.lib.java.reflector;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.List;
 
 import roth.lib.java.annotation.Property;
 import roth.lib.java.deserializer.Deserializer;
+import roth.lib.java.deserializer.VoidDeserializer;
+import roth.lib.java.filter.Filterer;
+import roth.lib.java.lang.List;
 import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
 import roth.lib.java.serializer.Serializer;
+import roth.lib.java.serializer.VoidSerializer;
 import roth.lib.java.util.AnnotationUtil;
 import roth.lib.java.util.ReflectionUtil;
+import roth.lib.java.validate.Validator;
 
 public class PropertyReflector
 {
@@ -170,52 +174,74 @@ public class PropertyReflector
 		return name;
 	}
 	
-	public Serializer<?> getSerializer(MapperType mapperType, MapperReflector mapperReflector, MapperConfig mapperConfig)
+	public boolean isExcluded(String context)
 	{
-		return getSerializer(mapperType, mapperReflector, mapperConfig, getFieldClass());
+		boolean contains = false;
+		String[] excludes = property.exclude();
+		if(excludes != null)
+		{
+			for(String exclude : excludes)
+			{
+				if(exclude.equalsIgnoreCase(context))
+				{
+					contains = true;
+					break;
+				}
+			}
+		}
+		return contains;
 	}
 	
-	public Serializer<?> getSerializer(MapperType mapperType, MapperReflector mapperReflector, MapperConfig mapperConfig, Class<?> klass)
+	public boolean isAttribute()
 	{
-		Serializer<?> serializer = null;
-		try
+		return property.attribute();
+	}
+	
+	public String getElementsName()
+	{
+		return AnnotationUtil.validate(property.elementsName());
+	}
+	
+	public String getTimeFormat(MapperType mapperType)
+	{
+		String timeFormat = null;
+		switch(mapperType)
+		{
+			case JSON:
+			{
+				timeFormat = getJsonTimeFormat();
+				break;
+			}
+			case XML:
+			{
+				timeFormat = getXmlTimeFormat();
+				break;
+			}
+			case FORM:
+			{
+				timeFormat = getFormTimeFormat();
+				break;
+			}
+			case TABLE:
+			{
+				timeFormat = getTableTimeFormat();
+				break;
+			}
+			case MYSQL:
+			{
+				break;
+			}
+		}
+		if(timeFormat == null)
 		{
 			switch(mapperType)
 			{
 				case JSON:
-				{
-					Class<?> serializerClass = property.jsonSerializer();
-					if(!Void.class.equals(serializerClass))
-					{
-						serializer = (Serializer<?>) serializerClass.newInstance();
-					}
-					break;
-				}
 				case XML:
-				{
-					Class<?> serializerClass = property.xmlSerializer();
-					if(!Void.class.equals(serializerClass))
-					{
-						serializer = (Serializer<?>) serializerClass.newInstance();
-					}
-					break;
-				}
 				case FORM:
-				{
-					Class<?> serializerClass = property.formSerializer();
-					if(!Void.class.equals(serializerClass))
-					{
-						serializer = (Serializer<?>) serializerClass.newInstance();
-					}
-					break;
-				}
 				case TABLE:
 				{
-					Class<?> serializerClass = property.tableSerializer();
-					if(!Void.class.equals(serializerClass))
-					{
-						serializer = (Serializer<?>) serializerClass.newInstance();
-					}
+					timeFormat = getTimeFormat();
 					break;
 				}
 				case MYSQL:
@@ -224,9 +250,156 @@ public class PropertyReflector
 				}
 			}
 		}
-		catch(Exception e)
+		return timeFormat;
+	}
+	
+	public String filter(String value, MapperType mapperType)
+	{
+		if(value != null)
 		{
-			e.printStackTrace();
+			for(Filterer filterer : getFilterers(mapperType))
+			{
+				if(value != null)
+				{
+					value = filterer.filter(value);
+				}
+			}
+		}
+		return value;
+	}
+	
+	public List<Filterer> getFilterers(MapperType mapperType)
+	{
+		List<Filterer> filterers = new List<Filterer>();
+		switch(mapperType)
+		{
+			case JSON:
+			{
+				if(hasJsonFilter())
+				{
+					filterers = getFilterers(getJsonFilter());
+				}
+				break;
+			}
+			case XML:
+			{
+				if(hasXmlFilter())
+				{
+					filterers = getFilterers(getXmlFilter());
+				}
+				break;
+			}
+			case FORM:
+			{
+				if(hasFormFilter())
+				{
+					filterers = getFilterers(getFormFilter());
+				}
+				break;
+			}
+			case TABLE:
+			{
+				if(hasTableFilter())
+				{
+					filterers = getFilterers(getTableFilter());
+				}
+				break;
+			}
+			case MYSQL:
+			{
+				break;
+			}
+		}
+		if(filterers == null)
+		{
+			switch(mapperType)
+			{
+				case JSON:
+				case XML:
+				case FORM:
+				case TABLE:
+				{
+					filterers = getFilterers(getFilter());
+					break;
+				}
+				case MYSQL:
+				{
+					break;
+				}
+			}
+		}
+		return filterers;
+	}
+	
+	protected List<Filterer> getFilterers(List<Class<? extends Filterer>> filtererClasses)
+	{
+		List<Filterer> filterers = new List<Filterer>();
+		for(Class<? extends Filterer> filtererClass : filtererClasses)
+		{
+			try
+			{
+				filterers.add(filtererClass.newInstance());
+			}
+			catch(InstantiationException | IllegalAccessException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return filterers;
+	}
+	
+	public Serializer<?> getSerializer(MapperType mapperType, MapperReflector mapperReflector, MapperConfig mapperConfig)
+	{
+		return getSerializer(mapperType, mapperReflector, mapperConfig, getFieldClass());
+	}
+	
+	public Serializer<?> getSerializer(MapperType mapperType, MapperReflector mapperReflector, MapperConfig mapperConfig, Class<?> klass)
+	{
+		Serializer<?> serializer = null;
+		switch(mapperType)
+		{
+			case JSON:
+			{
+				serializer = getJsonSerializer();
+				break;
+			}
+			case XML:
+			{
+				serializer = getXmlSerializer();
+				break;
+			}
+			case FORM:
+			{
+				serializer = getFormSerializer();
+				break;
+			}
+			case TABLE:
+			{
+				serializer = getTableSerializer();
+				break;
+			}
+			case MYSQL:
+			{
+				break;
+			}
+		}
+		if(serializer == null)
+		{
+			switch(mapperType)
+			{
+				case JSON:
+				case XML:
+				case FORM:
+				case TABLE:
+				{
+					serializer = getSerializer();
+					break;
+				}
+				case MYSQL:
+				{
+					break;
+				}
+			}
 		}
 		if(serializer == null)
 		{
@@ -247,44 +420,43 @@ public class PropertyReflector
 	public Deserializer<?> getDeserializer(MapperType mapperType, MapperReflector mapperReflector, MapperConfig mapperConfig, Class<?> klass)
 	{
 		Deserializer<?> deserializer = null;
-		try
+		switch(mapperType)
+		{
+			case JSON:
+			{
+				deserializer = getJsonDeserializer();
+				break;
+			}
+			case XML:
+			{
+				deserializer = getXmlDeserializer();
+				break;
+			}
+			case FORM:
+			{
+				deserializer = getFormDeserializer();
+				break;
+			}
+			case TABLE:
+			{
+				deserializer = getTableDeserializer();
+				break;
+			}
+			case MYSQL:
+			{
+				break;
+			}
+		}
+		if(deserializer == null)
 		{
 			switch(mapperType)
 			{
 				case JSON:
-				{
-					Class<?> deserializerClass = property.jsonDeserializer();
-					if(!Void.class.equals(deserializerClass))
-					{
-						deserializer = (Deserializer<?>) deserializerClass.newInstance();
-					}
-					break;
-				}
 				case XML:
-				{
-					Class<?> deserializerClass = property.xmlDeserializer();
-					if(!Void.class.equals(deserializerClass))
-					{
-						deserializer = (Deserializer<?>) deserializerClass.newInstance();
-					}
-					break;
-				}
 				case FORM:
-				{
-					Class<?> deserializerClass = property.formDeserializer();
-					if(!Void.class.equals(deserializerClass))
-					{
-						deserializer = (Deserializer<?>) deserializerClass.newInstance();
-					}
-					break;
-				}
 				case TABLE:
 				{
-					Class<?> deserializerClass = property.tableDeserializer();
-					if(!Void.class.equals(deserializerClass))
-					{
-						deserializer = (Deserializer<?>) deserializerClass.newInstance();
-					}
+					deserializer = getDeserializer();
 					break;
 				}
 				case MYSQL:
@@ -292,10 +464,6 @@ public class PropertyReflector
 					break;
 				}
 			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
 		}
 		if(deserializer == null)
 		{
@@ -308,127 +476,339 @@ public class PropertyReflector
 		return deserializer;
 	}
 	
-	public String getName()
+	protected String getName()
 	{
 		return AnnotationUtil.validate(property.name());
 	}
 	
-	public String getTimeFormat()
+	protected String getTimeFormat()
 	{
 		return AnnotationUtil.validate(property.timeFormat());
 	}
 	
-	public List<String> getExcludes()
+	protected List<String> getExcludes()
 	{
-		return AnnotationUtil.validate(property.exclude());
+		return new List<String>(property.exclude());
 	}
 	
-	public boolean isExcluded(String context)
-	{
-		boolean contains = false;
-		String[] excludes = property.exclude();
-		if(excludes != null)
-		{
-			for(String exclude : excludes)
-			{
-				if(exclude.equalsIgnoreCase(context))
-				{
-					contains = true;
-					break;
-				}
-			}
-		}
-		return contains;
-	}
-	
-	public boolean isDb()
+	protected boolean isDb()
 	{
 		return property.db();
 	}
 	
-	public String getDbName()
+	protected String getDbName()
 	{
 		return AnnotationUtil.validate(property.dbName());
 	}
 	
-	public boolean isId()
+	protected boolean isId()
 	{
 		return property.id();
 	}
 	
-	public boolean isGenerated()
+	protected boolean isGenerated()
 	{
 		return property.generated();
 	}
 	
-	public boolean isMysql()
+	protected boolean isMysql()
 	{
 		return property.mysql();
 	}
 	
-	public String getMysqlName()
+	protected String getMysqlName()
 	{
 		return AnnotationUtil.validate(property.mysqlName());
 	}
 	
-	public boolean isSerial()
+	protected boolean isSerial()
 	{
 		return property.serial();
 	}
 	
-	public String getSerialName()
+	protected String getSerialName()
 	{
 		return AnnotationUtil.validate(property.serialName());
 	}
 	
-	public boolean isJson()
+	protected boolean hasFilter()
+	{
+		return property.filter().length > 0;
+	}
+	
+	protected List<Class<? extends Filterer>> getFilter()
+	{
+		return new List<Class<? extends Filterer>>(property.filter());
+	}
+	
+	protected boolean hasDeserializer()
+	{
+		return !VoidDeserializer.class.equals(property.deserializer());
+	}
+	
+	protected Deserializer<?> getDeserializer()
+	{
+		try
+		{
+			return hasDeserializer() ? property.deserializer().newInstance() : null;
+		}
+		catch(InstantiationException | IllegalAccessException e)
+		{
+			return null;
+		}
+	}
+	
+	protected boolean hasSerializer()
+	{
+		return !VoidSerializer.class.equals(property.serializer());
+	}
+	
+	protected Serializer<?> getSerializer()
+	{
+		try
+		{
+			return hasSerializer() ? property.serializer().newInstance() : null;
+		}
+		catch(InstantiationException | IllegalAccessException e)
+		{
+			return null;
+		}
+	}
+	
+	protected boolean isJson()
 	{
 		return property.json();
 	}
 	
-	public String getJsonName()
+	protected String getJsonName()
 	{
 		return AnnotationUtil.validate(property.jsonName());
 	}
 	
-	public boolean isXml()
+	protected String getJsonTimeFormat()
+	{
+		return AnnotationUtil.validate(property.jsonTimeFormat());
+	}
+	
+	protected boolean hasJsonFilter()
+	{
+		return property.jsonFilter().length > 0;
+	}
+	
+	protected List<Class<? extends Filterer>> getJsonFilter()
+	{
+		return new List<Class<? extends Filterer>>(property.jsonFilter());
+	}
+	
+	protected boolean hasJsonDeserializer()
+	{
+		return !VoidDeserializer.class.equals(property.jsonDeserializer());
+	}
+	
+	protected Deserializer<?> getJsonDeserializer()
+	{
+		try
+		{
+			return hasJsonDeserializer() ? property.jsonDeserializer().newInstance() : null;
+		}
+		catch(InstantiationException | IllegalAccessException e)
+		{
+			return null;
+		}
+	}
+	
+	protected boolean hasJsonSerializer()
+	{
+		return !VoidSerializer.class.equals(property.jsonSerializer());
+	}
+	
+	protected Serializer<?> getJsonSerializer()
+	{
+		try
+		{
+			return hasJsonSerializer() ? property.jsonSerializer().newInstance() : null;
+		}
+		catch(InstantiationException | IllegalAccessException e)
+		{
+			return null;
+		}
+	}
+	
+	protected boolean isXml()
 	{
 		return property.xml();
 	}
 	
-	public String getXmlName()
+	protected String getXmlName()
 	{
 		return AnnotationUtil.validate(property.xmlName());
 	}
 	
-	public boolean isAttribute()
+	protected String getXmlTimeFormat()
 	{
-		return property.attribute();
+		return AnnotationUtil.validate(property.xmlTimeFormat());
 	}
 	
-	public String getElementsName()
+	protected boolean hasXmlFilter()
 	{
-		return AnnotationUtil.validate(property.elementsName());
+		return property.xmlFilter().length > 0;
 	}
 	
-	public boolean isForm()
+	protected List<Class<? extends Filterer>> getXmlFilter()
+	{
+		return new List<Class<? extends Filterer>>(property.xmlFilter());
+	}
+	
+	protected boolean hasXmlDeserializer()
+	{
+		return !VoidDeserializer.class.equals(property.xmlDeserializer());
+	}
+	
+	protected Deserializer<?> getXmlDeserializer()
+	{
+		try
+		{
+			return hasXmlDeserializer() ? property.xmlDeserializer().newInstance() : null;
+		}
+		catch(InstantiationException | IllegalAccessException e)
+		{
+			return null;
+		}
+	}
+	
+	protected boolean hasXmlSerializer()
+	{
+		return !VoidSerializer.class.equals(property.xmlSerializer());
+	}
+	
+	protected Serializer<?> getXmlSerializer()
+	{
+		try
+		{
+			return hasXmlSerializer() ? property.xmlSerializer().newInstance() : null;
+		}
+		catch(InstantiationException | IllegalAccessException e)
+		{
+			return null;
+		}
+	}
+	
+	protected boolean isForm()
 	{
 		return property.form();
 	}
 	
-	public String getFormName()
+	protected String getFormName()
 	{
 		return AnnotationUtil.validate(property.formName());
 	}
 	
-	public boolean isTable()
+	protected String getFormTimeFormat()
+	{
+		return AnnotationUtil.validate(property.formTimeFormat());
+	}
+	
+	protected boolean hasFormFilter()
+	{
+		return property.formFilter().length > 0;
+	}
+	
+	protected List<Class<? extends Filterer>> getFormFilter()
+	{
+		return new List<Class<? extends Filterer>>(property.formFilter());
+	}
+	
+	protected boolean hasFormDeserializer()
+	{
+		return !VoidDeserializer.class.equals(property.formDeserializer());
+	}
+	
+	protected Deserializer<?> getFormDeserializer()
+	{
+		try
+		{
+			return hasFormDeserializer() ? property.formDeserializer().newInstance() : null;
+		}
+		catch(InstantiationException | IllegalAccessException e)
+		{
+			return null;
+		}
+	}
+	
+	protected boolean hasFormSerializer()
+	{
+		return !VoidSerializer.class.equals(property.formSerializer());
+	}
+	
+	protected Serializer<?> getFormSerializer()
+	{
+		try
+		{
+			return hasFormSerializer() ? property.formSerializer().newInstance() : null;
+		}
+		catch(InstantiationException | IllegalAccessException e)
+		{
+			return null;
+		}
+	}
+	
+	protected boolean isTable()
 	{
 		return property.table();
 	}
 	
-	public String getTableName()
+	protected String getTableName()
 	{
 		return AnnotationUtil.validate(property.tableName());
+	}
+	
+	protected String getTableTimeFormat()
+	{
+		return AnnotationUtil.validate(property.tableTimeFormat());
+	}
+	
+	protected boolean hasTableFilter()
+	{
+		return property.tableFilter().length > 0;
+	}
+	
+	protected List<Class<? extends Filterer>> getTableFilter()
+	{
+		return new List<Class<? extends Filterer>>(property.tableFilter());
+	}
+	
+	protected boolean hasTableDeserializer()
+	{
+		return !VoidDeserializer.class.equals(property.tableDeserializer());
+	}
+	
+	protected Deserializer<?> getTableDeserializer()
+	{
+		try
+		{
+			return hasTableDeserializer() ? property.tableDeserializer().newInstance() : null;
+		}
+		catch(InstantiationException | IllegalAccessException e)
+		{
+			return null;
+		}
+	}
+	
+	protected boolean hasTableSerializer()
+	{
+		return !VoidSerializer.class.equals(property.tableSerializer());
+	}
+	
+	protected Serializer<?> getTableSerializer()
+	{
+		try
+		{
+			return hasTableSerializer() ? property.tableSerializer().newInstance() : null;
+		}
+		catch(InstantiationException | IllegalAccessException e)
+		{
+			return null;
+		}
 	}
 	
 	public boolean isRequired()
@@ -436,14 +816,26 @@ public class PropertyReflector
 		return property.required();
 	}
 	
-	public List<String> getFilters()
+	protected List<Class<? extends Validator>> getValidate()
 	{
-		return AnnotationUtil.validate(property.filter());
+		return new List<Class<? extends Validator>>(property.validate());
 	}
 	
-	public List<String> getValidates()
+	public List<Validator> getValidators()
 	{
-		return AnnotationUtil.validate(property.validate());
+		List<Validator> validators = new List<Validator>();
+		for(Class<? extends Validator> validateorClass : getValidate())
+		{
+			try
+			{
+				validators.add(validateorClass.newInstance());
+			}
+			catch (InstantiationException | IllegalAccessException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return validators;
 	}
 	
 }

@@ -4,49 +4,53 @@ import java.io.Serializable;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
+import roth.lib.java.deserializer.IntegerCurrencyDeserializer;
+import roth.lib.java.filter.NumberFilterer;
+import roth.lib.java.filter.TrimFilterer;
 import roth.lib.java.json.JsonMapper;
+import roth.lib.java.time.Time;
 
 @Entity
 @SuppressWarnings("serial")
 public class TableModel implements Serializable
 {
-	@Property(name = "TransactionDateTime")
-	protected String transactionDateTime;
+	@Property(name = "transactionTime", tableName = "TransactionDateTime", tableTimeFormat = "M/d/yyy h:mm:ss a")
+	protected Time transactionTime;
 	
-	@Property(name = "account_num")
+	@Property(name = "accountNum", tableName = "account_num")
 	protected String accountNum;
 	
-	@Property(name = "Trans_Id")
+	@Property(name = "transId", tableName = "Trans_Id")
 	protected String transId;
 	
-	@Property(name = "att_num")
+	@Property(name = "attNum", tableName = "att_num")
 	protected String attNum;
 	
-	@Property(name = "TransactionType")
+	@Property(name = "transactionType", tableName = "TransactionType")
 	protected String transactionType;
 	
-	@Property(name = "Amount")
-	protected String amount;
+	@Property(name = "amount", tableName = "Amount", tableFilter = NumberFilterer.class, tableDeserializer = IntegerCurrencyDeserializer.class)
+	protected Integer amount;
 	
-	@Property(name = "NetAmount")
-	protected String netAmount;
+	@Property(name = "netAmount", tableName = "NetAmount", tableFilter = NumberFilterer.class, tableDeserializer = IntegerCurrencyDeserializer.class)
+	protected Integer netAmount;
 	
-	@Property(name = "inv_num")
+	@Property(name = "invNum", tableName = "inv_num", tableFilter = TrimFilterer.class)
 	protected String invNum;
 	
-	@Property(name = "Details")
+	@Property(name = "details", tableName = "Details")
 	protected String details;
 	
-	@Property(name = "AchReturnCode")
+	@Property(name = "achReturnCode", tableName = "AchReturnCode")
 	protected String achReturnCode;
 
-	@Property(name = "ReturnCodeDescription")
+	@Property(name = "returnCodeDescription", tableName = "ReturnCodeDescription")
 	protected String returnCodeDescription;
 	
-	@Property(name = "ChargeBackResponeCode")
+	@Property(name = "chargeBackResponeCode", tableName = "ChargeBackResponeCode")
 	protected String chargeBackResponeCode;
 	
-	@Property(name = "ResponeCodeDescription")
+	@Property(name = "responeCodeDescription", tableName = "ResponeCodeDescription")
 	protected String responeCodeDescription;
 	
 	public TableModel()
@@ -54,9 +58,9 @@ public class TableModel implements Serializable
 		
 	}
 	
-	public TableModel(String transactionDateTime, String accountNum, String transId, String attNum, String transactionType, String amount, String netAmount, String invNum, String details, String achReturnCode, String returnCodeDescription, String chargeBackResponeCode, String responeCodeDescription)
+	public TableModel(Time transactionTime, String accountNum, String transId, String attNum, String transactionType, Integer amount, Integer netAmount, String invNum, String details, String achReturnCode, String returnCodeDescription, String chargeBackResponeCode, String responeCodeDescription)
 	{
-		this.transactionDateTime = transactionDateTime;
+		this.transactionTime = transactionTime;
 		this.accountNum = accountNum;
 		this.transId = transId;
 		this.attNum = attNum;
@@ -71,9 +75,9 @@ public class TableModel implements Serializable
 		this.responeCodeDescription = responeCodeDescription;
 	}
 	
-	public String getTransactionDateTime()
+	public Time getTransactionTime()
 	{
-		return transactionDateTime;
+		return transactionTime;
 	}
 	
 	public String getAccountNum()
@@ -96,12 +100,12 @@ public class TableModel implements Serializable
 		return transactionType;
 	}
 	
-	public String getAmount()
+	public Integer getAmount()
 	{
 		return amount;
 	}
 	
-	public String getNetAmount()
+	public Integer getNetAmount()
 	{
 		return netAmount;
 	}
@@ -136,9 +140,9 @@ public class TableModel implements Serializable
 		return responeCodeDescription;
 	}
 	
-	public TableModel setTransactionDateTime(String transactionDateTime)
+	public TableModel setTransactionTime(Time transactionTime)
 	{
-		this.transactionDateTime = transactionDateTime;
+		this.transactionTime = transactionTime;
 		return this;
 	}
 	
@@ -166,13 +170,13 @@ public class TableModel implements Serializable
 		return this;
 	}
 	
-	public TableModel setAmount(String amount)
+	public TableModel setAmount(Integer amount)
 	{
 		this.amount = amount;
 		return this;
 	}
 	
-	public TableModel setNetAmount(String netAmount)
+	public TableModel setNetAmount(Integer netAmount)
 	{
 		this.netAmount = netAmount;
 		return this;

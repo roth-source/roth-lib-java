@@ -276,6 +276,7 @@ public class FormMapper extends Mapper
 			if(deserializer != null)
 			{
 				String timeFormat = getTimeFormat(propertyReflector);
+				value = propertyReflector.filter(value, getMapperType());
 				ReflectionUtil.setFieldValue(propertyReflector.getField(), model, deserializer.deserialize(value, timeFormat, propertyReflector.getFieldClass()));
 			}
 		}
@@ -335,7 +336,7 @@ public class FormMapper extends Mapper
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(value.getClass());
 		for(PropertyReflector propertyReflector : entityReflector.getPropertyReflectors(getMapperType()))
 		{
-			if(!hasContext() || !propertyReflector.getExcludes().contains(getContext()))
+			if(!hasContext() || !propertyReflector.isExcluded(getContext()))
 			{
 				Class<?> propertyClass = propertyReflector.getFieldClass();
 				String propertyName = propertyReflector.getPropertyName(getMapperType());

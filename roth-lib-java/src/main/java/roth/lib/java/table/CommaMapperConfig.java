@@ -7,7 +7,7 @@ public class CommaMapperConfig extends MapperConfig
 	
 	public CommaMapperConfig()
 	{
-		delimiter = TAB;
+		delimiter = COMMA;
 	}
 	
 }

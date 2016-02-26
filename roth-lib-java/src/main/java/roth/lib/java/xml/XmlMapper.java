@@ -494,6 +494,7 @@ public class XmlMapper extends Mapper
 							if(deserializer != null)
 							{
 								String timeFormat = getTimeFormat(propertyReflector);
+								value = propertyReflector.filter(value, getMapperType());
 								ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeFormat, fieldClass));
 								setDeserializedName(model, propertyReflector.getFieldName());
 							}
@@ -593,6 +594,7 @@ public class XmlMapper extends Mapper
 						if(deserializer != null)
 						{
 							String timeFormat = getTimeFormat(propertyReflector);
+							value = propertyReflector.filter(value, getMapperType());
 							E deserializedValue = deserializer.deserialize(value, timeFormat, elementClass);
 							if(deserializedValue != null)
 							{
@@ -694,6 +696,7 @@ public class XmlMapper extends Mapper
 						String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
 						readTag(reader);
 						String timeFormat = getTimeFormat(propertyReflector);
+						value = propertyReflector.filter(value, getMapperType());
 						E deserializedValue = deserializer.deserialize(value, timeFormat, elementClass);
 						if(deserializedValue != null)
 						{
@@ -745,6 +748,7 @@ public class XmlMapper extends Mapper
 				String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
 				readTag(reader);
 				String timeFormat = getTimeFormat(propertyReflector);
+				value = propertyReflector.filter(value, getMapperType());
 				element = deserializer.deserialize(value, timeFormat, elementClass);
 			}
 			else

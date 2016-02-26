@@ -6,21 +6,44 @@ import java.text.DecimalFormat;
 
 public class CurrencyUtil
 {
+	public static final String DEFAULT_PATTERN 	= "'$'#,##0.00";
+	public static final String NUMBER_FILTER	= "[^0-9\\-\\.]";
 	
 	protected CurrencyUtil()
 	{
 		
 	}
 	
-	public static String format(Integer value)
+	public static String format(Number value)
 	{
-		DecimalFormat formatter = new DecimalFormat("'$'#,##0.00");
-		return value != null ? formatter.format(new BigDecimal(BigInteger.valueOf(value), 2)) : null;
+		return format(value, DEFAULT_PATTERN);
+	}
+	
+	public static String format(Number value, String pattern)
+	{
+		return value != null ? new DecimalFormat(pattern).format(new BigDecimal(BigInteger.valueOf(value.longValue()), 2)) : null;
+	}
+	
+	public static BigDecimal parse(String value)
+	{
+		BigDecimal number = null;
+		try
+		{
+			if(value != null)
+			{
+				number = new BigDecimal(value.replaceAll(NUMBER_FILTER, "")).multiply(new BigDecimal(100));
+			}
+		}
+		catch(Exception e)
+		{
+			
+		}
+		return number;
 	}
 	
 	public static void main(String[] args)
 	{
-		System.out.println(format(-123456789));
+		System.out.println(parse("$   -10,000"));
 	}
 	
 }
