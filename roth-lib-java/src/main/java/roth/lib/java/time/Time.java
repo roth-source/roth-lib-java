@@ -249,6 +249,11 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 		}
 	}
 	
+	public int getMonthDays()
+	{
+		return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+	}
+	
 	public Time addYears(int years)
 	{
 		calendar.add(Calendar.YEAR, years);
