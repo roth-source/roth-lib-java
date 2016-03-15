@@ -28,6 +28,7 @@
 		<module>../roth-lib-java-api</module>
 		<module>../roth-lib-java-server</module>
 		<module>../roth-lib-java-db</module>
+		<module>../roth-lib-java-web-plugin</module>
 	</modules>
 	<build>
 		<plugins>

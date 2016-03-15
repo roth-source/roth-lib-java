@@ -711,6 +711,10 @@ public class JsonMapper extends Mapper
 		Class<T> klass = ReflectionUtil.getTypeClass(type);
 		Type keyType = ReflectionUtil.getElementType(type);
 		Class<K> keyClass = ReflectionUtil.getTypeClass(keyType);
+		if(Object.class.equals(keyClass))
+		{
+			keyClass = (Class<K>) String.class;
+		}
 		Type elementType = ReflectionUtil.getElementType(type);
 		if(klass.isAssignableFrom(Map.class))
 		{

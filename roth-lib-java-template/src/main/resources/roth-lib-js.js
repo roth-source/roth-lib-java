@@ -201,6 +201,21 @@ var forEach = forEach || function(object, callback)
 };
 
 
+var mixin = mixin || function(dest, source)
+{
+	if(isFunction(dest) && isFunction(source))
+	{
+		forEach(source.prototype, function(value, name)
+		{
+			if(isFunction(value))
+			{
+				dest.prototype[name] = value;
+			}
+		});
+	}
+};
+
+
 
 
 
@@ -881,7 +896,44 @@ var DateUtil = DateUtil ||
 			value = this.format(formatPattern, date, lang);
 		}
 		return value;
+	},
+	
+	
+	equals : function(date1, date2)
+	{
+		return date1 >= date2 && date1 <= date2;
+	},
+	
+	
+	day : function(date)
+	{
+		if(!isDate(date))
+		{
+			date = new Date();
+		}
+		return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+	},
+	
+	
+	month : function(date)
+	{
+		if(!isDate(date))
+		{
+			date = new Date();
+		}
+		return new Date(date.getFullYear(), date.getMonth(), 1);
+	},
+	
+	
+	year : function(date)
+	{
+		if(!isDate(date))
+		{
+			date = new Date();
+		}
+		return new Date(date.getFullYear(), 0, 1);
 	}
+	
 	
 };
 
@@ -1064,6 +1116,22 @@ var StringUtil = StringUtil ||
 	capitalize : function(value)
 	{
 		return value.charAt(0).toUpperCase() + value.slice(1);
+	},
+	
+	
+	camelCase : function(value)
+	{
+		value = this.capitalize(value);
+		value = value.replace(/[^a-zA-Z0-9]+([a-zA-Z0-9]{1})/g, function(match, capture)
+		{
+			var replacement = "";
+			if(isValidString(capture))
+			{
+				replacement = capture.charAt(0).toUpperCase();
+			}
+			return replacement;
+		});
+		return value;
 	}
 	
 	
