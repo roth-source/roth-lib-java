@@ -101,12 +101,12 @@ public class TableMapper extends Mapper
 	{
 		if(getMapperConfig().isSerializeHeader())
 		{
-			Character seperator = NULL;
+			String seperator = BLANK;
 			for(PropertyReflector propertyReflector : entityReflector.getPropertyReflectors(getMapperType()))
 			{
 				writer.write(seperator);
 				writer.write(propertyReflector.getPropertyName(getMapperType()));
-				seperator = getMapperConfig().getDelimiter();
+				seperator = String.valueOf(getMapperConfig().getDelimiter());
 			}
 			writer.write(CARRIAGE_RETURN);
 			writer.write(NEW_LINE);
@@ -123,12 +123,12 @@ public class TableMapper extends Mapper
 	
 	protected void writeEntity(Writer writer, Object value, EntityReflector entityReflector) throws Exception
 	{
-		Character seperator = NULL;
+		String seperator = BLANK;
 		for(PropertyReflector propertyReflector : entityReflector.getPropertyReflectors(getMapperType()))
 		{
 			writer.write(seperator);
 			writeField(writer, ReflectionUtil.getFieldValue(propertyReflector.getField(), value), propertyReflector);
-			seperator = getMapperConfig().getDelimiter();
+			seperator = String.valueOf(getMapperConfig().getDelimiter());
 		}
 		writer.write(CARRIAGE_RETURN);
 		writer.write(NEW_LINE);
