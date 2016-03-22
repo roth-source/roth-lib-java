@@ -26,13 +26,20 @@ public class List<E> extends LinkedList<E>
 	public List(E...c)
 	{
 		super();
-		addAll(Arrays.asList(c));
+		if(c != null)
+		{
+			addAll(Arrays.asList(c));
+		}
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<E> array(E...c)
 	{
-		return collection(Arrays.asList(c));
+		if(c != null)
+		{
+			collection(Arrays.asList(c));
+		}
+		return this;
 	}
 	
 	public List<E> collection(Collection<? extends E> c)

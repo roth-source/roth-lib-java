@@ -49,6 +49,7 @@ public class WebCompile implements Characters
 	protected static String COMPONENT				= "component";
 	protected static String SOURCE					= "source";
 	
+	protected PrintWriter writer = null;
 	protected Template template = new Template();
 	protected File projectDir;
 	protected File webAppDir;
@@ -64,7 +65,16 @@ public class WebCompile implements Characters
 	
 	public WebCompile()
 	{
+		this(true);
+	}
+	
+	public WebCompile(boolean debug)
+	{
 		init();
+		if(debug)
+		{
+			writer = new PrintWriter(System.out, true);
+		}
 	}
 	
 	protected void init()
@@ -197,6 +207,19 @@ public class WebCompile implements Characters
 		return baseDir.toPath().relativize(file.toPath()).toString();
 	}
 	
+	protected void println()
+	{
+		println("");
+	}
+	
+	protected void println(String message)
+	{
+		if(writer != null)
+		{
+			writer.println(message);
+		}
+	}
+	
 	public void compile() throws Exception
 	{
 		for(File appDir : this.appDir.listFiles())
@@ -211,10 +234,10 @@ public class WebCompile implements Characters
 	protected void compileApp(File appDir) throws Exception
 	{
 		String app = appDir.getName();
-		System.out.println("--------------------------------------------------------------------");
-		System.out.println("Compiling app " + app);
-		System.out.println("--------------------------------------------------------------------");
-		System.out.println("");
+		println("--------------------------------------------------------------------");
+		println("Compiling app " + app);
+		println("--------------------------------------------------------------------");
+		println();
 		for(File moduleDir : appDir.listFiles())
 		{
 			if(moduleDir.isDirectory())
@@ -224,51 +247,51 @@ public class WebCompile implements Characters
 				compileModule(moduleDir, targetDir);
 			}
 		}
-		System.out.println("");
+		println();
 	}
 	
 	protected void compileModule(File moduleDir, File targetDir) throws Exception
 	{
 		String module = moduleDir.getName();
-		System.out.println("Compiling module " + module);
+		println("Compiling module " + module);
 		try(PrintWriter writer = new PrintWriter(new File(targetDir, module + ".js")))
 		{
 			File scriptDir = getScriptDir(moduleDir);
 			if(scriptDir.exists() && scriptDir.list().length > 0)
 			{
-				System.out.println("Scripts");
+				println("Scripts");
 				compileScripts(writer, scriptDir, scriptDir);
 			}
 			
 			File textDir = getTextDir(moduleDir);
 			if(textDir.exists() && textDir.list().length > 0)
 			{
-				System.out.println("Texts");
+				println("Texts");
 				compileTexts(writer, textDir, textDir, module);
 			}
 			
 			File layoutDir = getLayoutDir(moduleDir);
 			if(layoutDir.exists() && layoutDir.list().length > 0)
 			{
-				System.out.println("Layouts");
+				println("Layouts");
 				compileViews(writer, layoutDir, layoutDir, module, LAYOUT);
 			}
 			
 			File pageDir = getPageDir(moduleDir);
 			if(pageDir.exists() && pageDir.list().length > 0)
 			{
-				System.out.println("Pages");
+				println("Pages");
 				compileViews(writer, pageDir, pageDir, module, PAGE);
 			}
 			
 			File componentDir = getComponentDir(moduleDir);
 			if(componentDir.exists() && componentDir.list().length > 0)
 			{
-				System.out.println("Components");
+				println("Components");
 				compileViews(writer, componentDir, componentDir, module, COMPONENT);
 			}
 		}
-		System.out.println();
+		println();
 	}
 	
 	protected void compileScripts(PrintWriter writer, File dir, File baseDir) throws Exception
@@ -283,7 +306,7 @@ public class WebCompile implements Characters
 			{
 				try(FileReader reader = new FileReader(file))
 				{
-					System.out.println("- " + relative(baseDir, file));
+					println("- " + relative(baseDir, file));
 					writer.println();
 					IoUtil.copy(reader, writer);
 					writer.println();
@@ -305,7 +328,7 @@ public class WebCompile implements Characters
 				Matcher matcher = LANG_PATTERN.matcher(file.getName());
 				if(matcher.find())
 				{
-					System.out.println("- " + relative(baseDir, file));
+					println("- " + relative(baseDir, file));
 					String lang = matcher.group(1);
 					String text = FileUtil.toString(file).replaceAll("[\\r\\n\\t]", "");
 					writer.println();
@@ -313,9 +336,9 @@ public class WebCompile implements Characters
 					writer.print(DOT);
 					writer.print(REGISTER);
 					writer.print(DOT);
-					writer.print(TEXT);
-					writer.print(DOT);
 					writer.print(module);
+					writer.print(DOT);
+					writer.print(TEXT);
 					writer.print(DOT);
 					writer.print(lang);
 					writer.print(SPACE);
@@ -343,7 +366,7 @@ public class WebCompile implements Characters
 				File htmlFile = new File(file.getParentFile(), file.getName().replaceFirst("\\.js$", ".html"));
 				if(htmlFile.exists())
 				{
-					System.out.println("- " + relative);
+					println("- " + relative);
 					try(FileReader reader = new FileReader(file))
 					{
 						writer.println();
@@ -357,9 +380,9 @@ public class WebCompile implements Characters
 					writer.print(DOT);
 					writer.print(REGISTER);
 					writer.print(DOT);
-					writer.print(type);
-					writer.print(DOT);
 					writer.print(module);
+					writer.print(DOT);
+					writer.print(type);
 					writer.print(DOT);
 					writer.print(name);
 					writer.print(DOT);

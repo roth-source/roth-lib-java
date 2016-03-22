@@ -21,7 +21,7 @@ public class WebCompilePlugin extends AbstractMojo
 	{
 		try
 		{
-			WebCompile webCompile = new WebCompile();
+			WebCompile webCompile = new WebCompile(false);
 			webCompile.compile();
 		}
 		catch(Exception e)
