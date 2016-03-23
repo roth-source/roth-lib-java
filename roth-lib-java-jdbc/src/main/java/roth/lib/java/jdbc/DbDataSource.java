@@ -17,6 +17,7 @@ import javax.sql.DataSource;
 
 import roth.lib.java.Callback;
 import roth.lib.java.Characters;
+import roth.lib.java.Init;
 import roth.lib.java.jdbc.sql.Delete;
 import roth.lib.java.jdbc.sql.Insert;
 import roth.lib.java.jdbc.sql.Select;
@@ -560,6 +561,10 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 					Object value = resultSet.getValue(columnLabel, field.getType());
 					field.set(model, value);
 				}
+			}
+			if(model instanceof Init)
+			{
+				((Init) model).init();
 			}
 		}
 		catch(Exception e)
