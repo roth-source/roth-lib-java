@@ -48,6 +48,8 @@ public class WebCompile implements Characters
 	protected static String PAGE					= "page";
 	protected static String COMPONENT				= "component";
 	protected static String SOURCE					= "source";
+	protected static String OPEN_CLOSURE			= "(function(){";
+	protected static String CLOSE_CLOSURE			= "})();";
 	
 	protected PrintWriter writer = null;
 	protected Template template = new Template();
@@ -366,25 +368,35 @@ public class WebCompile implements Characters
 				File htmlFile = new File(file.getParentFile(), file.getName().replaceFirst("\\.js$", ".html"));
 				if(htmlFile.exists())
 				{
+					String name = relative.replaceFirst("\\.js$", "").replaceAll("[^a-zA-Z_0-9]", "_");
+					StringBuilder namespace = new StringBuilder();
+					namespace.append(web);
+					namespace.append(DOT);
+					namespace.append(REGISTER);
+					namespace.append(DOT);
+					namespace.append(module);
+					namespace.append(DOT);
+					namespace.append(type);
+					namespace.append(DOT);
+					namespace.append(name);
+					
 					println("- " + relative);
 					try(FileReader reader = new FileReader(file))
 					{
 						writer.println();
-						IoUtil.copy(reader, writer);
+						String viewScript = IoUtil.toString(reader);
+						writer.print(namespace);
+						writer.print(SPACE);
+						writer.print(EQUAL);
+						writer.print(SPACE);
+						writer.print(OPEN_CLOSURE);
+						writer.print(viewScript);
+						writer.print(CLOSE_CLOSURE);
 						writer.println();
 					}
-					String name = relative.replaceFirst("\\.js$", "").replaceAll("[^a-zA-Z_0-9]", "_");
 					String source = template.parse(FileUtil.toString(htmlFile)).replaceAll("[\\r\\n\\t]", "").replaceAll("\\\\n", "\\\\\\\\n").replaceAll("\\\\\\\"", "\\\\\\\\\"").replaceAll("\"", "\\\\\"");
 					writer.println();
-					writer.print(web);
-					writer.print(DOT);
-					writer.print(REGISTER);
-					writer.print(DOT);
-					writer.print(module);
-					writer.print(DOT);
-					writer.print(type);
-					writer.print(DOT);
-					writer.print(name);
+					writer.print(namespace);
 					writer.print(DOT);
 					writer.print(SOURCE);
 					writer.print(SPACE);
