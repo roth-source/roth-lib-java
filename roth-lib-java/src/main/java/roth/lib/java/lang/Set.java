@@ -205,7 +205,18 @@ public class Set<E> extends LinkedHashSet<E>
 	@Override
 	public String toString()
 	{
-		return super.toString();
+		StringBuilder builder = new StringBuilder();
+		String seperater = "";
+		for(E element : this)
+		{
+			if(element != null)
+			{
+				builder.append(seperater);
+				builder.append(element.toString());
+				seperater = ",";
+			}
+		}
+		return builder.toString();
 	}
 	
 	public static <E> Set<E> fromArray(E[] array)

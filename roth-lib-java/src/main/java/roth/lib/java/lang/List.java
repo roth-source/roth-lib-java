@@ -474,7 +474,18 @@ public class List<E> extends LinkedList<E>
 	@Override
 	public String toString()
 	{
-		return super.toString();
+		StringBuilder builder = new StringBuilder();
+		String seperater = "";
+		for(E element : this)
+		{
+			if(element != null)
+			{
+				builder.append(seperater);
+				builder.append(element.toString());
+				seperater = ",";
+			}
+		}
+		return builder.toString();
 	}
 	
 	@SafeVarargs
