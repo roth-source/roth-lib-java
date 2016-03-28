@@ -24,6 +24,7 @@ public class WebCompile implements Characters
 	protected static String TARGET_DEFAULT			= "app";
 	protected static String SCRIPT_DEFAULT			= "script";
 	protected static String TEXT_DEFAULT			= "text";
+	protected static String MIXIN_DEFAULT			= "mixin";
 	protected static String LAYOUT_DEFAULT			= "layout";
 	protected static String PAGE_DEFAULT			= "page";
 	protected static String COMPONENT_DEFAULT		= "component";
@@ -38,12 +39,14 @@ public class WebCompile implements Characters
 	protected static String TARGET_DIR				= "targetDir";
 	protected static String SCRIPT_DIR				= "scriptDir";
 	protected static String TEXT_DIR				= "textDir";
+	protected static String MIXIN_DIR				= "mixinDir";
 	protected static String LAYOUT_DIR				= "layoutDir";
 	protected static String PAGE_DIR				= "pageDir";
 	protected static String COMPONENT_DIR			= "componentDir";
 	protected static String WEB						= "web";
 	protected static String REGISTER				= "register";
 	protected static String TEXT					= "text";
+	protected static String MIXIN					= "mixin";
 	protected static String LAYOUT					= "layout";
 	protected static String PAGE					= "page";
 	protected static String COMPONENT				= "component";
@@ -60,6 +63,7 @@ public class WebCompile implements Characters
 	protected File targetDir;
 	protected String scriptDir;
 	protected String textDir;
+	protected String mixinDir;
 	protected String layoutDir;
 	protected String pageDir;
 	protected String componentDir;
@@ -88,6 +92,7 @@ public class WebCompile implements Characters
 		targetDir = new File(webAppDir, TARGET_DEFAULT);
 		scriptDir = SCRIPT_DEFAULT;
 		textDir = TEXT_DEFAULT;
+		mixinDir = MIXIN_DEFAULT;
 		layoutDir = LAYOUT_DEFAULT;
 		pageDir = PAGE_DEFAULT;
 		componentDir = COMPONENT_DEFAULT;
@@ -127,6 +132,11 @@ public class WebCompile implements Characters
 	public File getTextDir(File moduleDir)
 	{
 		return new File(moduleDir, textDir);
+	}
+	
+	public File getMixinDir(File moduleDir)
+	{
+		return new File(moduleDir, mixinDir);
 	}
 	
 	public File getLayoutDir(File moduleDir)
@@ -182,6 +192,11 @@ public class WebCompile implements Characters
 	public void setTextDir(String textDir)
 	{
 		this.textDir = textDir;
+	}
+	
+	public void setMixinDir(String mixinDir)
+	{
+		this.mixinDir = mixinDir;
 	}
 	
 	public void setLayoutDir(String layoutDir)
@@ -270,6 +285,13 @@ public class WebCompile implements Characters
 			{
 				println("Texts");
 				compileTexts(writer, textDir, textDir, module);
+			}
+
+			File mixinDir = getMixinDir(moduleDir);
+			if(mixinDir.exists() && mixinDir.list().length > 0)
+			{
+				println("Mixins");
+				compileViews(writer, mixinDir, mixinDir, module, MIXIN);
 			}
 			
 			File layoutDir = getLayoutDir(moduleDir);
@@ -366,7 +388,7 @@ public class WebCompile implements Characters
 			{
 				String relative = relative(baseDir, file);
 				File htmlFile = new File(file.getParentFile(), file.getName().replaceFirst("\\.js$", ".html"));
-				if(htmlFile.exists())
+				if(htmlFile.exists() || type.equals(MIXIN))
 				{
 					String name = relative.replaceFirst("\\.js$", "").replaceAll("[^a-zA-Z_0-9]", "_");
 					StringBuilder namespace = new StringBuilder();
@@ -394,19 +416,23 @@ public class WebCompile implements Characters
 						writer.print(CLOSE_CLOSURE);
 						writer.println();
 					}
-					String source = template.parse(FileUtil.toString(htmlFile)).replaceAll("[\\r\\n\\t]", "").replaceAll("\\\\n", "\\\\\\\\n").replaceAll("\\\\\\\"", "\\\\\\\\\"").replaceAll("\"", "\\\\\"");
-					writer.println();
-					writer.print(namespace);
-					writer.print(DOT);
-					writer.print(SOURCE);
-					writer.print(SPACE);
-					writer.print(EQUAL);
-					writer.print(SPACE);
-					writer.print(QUOTE);
-					writer.print(source);
-					writer.print(QUOTE);
-					writer.print(SEMI_COLON);
-					writer.println();
+					
+					if(htmlFile.exists() && !type.equals(MIXIN))
+					{
+						String source = template.parse(FileUtil.toString(htmlFile)).replaceAll("[\\r\\n\\t]", "").replaceAll("\\\\n", "\\\\\\\\n").replaceAll("\\\\\\\"", "\\\\\\\\\"").replaceAll("\"", "\\\\\"");
+						writer.println();
+						writer.print(namespace);
+						writer.print(DOT);
+						writer.print(SOURCE);
+						writer.print(SPACE);
+						writer.print(EQUAL);
+						writer.print(SPACE);
+						writer.print(QUOTE);
+						writer.print(source);
+						writer.print(QUOTE);
+						writer.print(SEMI_COLON);
+						writer.println();
+					}
 				}
 			}
 		}
@@ -443,6 +469,10 @@ public class WebCompile implements Characters
 		if(argMap.containsKey(TEXT_DIR))
 		{
 			webCompile.setTextDir(argMap.get(TEXT_DIR));
+		}
+		if(argMap.containsKey(MIXIN_DIR))
+		{
+			webCompile.setMixinDir(argMap.get(MIXIN_DIR));
 		}
 		if(argMap.containsKey(LAYOUT_DIR))
 		{
