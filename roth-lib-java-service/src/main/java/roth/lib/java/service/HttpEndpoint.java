@@ -15,7 +15,6 @@ import java.util.zip.GZIPInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import roth.lib.java.Characters;
 import roth.lib.java.http.HttpMethod;
@@ -261,15 +260,6 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		
 		if(methodResponse != null)
 		{
-			if(dev && methodResponse instanceof HttpServiceResponse)
-			{
-				HttpServiceResponse serviceResponse = (HttpServiceResponse) methodResponse;
-				HttpSession session = request.getSession(false);
-				if(session != null)
-				{
-					serviceResponse.setJsessionId(session.getId());
-				}
-			}
 			try(OutputStream output = response.getOutputStream())
 			{
 				responseMapper.serialize(methodResponse, output);

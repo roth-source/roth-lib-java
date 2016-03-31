@@ -709,7 +709,7 @@ public class JsonMapper extends Mapper
 	{
 		Map<K, E> map = null;
 		Class<T> klass = ReflectionUtil.getTypeClass(type);
-		Type keyType = ReflectionUtil.getElementType(type);
+		Type keyType = ReflectionUtil.getKeyType(type);
 		Class<K> keyClass = ReflectionUtil.getTypeClass(keyType);
 		if(Object.class.equals(keyClass))
 		{

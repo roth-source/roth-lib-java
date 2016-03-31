@@ -10,24 +10,12 @@ import roth.lib.java.annotation.Property;
 @SuppressWarnings("serial")
 public class HttpServiceResponse implements Serializable
 {
-	@Property(name = "dev")
-	protected HttpServiceDev dev;
-	
 	@Property(name = "errors")
 	protected List<HttpError> errors;
 	
 	public HttpServiceResponse()
 	{
 		
-	}
-	
-	public HttpServiceDev getDev()
-	{
-		if(dev == null)
-		{
-			dev = new HttpServiceDev();
-		}
-		return dev;
 	}
 	
 	public HttpServiceResponse addError(HttpError error)
@@ -43,18 +31,6 @@ public class HttpServiceResponse implements Serializable
 			errors = new List<HttpError>();
 		}
 		return errors;
-	}
-	
-	public HttpServiceResponse setDev(HttpServiceDev dev)
-	{
-		this.dev = dev;
-		return this;
-	}
-	
-	public HttpServiceResponse setJsessionId(String jsessionId)
-	{
-		getDev().setJsessionId(jsessionId);
-		return this;
 	}
 	
 	public HttpServiceResponse setErrors(List<HttpError> errors)
