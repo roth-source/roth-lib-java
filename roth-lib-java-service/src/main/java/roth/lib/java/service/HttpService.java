@@ -153,16 +153,21 @@ public abstract class HttpService
 	
 	public HttpSession initSession()
 	{
-		HttpSession session = httpServletRequest.getSession(false);
+		HttpSession session = getSession(false);
 		if(session != null)
 		{
 			session.invalidate();
 		}
-		session = httpServletRequest.getSession(true);
+		session = getSession(true);
 		String csrfToken = generateCsrfToken();
 		session.setAttribute(CSRF_TOKEN, csrfToken);
 		httpServletResponse.setHeader(X_CSRF_TOKEN, csrfToken);
 		return session;
+	}
+	
+	public HttpSession getSession(boolean create)
+	{
+		return httpServletRequest.getSession(true);
 	}
 	
 	public String generateCsrfToken()
@@ -185,7 +190,7 @@ public abstract class HttpService
 	public String getSessionCsrfToken()
 	{
 		String csrfToken = null;
-		Object csrfTokenObject = httpServletRequest.getSession().getAttribute(CSRF_TOKEN);
+		Object csrfTokenObject = getSession(true).getAttribute(CSRF_TOKEN);
 		if(csrfTokenObject != null && csrfTokenObject instanceof String)
 		{
 			csrfToken = (String) csrfTokenObject;
