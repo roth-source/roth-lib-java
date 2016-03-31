@@ -237,9 +237,12 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		DbConnection connection = wrap(driver.connect(url, properties));
 		connection.setCloseHandler(closeHandler);
 		connection.setAutoCommit(false);
+		setTimeZone(connection);
 		usedConnections.add(connection);
 		return connection;
 	}
+	
+	protected abstract void setTimeZone(DbConnection connection);
 	
 	@Override
 	public PrintWriter getLogWriter()
@@ -1260,6 +1263,63 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 				model.deleted();
 				model.resetDirty();
 			}
+		}
+		return result;
+	}
+	
+
+	public int execute(String sql)
+	{
+		return execute(sql, (Collection<Object>) null);
+	}
+	
+	public int execute(String sql, Collection<Object> values)
+	{
+		return execute(sql, values, 0);
+	}
+	
+	protected int execute(String sql, Collection<Object> values, int attempt)
+	{
+		int result = 0;
+		try(DbConnection connection = getConnection())
+		{
+			try
+			{
+				result = execute(sql, values, connection);
+				connection.commit();
+			}
+			catch(SQLException e)
+			{
+				connection.rollback();
+				connection.close();
+				throw e;
+			}
+		}
+		catch(SQLException e)
+		{
+			if(isDeadLockException(e) && attempt++ < getDeadLockRetries())
+			{
+				result = execute(sql, values, attempt);
+			}
+			else
+			{
+				throw new DbException(e);
+			}
+		}
+		return result;
+	}
+	
+	protected int execute(String sql, DbConnection connection) throws SQLException
+	{
+		return execute(sql, (Collection<Object>) null, connection);
+	}
+	
+	protected int execute(String sql, Collection<Object> values, DbConnection connection) throws SQLException
+	{
+		int result = 0;
+		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
+		{
+			result = preparedStatement.executeUpdate();
 		}
 		return result;
 	}

@@ -1,9 +1,13 @@
 package roth.lib.java.jdbc.mysql;
 
+import java.sql.SQLException;
+import java.time.ZonedDateTime;
 import java.util.Properties;
 
+import roth.lib.java.jdbc.DbConnection;
 import roth.lib.java.jdbc.DbDataSource;
 import roth.lib.java.jdbc.mysql.sql.MysqlSqlFactory;
+import roth.lib.java.lang.List;
 import roth.lib.java.mapper.MapperType;
 
 public class MysqlDb extends DbDataSource implements MysqlDbWrapper, MysqlSqlFactory
@@ -47,6 +51,20 @@ public class MysqlDb extends DbDataSource implements MysqlDbWrapper, MysqlSqlFac
 			deadLockExcepione = true;
 		}
 		return deadLockExcepione;
+	}
+	
+	@Override
+	protected void setTimeZone(DbConnection connection)
+	{
+		try
+		{
+			String timeZone = ZonedDateTime.now().getOffset().toString();
+			execute("SET time_zone = ?", new List<Object>(timeZone), connection);
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 }
