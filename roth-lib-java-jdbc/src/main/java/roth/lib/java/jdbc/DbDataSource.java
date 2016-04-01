@@ -237,12 +237,9 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		DbConnection connection = wrap(driver.connect(url, properties));
 		connection.setCloseHandler(closeHandler);
 		connection.setAutoCommit(false);
-		setTimeZone(connection);
 		usedConnections.add(connection);
 		return connection;
 	}
-	
-	protected abstract void setTimeZone(DbConnection connection);
 	
 	@Override
 	public PrintWriter getLogWriter()
