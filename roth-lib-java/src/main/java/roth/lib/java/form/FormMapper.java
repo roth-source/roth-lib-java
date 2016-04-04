@@ -109,6 +109,43 @@ public class FormMapper extends Mapper
 		}
 	}
 	
+	public Map<String, String> getParamMap(Object value)
+	{
+		Map<String, String> paramMap = new Map<>();
+		EntityReflector entityReflector = getMapperReflector().getEntityReflector(value.getClass());
+		for(PropertyReflector propertyReflector : entityReflector.getPropertyReflectors(getMapperType()))
+		{
+			if(!hasContext() || !propertyReflector.isExcluded(getContext()))
+			{
+				Class<?> propertyClass = propertyReflector.getFieldClass();
+				String propertyName = propertyReflector.getPropertyName(getMapperType());
+				if(propertyName != null)
+				{
+					Serializer<?> serializer = getSerializer(propertyClass, propertyReflector);
+					if(serializer != null)
+					{
+						String serializedValue = null;
+						Object fieldValue = ReflectionUtil.getFieldValue(propertyReflector.getField(), value);
+						if(fieldValue != null)
+						{
+							String timeFormat = getTimeFormat(propertyReflector);
+							serializedValue = serializer.serialize(fieldValue, timeFormat);
+						}
+						else if(getMapperConfig().isSerializeNulls())
+						{
+							serializedValue = BLANK;
+						}
+						if(serializedValue != null)
+						{
+							paramMap.put(propertyName, serializedValue);
+						}
+					}
+				}
+			}
+		}
+		return paramMap;
+	}
+	
 	@Override
 	public void serialize(Object value, Writer writer)
 	{

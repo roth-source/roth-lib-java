@@ -110,7 +110,7 @@ public abstract class Select extends Sql implements SqlFactory
 	
 	public Select joinAs(String table1, String alias, String name1, String table2, String name2)
 	{
-		return join(newJoin().setJoinType(JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+		return join(newJoin().setJoinType(JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
 	}
 	
 	public Select joinAs(Select select, String alias, On...ons)
@@ -140,7 +140,7 @@ public abstract class Select extends Sql implements SqlFactory
 	
 	public Select joinInnerAs(String table1, String alias, String name1, String table2, String name2)
 	{
-		return join(newJoin().setJoinType(INNER_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+		return join(newJoin().setJoinType(INNER_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
 	}
 	
 	public Select joinInnerAs(Select select, String alias, On...ons)
@@ -170,7 +170,7 @@ public abstract class Select extends Sql implements SqlFactory
 	
 	public Select joinLeftAs(String table1, String alias, String name1, String table2, String name2)
 	{
-		return join(newJoin().setJoinType(LEFT_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+		return join(newJoin().setJoinType(LEFT_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
 	}
 	
 	public Select joinLeftAs(Select select, String alias, On...ons)
@@ -200,7 +200,7 @@ public abstract class Select extends Sql implements SqlFactory
 	
 	public Select joinRightAs(String table1, String alias, String name1, String table2, String name2)
 	{
-		return join(newJoin().setJoinType(RIGHT_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+		return join(newJoin().setJoinType(RIGHT_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
 	}
 	
 	public Select joinRightAs(Select select, String alias, On...ons)
@@ -230,7 +230,7 @@ public abstract class Select extends Sql implements SqlFactory
 	
 	public Select joinOuterAs(String table1, String alias, String name1, String table2, String name2)
 	{
-		return join(newJoin().setJoinType(OUTER_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+		return join(newJoin().setJoinType(OUTER_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
 	}
 	
 	public Select joinOuterAs(Select select, String alias, On...ons)

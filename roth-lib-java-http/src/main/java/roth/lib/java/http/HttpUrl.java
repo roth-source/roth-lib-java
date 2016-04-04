@@ -269,7 +269,7 @@ public class HttpUrl implements Characters
 		return this;
 	}
 	
-	public HttpUrl setParams(Map<String, String> paramMap)
+	public HttpUrl setParamMap(Map<String, String> paramMap)
 	{
 		this.paramMap = paramMap;
 		return this;
