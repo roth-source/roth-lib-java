@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.util.Vector;
 
 import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
@@ -48,7 +49,7 @@ public class Sftp implements AutoCloseable
 	
 	public List<String> ls()
 	{
-		return ls("");
+		return ls(".");
 	}
 	
 	public List<String> ls(String path)
@@ -60,9 +61,9 @@ public class Sftp implements AutoCloseable
 			Vector<?> vector = channelSftp.ls(path);
 			for(Object object : vector)
 			{
-				if(object != null)
+				if(object instanceof LsEntry)
 				{
-					lines.add(object.toString());
+					lines.add(((LsEntry) object).getFilename());
 				}
 			}
 		}
@@ -85,7 +86,7 @@ public class Sftp implements AutoCloseable
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void put(File source, String dest)
 	{
 		try(FileInputStream input = new FileInputStream(source);)
@@ -174,6 +175,19 @@ public class Sftp implements AutoCloseable
 		catch(IOException e)
 		{
 			throw new SshException(e);
+		}
+	}
+	
+	public void mv(String src, String dest)
+	{
+		try
+		{
+			openChannelSftp();
+			channelSftp.rename(src, dest);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
 		}
 	}
 	

@@ -6,10 +6,11 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import roth.lib.java.Characters;
 import roth.lib.java.lang.Map;
 import roth.lib.java.util.UrlUtil;
 
-public class HttpUrl
+public class HttpUrl implements Characters
 {
 	public static final int HTTP_PORT				= 80;
 	public static final int HTTPS_PORT				= 443;
@@ -61,7 +62,7 @@ public class HttpUrl
 	protected HttpProtocol protocol;
 	protected InetAddress inetAddress;
 	protected int port;
-	protected String path = "/";
+	protected String path = String.valueOf(SLASH);
 	protected Map<String, String> paramMap = new Map<String, String>();
 	protected String hash;
 	
@@ -246,7 +247,7 @@ public class HttpUrl
 	
 	public HttpUrl setPath(String path)
 	{
-		this.path = path;
+		this.path = path.startsWith(String.valueOf(SLASH)) ? path : SLASH + path;
 		return this;
 	}
 	

@@ -72,6 +72,36 @@ public class HttpStatus implements Characters
 		}
 		return this;
 	}
+
+	public boolean isInformational()
+	{
+		return statusCode.isInformational();
+	}
+	
+	public boolean isSuccess()
+	{
+		return statusCode.isSuccess();
+	}
+	
+	public boolean isRedirection()
+	{
+		return statusCode.isRedirection();
+	}
+	
+	public boolean isClientError()
+	{
+		return statusCode.isClientError();
+	}
+	
+	public boolean isServerError()
+	{
+		return statusCode.isServerError();
+	}
+	
+	public boolean is(HttpStatusCode statusCode)
+	{
+		return this.statusCode == statusCode;
+	}
 	
 	@Override
 	public String toString()
