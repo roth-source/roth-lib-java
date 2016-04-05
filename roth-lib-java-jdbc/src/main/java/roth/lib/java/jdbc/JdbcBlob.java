@@ -5,11 +5,11 @@ import java.io.OutputStream;
 import java.sql.Blob;
 import java.sql.SQLException;
 
-public abstract class DbBlob implements Blob, DbWrapper
+public abstract class JdbcBlob implements Blob, JdbcWrapper
 {
 	protected Blob blob;
 	
-	public DbBlob(Blob blob)
+	public JdbcBlob(Blob blob)
 	{
 		this.blob = blob;
 	}

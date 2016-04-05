@@ -2,9 +2,9 @@ package roth.lib.java.jdbc.mysql;
 
 import java.sql.ResultSet;
 
-import roth.lib.java.jdbc.DbResultSet;
+import roth.lib.java.jdbc.JdbcResultSet;
 
-public class MysqlDbResultSet extends DbResultSet implements MysqlDbWrapper
+public class MysqlDbResultSet extends JdbcResultSet implements MysqlDbWrapper
 {
 	
 	public MysqlDbResultSet(ResultSet resultSet)

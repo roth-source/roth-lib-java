@@ -2,9 +2,9 @@ package roth.lib.java.jdbc.mysql;
 
 import java.sql.SQLType;
 
-import roth.lib.java.jdbc.DbSQLType;
+import roth.lib.java.jdbc.JdbcSQLType;
 
-public class MysqlDbSQLType extends DbSQLType implements MysqlDbWrapper
+public class MysqlDbSQLType extends JdbcSQLType implements MysqlDbWrapper
 {
 	
 	public MysqlDbSQLType(SQLType sqlType)

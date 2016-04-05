@@ -4,11 +4,11 @@ import java.sql.DatabaseMetaData;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
 
-public abstract class DbDatabaseMetaData implements DatabaseMetaData, DbWrapper
+public abstract class JdbcDatabaseMetaData implements DatabaseMetaData, JdbcWrapper
 {
 	protected DatabaseMetaData databaseMetaData;
 	
-	public DbDatabaseMetaData(DatabaseMetaData databaseMetaData)
+	public JdbcDatabaseMetaData(DatabaseMetaData databaseMetaData)
 	{
 		this.databaseMetaData = databaseMetaData;
 	}
@@ -613,87 +613,87 @@ public abstract class DbDatabaseMetaData implements DatabaseMetaData, DbWrapper
 		return databaseMetaData.dataDefinitionIgnoredInTransactions();
 	}
 	
-	public DbResultSet getProcedures(String catalog, String schemaPattern, String procedureNamePattern) throws SQLException
+	public JdbcResultSet getProcedures(String catalog, String schemaPattern, String procedureNamePattern) throws SQLException
 	{
 		return wrap(databaseMetaData.getProcedures(catalog, schemaPattern, procedureNamePattern));
 	}
 	
-	public DbResultSet getProcedureColumns(String catalog, String schemaPattern, String procedureNamePattern, String columnNamePattern) throws SQLException
+	public JdbcResultSet getProcedureColumns(String catalog, String schemaPattern, String procedureNamePattern, String columnNamePattern) throws SQLException
 	{
 		return wrap(databaseMetaData.getProcedureColumns(catalog, schemaPattern, procedureNamePattern, columnNamePattern));
 	}
 	
-	public DbResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException
+	public JdbcResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException
 	{
 		return wrap(databaseMetaData.getTables(catalog, schemaPattern, tableNamePattern, types));
 	}
 	
-	public DbResultSet getSchemas() throws SQLException
+	public JdbcResultSet getSchemas() throws SQLException
 	{
 		return wrap(databaseMetaData.getSchemas());
 	}
 	
-	public DbResultSet getCatalogs() throws SQLException
+	public JdbcResultSet getCatalogs() throws SQLException
 	{
 		return wrap(databaseMetaData.getCatalogs());
 	}
 	
-	public DbResultSet getTableTypes() throws SQLException
+	public JdbcResultSet getTableTypes() throws SQLException
 	{
 		return wrap(databaseMetaData.getTableTypes());
 	}
 	
-	public DbResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) throws SQLException
+	public JdbcResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) throws SQLException
 	{
 		return wrap(databaseMetaData.getColumns(catalog, schemaPattern, tableNamePattern, columnNamePattern));
 	}
 	
-	public DbResultSet getColumnPrivileges(String catalog, String schema, String table, String columnNamePattern) throws SQLException
+	public JdbcResultSet getColumnPrivileges(String catalog, String schema, String table, String columnNamePattern) throws SQLException
 	{
 		return wrap(databaseMetaData.getColumnPrivileges(catalog, schema, table, columnNamePattern));
 	}
 	
-	public DbResultSet getTablePrivileges(String catalog, String schemaPattern, String tableNamePattern) throws SQLException
+	public JdbcResultSet getTablePrivileges(String catalog, String schemaPattern, String tableNamePattern) throws SQLException
 	{
 		return wrap(databaseMetaData.getTablePrivileges(catalog, schemaPattern, tableNamePattern));
 	}
 	
-	public DbResultSet getBestRowIdentifier(String catalog, String schema, String table, int scope, boolean nullable) throws SQLException
+	public JdbcResultSet getBestRowIdentifier(String catalog, String schema, String table, int scope, boolean nullable) throws SQLException
 	{
 		return wrap(databaseMetaData.getBestRowIdentifier(catalog, schema, table, scope, nullable));
 	}
 	
-	public DbResultSet getVersionColumns(String catalog, String schema, String table) throws SQLException
+	public JdbcResultSet getVersionColumns(String catalog, String schema, String table) throws SQLException
 	{
 		return wrap(databaseMetaData.getVersionColumns(catalog, schema, table));
 	}
 	
-	public DbResultSet getPrimaryKeys(String catalog, String schema, String table) throws SQLException
+	public JdbcResultSet getPrimaryKeys(String catalog, String schema, String table) throws SQLException
 	{
 		return wrap(databaseMetaData.getPrimaryKeys(catalog, schema, table));
 	}
 	
-	public DbResultSet getImportedKeys(String catalog, String schema, String table) throws SQLException
+	public JdbcResultSet getImportedKeys(String catalog, String schema, String table) throws SQLException
 	{
 		return wrap(databaseMetaData.getImportedKeys(catalog, schema, table));
 	}
 	
-	public DbResultSet getExportedKeys(String catalog, String schema, String table) throws SQLException
+	public JdbcResultSet getExportedKeys(String catalog, String schema, String table) throws SQLException
 	{
 		return wrap(databaseMetaData.getExportedKeys(catalog, schema, table));
 	}
 	
-	public DbResultSet getCrossReference(String parentCatalog, String parentSchema, String parentTable, String foreignCatalog, String foreignSchema, String foreignTable) throws SQLException
+	public JdbcResultSet getCrossReference(String parentCatalog, String parentSchema, String parentTable, String foreignCatalog, String foreignSchema, String foreignTable) throws SQLException
 	{
 		return wrap(databaseMetaData.getCrossReference(parentCatalog, parentSchema, parentTable, foreignCatalog, foreignSchema, foreignTable));
 	}
 	
-	public DbResultSet getTypeInfo() throws SQLException
+	public JdbcResultSet getTypeInfo() throws SQLException
 	{
 		return wrap(databaseMetaData.getTypeInfo());
 	}
 	
-	public DbResultSet getIndexInfo(String catalog, String schema, String table, boolean unique, boolean approximate) throws SQLException
+	public JdbcResultSet getIndexInfo(String catalog, String schema, String table, boolean unique, boolean approximate) throws SQLException
 	{
 		return wrap(databaseMetaData.getIndexInfo(catalog, schema, table, unique, approximate));
 	}
@@ -758,12 +758,12 @@ public abstract class DbDatabaseMetaData implements DatabaseMetaData, DbWrapper
 		return databaseMetaData.supportsBatchUpdates();
 	}
 	
-	public DbResultSet getUDTs(String catalog, String schemaPattern, String typeNamePattern, int[] types) throws SQLException
+	public JdbcResultSet getUDTs(String catalog, String schemaPattern, String typeNamePattern, int[] types) throws SQLException
 	{
 		return wrap(databaseMetaData.getUDTs(catalog, schemaPattern, typeNamePattern, types));
 	}
 	
-	public DbConnection getConnection() throws SQLException
+	public JdbcConnection getConnection() throws SQLException
 	{
 		return wrap(databaseMetaData.getConnection());
 	}
@@ -788,17 +788,17 @@ public abstract class DbDatabaseMetaData implements DatabaseMetaData, DbWrapper
 		return databaseMetaData.supportsGetGeneratedKeys();
 	}
 	
-	public DbResultSet getSuperTypes(String catalog, String schemaPattern, String typeNamePattern) throws SQLException
+	public JdbcResultSet getSuperTypes(String catalog, String schemaPattern, String typeNamePattern) throws SQLException
 	{
 		return wrap(databaseMetaData.getSuperTypes(catalog, schemaPattern, typeNamePattern));
 	}
 	
-	public DbResultSet getSuperTables(String catalog, String schemaPattern, String tableNamePattern) throws SQLException
+	public JdbcResultSet getSuperTables(String catalog, String schemaPattern, String tableNamePattern) throws SQLException
 	{
 		return wrap(databaseMetaData.getSuperTables(catalog, schemaPattern, tableNamePattern));
 	}
 	
-	public DbResultSet getAttributes(String catalog, String schemaPattern, String typeNamePattern, String attributeNamePattern) throws SQLException
+	public JdbcResultSet getAttributes(String catalog, String schemaPattern, String typeNamePattern, String attributeNamePattern) throws SQLException
 	{
 		return wrap(databaseMetaData.getAttributes(catalog, schemaPattern, typeNamePattern, attributeNamePattern));
 	}
@@ -853,7 +853,7 @@ public abstract class DbDatabaseMetaData implements DatabaseMetaData, DbWrapper
 		return databaseMetaData.getRowIdLifetime();
 	}
 	
-	public DbResultSet getSchemas(String catalog, String schemaPattern) throws SQLException
+	public JdbcResultSet getSchemas(String catalog, String schemaPattern) throws SQLException
 	{
 		return wrap(databaseMetaData.getSchemas(catalog, schemaPattern));
 	}
@@ -868,22 +868,22 @@ public abstract class DbDatabaseMetaData implements DatabaseMetaData, DbWrapper
 		return databaseMetaData.autoCommitFailureClosesAllResultSets();
 	}
 	
-	public DbResultSet getClientInfoProperties() throws SQLException
+	public JdbcResultSet getClientInfoProperties() throws SQLException
 	{
 		return wrap(databaseMetaData.getClientInfoProperties());
 	}
 	
-	public DbResultSet getFunctions(String catalog, String schemaPattern, String functionNamePattern) throws SQLException
+	public JdbcResultSet getFunctions(String catalog, String schemaPattern, String functionNamePattern) throws SQLException
 	{
 		return wrap(databaseMetaData.getFunctions(catalog, schemaPattern, functionNamePattern));
 	}
 	
-	public DbResultSet getFunctionColumns(String catalog, String schemaPattern, String functionNamePattern, String columnNamePattern) throws SQLException
+	public JdbcResultSet getFunctionColumns(String catalog, String schemaPattern, String functionNamePattern, String columnNamePattern) throws SQLException
 	{
 		return wrap(databaseMetaData.getFunctionColumns(catalog, schemaPattern, functionNamePattern, columnNamePattern));
 	}
 	
-	public DbResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) throws SQLException
+	public JdbcResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) throws SQLException
 	{
 		return wrap(databaseMetaData.getPseudoColumns(catalog, schemaPattern, tableNamePattern, columnNamePattern));
 	}

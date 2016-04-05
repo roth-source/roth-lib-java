@@ -10,11 +10,11 @@ import java.sql.SQLInput;
 import java.sql.Time;
 import java.sql.Timestamp;
 
-public abstract class DbSQLInput implements SQLInput, DbWrapper
+public abstract class JdbcSQLInput implements SQLInput, JdbcWrapper
 {
 	protected SQLInput sqlInput;
 	
-	public DbSQLInput(SQLInput sqlInput)
+	public JdbcSQLInput(SQLInput sqlInput)
 	{
 		this.sqlInput = sqlInput;
 	}
@@ -104,22 +104,22 @@ public abstract class DbSQLInput implements SQLInput, DbWrapper
 		return sqlInput.readObject();
 	}
 	
-	public DbRef readRef() throws SQLException
+	public JdbcRef readRef() throws SQLException
 	{
 		return wrap(sqlInput.readRef());
 	}
 	
-	public DbBlob readBlob() throws SQLException
+	public JdbcBlob readBlob() throws SQLException
 	{
 		return wrap(sqlInput.readBlob());
 	}
 	
-	public DbClob readClob() throws SQLException
+	public JdbcClob readClob() throws SQLException
 	{
 		return wrap(sqlInput.readClob());
 	}
 	
-	public DbArray readArray() throws SQLException
+	public JdbcArray readArray() throws SQLException
 	{
 		return wrap(sqlInput.readArray());
 	}
@@ -134,7 +134,7 @@ public abstract class DbSQLInput implements SQLInput, DbWrapper
 		return sqlInput.readURL();
 	}
 	
-	public DbNClob readNClob() throws SQLException
+	public JdbcNClob readNClob() throws SQLException
 	{
 		return wrap(sqlInput.readNClob());
 	}
@@ -144,12 +144,12 @@ public abstract class DbSQLInput implements SQLInput, DbWrapper
 		return sqlInput.readNString();
 	}
 	
-	public DbSQLXML readSQLXML() throws SQLException
+	public JdbcSQLXML readSQLXML() throws SQLException
 	{
 		return wrap(sqlInput.readSQLXML());
 	}
 	
-	public DbRowId readRowId() throws SQLException
+	public JdbcRowId readRowId() throws SQLException
 	{
 		return wrap(sqlInput.readRowId());
 	}

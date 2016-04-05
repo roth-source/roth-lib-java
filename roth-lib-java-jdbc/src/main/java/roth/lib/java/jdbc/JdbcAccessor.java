@@ -7,15 +7,15 @@ import roth.lib.java.lang.Map;
 import roth.lib.java.Callback;
 import roth.lib.java.jdbc.sql.Select;
 
-public abstract class DbAccessor
+public abstract class JdbcAccessor
 {
 	
-	public DbAccessor()
+	public JdbcAccessor()
 	{
 		
 	}
 	
-	public abstract DbDataSource getDb();
+	public abstract Jdbc getDb();
 	
 	public <T> T findBy(Select select, Class<T> klass)
 	{

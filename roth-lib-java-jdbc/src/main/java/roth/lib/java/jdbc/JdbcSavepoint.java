@@ -3,11 +3,11 @@ package roth.lib.java.jdbc;
 import java.sql.SQLException;
 import java.sql.Savepoint;
 
-public abstract class DbSavepoint implements Savepoint, DbWrapper
+public abstract class JdbcSavepoint implements Savepoint, JdbcWrapper
 {
 	protected Savepoint savepoint;
 	
-	public DbSavepoint(Savepoint savepoint)
+	public JdbcSavepoint(Savepoint savepoint)
 	{
 		this.savepoint = savepoint;
 	}

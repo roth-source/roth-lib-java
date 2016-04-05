@@ -19,11 +19,11 @@ import java.sql.Struct;
 import java.sql.Time;
 import java.sql.Timestamp;
 
-public abstract class DbSQLOutput implements SQLOutput, DbWrapper
+public abstract class JdbcSQLOutput implements SQLOutput, JdbcWrapper
 {
 	protected SQLOutput sqlOutput;
 	
-	public DbSQLOutput(SQLOutput sqlOutput)
+	public JdbcSQLOutput(SQLOutput sqlOutput)
 	{
 		this.sqlOutput = sqlOutput;
 	}

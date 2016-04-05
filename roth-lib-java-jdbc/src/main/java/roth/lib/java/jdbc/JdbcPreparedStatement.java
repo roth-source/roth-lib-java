@@ -22,18 +22,18 @@ import roth.lib.java.time.Day;
 import roth.lib.java.time.Month;
 import roth.lib.java.time.Year;
 
-public abstract class DbPreparedStatement extends DbStatement implements PreparedStatement
+public abstract class JdbcPreparedStatement extends JdbcStatement implements PreparedStatement
 {
 	protected PreparedStatement preparedStatement;
 	
-	public DbPreparedStatement(PreparedStatement preparedStatement)
+	public JdbcPreparedStatement(PreparedStatement preparedStatement)
 	{
 		super(preparedStatement);
 		this.preparedStatement = preparedStatement;
 	}
 	
 	@Override
-	public DbResultSet executeQuery() throws SQLException
+	public JdbcResultSet executeQuery() throws SQLException
 	{
 		return wrap(preparedStatement.executeQuery());
 	}
@@ -240,7 +240,7 @@ public abstract class DbPreparedStatement extends DbStatement implements Prepare
 	}
 	
 	@Override
-	public DbResultSetMetaData getMetaData() throws SQLException
+	public JdbcResultSetMetaData getMetaData() throws SQLException
 	{
 		return wrap(preparedStatement.getMetaData());
 	}
@@ -276,7 +276,7 @@ public abstract class DbPreparedStatement extends DbStatement implements Prepare
 	}
 	
 	@Override
-	public DbParameterMetaData getParameterMetaData() throws SQLException
+	public JdbcParameterMetaData getParameterMetaData() throws SQLException
 	{
 		return wrap(preparedStatement.getParameterMetaData());
 	}

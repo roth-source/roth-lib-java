@@ -1,4 +1,4 @@
-package roth.lib.java.util;
+package roth.lib.java.jdbc;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -7,24 +7,26 @@ import java.util.Random;
 
 import roth.lib.java.lang.Map;
 import roth.lib.java.time.Time;
+import roth.lib.java.util.BaseUtil;
+import roth.lib.java.util.StringUtil;
 
-public class IdUtil
+public class JdbcIdUtil
 {
-	protected static final int DEFAULT_LENGTH 		= 14;
-	protected static final int TIME_LENGTH 			= 7;
+	protected static final int DEFAULT_LENGTH 		= 16;
+	protected static final int TIME_LENGTH 			= 8;
 	protected static final int RANDOM_MIN_LENGTH 	= 1;
-	protected static final int RANDOM_MAX_LENGTH 	= 10;
+	protected static final int RANDOM_MAX_LENGTH 	= 12;
 	protected static final Map<Integer, Long> MAX_VALUES = new Map<Integer, Long>();
 	
 	static
 	{
 		for(int length = RANDOM_MIN_LENGTH; length <= RANDOM_MAX_LENGTH; length++)
 		{
-			MAX_VALUES.put(length, (long) Math.pow(BaseUtil.BASE_62, length));
+			MAX_VALUES.put(length, (long) Math.pow(BaseUtil.BASE_36, length));
 		}
 	}
 	
-	protected IdUtil()
+	protected JdbcIdUtil()
 	{
 		
 	}
@@ -46,12 +48,12 @@ public class IdUtil
 	
 	protected static String time(long time)
 	{
-		return StringUtil.padLeftLimit(BaseUtil.encode62(time), TIME_LENGTH, BaseUtil.BASE_PAD);
+		return StringUtil.padLeftLimit(BaseUtil.encode36(time), TIME_LENGTH, BaseUtil.BASE_PAD);
 	}
 	
 	public static String random(int length)
 	{
-		return StringUtil.padLeftLimit(BaseUtil.encode62(randomNumber(length)), length, BaseUtil.BASE_PAD);
+		return StringUtil.padLeftLimit(BaseUtil.encode36(randomNumber(length)), length, BaseUtil.BASE_PAD);
 	}
 	
 	protected static long randomNumber(int length)
@@ -120,12 +122,12 @@ public class IdUtil
 		builder.append(prefix);
 		builder.append(time);
 		builder.append(random(randomLength));
-		return builder.toString();
+		return builder.toString().toUpperCase();
 	}
 	
 	public static long uuidTimestamp(String uuid)
 	{
-		return BaseUtil.decode62(uuid.substring(1, 1 + TIME_LENGTH)).longValue();
+		return BaseUtil.decode36(uuid.substring(1, 1 + TIME_LENGTH).toLowerCase()).longValue();
 	}
 	
 	public static Time uuidTime(String uuid)
@@ -155,7 +157,9 @@ public class IdUtil
 		int count = 0;
 		for(int i = 0; i < 10000000; i++)
 		{
-			String uuid = uuid('0', now(), 14);
+			String uuid = uuid('0', now(), 15);
+			//System.out.println(uuid);
+			//System.out.println(uuidTime(uuid));
 			if(!set.add(uuid))
 			{
 				System.err.println(++count + ":" + uuid);

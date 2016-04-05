@@ -7,11 +7,11 @@ import java.io.Writer;
 import java.sql.Clob;
 import java.sql.SQLException;
 
-public abstract class DbClob implements Clob, DbWrapper
+public abstract class JdbcClob implements Clob, JdbcWrapper
 {
 	protected Clob clob;
 	
-	public DbClob(Clob clob)
+	public JdbcClob(Clob clob)
 	{
 		this.clob = clob;
 	}

@@ -9,14 +9,14 @@ import java.util.regex.Pattern;
 
 import roth.lib.java.Characters;
 
-public class DbNamedQuery implements Characters
+public class JdbcNamedQuery implements Characters
 {
 	protected static Pattern NAMED_PATTERN = Pattern.compile(":(\\w+)");
 	
 	protected String sql = "";
 	protected List<Object> values = new List<Object>().allowNull();
 	
-	public DbNamedQuery(String sql, Map<String, Object> valueMap)
+	public JdbcNamedQuery(String sql, Map<String, Object> valueMap)
 	{
 		StringBuilder builder = new StringBuilder();
 		int start = 0;

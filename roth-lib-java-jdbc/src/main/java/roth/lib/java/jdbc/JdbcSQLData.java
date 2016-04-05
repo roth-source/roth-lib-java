@@ -5,11 +5,11 @@ import java.sql.SQLException;
 import java.sql.SQLInput;
 import java.sql.SQLOutput;
 
-public abstract class DbSQLData implements SQLData, DbWrapper
+public abstract class JdbcSQLData implements SQLData, JdbcWrapper
 {
 	protected SQLData sqlData;
 	
-	public DbSQLData(SQLData sqlData)
+	public JdbcSQLData(SQLData sqlData)
 	{
 		this.sqlData = sqlData;
 	}

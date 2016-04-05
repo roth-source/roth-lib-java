@@ -2,11 +2,11 @@ package roth.lib.java.jdbc;
 
 import java.sql.SQLType;
 
-public abstract class DbSQLType implements SQLType, DbWrapper
+public abstract class JdbcSQLType implements SQLType, JdbcWrapper
 {
 	protected SQLType sqlType;
 	
-	public DbSQLType(SQLType sqlType)
+	public JdbcSQLType(SQLType sqlType)
 	{
 		this.sqlType = sqlType;
 	}

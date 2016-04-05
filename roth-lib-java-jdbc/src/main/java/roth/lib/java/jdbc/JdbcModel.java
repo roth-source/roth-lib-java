@@ -14,19 +14,19 @@ import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.PropertyReflector;
 
 @SuppressWarnings({"serial","unchecked"})
-public abstract class DbModel extends Model implements SqlFactory
+public abstract class JdbcModel extends Model implements SqlFactory
 {
 	protected transient Map<String, Object> dirtyIdMap = new Map<String, Object>();
 	protected transient Set<String> dirtyNames = new Set<String>();
 	protected transient State state = State.NEW;
 	
-	protected DbModel()
+	protected JdbcModel()
 	{
 		
 	}
 	
-	public abstract DbDataSource getDb();
-	public abstract DbModel setDb(DbDataSource db);
+	public abstract Jdbc getDb();
+	public abstract JdbcModel setDb(Jdbc db);
 	
 	public boolean isNew()
 	{
@@ -83,7 +83,7 @@ public abstract class DbModel extends Model implements SqlFactory
 		// override to implement
 	}
 	
-	public <T extends DbModel> T refresh()
+	public <T extends JdbcModel> T refresh()
 	{
 		T model = (T) this;
 		if(isPersisted())
@@ -93,17 +93,17 @@ public abstract class DbModel extends Model implements SqlFactory
 		return model;
 	}
 	
-	public <T extends DbModel> T save()
+	public <T extends JdbcModel> T save()
 	{
 		return (T) (isNew() ? insert() : update());
 	}
 	
-	public <T extends DbModel> T save(DbConnection connection) throws SQLException
+	public <T extends JdbcModel> T save(JdbcConnection connection) throws SQLException
 	{
 		return (T) (isNew() ? insert(connection) : update(connection));
 	}
 	
-	public <T extends DbModel> T insert()
+	public <T extends JdbcModel> T insert()
 	{
 		if(isNew())
 		{
@@ -113,7 +113,7 @@ public abstract class DbModel extends Model implements SqlFactory
 		return (T) this;
 	}
 	
-	public <T extends DbModel> T insert(DbConnection connection) throws SQLException
+	public <T extends JdbcModel> T insert(JdbcConnection connection) throws SQLException
 	{
 		if(isNew())
 		{
@@ -123,7 +123,7 @@ public abstract class DbModel extends Model implements SqlFactory
 		return (T) this;
 	}
 	
-	public <T extends DbModel> T update()
+	public <T extends JdbcModel> T update()
 	{
 		if(isPersisted() && isDirty())
 		{
@@ -133,7 +133,7 @@ public abstract class DbModel extends Model implements SqlFactory
 		return (T) this;
 	}
 	
-	public <T extends DbModel> T update(DbConnection connection) throws SQLException
+	public <T extends JdbcModel> T update(JdbcConnection connection) throws SQLException
 	{
 		if(isPersisted() && isDirty())
 		{
@@ -143,7 +143,7 @@ public abstract class DbModel extends Model implements SqlFactory
 		return (T) this;
 	}
 	
-	public <T extends DbModel> T delete()
+	public <T extends JdbcModel> T delete()
 	{
 		if(isPersisted())
 		{
@@ -153,7 +153,7 @@ public abstract class DbModel extends Model implements SqlFactory
 		return (T) this;
 	}
 	
-	public <T extends DbModel> T delete(DbConnection connection) throws SQLException
+	public <T extends JdbcModel> T delete(JdbcConnection connection) throws SQLException
 	{
 		if(isPersisted())
 		{
@@ -163,7 +163,7 @@ public abstract class DbModel extends Model implements SqlFactory
 		return (T) this;
 	}
 	
-	public <T extends DbModel> T sync(DbDataSource db)
+	public <T extends JdbcModel> T sync(Jdbc db)
 	{
 		setDb(db);
 		T presistedModel = (T) db.query(this);
@@ -192,9 +192,9 @@ public abstract class DbModel extends Model implements SqlFactory
 		return (T) save();
 	}
 	
-	public <T extends DbModel> T set(String name, String value)
+	public <T extends JdbcModel> T set(String name, String value)
 	{
-		DbDataSource db = getDb();
+		Jdbc db = getDb();
 		EntityReflector entityReflector = db.getMapperReflector().getEntityReflector(getClass());
 		PropertyReflector propertyReflector = entityReflector.getFieldReflector(name, db.getMapperType(), db.getMapperReflector());
 		if(propertyReflector != null)
@@ -212,7 +212,7 @@ public abstract class DbModel extends Model implements SqlFactory
 				}
 				catch(IllegalArgumentException | IllegalAccessException e)
 				{
-					throw new DbException(e);
+					throw new JdbcException(e);
 				}
 			}
 		}

@@ -7,17 +7,17 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-public abstract class DbDriver implements Driver, DbWrapper
+public abstract class JdbcDriver implements Driver, JdbcWrapper
 {
 	protected Driver driver;
 	
-	public DbDriver(Driver driver)
+	public JdbcDriver(Driver driver)
 	{
 		this.driver = driver;
 	}
 	
 	@Override
-	public DbConnection connect(String url, Properties info) throws SQLException
+	public JdbcConnection connect(String url, Properties info) throws SQLException
 	{
 		return wrap(driver.connect(url, info));
 	}

@@ -4,11 +4,11 @@ import java.sql.Ref;
 import java.sql.SQLException;
 import java.util.Map;
 
-public abstract class DbRef implements Ref, DbWrapper
+public abstract class JdbcRef implements Ref, JdbcWrapper
 {
 	protected Ref ref;
 	
-	public DbRef(Ref ref)
+	public JdbcRef(Ref ref)
 	{
 		this.ref = ref;
 	}

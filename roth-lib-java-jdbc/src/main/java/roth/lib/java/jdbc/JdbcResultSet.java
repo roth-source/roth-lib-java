@@ -31,11 +31,11 @@ import roth.lib.java.time.Second;
 import roth.lib.java.time.Year;
 import roth.lib.java.util.EnumUtil;
 
-public abstract class DbResultSet implements ResultSet, DbWrapper
+public abstract class JdbcResultSet implements ResultSet, JdbcWrapper
 {
 	protected ResultSet resultSet;
 	
-	public DbResultSet(ResultSet resultSet)
+	public JdbcResultSet(ResultSet resultSet)
 	{
 		this.resultSet = resultSet;
 	}
@@ -285,7 +285,7 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 	}
 	
 	@Override
-	public DbResultSetMetaData getMetaData() throws SQLException
+	public JdbcResultSetMetaData getMetaData() throws SQLException
 	{
 		return wrap(resultSet.getMetaData());
 	}
@@ -739,7 +739,7 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 	}
 	
 	@Override
-	public DbStatement getStatement() throws SQLException
+	public JdbcStatement getStatement() throws SQLException
 	{
 		return wrap(resultSet.getStatement());
 	}
@@ -751,25 +751,25 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 	}
 	
 	@Override
-	public DbRef getRef(int columnIndex) throws SQLException
+	public JdbcRef getRef(int columnIndex) throws SQLException
 	{
 		return wrap(resultSet.getRef(columnIndex));
 	}
 	
 	@Override
-	public DbBlob getBlob(int columnIndex) throws SQLException
+	public JdbcBlob getBlob(int columnIndex) throws SQLException
 	{
 		return wrap(resultSet.getBlob(columnIndex));
 	}
 	
 	@Override
-	public DbClob getClob(int columnIndex) throws SQLException
+	public JdbcClob getClob(int columnIndex) throws SQLException
 	{
 		return wrap(resultSet.getClob(columnIndex));
 	}
 	
 	@Override
-	public DbArray getArray(int columnIndex) throws SQLException
+	public JdbcArray getArray(int columnIndex) throws SQLException
 	{
 		return wrap(resultSet.getArray(columnIndex));
 	}
@@ -781,25 +781,25 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 	}
 	
 	@Override
-	public DbRef getRef(String columnLabel) throws SQLException
+	public JdbcRef getRef(String columnLabel) throws SQLException
 	{
 		return wrap(resultSet.getRef(columnLabel));
 	}
 	
 	@Override
-	public DbBlob getBlob(String columnLabel) throws SQLException
+	public JdbcBlob getBlob(String columnLabel) throws SQLException
 	{
 		return wrap(resultSet.getBlob(columnLabel));
 	}
 	
 	@Override
-	public DbClob getClob(String columnLabel) throws SQLException
+	public JdbcClob getClob(String columnLabel) throws SQLException
 	{
 		return wrap(resultSet.getClob(columnLabel));
 	}
 	
 	@Override
-	public DbArray getArray(String columnLabel) throws SQLException
+	public JdbcArray getArray(String columnLabel) throws SQLException
 	{
 		return wrap(resultSet.getArray(columnLabel));
 	}
@@ -901,13 +901,13 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 	}
 	
 	@Override
-	public DbRowId getRowId(int columnIndex) throws SQLException
+	public JdbcRowId getRowId(int columnIndex) throws SQLException
 	{
 		return wrap(resultSet.getRowId(columnIndex));
 	}
 	
 	@Override
-	public DbRowId getRowId(String columnLabel) throws SQLException
+	public JdbcRowId getRowId(String columnLabel) throws SQLException
 	{
 		return wrap(resultSet.getRowId(columnLabel));
 	}
@@ -961,25 +961,25 @@ public abstract class DbResultSet implements ResultSet, DbWrapper
 	}
 	
 	@Override
-	public DbNClob getNClob(int columnIndex) throws SQLException
+	public JdbcNClob getNClob(int columnIndex) throws SQLException
 	{
 		return wrap(resultSet.getNClob(columnIndex));
 	}
 	
 	@Override
-	public DbNClob getNClob(String columnLabel) throws SQLException
+	public JdbcNClob getNClob(String columnLabel) throws SQLException
 	{
 		return wrap(resultSet.getNClob(columnLabel));
 	}
 	
 	@Override
-	public DbSQLXML getSQLXML(int columnIndex) throws SQLException
+	public JdbcSQLXML getSQLXML(int columnIndex) throws SQLException
 	{
 		return wrap(resultSet.getSQLXML(columnIndex));
 	}
 	
 	@Override
-	public DbSQLXML getSQLXML(String columnLabel) throws SQLException
+	public JdbcSQLXML getSQLXML(String columnLabel) throws SQLException
 	{
 		return wrap(resultSet.getSQLXML(columnLabel));
 	}

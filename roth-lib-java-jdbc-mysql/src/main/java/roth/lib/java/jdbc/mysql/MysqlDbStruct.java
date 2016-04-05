@@ -2,9 +2,9 @@ package roth.lib.java.jdbc.mysql;
 
 import java.sql.Struct;
 
-import roth.lib.java.jdbc.DbStruct;
+import roth.lib.java.jdbc.JdbcStruct;
 
-public class MysqlDbStruct extends DbStruct implements MysqlDbWrapper
+public class MysqlDbStruct extends JdbcStruct implements MysqlDbWrapper
 {
 	
 	public MysqlDbStruct(Struct struct)

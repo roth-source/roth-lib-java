@@ -2,11 +2,11 @@ package roth.lib.java.jdbc.mysql;
 
 import java.util.Properties;
 
-import roth.lib.java.jdbc.DbDataSource;
+import roth.lib.java.jdbc.Jdbc;
 import roth.lib.java.jdbc.mysql.sql.MysqlSqlFactory;
 import roth.lib.java.mapper.MapperType;
 
-public class MysqlDb extends DbDataSource implements MysqlDbWrapper, MysqlSqlFactory
+public class MysqlDb extends Jdbc implements MysqlDbWrapper, MysqlSqlFactory
 {
 	
 	public MysqlDb()

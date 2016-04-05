@@ -2,11 +2,11 @@ package roth.lib.java.jdbc;
 
 import java.sql.DriverAction;
 
-public abstract class DbDriverAction implements DriverAction, DbWrapper
+public abstract class JdbcDriverAction implements DriverAction, JdbcWrapper
 {
 	protected DriverAction driverAction;
 	
-	public DbDriverAction(DriverAction driverAction)
+	public JdbcDriverAction(DriverAction driverAction)
 	{
 		this.driverAction = driverAction;
 	}

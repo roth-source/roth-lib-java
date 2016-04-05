@@ -17,11 +17,11 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
 
-public abstract class DbCallableStatement extends DbPreparedStatement implements CallableStatement
+public abstract class JdbcCallableStatement extends JdbcPreparedStatement implements CallableStatement
 {
 	protected CallableStatement callableStatement;
 	
-	public DbCallableStatement(CallableStatement callableStatement)
+	public JdbcCallableStatement(CallableStatement callableStatement)
 	{
 		super(callableStatement);
 		this.callableStatement = callableStatement;
@@ -143,25 +143,25 @@ public abstract class DbCallableStatement extends DbPreparedStatement implements
 	}
 
 	@Override
-	public DbRef getRef(int parameterIndex) throws SQLException
+	public JdbcRef getRef(int parameterIndex) throws SQLException
 	{
 		return wrap(callableStatement.getRef(parameterIndex));
 	}
 
 	@Override
-	public DbBlob getBlob(int parameterIndex) throws SQLException
+	public JdbcBlob getBlob(int parameterIndex) throws SQLException
 	{
 		return wrap(callableStatement.getBlob(parameterIndex));
 	}
 
 	@Override
-	public DbClob getClob(int parameterIndex) throws SQLException
+	public JdbcClob getClob(int parameterIndex) throws SQLException
 	{
 		return wrap(callableStatement.getClob(parameterIndex));
 	}
 
 	@Override
-	public DbArray getArray(int parameterIndex) throws SQLException
+	public JdbcArray getArray(int parameterIndex) throws SQLException
 	{
 		return wrap(callableStatement.getArray(parameterIndex));
 	}
@@ -455,25 +455,25 @@ public abstract class DbCallableStatement extends DbPreparedStatement implements
 	}
 
 	@Override
-	public DbRef getRef(String parameterName) throws SQLException
+	public JdbcRef getRef(String parameterName) throws SQLException
 	{
 		return wrap(callableStatement.getRef(parameterName));
 	}
 
 	@Override
-	public DbBlob getBlob(String parameterName) throws SQLException
+	public JdbcBlob getBlob(String parameterName) throws SQLException
 	{
 		return wrap(callableStatement.getBlob(parameterName));
 	}
 
 	@Override
-	public DbClob getClob(String parameterName) throws SQLException
+	public JdbcClob getClob(String parameterName) throws SQLException
 	{
 		return wrap(callableStatement.getClob(parameterName));
 	}
 
 	@Override
-	public DbArray getArray(String parameterName) throws SQLException
+	public JdbcArray getArray(String parameterName) throws SQLException
 	{
 		return wrap(callableStatement.getArray(parameterName));
 	}
@@ -503,13 +503,13 @@ public abstract class DbCallableStatement extends DbPreparedStatement implements
 	}
 
 	@Override
-	public DbRowId getRowId(int parameterIndex) throws SQLException
+	public JdbcRowId getRowId(int parameterIndex) throws SQLException
 	{
 		return wrap(callableStatement.getRowId(parameterIndex));
 	}
 
 	@Override
-	public DbRowId getRowId(String parameterName) throws SQLException
+	public JdbcRowId getRowId(String parameterName) throws SQLException
 	{
 		return wrap(callableStatement.getRowId(parameterName));
 	}
@@ -557,13 +557,13 @@ public abstract class DbCallableStatement extends DbPreparedStatement implements
 	}
 
 	@Override
-	public DbNClob getNClob(int parameterIndex) throws SQLException
+	public JdbcNClob getNClob(int parameterIndex) throws SQLException
 	{
 		return wrap(callableStatement.getNClob(parameterIndex));
 	}
 
 	@Override
-	public DbNClob getNClob(String parameterName) throws SQLException
+	public JdbcNClob getNClob(String parameterName) throws SQLException
 	{
 		return wrap(callableStatement.getNClob(parameterName));
 	}
@@ -575,13 +575,13 @@ public abstract class DbCallableStatement extends DbPreparedStatement implements
 	}
 
 	@Override
-	public DbSQLXML getSQLXML(int parameterIndex) throws SQLException
+	public JdbcSQLXML getSQLXML(int parameterIndex) throws SQLException
 	{
 		return wrap(callableStatement.getSQLXML(parameterIndex));
 	}
 
 	@Override
-	public DbSQLXML getSQLXML(String parameterName) throws SQLException
+	public JdbcSQLXML getSQLXML(String parameterName) throws SQLException
 	{
 		return wrap(callableStatement.getSQLXML(parameterName));
 	}

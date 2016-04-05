@@ -10,11 +10,11 @@ import java.sql.SQLXML;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 
-public abstract class DbSQLXML implements SQLXML, DbWrapper
+public abstract class JdbcSQLXML implements SQLXML, JdbcWrapper
 {
 	protected SQLXML sqlXml;
 	
-	public DbSQLXML(SQLXML sqlXml)
+	public JdbcSQLXML(SQLXML sqlXml)
 	{
 		this.sqlXml = sqlXml;
 	}

@@ -2,9 +2,9 @@ package roth.lib.java.jdbc.mysql;
 
 import java.sql.DatabaseMetaData;
 
-import roth.lib.java.jdbc.DbDatabaseMetaData;
+import roth.lib.java.jdbc.JdbcDatabaseMetaData;
 
-public class MysqlDbDatabaseMetaData extends DbDatabaseMetaData implements MysqlDbWrapper
+public class MysqlDbDatabaseMetaData extends JdbcDatabaseMetaData implements MysqlDbWrapper
 {
 	
 	public MysqlDbDatabaseMetaData(DatabaseMetaData databaseMetaData)

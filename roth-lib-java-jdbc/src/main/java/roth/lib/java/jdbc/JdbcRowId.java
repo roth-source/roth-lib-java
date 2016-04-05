@@ -2,11 +2,11 @@ package roth.lib.java.jdbc;
 
 import java.sql.RowId;
 
-public abstract class DbRowId implements RowId, DbWrapper
+public abstract class JdbcRowId implements RowId, JdbcWrapper
 {
 	protected RowId rowId;
 	
-	public DbRowId(RowId rowId)
+	public JdbcRowId(RowId rowId)
 	{
 		this.rowId = rowId;
 	}

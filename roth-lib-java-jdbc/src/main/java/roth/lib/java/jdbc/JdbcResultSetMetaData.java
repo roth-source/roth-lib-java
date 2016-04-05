@@ -3,11 +3,11 @@ package roth.lib.java.jdbc;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-public abstract class DbResultSetMetaData implements ResultSetMetaData, DbWrapper
+public abstract class JdbcResultSetMetaData implements ResultSetMetaData, JdbcWrapper
 {
 	protected ResultSetMetaData resultSetMetaData;
 	
-	public DbResultSetMetaData(ResultSetMetaData resultSetMetaData)
+	public JdbcResultSetMetaData(ResultSetMetaData resultSetMetaData)
 	{
 		this.resultSetMetaData = resultSetMetaData;
 	}

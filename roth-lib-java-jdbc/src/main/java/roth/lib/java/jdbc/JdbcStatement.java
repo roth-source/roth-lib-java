@@ -5,29 +5,29 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 
-public abstract class DbStatement implements Statement, DbWrapper
+public abstract class JdbcStatement implements Statement, JdbcWrapper
 {
 	protected Statement statement;
 	
-	public DbStatement(Statement statement)
+	public JdbcStatement(Statement statement)
 	{
 		this.statement = statement;
 	}
 	
 	@Override
-	public DbResultSet executeQuery(String sql) throws SQLException
+	public JdbcResultSet executeQuery(String sql) throws SQLException
 	{
 		return wrap(statement.executeQuery(sql));
 	}
 	
 	@Override
-	public DbResultSet getResultSet() throws SQLException
+	public JdbcResultSet getResultSet() throws SQLException
 	{
 		return wrap(statement.getResultSet());
 	}
 	
 	@Override
-	public DbResultSet getGeneratedKeys() throws SQLException
+	public JdbcResultSet getGeneratedKeys() throws SQLException
 	{
 		return wrap(statement.getGeneratedKeys());
 	}
@@ -195,7 +195,7 @@ public abstract class DbStatement implements Statement, DbWrapper
 	}
 	
 	@Override
-	public DbConnection getConnection() throws SQLException
+	public JdbcConnection getConnection() throws SQLException
 	{
 		return wrap(statement.getConnection());
 	}

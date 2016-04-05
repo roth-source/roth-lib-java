@@ -4,11 +4,11 @@ import java.sql.Array;
 import java.sql.SQLException;
 import java.util.Map;
 
-public abstract class DbArray implements Array, DbWrapper
+public abstract class JdbcArray implements Array, JdbcWrapper
 {
 	protected Array array;
 	
-	public DbArray(Array array)
+	public JdbcArray(Array array)
 	{
 		this.array = array;
 	}
@@ -50,25 +50,25 @@ public abstract class DbArray implements Array, DbWrapper
 	}
 	
 	@Override
-	public DbResultSet getResultSet() throws SQLException
+	public JdbcResultSet getResultSet() throws SQLException
 	{
 		return wrap(array.getResultSet());
 	}
 	
 	@Override
-	public DbResultSet getResultSet(Map<String, Class<?>> map) throws SQLException
+	public JdbcResultSet getResultSet(Map<String, Class<?>> map) throws SQLException
 	{
 		return wrap(array.getResultSet(map));
 	}
 	
 	@Override
-	public DbResultSet getResultSet(long index, int count) throws SQLException
+	public JdbcResultSet getResultSet(long index, int count) throws SQLException
 	{
 		return wrap(array.getResultSet(index, count));
 	}
 	
 	@Override
-	public DbResultSet getResultSet(long index, int count, Map<String, Class<?>> map) throws SQLException
+	public JdbcResultSet getResultSet(long index, int count, Map<String, Class<?>> map) throws SQLException
 	{
 		return wrap(array.getResultSet(index, count, map));
 	}

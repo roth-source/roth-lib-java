@@ -24,9 +24,9 @@ import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
 
-import roth.lib.java.jdbc.DbWrapper;
+import roth.lib.java.jdbc.JdbcWrapper;
 
-public interface MysqlDbWrapper extends DbWrapper
+public interface MysqlDbWrapper extends JdbcWrapper
 {
 	
 	@Override

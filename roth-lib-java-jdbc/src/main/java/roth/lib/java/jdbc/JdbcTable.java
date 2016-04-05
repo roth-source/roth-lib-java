@@ -17,16 +17,16 @@ import roth.lib.java.jdbc.sql.Wheres;
 import roth.lib.java.lang.List;
 import roth.lib.java.lang.Map;
 
-public abstract class DbTable<T> implements SqlFactory
+public abstract class JdbcTable<T> implements SqlFactory
 {
 	protected Class<T> klass;
 	
-	protected DbTable(Class<T> klass)
+	protected JdbcTable(Class<T> klass)
 	{
 		this.klass = klass;
 	}
 	
-	public abstract DbDataSource getDb();
+	public abstract Jdbc getDb();
 	
 	public String tableName()
 	{
@@ -303,17 +303,17 @@ public abstract class DbTable<T> implements SqlFactory
 		return getDb().executeInsert(sql, values);
 	}
 	
-	public int executeInsert(Insert insert, DbConnection connection) throws SQLException
+	public int executeInsert(Insert insert, JdbcConnection connection) throws SQLException
 	{
 		return getDb().executeInsert(insert, connection);
 	}
 	
-	public int executeInsert(String sql, DbConnection connection) throws SQLException
+	public int executeInsert(String sql, JdbcConnection connection) throws SQLException
 	{
 		return getDb().executeInsert(sql, connection);
 	}
 	
-	public int executeInsert(String sql, Collection<Object> values, DbConnection connection) throws SQLException
+	public int executeInsert(String sql, Collection<Object> values, JdbcConnection connection) throws SQLException
 	{
 		return getDb().executeInsert(sql, values, connection);
 	}
@@ -333,17 +333,17 @@ public abstract class DbTable<T> implements SqlFactory
 		return getDb().executeUpdate(sql, values);
 	}
 	
-	public int executeUpdate(Update update, DbConnection connection) throws SQLException
+	public int executeUpdate(Update update, JdbcConnection connection) throws SQLException
 	{
 		return getDb().executeUpdate(update, connection);
 	}
 	
-	public int executeUpdate(String sql, DbConnection connection) throws SQLException
+	public int executeUpdate(String sql, JdbcConnection connection) throws SQLException
 	{
 		return getDb().executeUpdate(sql, connection);
 	}
 	
-	public int executeUpdate(String sql, Collection<Object> values, DbConnection connection) throws SQLException
+	public int executeUpdate(String sql, Collection<Object> values, JdbcConnection connection) throws SQLException
 	{
 		return getDb().executeUpdate(sql, values, connection);
 	}
@@ -363,17 +363,17 @@ public abstract class DbTable<T> implements SqlFactory
 		return getDb().executeDelete(sql, values);
 	}
 	
-	public int executeDelete(Delete delete, DbConnection connection) throws SQLException
+	public int executeDelete(Delete delete, JdbcConnection connection) throws SQLException
 	{
 		return getDb().executeDelete(delete, connection);
 	}
 	
-	public int executeDelete(String sql, DbConnection connection) throws SQLException
+	public int executeDelete(String sql, JdbcConnection connection) throws SQLException
 	{
 		return getDb().executeDelete(sql, connection);
 	}
 	
-	public int executeDelete(String sql, Collection<Object> values, DbConnection connection) throws SQLException
+	public int executeDelete(String sql, Collection<Object> values, JdbcConnection connection) throws SQLException
 	{
 		return getDb().executeDelete(sql, values, connection);
 	}

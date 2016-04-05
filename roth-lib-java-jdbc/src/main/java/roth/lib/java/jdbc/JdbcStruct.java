@@ -4,11 +4,11 @@ import java.sql.SQLException;
 import java.sql.Struct;
 import java.util.Map;
 
-public abstract class DbStruct implements Struct, DbWrapper
+public abstract class JdbcStruct implements Struct, JdbcWrapper
 {
 	protected Struct struct;
 	
-	public DbStruct(Struct struct)
+	public JdbcStruct(Struct struct)
 	{
 		this.struct = struct;
 	}

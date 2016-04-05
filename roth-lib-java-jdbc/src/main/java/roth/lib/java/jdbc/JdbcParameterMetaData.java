@@ -3,11 +3,11 @@ package roth.lib.java.jdbc;
 import java.sql.ParameterMetaData;
 import java.sql.SQLException;
 
-public abstract class DbParameterMetaData implements ParameterMetaData, DbWrapper
+public abstract class JdbcParameterMetaData implements ParameterMetaData, JdbcWrapper
 {
 	protected ParameterMetaData parameterMetaData;
 	
-	public DbParameterMetaData(ParameterMetaData parameterMetaData)
+	public JdbcParameterMetaData(ParameterMetaData parameterMetaData)
 	{
 		this.parameterMetaData = parameterMetaData;
 	}

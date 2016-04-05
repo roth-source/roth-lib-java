@@ -32,11 +32,11 @@ import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertyReflector;
 
-public abstract class DbDataSource implements DataSource, DbWrapper, Characters, SqlFactory
+public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFactory
 {
 	protected MapperType mapperType;
 	protected MapperReflector mapperReflector;
-	protected DbDriver driver;
+	protected JdbcDriver driver;
 	protected String url;
 	protected String username;
 	protected String password;
@@ -45,12 +45,12 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	protected int loginTimeout = 60;
 	protected int deadLockRetries = 3;
 	protected PrintWriter logWriter;
-	protected ConcurrentLinkedDeque<DbConnection> availableConnections = new ConcurrentLinkedDeque<DbConnection>();
-	protected ConcurrentLinkedDeque<DbConnection> usedConnections = new ConcurrentLinkedDeque<DbConnection>();
-	protected DbCloseHandler closeHandler = new DbCloseHandler()
+	protected ConcurrentLinkedDeque<JdbcConnection> availableConnections = new ConcurrentLinkedDeque<JdbcConnection>();
+	protected ConcurrentLinkedDeque<JdbcConnection> usedConnections = new ConcurrentLinkedDeque<JdbcConnection>();
+	protected JdbcCloseHandler closeHandler = new JdbcCloseHandler()
 	{
 		@Override
-		public void close(DbConnection connection)
+		public void close(JdbcConnection connection)
 		{
 			usedConnections.remove(connection);
 			availableConnections.add(connection);
@@ -68,30 +68,30 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		}));
 	}
 	
-	protected DbDataSource(MapperType mapperType)
+	protected Jdbc(MapperType mapperType)
 	{
 		this.mapperType = mapperType;
 	}
 	
-	public DbDataSource(MapperType mapperType, String driver, String url)
+	public Jdbc(MapperType mapperType, String driver, String url)
 	{
 		this.mapperType = mapperType;
 		init(driver, url);
 	}
 	
-	public DbDataSource(MapperType mapperType, String driver, String url, Properties properties)
+	public Jdbc(MapperType mapperType, String driver, String url, Properties properties)
 	{
 		this.mapperType = mapperType;
 		init(driver, url, properties);
 	}
 	
-	public DbDataSource(MapperType mapperType, String driver, String url, String username, String password)
+	public Jdbc(MapperType mapperType, String driver, String url, String username, String password)
 	{
 		this.mapperType = mapperType;
 		init(driver, url, username, password);
 	}
 	
-	public DbDataSource(MapperType mapperType, String driver, String url, String username, String password, Properties properties)
+	public Jdbc(MapperType mapperType, String driver, String url, String username, String password, Properties properties)
 	{
 		this.mapperType = mapperType;
 		init(driver, url, username, password, properties);
@@ -134,7 +134,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return mapperReflector;
 	}
 	
-	public DbDriver createDriver(String driverName)
+	public JdbcDriver createDriver(String driverName)
 	{
 		try
 		{
@@ -166,15 +166,15 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	}
 	
 	@Override
-	public DbConnection getConnection() throws SQLException
+	public JdbcConnection getConnection() throws SQLException
 	{
 		return getConnection(username, password);
 	}
 	
 	@Override
-	public DbConnection getConnection(String username, String password) throws SQLException
+	public JdbcConnection getConnection(String username, String password) throws SQLException
 	{
-		DbConnection connection = getAvailableConnection();
+		JdbcConnection connection = getAvailableConnection();
 		if(connection == null)
 		{
 			if(usedConnections.size() < maxConnections)
@@ -199,9 +199,9 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return connection;
 	}
 	
-	protected DbConnection getAvailableConnection()
+	protected JdbcConnection getAvailableConnection()
 	{
-		DbConnection connection = null;
+		JdbcConnection connection = null;
 		while((connection = availableConnections.poll()) != null)
 		{
 			try
@@ -224,7 +224,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return connection;
 	}
 	
-	protected DbConnection createConnection(String username, String password) throws SQLException
+	protected JdbcConnection createConnection(String username, String password) throws SQLException
 	{
 		if(username != null)
 		{
@@ -234,7 +234,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		{
 			properties.put("password", password);
 		}
-		DbConnection connection = wrap(driver.connect(url, properties));
+		JdbcConnection connection = wrap(driver.connect(url, properties));
 		connection.setCloseHandler(closeHandler);
 		connection.setAutoCommit(false);
 		usedConnections.add(connection);
@@ -302,7 +302,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return generatedColumns;
 	}
 	
-	public void setGeneratedFields(DbResultSet resultSet, List<String> generatedColumns, DbModel model)
+	public void setGeneratedFields(JdbcResultSet resultSet, List<String> generatedColumns, JdbcModel model)
 	{
 		try
 		{
@@ -350,7 +350,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return wheres;
 	}
 	
-	public Wheres toIdWheres(DbModel model)
+	public Wheres toIdWheres(JdbcModel model)
 	{
 		Wheres wheres = newWheres();
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(model.getClass());
@@ -383,7 +383,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return wheres;
 	}
 	
-	public Select toSelect(DbModel model)
+	public Select toSelect(JdbcModel model)
 	{
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(model.getClass());
 		Wheres wheres = toIdWheres(model);
@@ -394,7 +394,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return null;
 	}
 	
-	public Insert toInsert(DbModel model)
+	public Insert toInsert(JdbcModel model)
 	{
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(model.getClass());
 		Map<String, Object> nameValues = new Map<String, Object>();
@@ -419,7 +419,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return null;
 	}
 	
-	public Update toUpdate(DbModel model)
+	public Update toUpdate(JdbcModel model)
 	{
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(model.getClass());
 		Map<String, Object> nameValues = new Map<String, Object>();
@@ -452,7 +452,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return null;
 	}
 	
-	public Delete toDelete(DbModel model)
+	public Delete toDelete(JdbcModel model)
 	{
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(model.getClass());
 		Wheres wheres = toIdWheres(model);
@@ -464,7 +464,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T> void fromDb(DbResultSet resultSet, Callback<T> callback)
+	public <T> void fromDb(JdbcResultSet resultSet, Callback<T> callback)
 	{
 		try
 		{
@@ -501,7 +501,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T> List<T> fromDb(DbResultSet resultSet, Class<T> klass)
+	public <T> List<T> fromDb(JdbcResultSet resultSet, Class<T> klass)
 	{
 		List<T> models = new List<T>();
 		try
@@ -538,7 +538,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return models;
 	}
 	
-	public <T> T fromDb(DbResultSet resultSet, Class<T> klass, ResultSetMetaData metaData, EntityReflector entityReflector)
+	public <T> T fromDb(JdbcResultSet resultSet, Class<T> klass, ResultSetMetaData metaData, EntityReflector entityReflector)
 	{
 		T model = null;
 		try
@@ -547,9 +547,9 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			constructor = klass.getDeclaredConstructor();
 			constructor.setAccessible(true);
 			model = constructor.newInstance();
-			if(model instanceof DbModel)
+			if(model instanceof JdbcModel)
 			{
-				((DbModel) model).setDb(this).persisted();
+				((JdbcModel) model).setDb(this).persisted();
 			}
 			for(int i = 1; i <= metaData.getColumnCount(); i++)
 			{
@@ -574,7 +574,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return model;
 	}
 	
-	public List<Map<String, Object>> fromDb(DbResultSet resultSet)
+	public List<Map<String, Object>> fromDb(JdbcResultSet resultSet)
 	{
 		List<Map<String, Object>> dataMaps = new List<Map<String, Object>>();
 		try
@@ -608,22 +608,22 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return dataMaps;
 	}
 	
-	public DbPreparedStatement prepareStatement(DbConnection connection, Sql sql) throws SQLException
+	public JdbcPreparedStatement prepareStatement(JdbcConnection connection, Sql sql) throws SQLException
 	{
 		return prepareStatement(connection, sql.toString(), sql.getValues());
 	}
 	
-	public DbPreparedStatement prepareStatement(DbConnection connection, Sql sql,  List<String> generated) throws SQLException
+	public JdbcPreparedStatement prepareStatement(JdbcConnection connection, Sql sql,  List<String> generated) throws SQLException
 	{
 		return prepareStatement(connection, sql.toString(), sql.getValues(), generated);
 	}
 	
-	public DbPreparedStatement prepareStatement(DbConnection connection, String sql, Collection<Object> values) throws SQLException
+	public JdbcPreparedStatement prepareStatement(JdbcConnection connection, String sql, Collection<Object> values) throws SQLException
 	{
 		return prepareStatement(connection, sql, values, null);
 	}
 	
-	public DbPreparedStatement prepareStatement(DbConnection connection, String sql, Collection<Object> values, List<String> generatedColumns) throws SQLException
+	public JdbcPreparedStatement prepareStatement(JdbcConnection connection, String sql, Collection<Object> values, List<String> generatedColumns) throws SQLException
 	{
 		if(generatedColumns != null && !generatedColumns.isEmpty())
 		{
@@ -635,7 +635,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		}
 	}
 	
-	public DbPreparedStatement setValues(DbPreparedStatement preparedStatement, Collection<Object> values) throws SQLException
+	public JdbcPreparedStatement setValues(JdbcPreparedStatement preparedStatement, Collection<Object> values) throws SQLException
 	{
 		if(values != null)
 		{
@@ -661,18 +661,18 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			table = entityReflector.getEntityName();
 			if(table == null)
 			{
-				throw new DbException("Entity name not found");
+				throw new JdbcException("Entity name not found");
 			}
 		}
 		else
 		{
-			throw new DbException("Entity annotation not found");
+			throw new JdbcException("Entity annotation not found");
 		}
 		return table;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends DbModel> T query(T model)
+	public <T extends JdbcModel> T query(T model)
 	{
 		Select select = toSelect(model);
 		if(select != null)
@@ -718,13 +718,13 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	public <T> List<T> queryAll(String sql, Map<String, Object> valueMap, Class<T> klass)
 	{
 		List<T> models = new List<T>();
-		try(DbConnection connection = getConnection())
+		try(JdbcConnection connection = getConnection())
 		{
 			models = queryAll(sql, valueMap, klass, connection); 
 		}
 		catch(SQLException e)
 		{
-			throw new DbException(e);
+			throw new JdbcException(e);
 		}
 		return models;
 	}
@@ -732,38 +732,38 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	public <T> List<T> queryAll(String sql, Collection<Object> values, Class<T> klass)
 	{
 		List<T> models = new List<T>();
-		try(DbConnection connection = getConnection())
+		try(JdbcConnection connection = getConnection())
 		{
 			models = queryAll(sql, values, klass, connection); 
 		}
 		catch(SQLException e)
 		{
-			throw new DbException(e);
+			throw new JdbcException(e);
 		}
 		return models;
 	}
 	
-	public <T> List<T> queryAll(Select select, Class<T> klass, DbConnection connection) throws SQLException
+	public <T> List<T> queryAll(Select select, Class<T> klass, JdbcConnection connection) throws SQLException
 	{
 		return queryAll(select.toString(), select.getValues(), klass, connection);
 	}
 	
-	public <T> List<T> queryAll(String sql, Class<T> klass, DbConnection connection) throws SQLException
+	public <T> List<T> queryAll(String sql, Class<T> klass, JdbcConnection connection) throws SQLException
 	{
 		return queryAll(sql, (Collection<Object>) null, klass, connection);
 	}
 	
-	public <T> List<T> queryAll(String sql, Map<String, Object> valueMap, Class<T> klass, DbConnection connection) throws SQLException
+	public <T> List<T> queryAll(String sql, Map<String, Object> valueMap, Class<T> klass, JdbcConnection connection) throws SQLException
 	{
-		DbNamedQuery namedQuery = namedQuery(sql, valueMap);
+		JdbcNamedQuery namedQuery = namedQuery(sql, valueMap);
 		return queryAll(namedQuery.getSql(), namedQuery.getValues(), klass, connection);
 	}
 	
-	public <T> List<T> queryAll(String sql, Collection<Object> values, Class<T> klass, DbConnection connection) throws SQLException
+	public <T> List<T> queryAll(String sql, Collection<Object> values, Class<T> klass, JdbcConnection connection) throws SQLException
 	{
-		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
+		try(JdbcPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
 		{
-			try(DbResultSet resultSet = preparedStatement.executeQuery())
+			try(JdbcResultSet resultSet = preparedStatement.executeQuery())
 			{
 				List<T> result = fromDb(resultSet, klass);
 				connection.commit();
@@ -784,49 +784,49 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	
 	public <T> void queryAll(String sql, Map<String, Object> valueMap, Callback<T> callback)
 	{
-		try(DbConnection connection = getConnection())
+		try(JdbcConnection connection = getConnection())
 		{
 			queryAll(sql, valueMap, callback, connection); 
 		}
 		catch(SQLException e)
 		{
-			throw new DbException(e);
+			throw new JdbcException(e);
 		}
 	}
 	
 	public <T> void queryAll(String sql, Collection<Object> values, Callback<T> callback)
 	{
-		try(DbConnection connection = getConnection())
+		try(JdbcConnection connection = getConnection())
 		{
 			queryAll(sql, values, callback, connection); 
 		}
 		catch(SQLException e)
 		{
-			throw new DbException(e);
+			throw new JdbcException(e);
 		}
 	}
 	
-	public <T> void queryAll(Select select, Callback<T> callback, DbConnection connection) throws SQLException
+	public <T> void queryAll(Select select, Callback<T> callback, JdbcConnection connection) throws SQLException
 	{
 		queryAll(select.toString(), select.getValues(), callback, connection);
 	}
 	
-	public <T> void queryAll(String sql, Callback<T> callback, DbConnection connection) throws SQLException
+	public <T> void queryAll(String sql, Callback<T> callback, JdbcConnection connection) throws SQLException
 	{
 		queryAll(sql, (Collection<Object>) null, callback, connection);
 	}
 	
-	public <T> void queryAll(String sql, Map<String, Object> valueMap, Callback<T> callback, DbConnection connection) throws SQLException
+	public <T> void queryAll(String sql, Map<String, Object> valueMap, Callback<T> callback, JdbcConnection connection) throws SQLException
 	{
-		DbNamedQuery namedQuery = namedQuery(sql, valueMap);
+		JdbcNamedQuery namedQuery = namedQuery(sql, valueMap);
 		queryAll(namedQuery.getSql(), namedQuery.getValues(), callback, connection);
 	}
 	
-	public <T> void queryAll(String sql, Collection<Object> values, Callback<T> callback, DbConnection connection) throws SQLException
+	public <T> void queryAll(String sql, Collection<Object> values, Callback<T> callback, JdbcConnection connection) throws SQLException
 	{
-		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
+		try(JdbcPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
 		{
-			try(DbResultSet resultSet = preparedStatement.executeQuery())
+			try(JdbcResultSet resultSet = preparedStatement.executeQuery())
 			{
 				fromDb(resultSet, callback);
 				connection.commit();
@@ -865,13 +865,13 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	public List<Map<String, Object>> queryAll(String sql, Map<String, Object> valueMap)
 	{
 		List<Map<String, Object>> maps = new List<Map<String, Object>>();
-		try(DbConnection connection = getConnection())
+		try(JdbcConnection connection = getConnection())
 		{
 			maps = queryAll(sql, valueMap, connection); 
 		}
 		catch(SQLException e)
 		{
-			throw new DbException(e);
+			throw new JdbcException(e);
 		}
 		return maps;
 	}
@@ -879,38 +879,38 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	public List<Map<String, Object>> queryAll(String sql, Collection<Object> values)
 	{
 		List<Map<String, Object>> maps = new List<Map<String, Object>>();
-		try(DbConnection connection = getConnection())
+		try(JdbcConnection connection = getConnection())
 		{
 			maps = queryAll(sql, values, connection); 
 		}
 		catch(SQLException e)
 		{
-			throw new DbException(e);
+			throw new JdbcException(e);
 		}
 		return maps;
 	}
 	
-	public List<Map<String, Object>> queryAll(Select select, DbConnection connection) throws SQLException
+	public List<Map<String, Object>> queryAll(Select select, JdbcConnection connection) throws SQLException
 	{
 		return queryAll(select.toString(), select.getValues(), connection);
 	}
 	
-	public List<Map<String, Object>> queryAll(String sql, DbConnection connection) throws SQLException
+	public List<Map<String, Object>> queryAll(String sql, JdbcConnection connection) throws SQLException
 	{
 		return queryAll(sql, (Collection<Object>) null, connection);
 	}
 	
-	public List<Map<String, Object>> queryAll(String sql, Map<String, Object> valueMap, DbConnection connection) throws SQLException
+	public List<Map<String, Object>> queryAll(String sql, Map<String, Object> valueMap, JdbcConnection connection) throws SQLException
 	{
-		DbNamedQuery namedQuery = namedQuery(sql, valueMap);
+		JdbcNamedQuery namedQuery = namedQuery(sql, valueMap);
 		return queryAll(namedQuery.getSql(), namedQuery.getValues(), connection);
 	}
 	
-	public List<Map<String, Object>> queryAll(String sql, Collection<Object> values, DbConnection connection) throws SQLException
+	public List<Map<String, Object>> queryAll(String sql, Collection<Object> values, JdbcConnection connection) throws SQLException
 	{
-		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
+		try(JdbcPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
 		{
-			try(DbResultSet resultSet = preparedStatement.executeQuery())
+			try(JdbcResultSet resultSet = preparedStatement.executeQuery())
 			{
 				 List<Map<String, Object>> result = fromDb(resultSet);
 				 connection.commit();
@@ -919,7 +919,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		}
 	}
 	
-	public int executeInsert(DbModel model)
+	public int executeInsert(JdbcModel model)
 	{
 		Insert insert = toInsert(model);
 		if(insert != null)
@@ -931,10 +931,10 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	
 	public int executeInsert(Insert insert)
 	{
-		return executeInsert(insert, (DbModel) null);
+		return executeInsert(insert, (JdbcModel) null);
 	}
 	
-	public int executeInsert(Insert insert, DbModel model)
+	public int executeInsert(Insert insert, JdbcModel model)
 	{
 		return executeInsert(insert.toString(), insert.getValues(), model);
 	}
@@ -946,18 +946,18 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	
 	public int executeInsert(String sql, Collection<Object> values)
 	{
-		return executeInsert(sql, values, (DbModel) null);
+		return executeInsert(sql, values, (JdbcModel) null);
 	}
 	
-	protected int executeInsert(String sql, Collection<Object> values, DbModel model)
+	protected int executeInsert(String sql, Collection<Object> values, JdbcModel model)
 	{
 		return executeInsert(sql, values, model, 0);
 	}
 	
-	protected int executeInsert(String sql, Collection<Object> values, DbModel model, int attempt)
+	protected int executeInsert(String sql, Collection<Object> values, JdbcModel model, int attempt)
 	{
 		int result = 0;
-		try(DbConnection connection = getConnection())
+		try(JdbcConnection connection = getConnection())
 		{
 			try
 			{
@@ -979,13 +979,13 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			}
 			else
 			{
-				throw new DbException(e);
+				throw new JdbcException(e);
 			}
 		}
 		return result;
 	}
 	
-	public int executeInsert(DbModel model, DbConnection connection) throws SQLException
+	public int executeInsert(JdbcModel model, JdbcConnection connection) throws SQLException
 	{
 		Insert insert = toInsert(model);
 		if(insert != null)
@@ -995,27 +995,27 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return 0;
 	}
 	
-	public int executeInsert(Insert insert, DbConnection connection) throws SQLException
+	public int executeInsert(Insert insert, JdbcConnection connection) throws SQLException
 	{
-		return executeInsert(insert, (DbModel) null, connection);
+		return executeInsert(insert, (JdbcModel) null, connection);
 	}
 	
-	public int executeInsert(Insert insert, DbModel model, DbConnection connection) throws SQLException
+	public int executeInsert(Insert insert, JdbcModel model, JdbcConnection connection) throws SQLException
 	{
 		return executeInsert(insert.toString(), insert.getValues(), model, connection);
 	}
 	
-	public int executeInsert(String sql, DbConnection connection) throws SQLException
+	public int executeInsert(String sql, JdbcConnection connection) throws SQLException
 	{
 		return executeInsert(sql, (Collection<Object>) null, connection);
 	}
 	
-	public int executeInsert(String sql, Collection<Object> values, DbConnection connection) throws SQLException
+	public int executeInsert(String sql, Collection<Object> values, JdbcConnection connection) throws SQLException
 	{
-		return executeInsert(sql, values, (DbModel) null, connection);
+		return executeInsert(sql, values, (JdbcModel) null, connection);
 	}
 	
-	protected int executeInsert(String sql, Collection<Object> values, DbModel model, DbConnection connection) throws SQLException
+	protected int executeInsert(String sql, Collection<Object> values, JdbcModel model, JdbcConnection connection) throws SQLException
 	{
 		int result = 0;
 		List<String> generatedColumns = new List<String>();
@@ -1023,7 +1023,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		{
 			generatedColumns = getGeneratedColumns(model.getClass());
 		}
-		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values, generatedColumns))
+		try(JdbcPreparedStatement preparedStatement = prepareStatement(connection, sql, values, generatedColumns))
 		{
 			result = preparedStatement.executeUpdate();
 			if(model != null)
@@ -1032,7 +1032,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 				model.resetDirty();
 				if(!generatedColumns.isEmpty())
 				{
-					try(DbResultSet resultSet = preparedStatement.getGeneratedKeys())
+					try(JdbcResultSet resultSet = preparedStatement.getGeneratedKeys())
 					{
 						setGeneratedFields(resultSet, generatedColumns, model);
 					}
@@ -1042,7 +1042,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return result;
 	}
 	
-	public int executeUpdate(DbModel model)
+	public int executeUpdate(JdbcModel model)
 	{
 		Update update = toUpdate(model);
 		if(update != null)
@@ -1054,10 +1054,10 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	
 	public int executeUpdate(Update update)
 	{
-		return executeUpdate(update, (DbModel) null);
+		return executeUpdate(update, (JdbcModel) null);
 	}
 	
-	public int executeUpdate(Update update, DbModel model)
+	public int executeUpdate(Update update, JdbcModel model)
 	{
 		return executeUpdate(update.toString(), update.getValues(), model);
 	}
@@ -1069,18 +1069,18 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	
 	public int executeUpdate(String sql, Collection<Object> values)
 	{
-		return executeUpdate(sql, values, (DbModel) null);
+		return executeUpdate(sql, values, (JdbcModel) null);
 	}
 	
-	protected int executeUpdate(String sql, Collection<Object> values, DbModel model)
+	protected int executeUpdate(String sql, Collection<Object> values, JdbcModel model)
 	{
 		return executeUpdate(sql, values, model, 0);
 	}
 	
-	protected int executeUpdate(String sql, Collection<Object> values, DbModel model, int attempt)
+	protected int executeUpdate(String sql, Collection<Object> values, JdbcModel model, int attempt)
 	{
 		int result = 0;
-		try(DbConnection connection = getConnection())
+		try(JdbcConnection connection = getConnection())
 		{
 			try
 			{
@@ -1102,13 +1102,13 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			}
 			else
 			{
-				throw new DbException(e);
+				throw new JdbcException(e);
 			}
 		}
 		return result;
 	}
 	
-	public int executeUpdate(DbModel model, DbConnection connection) throws SQLException
+	public int executeUpdate(JdbcModel model, JdbcConnection connection) throws SQLException
 	{
 		Update update = toUpdate(model);
 		if(update != null)
@@ -1118,30 +1118,30 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return 0;
 	}
 	
-	public int executeUpdate(Update update, DbConnection connection) throws SQLException
+	public int executeUpdate(Update update, JdbcConnection connection) throws SQLException
 	{
-		return executeUpdate(update, (DbModel) null, connection);
+		return executeUpdate(update, (JdbcModel) null, connection);
 	}
 	
-	public int executeUpdate(Update update, DbModel model, DbConnection connection) throws SQLException
+	public int executeUpdate(Update update, JdbcModel model, JdbcConnection connection) throws SQLException
 	{
 		return executeUpdate(update.toString(), update.getValues(), model, connection);
 	}
 	
-	public int executeUpdate(String sql, DbConnection connection) throws SQLException
+	public int executeUpdate(String sql, JdbcConnection connection) throws SQLException
 	{
 		return executeUpdate(sql, (Collection<Object>) null, connection);
 	}
 	
-	public int executeUpdate(String sql, Collection<Object> values, DbConnection connection) throws SQLException
+	public int executeUpdate(String sql, Collection<Object> values, JdbcConnection connection) throws SQLException
 	{
-		return executeUpdate(sql, values, (DbModel) null, connection);
+		return executeUpdate(sql, values, (JdbcModel) null, connection);
 	}
 	
-	protected int executeUpdate(String sql, Collection<Object> values, DbModel model, DbConnection connection) throws SQLException
+	protected int executeUpdate(String sql, Collection<Object> values, JdbcModel model, JdbcConnection connection) throws SQLException
 	{
 		int result = 0;
-		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
+		try(JdbcPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
 		{
 			result = preparedStatement.executeUpdate();
 			if(model != null)
@@ -1153,7 +1153,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return result;
 	}
 	
-	public int executeDelete(DbModel model)
+	public int executeDelete(JdbcModel model)
 	{
 		Delete delete = toDelete(model);
 		if(delete != null)
@@ -1165,10 +1165,10 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	
 	public int executeDelete(Delete delete)
 	{
-		return executeDelete(delete, (DbModel) null);
+		return executeDelete(delete, (JdbcModel) null);
 	}
 	
-	public int executeDelete(Delete delete, DbModel model)
+	public int executeDelete(Delete delete, JdbcModel model)
 	{
 		return executeDelete(delete.toString(), delete.getValues(), model);
 	}
@@ -1180,18 +1180,18 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	
 	public int executeDelete(String sql, Collection<Object> values)
 	{
-		return executeDelete(sql, values, (DbModel) null);
+		return executeDelete(sql, values, (JdbcModel) null);
 	}
 	
-	protected int executeDelete(String sql, Collection<Object> values, DbModel model)
+	protected int executeDelete(String sql, Collection<Object> values, JdbcModel model)
 	{
 		return executeDelete(sql, values, model, 0);
 	}
 	
-	protected int executeDelete(String sql, Collection<Object> values, DbModel model, int attempt)
+	protected int executeDelete(String sql, Collection<Object> values, JdbcModel model, int attempt)
 	{
 		int result = 0;
-		try(DbConnection connection = getConnection())
+		try(JdbcConnection connection = getConnection())
 		{
 			try
 			{
@@ -1213,13 +1213,13 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			}
 			else
 			{
-				throw new DbException(e);
+				throw new JdbcException(e);
 			}
 		}
 		return result;
 	}
 	
-	public int executeDelete(DbModel model, DbConnection connection) throws SQLException
+	public int executeDelete(JdbcModel model, JdbcConnection connection) throws SQLException
 	{
 		Delete delete = toDelete(model);
 		if(delete != null)
@@ -1229,30 +1229,30 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		return 0;
 	}
 	
-	public int executeDelete(Delete delete, DbConnection connection) throws SQLException
+	public int executeDelete(Delete delete, JdbcConnection connection) throws SQLException
 	{
-		return executeDelete(delete, (DbModel) null, connection);
+		return executeDelete(delete, (JdbcModel) null, connection);
 	}
 	
-	public int executeDelete(Delete delete, DbModel model, DbConnection connection) throws SQLException
+	public int executeDelete(Delete delete, JdbcModel model, JdbcConnection connection) throws SQLException
 	{
 		return executeDelete(delete.toString(), delete.getValues(), model, connection);
 	}
 	
-	public int executeDelete(String sql, DbConnection connection) throws SQLException
+	public int executeDelete(String sql, JdbcConnection connection) throws SQLException
 	{
 		return executeDelete(sql, (Collection<Object>) null, connection);
 	}
 	
-	public int executeDelete(String sql, Collection<Object> values, DbConnection connection) throws SQLException
+	public int executeDelete(String sql, Collection<Object> values, JdbcConnection connection) throws SQLException
 	{
-		return executeDelete(sql, values, (DbModel) null, connection);
+		return executeDelete(sql, values, (JdbcModel) null, connection);
 	}
 	
-	protected int executeDelete(String sql, Collection<Object> values, DbModel model, DbConnection connection) throws SQLException
+	protected int executeDelete(String sql, Collection<Object> values, JdbcModel model, JdbcConnection connection) throws SQLException
 	{
 		int result = 0;
-		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
+		try(JdbcPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
 		{
 			result = preparedStatement.executeUpdate();
 			if(model != null)
@@ -1278,7 +1278,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	protected int execute(String sql, Collection<Object> values, int attempt)
 	{
 		int result = 0;
-		try(DbConnection connection = getConnection())
+		try(JdbcConnection connection = getConnection())
 		{
 			try
 			{
@@ -1300,21 +1300,21 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 			}
 			else
 			{
-				throw new DbException(e);
+				throw new JdbcException(e);
 			}
 		}
 		return result;
 	}
 	
-	protected int execute(String sql, DbConnection connection) throws SQLException
+	protected int execute(String sql, JdbcConnection connection) throws SQLException
 	{
 		return execute(sql, (Collection<Object>) null, connection);
 	}
 	
-	protected int execute(String sql, Collection<Object> values, DbConnection connection) throws SQLException
+	protected int execute(String sql, Collection<Object> values, JdbcConnection connection) throws SQLException
 	{
 		int result = 0;
-		try(DbPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
+		try(JdbcPreparedStatement preparedStatement = prepareStatement(connection, sql, values))
 		{
 			result = preparedStatement.executeUpdate();
 		}
@@ -1323,7 +1323,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 	
 	public void close()
 	{
-		for(DbConnection dbConnection : availableConnections)
+		for(JdbcConnection dbConnection : availableConnections)
 		{
 			try
 			{
@@ -1334,7 +1334,7 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 				
 			}
 		}
-		for(DbConnection dbConnection : usedConnections)
+		for(JdbcConnection dbConnection : usedConnections)
 		{
 			try
 			{
@@ -1347,9 +1347,9 @@ public abstract class DbDataSource implements DataSource, DbWrapper, Characters,
 		}
 	}
 	
-	public DbNamedQuery namedQuery(String sql, Map<String, Object> valueMap)
+	public JdbcNamedQuery namedQuery(String sql, Map<String, Object> valueMap)
 	{
-		return new DbNamedQuery(sql, valueMap);
+		return new JdbcNamedQuery(sql, valueMap);
 	}
 	
 }

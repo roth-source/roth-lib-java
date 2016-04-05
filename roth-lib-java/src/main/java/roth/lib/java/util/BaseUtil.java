@@ -21,8 +21,8 @@ public class BaseUtil
 		// base 62
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
 	};
-	protected static final String CHARACTER_STRING = new String(CHARACTERS);
-	protected static final char BASE_PAD = CHARACTERS[0];
+	public static final String CHARACTER_STRING = new String(CHARACTERS);
+	public static final char BASE_PAD = CHARACTERS[0];
 	
 	protected BaseUtil()
 	{
