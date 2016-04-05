@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class FileUtil
 {
@@ -43,6 +44,19 @@ public class FileUtil
 			contents = new String(bytes);
 		}
 		return contents;
+	}
+
+	public static void copy(File file, OutputStream output) throws IOException
+	{
+		try(FileInputStream input = new FileInputStream(file))
+		{
+			IoUtil.copy(input, output);
+		}
+	}
+	
+	public static String relative(File baseDir, File file)
+	{
+		return baseDir.toPath().relativize(file.toPath()).toString();
 	}
 	
 }
