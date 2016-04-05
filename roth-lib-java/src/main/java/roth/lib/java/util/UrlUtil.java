@@ -37,4 +37,9 @@ public class UrlUtil implements Characters
 		}
 	}
 	
+	public static String escapePath(String path)
+	{
+		return path.replaceAll(" ", "%20");
+	}
+	
 }

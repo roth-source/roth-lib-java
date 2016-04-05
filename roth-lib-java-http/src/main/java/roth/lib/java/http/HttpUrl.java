@@ -301,7 +301,7 @@ public class HttpUrl implements Characters
 	public String toResourcePath()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder.append(path);
+		builder.append(UrlUtil.escapePath(path));
 		if(!paramMap.isEmpty())
 		{
 			builder.append("?");
