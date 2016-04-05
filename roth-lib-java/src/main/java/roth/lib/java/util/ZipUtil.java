@@ -1,6 +1,7 @@
 package roth.lib.java.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
@@ -25,16 +26,23 @@ public class ZipUtil
 	
 	public static void zip(File dir, File archive) throws IOException
 	{
-		try(ZipOutputStream output = new ZipOutputStream(new FileOutputStream(archive));)
+		List<File> files = DirUtil.files(dir);
+		if(!files.isEmpty())
 		{
-			List<File> files = DirUtil.files(dir);
-			for(File file : files)
+			try(ZipOutputStream output = new ZipOutputStream(new FileOutputStream(archive));)
 			{
-				output.putNextEntry(new ZipEntry(FileUtil.relative(dir, file)));
-				FileUtil.copy(file, output);
-				output.closeEntry();
+				for(File file : files)
+				{
+					output.putNextEntry(new ZipEntry(FileUtil.relative(dir, file)));
+					FileUtil.copy(file, output);
+					output.closeEntry();
+				}
+				
 			}
-			
+		}
+		else
+		{
+			throw new FileNotFoundException("no files found in dir " + dir.getAbsolutePath());
 		}
 	}
 	
