@@ -35,8 +35,8 @@ public class InitialContextUtil
 	
 	public static boolean getEnvFlag(String name)
 	{
-		Object object = lookup(ENV + name);
-		return object != null && object instanceof Boolean ? (boolean) object : false;
+		String value = getEnvEntry(name);
+		return value != null && "true".equalsIgnoreCase(value);
 	}
 	
 	public static Object getResource(String name)
