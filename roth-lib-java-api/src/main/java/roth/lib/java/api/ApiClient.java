@@ -1,6 +1,7 @@
 package roth.lib.java.api;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Type;
 
 import roth.lib.java.Generic;
@@ -31,6 +32,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	protected MapperReflector mapperReflector;
 	protected MapperConfig mapperConfig;
 	protected boolean debug;
+	protected PrintWriter logWriter;
 	
 	public ApiClient(boolean debug, MapperType requestMapperType, MapperType responseMapperType)
 	{
@@ -128,6 +130,20 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 			}
 		}
 		return contentType;
+	}
+	
+	public PrintWriter getLogWriter()
+	{
+		if(logWriter == null)
+		{
+			logWriter = new PrintWriter(System.out, true);
+		}
+		return logWriter;
+	}
+	
+	public void setLogWriter(PrintWriter logWriter)
+	{
+		this.logWriter = logWriter;
 	}
 	
 	protected abstract HttpUrl url();
@@ -806,11 +822,13 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 			}
 			if(isDebug())
 			{
-				System.out.print(request);
+				StringBuilder builder = new StringBuilder();
+				builder.append(request);
 				if(apiRequest != null && !(apiRequest instanceof Serializer))
 				{
-					System.out.println(debugRequest(apiRequest));
+					builder.append(debugRequest(apiRequest));
 				}
+				logRequest(builder.toString());
 			}
 			Inputter<T> inputter = null;
 			if(responseType != null)
@@ -821,18 +839,20 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 			T apiResponse = response.getEntity();
 			if(isDebug())
 			{
-				System.out.print(response);
+				StringBuilder builder = new StringBuilder();
+				builder.append(response);
 				String body = response.getBody();
 				if(body != null)
 				{
-					System.out.println(RAW_BODY);
-					System.out.println(debugBody(body));
+					builder.append(RAW_BODY);
+					builder.append(debugBody(body));
 				}
 				if(apiResponse != null)
 				{
-					System.out.println(MAPPED_ENTITY);
-					System.out.println(debugResponse(apiResponse));
+					builder.append(MAPPED_ENTITY);
+					builder.append(debugResponse(apiResponse));
 				}
+				logResponse(builder.toString());
 			}
 			checkResponse(response);
 			return response;
@@ -841,6 +861,16 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 		{
 			throw new ApiException(e);
 		}
+	}
+	
+	protected void logRequest(String request)
+	{
+		getLogWriter().write(request);
+	}
+	
+	protected void logResponse(String response)
+	{
+		getLogWriter().write(response);
 	}
 	
 	protected <T extends ApiResponse> void checkResponse(HttpResponse<T> response)
