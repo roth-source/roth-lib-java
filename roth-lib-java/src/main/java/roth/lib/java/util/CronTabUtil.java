@@ -135,12 +135,20 @@ public class CronTabUtil
 	
 	public static boolean isWeekdayNow(String value, Time now)
 	{
-		return matches(value, now.getWeekday(), WEEKDAY_MIN, WEEKDAY_MAX);
+		return matches(value, now.getWeekday() - 1, WEEKDAY_MIN, WEEKDAY_MAX);
 	}
 	
 	public static void main(String[] args)
 	{
-		System.out.println(isMinuteNow("*/5", new Time()));
+		//System.out.println(isMinuteNow("*/5", new Time()));
+		/*
+		Minute minute = new Minute(2016, 1, 1, 0, 0);
+		System.out.println(minute.getMinute());
+		System.out.println(minute.getHour());
+		System.out.println(minute.getDay());
+		System.out.println(minute.getMonth());
+		System.out.println(minute.getWeekday());
+		*/
 	}
 	
 }
