@@ -865,12 +865,12 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 	
 	protected void logRequest(String request)
 	{
-		getLogWriter().write(request);
+		getLogWriter().println(request);
 	}
 	
 	protected void logResponse(String response)
 	{
-		getLogWriter().write(response);
+		getLogWriter().println(response);
 	}
 	
 	protected <T extends ApiResponse> void checkResponse(HttpResponse<T> response)
