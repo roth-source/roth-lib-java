@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import roth.lib.java.lang.List;
+import roth.lib.java.time.Minute;
 import roth.lib.java.time.Time;
 
 public class CronTabUtil
@@ -52,9 +53,9 @@ public class CronTabUtil
 		return matches;
 	}
 	
-	public static boolean isAll(String value)
+	public static boolean isAll(String expression)
 	{
-		return ALL.equals(StringUtil.trim(value));
+		return ALL.equals(StringUtil.trim(expression));
 	}
 	
 	protected static List<Integer> parse(String expression, int min, int max)
@@ -100,55 +101,52 @@ public class CronTabUtil
 		return values;
 	}
 	
-	protected static boolean matches(String value, int timeValue, int min, int max)
+	protected static boolean matches(String expressions, int value, int min, int max)
 	{
 		boolean matches = false;
-		if(value != null)
+		if(expressions != null)
 		{
-			for(String expression : StringUtil.trim(value).split(","))
+			for(String expression : expressions.trim().split(","))
 			{
-				matches = parse(expression, min, max).contains(timeValue);
+				matches = parse(expression, min, max).contains(value);
+				if(matches)
+				{
+					break;
+				}
 			}
 		}
 		return matches;
 	}
 	
-	public static boolean isMinuteNow(String value, Time now)
+	public static boolean isMinuteNow(String expressions, Time now)
 	{
-		return matches(value, now.getMinute(), MINUTE_MIN, MINUTE_MAX);
+		return matches(expressions, now.getMinute(), MINUTE_MIN, MINUTE_MAX);
 	}
 	
-	protected static boolean isHourNow(String value, Time now)
+	protected static boolean isHourNow(String expressions, Time now)
 	{
-		return matches(value, now.getHour(), HOUR_MIN, HOUR_MAX);
+		return matches(expressions, now.getHour(), HOUR_MIN, HOUR_MAX);
 	}
 	
-	protected static boolean isDayNow(String value, Time now)
+	protected static boolean isDayNow(String expressions, Time now)
 	{
-		return matches(value, now.getDay(), DAY_MIN, DAY_MAX);
+		return matches(expressions, now.getDay(), DAY_MIN, DAY_MAX);
 	}
 	
-	public static boolean isMonthNow(String value, Time now)
+	public static boolean isMonthNow(String expressions, Time now)
 	{
-		return matches(value, now.getMonth(), HOUR_MIN, HOUR_MAX);
+		return matches(expressions, now.getMonth(), HOUR_MIN, HOUR_MAX);
 	}
 	
-	public static boolean isWeekdayNow(String value, Time now)
+	public static boolean isWeekdayNow(String expressions, Time now)
 	{
-		return matches(value, now.getWeekday() - 1, WEEKDAY_MIN, WEEKDAY_MAX);
+		return matches(expressions, now.getWeekday() - 1, WEEKDAY_MIN, WEEKDAY_MAX);
 	}
 	
 	public static void main(String[] args)
 	{
-		//System.out.println(isMinuteNow("*/5", new Time()));
-		/*
 		Minute minute = new Minute(2016, 1, 1, 0, 0);
-		System.out.println(minute.getMinute());
-		System.out.println(minute.getHour());
-		System.out.println(minute.getDay());
-		System.out.println(minute.getMonth());
-		System.out.println(minute.getWeekday());
-		*/
+		System.out.println(isNow(minute, "0,30", "*", "*", "*", "*"));
 	}
 	
 }
