@@ -29,4 +29,20 @@ public class DirUtil
 		return files;
 	}
 	
+	public static void delete(File dir)
+	{
+		for(File file : dir.listFiles())
+		{
+			if(file.isDirectory())
+			{
+				delete(file);
+			}
+			else
+			{
+				file.delete();
+			}
+		}
+		dir.delete();
+	}
+	
 }
