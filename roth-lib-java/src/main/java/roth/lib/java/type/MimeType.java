@@ -115,13 +115,39 @@ public enum MimeType
 	
 	public static MimeType fromString(String value)
 	{
+		MimeType mimeType = null;
 		if(value != null)
 		{
-			for(MimeType mimeType : values())
+			switch(value)
 			{
-				if(mimeType.value.equalsIgnoreCase(value))
+				case "json":
+				case "application/json":
 				{
-					return mimeType;
+					mimeType =  MimeType.APPLICATION_JSON;
+					break;
+				}
+				case "xml":
+				case "application/xml":
+				{
+					mimeType =  MimeType.APPLICATION_XML;
+					break;
+				}
+				case "form":
+				case "application/x-www-form-urlencoded":
+				{
+					mimeType =  MimeType.APPLICATION_X_WWW_FORM_URLENCODED;
+					break;
+				}
+			}
+			if(mimeType == null)
+			{
+				for(MimeType tempMimeType : values())
+				{
+					if(tempMimeType.value.equalsIgnoreCase(value))
+					{
+						mimeType = tempMimeType;
+						break;
+					}
 				}
 			}
 		}
