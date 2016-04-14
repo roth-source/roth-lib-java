@@ -118,7 +118,7 @@ public enum MimeType
 		MimeType mimeType = null;
 		if(value != null)
 		{
-			switch(value)
+			switch(value.toLowerCase())
 			{
 				case "json":
 				case "application/json":
