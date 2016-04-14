@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import roth.lib.java.Characters;
 import roth.lib.java.http.HttpMethod;
+import roth.lib.java.http.HttpUrl;
 import roth.lib.java.lang.List;
 import roth.lib.java.lang.Map;
 import roth.lib.java.mapper.Mapper;
@@ -45,8 +46,10 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 	protected static String ACCESS_CONTROL_ALLOW_CREDENTIALS 	= "Access-Control-Allow-Credentials";
 	protected static String ACCESS_CONTROL_ALLOW_METHODS 		= "Access-Control-Allow-Methods";
 	protected static String ACCESS_CONTROL_EXPOSE_HEADERS 		= "Access-Control-Expose-Headers";
-	protected static String CONTENT_TYPE 						= "Content-Type";
-	protected static String ACCEPT		 						= "Accept";
+	protected static String CONTENT_TYPE_PARAM	 				= "contentType";
+	protected static String CONTENT_TYPE_HEADER 				= "Content-Type";
+	protected static String ACCEPT_PARAM		 				= "accept";
+	protected static String ACCEPT_HEADER		 				= "Accept";
 	protected static String ALLOWED_METHODS 					= "GET, POST";
 	protected static List<HttpMethod> SUPPORTED_METHODS			= List.fromArray(HttpMethod.GET, HttpMethod.POST);
 	protected static List<String> LOCALHOSTS 					= List.fromArray("localhost", "127.0.0.1");
@@ -82,7 +85,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		MimeType requestContentType = getRequestContentType(request, response);
 		MimeType responseContentType = getResponseContentType(request, response);
 		Mapper responseMapper = getResponseMapper(request, response, responseContentType);
-		response.setHeader(CONTENT_TYPE, responseContentType.toString());
+		response.setHeader(CONTENT_TYPE_HEADER, responseContentType.toString());
 		boolean dev = isDev(request, response);
 		try
 		{
@@ -362,31 +365,34 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 	
 	protected MimeType getRequestContentType(HttpServletRequest request, HttpServletResponse response)
 	{
-		MimeType contentType = null;
-		String contentTypeHeader = request.getHeader(CONTENT_TYPE);
-		if(contentTypeHeader != null)
+		MimeType contentType = MimeType.fromString(HttpUrl.parseParamMap(request.getQueryString()).get(CONTENT_TYPE_PARAM));
+		if(contentType == null)
 		{
-			int index = contentTypeHeader.indexOf(";");
-			if(index > -1)
+			String contentTypeHeader = request.getHeader(CONTENT_TYPE_HEADER);
+			if(contentTypeHeader != null)
 			{
-				contentTypeHeader = contentTypeHeader.substring(0, index);
-			}
-			contentType = MimeType.fromString(contentTypeHeader);
-			if(contentType != null)
-			{
-				switch(contentType)
+				int index = contentTypeHeader.indexOf(";");
+				if(index > -1)
 				{
-					case APPLICATION_JSON:
-					case APPLICATION_XML:
-					case APPLICATION_X_WWW_FORM_URLENCODED:
+					contentTypeHeader = contentTypeHeader.substring(0, index);
+				}
+				contentType = MimeType.fromString(contentTypeHeader);
+				if(contentType != null)
+				{
+					switch(contentType)
 					{
-						break;
-					}
-					case TEXT_PLAIN:
-					default:
-					{
-						contentType = null;
-						break;
+						case APPLICATION_JSON:
+						case APPLICATION_XML:
+						case APPLICATION_X_WWW_FORM_URLENCODED:
+						{
+							break;
+						}
+						case TEXT_PLAIN:
+						default:
+						{
+							contentType = null;
+							break;
+						}
 					}
 				}
 			}
@@ -396,32 +402,35 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 	
 	protected MimeType getResponseContentType(HttpServletRequest request, HttpServletResponse response)
 	{
-		MimeType contentType = null;
-		String acceptHeader = request.getHeader(ACCEPT);
-		if(acceptHeader != null)
+		MimeType contentType = MimeType.fromString(HttpUrl.parseParamMap(request.getQueryString()).get(ACCEPT_PARAM));
+		if(contentType == null)
 		{
-			int index = acceptHeader.indexOf(";");
-			if(index > -1)
+			String acceptHeader = request.getHeader(ACCEPT_HEADER);
+			if(acceptHeader != null)
 			{
-				acceptHeader = acceptHeader.substring(0, index);
-			}
-			List<String> acceptTypes = List.fromArray(acceptHeader.split(","));
-			accepts: for(String acceptType : acceptTypes)
-			{
-				contentType = MimeType.fromString(acceptType);
-				if(contentType != null)
+				int index = acceptHeader.indexOf(";");
+				if(index > -1)
 				{
-					switch(contentType)
+					acceptHeader = acceptHeader.substring(0, index);
+				}
+				List<String> acceptTypes = List.fromArray(acceptHeader.split(","));
+				accepts: for(String acceptType : acceptTypes)
+				{
+					contentType = MimeType.fromString(acceptType);
+					if(contentType != null)
 					{
-						case APPLICATION_JSON:
-						case APPLICATION_XML:
+						switch(contentType)
 						{
-							break accepts;
-						}
-						default:
-						{
-							contentType = null;
-							break;
+							case APPLICATION_JSON:
+							case APPLICATION_XML:
+							{
+								break accepts;
+							}
+							default:
+							{
+								contentType = null;
+								break;
+							}
 						}
 					}
 				}

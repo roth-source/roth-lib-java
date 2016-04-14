@@ -144,17 +144,15 @@ public class HttpUrl implements Characters
 			}
 			String path = matcher.group(PATH);
 			this.path = path != null ? path : "/";
-			String parameters = matcher.group(PARAM);
-			if(parameters != null)
+			String params = matcher.group(PARAM);
+			if(params != null)
 			{
-				Matcher parameterMatcher = PARAM_PATTERN.matcher(parameters);
+				Matcher parameterMatcher = PARAM_PATTERN.matcher(params);
 				while(parameterMatcher.find())
 				{
-					
-						String name = UrlUtil.decode(parameterMatcher.group(NAME));
-						String value = UrlUtil.decode(parameterMatcher.group(VALUE));
-						this.paramMap.put(name, value);
-					
+					String name = UrlUtil.decode(parameterMatcher.group(NAME));
+					String value = UrlUtil.decode(parameterMatcher.group(VALUE));
+					this.paramMap.put(name, value);
 				}
 			}
 			String hash = matcher.group(HASH);
@@ -164,6 +162,22 @@ public class HttpUrl implements Characters
 		{
 			throw new HttpUrlException("invalid url format - " + url);
 		}
+	}
+	
+	public static Map<String, String> parseParamMap(String params)
+	{
+		Map<String, String> paramMap = new Map<>();
+		if(params != null)
+		{
+			Matcher parameterMatcher = HttpUrl.PARAM_PATTERN.matcher(params);
+			while(parameterMatcher.find())
+			{
+				String name = UrlUtil.decode(parameterMatcher.group(HttpUrl.NAME));
+				String value = UrlUtil.decode(parameterMatcher.group(HttpUrl.VALUE));
+				paramMap.put(name, value);
+			}
+		}
+		return paramMap;
 	}
 	
 	public HttpProtocol getProtocol()
