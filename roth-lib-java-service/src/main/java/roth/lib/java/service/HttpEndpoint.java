@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import roth.lib.java.Characters;
+import roth.lib.java.form.FormMapper;
 import roth.lib.java.http.HttpMethod;
 import roth.lib.java.http.HttpUrl;
 import roth.lib.java.lang.List;
@@ -57,6 +58,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 	protected static String SERVICE 							= "service";
 	protected static String METHOD 								= "method";
 	protected static Pattern SERVICE_METHOD_PATTERN 			= Pattern.compile("(?:^|/)(?<" + SERVICE + ">\\w+)/(?<" + METHOD + ">\\w+)(?:/|$)");
+	protected static Pattern BOUNDARY_PATTERN					= Pattern.compile("boundary\\=(?:\")?(.+?)(?:\"|;|$)");
 	
 	protected static Map<String, ServiceReflector> serviceReflectorMap = new Map<String, ServiceReflector>();
 	
@@ -135,13 +137,34 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 												Parameter parameter = methodReflector.getParameter();
 												if(parameter != null)
 												{
-													InputStream input = methodReflector.isGzippedInput() ? new GZIPInputStream(request.getInputStream()) : request.getInputStream();
-													Type methodParameterType = parameter.getParameterizedType();
-													service.setRequestContentType(requestContentType);
-													requestMapper = getRequestMapper(request, response, requestContentType);
-													service.setRequestMapper(requestMapper);
-													methodRequest = requestMapper.setContext(methodReflector.getContext()).deserialize(input, methodParameterType);
-													errors.addAll(validate(request, response, methodRequest, requestMapper.getMapperType()));
+													if(!HttpMethod.GET.equals(httpMethod))
+													{
+														InputStream input = methodReflector.isGzippedInput() ? new GZIPInputStream(request.getInputStream()) : request.getInputStream();
+														service.setRequestContentType(requestContentType);
+														requestMapper = getRequestMapper(request, response, requestContentType);
+														requestMapper.setContext(methodReflector.getContext()).setContentType(requestContentType);
+														if(requestMapper instanceof FormMapper && MimeType.MULTIPART_FORM_DATA.equals(requestContentType))
+														{
+															Matcher matcher = BOUNDARY_PATTERN.matcher(request.getHeader(CONTENT_TYPE_HEADER));
+															if(matcher.find())
+															{
+																((FormMapper) requestMapper).setBoundary(matcher.group(1));
+															}
+														}
+														service.setRequestMapper(requestMapper);
+														methodRequest = requestMapper.deserialize(input, parameter.getParameterizedType());
+														errors.addAll(validate(request, response, methodRequest, requestMapper.getMapperType()));
+													}
+													else
+													{
+														requestMapper = getMapperReflector().getMapper(MapperType.FORM, getMapperConfig());
+														requestMapper.setContext(methodReflector.getContext()).setContentType(requestContentType);
+														if(requestMapper instanceof FormMapper)
+														{
+															methodRequest = ((FormMapper) requestMapper).deserialize(HttpUrl.parseParamMap(request.getQueryString()), parameter.getParameterizedType());
+															errors.addAll(validate(request, response, methodRequest, requestMapper.getMapperType()));
+														}
+													}
 												}
 												if(dev)
 												{
@@ -384,6 +407,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 						case APPLICATION_JSON:
 						case APPLICATION_XML:
 						case APPLICATION_X_WWW_FORM_URLENCODED:
+						case MULTIPART_FORM_DATA:
 						{
 							break;
 						}
@@ -505,7 +529,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 						Object propertyValue = propertyReflector.getField().get(value);
 						if(ReflectionUtil.isArray(propertyType) || ReflectionUtil.isCollection(propertyType))
 						{
-							if(propertyValue != null)
+							if(propertyValue != null && !byte[].class.isAssignableFrom(propertyReflector.getFieldClass()))
 							{
 								int i = 0;
 								for(Object element : ReflectionUtil.asCollection(propertyValue))

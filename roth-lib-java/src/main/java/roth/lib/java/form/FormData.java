@@ -1,26 +1,20 @@
 package roth.lib.java.form;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
+
+import roth.lib.java.type.MimeType;
 
 public class FormData
 {
 	protected String filename;
-	protected String contentType;
-	protected ByteArrayOutputStream output;
+	protected MimeType contentType;
+	protected byte[] bytes;
 	
-	public FormData(String filename, String contentType, ByteArrayOutputStream output)
+	public FormData(String filename, MimeType contentType, byte[] bytes)
 	{
 		this.filename = filename;
 		this.contentType = contentType;
-		this.output = output;
-	}
-	
-	public FormData(String filename, String contentType, byte[] bytes)
-	{
-		this.filename = filename;
-		this.contentType = contentType;
-		setBytes(bytes);
+		this.bytes = bytes;
 	}
 	
 	public String getFilename()
@@ -28,14 +22,14 @@ public class FormData
 		return filename;
 	}
 	
-	public String getContentType()
+	public MimeType getContentType()
 	{
 		return contentType;
 	}
 	
-	public ByteArrayOutputStream getOutput()
+	public ByteArrayInputStream getInput()
 	{
-		return output;
+		return new ByteArrayInputStream(bytes);
 	}
 	
 	public FormData setFilename(String filename)
@@ -44,29 +38,15 @@ public class FormData
 		return this;
 	}
 	
-	public FormData setContentType(String contentType)
+	public FormData setContentType(MimeType contentType)
 	{
 		this.contentType = contentType;
 		return this;
 	}
 	
-	public FormData setOutput(ByteArrayOutputStream output)
-	{
-		this.output = output;
-		return this;
-	}
-	
 	public FormData setBytes(byte[] bytes)
 	{
-		this.output = new ByteArrayOutputStream();
-		try
-		{
-			output.write(bytes);
-		}
-		catch(IOException e)
-		{
-			
-		}
+		this.bytes = bytes;
 		return this;
 	}
 	

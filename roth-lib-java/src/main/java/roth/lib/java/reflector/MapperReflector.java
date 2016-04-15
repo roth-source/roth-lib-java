@@ -50,6 +50,7 @@ import roth.lib.java.serializer.EscapedSerializer;
 import roth.lib.java.serializer.Serializer;
 import roth.lib.java.serializer.TimeSerializer;
 import roth.lib.java.serializer.UnescapedSerializer;
+import roth.lib.java.table.TableMapper;
 import roth.lib.java.time.Day;
 import roth.lib.java.time.Hour;
 import roth.lib.java.time.Millisecond;
@@ -226,7 +227,7 @@ public class MapperReflector
 			}
 			case TABLE:
 			{
-				//mapper = getTableMapper(mapperConfig);
+				mapper = getTableMapper(mapperConfig);
 				break;
 			}
 			default:
@@ -268,7 +269,6 @@ public class MapperReflector
 		return new FormMapper(mapperConfig);
 	}
 	
-	/*
 	public TableMapper getTableMapper()
 	{
 		return getTableMapper(MapperConfig.get());
@@ -278,7 +278,6 @@ public class MapperReflector
 	{
 		return new TableMapper(mapperConfig);
 	}
-	*/
 	
 	public Serializer<?> getSerializer(Class<?> klass)
 	{

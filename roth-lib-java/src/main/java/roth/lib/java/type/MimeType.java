@@ -138,6 +138,11 @@ public enum MimeType
 					mimeType =  MimeType.APPLICATION_X_WWW_FORM_URLENCODED;
 					break;
 				}
+				case "multipart/form-data":
+				{
+					mimeType =  MimeType.MULTIPART_FORM_DATA;
+					break;
+				}
 			}
 			if(mimeType == null)
 			{
@@ -151,7 +156,7 @@ public enum MimeType
 				}
 			}
 		}
-		return null;
+		return mimeType;
 	}
 	
 }

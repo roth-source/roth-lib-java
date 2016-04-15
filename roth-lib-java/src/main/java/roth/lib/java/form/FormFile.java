@@ -4,6 +4,8 @@ import java.io.File;
 import java.net.URLConnection;
 import java.nio.file.Files;
 
+import roth.lib.java.type.MimeType;
+
 public class FormFile
 {
 	protected File file;
@@ -36,12 +38,12 @@ public class FormFile
 		return length != null ? length : file.length();
 	}
 	
-	public String getContentType()
+	public MimeType getContentType()
 	{
-		String contentType = "";
+		MimeType contentType = null;
 		try
 		{
-			contentType = Files.probeContentType(file.toPath());
+			contentType = MimeType.fromString(Files.probeContentType(file.toPath()));
 		}
 		catch(Exception e)
 		{
@@ -49,7 +51,7 @@ public class FormFile
 		}
 		if(contentType == null)
 		{
-			contentType = URLConnection.guessContentTypeFromName(file.getName());
+			contentType = MimeType.fromString(URLConnection.guessContentTypeFromName(file.getName()));
 		}
 		return contentType;
 	}

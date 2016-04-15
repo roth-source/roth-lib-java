@@ -24,6 +24,7 @@ import roth.lib.java.lang.Map;
 import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.serializer.Serializer;
+import roth.lib.java.type.MimeType;
 
 public abstract class Mapper implements Characters
 {
@@ -32,6 +33,7 @@ public abstract class Mapper implements Characters
 	protected MapperReflector mapperReflector;
 	protected MapperConfig mapperConfig;
 	protected String context;
+	protected MimeType contentType;
 	protected List<Callback<?>> callbacks = new List<Callback<?>>();
 	protected int tabs;
 	
@@ -70,6 +72,11 @@ public abstract class Mapper implements Characters
 	public String getContext()
 	{
 		return context;
+	}
+	
+	public MimeType getContentType()
+	{
+		return contentType;
 	}
 	
 	public List<Callback<?>> getCallbacks()
@@ -154,6 +161,12 @@ public abstract class Mapper implements Characters
 	public Mapper setContext(String context)
 	{
 		this.context = context;
+		return this;
+	}
+	
+	public Mapper setContentType(MimeType contentType)
+	{
+		this.contentType = contentType;
 		return this;
 	}
 	
