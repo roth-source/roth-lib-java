@@ -27,6 +27,11 @@ public class FormData
 		return contentType;
 	}
 	
+	public byte[] getBytes()
+	{
+		return bytes;
+	}
+	
 	public ByteArrayInputStream getInput()
 	{
 		return new ByteArrayInputStream(bytes);
