@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
 
+import roth.lib.java.Characters;
 import roth.lib.java.Generic;
 import roth.lib.java.http.HttpClient;
 import roth.lib.java.http.HttpHeader;
@@ -22,7 +23,7 @@ import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.serializer.Serializer;
 import roth.lib.java.type.MimeType;
 
-public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
+public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient implements Characters
 {
 	protected static String RAW_BODY		= "RAW BODY";
 	protected static String MAPPED_ENTITY	= "MAPPED ENTITY";
@@ -845,11 +846,13 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient
 				if(body != null)
 				{
 					builder.append(RAW_BODY);
+					builder.append(NEW_LINE);
 					builder.append(debugBody(body));
 				}
 				if(apiResponse != null)
 				{
 					builder.append(MAPPED_ENTITY);
+					builder.append(NEW_LINE);
 					builder.append(debugResponse(apiResponse));
 				}
 				logResponse(builder.toString());
