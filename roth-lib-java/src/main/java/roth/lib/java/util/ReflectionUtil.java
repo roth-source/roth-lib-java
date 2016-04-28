@@ -2,6 +2,7 @@ package roth.lib.java.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -240,6 +241,25 @@ public class ReflectionUtil
 			annotation = klass.getDeclaredAnnotation(annotationClass);
 		}
 		return annotation;
+	}
+	
+	public static <T> T newInstance(Class<T> klass)
+	{
+		T t = null;
+		try
+		{
+			Constructor<T> constructor = klass.getDeclaredConstructor();
+			if(constructor != null)
+			{
+				constructor.setAccessible(true);
+				t = constructor.newInstance();
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return t;
 	}
 	
 }
