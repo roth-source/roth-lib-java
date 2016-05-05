@@ -12,6 +12,7 @@ public class Template
 	protected static final String ENGINE			= "nashorn";
 	protected static final String ROTH_JS			= "roth-lib-js.js";
 	protected static final String ROTH_JS_TEMPLATE	= "roth-lib-js-template.js";
+	protected static final String ROTH_JS_JAVA		= "roth-lib-js-java.js";
 	protected static final String VERSION			= "$_version";
 	protected static final String CONFIG			= "$_config";
 	protected static final String TEMPLATE			= "$_template";
@@ -42,6 +43,7 @@ public class Template
 			engine = new ScriptEngineManager().getEngineByName(ENGINE);
 			engine.eval(ResourceUtil.toString(ROTH_JS));
 			engine.eval(ResourceUtil.toString(ROTH_JS_TEMPLATE));
+			engine.eval(ResourceUtil.toString(ROTH_JS_JAVA));
 			engine.put(CONFIG, config);
 			engine.eval(SET_VERSION + SET_TEMPLATE);
 			version = (String) engine.get(VERSION);
