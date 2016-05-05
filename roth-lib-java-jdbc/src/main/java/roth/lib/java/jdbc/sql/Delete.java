@@ -7,6 +7,7 @@ import roth.lib.java.lang.List;
 public abstract class Delete extends Sql
 {
 	protected String table;
+	protected Joins joins;
 	protected Wheres wheres;
 	
 	protected List<Wheres> nestedWheres = new List<Wheres>();
@@ -20,6 +21,169 @@ public abstract class Delete extends Sql
 	{
 		this.table = table;
 		return this;
+	}
+	
+	public Delete joins(Joins joins)
+	{
+		this.joins = joins;
+		return this;
+	}
+	
+	public Delete join(Join join)
+	{
+		joins = joins != null ? joins : newJoins();
+		joins.addJoins(join);
+		return this;
+	}
+	
+	public Delete join(String table1, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(JOIN).setTable(table1).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Delete joinAs(String table1, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Delete joinAs(Select select, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(JOIN).setSelect(select).setAlias(alias).addOns(ons));
+	}
+	
+	public Delete joinAs(Select select, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(JOIN).setSelect(select).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Delete join(String table, On...ons)
+	{
+		return join(newJoin().setJoinType(JOIN).setTable(table).addOns(ons));
+	}
+	
+	public Delete joinAs(String table, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(JOIN).setTable(table).setAlias(alias).addOns(ons));
+	}
+	
+	public Delete joinInner(String table1, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(INNER_JOIN).setTable(table1).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Delete joinInnerAs(String table1, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(INNER_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Delete joinInnerAs(Select select, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(INNER_JOIN).setSelect(select).setAlias(alias).addOns(ons));
+	}
+	
+	public Delete joinInnerAs(Select select, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(INNER_JOIN).setSelect(select).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Delete joinInner(String table, On...ons)
+	{
+		return join(newJoin().setJoinType(INNER_JOIN).setTable(table).addOns(ons));
+	}
+	
+	public Delete joinInnerAs(String table, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(INNER_JOIN).setTable(table).setAlias(alias).addOns(ons));
+	}
+	
+	public Delete joinLeft(String table1, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(LEFT_JOIN).setTable(table1).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Delete joinLeftAs(String table1, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(LEFT_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Delete joinLeftAs(Select select, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(LEFT_JOIN).setSelect(select).setAlias(alias).addOns(ons));
+	}
+	
+	public Delete joinLeftAs(Select select, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(LEFT_JOIN).setSelect(select).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Delete joinLeft(String table, On...ons)
+	{
+		return join(newJoin().setJoinType(LEFT_JOIN).setTable(table).addOns(ons));
+	}
+	
+	public Delete joinLeftAs(String table, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(LEFT_JOIN).setTable(table).setAlias(alias).addOns(ons));
+	}
+	
+	public Delete joinRight(String table1, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(RIGHT_JOIN).setTable(table1).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Delete joinRightAs(String table1, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(RIGHT_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Delete joinRightAs(Select select, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(RIGHT_JOIN).setSelect(select).setAlias(alias).addOns(ons));
+	}
+	
+	public Delete joinRightAs(Select select, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(RIGHT_JOIN).setSelect(select).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Delete joinRight(String table, On...ons)
+	{
+		return join(newJoin().setJoinType(RIGHT_JOIN).setTable(table).addOns(ons));
+	}
+	
+	public Delete joinRightAs(String table, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(RIGHT_JOIN).setTable(table).setAlias(alias).addOns(ons));
+	}
+	
+	public Delete joinOuter(String table1, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(OUTER_JOIN).setTable(table1).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Delete joinOuterAs(String table1, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(OUTER_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Delete joinOuterAs(Select select, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(OUTER_JOIN).setSelect(select).setAlias(alias).addOns(ons));
+	}
+	
+	public Delete joinOuterAs(Select select, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(OUTER_JOIN).setSelect(select).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Delete joinOuter(String table, On...ons)
+	{
+		return join(newJoin().setJoinType(OUTER_JOIN).setTable(table).addOns(ons));
+	}
+	
+	public Delete joinOuterAs(String table, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(OUTER_JOIN).setTable(table).setAlias(alias).addOns(ons));
 	}
 	
 	public Delete wheres(Wheres wheres)
@@ -442,6 +606,7 @@ public abstract class Delete extends Sql
 		}
 		StringBuilder builder = new StringBuilder();
 		builder.append(DELETE + tick(table));
+		builder.append(joins != null ? joins : "");
 		builder.append(wheresValue);
 		builder.append(END);
 		return builder.toString();

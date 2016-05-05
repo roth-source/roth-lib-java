@@ -10,6 +10,7 @@ import roth.lib.java.lang.List;
 public abstract class Update extends Sql
 {
 	protected String table;
+	protected Joins joins;
 	protected List<Set> sets = new List<Set>();
 	protected Wheres wheres;
 	
@@ -24,6 +25,169 @@ public abstract class Update extends Sql
 	{
 		this.table = table;
 		return this;
+	}
+
+	public Update joins(Joins joins)
+	{
+		this.joins = joins;
+		return this;
+	}
+	
+	public Update join(Join join)
+	{
+		joins = joins != null ? joins : newJoins();
+		joins.addJoins(join);
+		return this;
+	}
+	
+	public Update join(String table1, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(JOIN).setTable(table1).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Update joinAs(String table1, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Update joinAs(Select select, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(JOIN).setSelect(select).setAlias(alias).addOns(ons));
+	}
+	
+	public Update joinAs(Select select, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(JOIN).setSelect(select).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Update join(String table, On...ons)
+	{
+		return join(newJoin().setJoinType(JOIN).setTable(table).addOns(ons));
+	}
+	
+	public Update joinAs(String table, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(JOIN).setTable(table).setAlias(alias).addOns(ons));
+	}
+	
+	public Update joinInner(String table1, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(INNER_JOIN).setTable(table1).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Update joinInnerAs(String table1, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(INNER_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Update joinInnerAs(Select select, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(INNER_JOIN).setSelect(select).setAlias(alias).addOns(ons));
+	}
+	
+	public Update joinInnerAs(Select select, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(INNER_JOIN).setSelect(select).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Update joinInner(String table, On...ons)
+	{
+		return join(newJoin().setJoinType(INNER_JOIN).setTable(table).addOns(ons));
+	}
+	
+	public Update joinInnerAs(String table, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(INNER_JOIN).setTable(table).setAlias(alias).addOns(ons));
+	}
+	
+	public Update joinLeft(String table1, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(LEFT_JOIN).setTable(table1).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Update joinLeftAs(String table1, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(LEFT_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Update joinLeftAs(Select select, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(LEFT_JOIN).setSelect(select).setAlias(alias).addOns(ons));
+	}
+	
+	public Update joinLeftAs(Select select, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(LEFT_JOIN).setSelect(select).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Update joinLeft(String table, On...ons)
+	{
+		return join(newJoin().setJoinType(LEFT_JOIN).setTable(table).addOns(ons));
+	}
+	
+	public Update joinLeftAs(String table, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(LEFT_JOIN).setTable(table).setAlias(alias).addOns(ons));
+	}
+	
+	public Update joinRight(String table1, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(RIGHT_JOIN).setTable(table1).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Update joinRightAs(String table1, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(RIGHT_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Update joinRightAs(Select select, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(RIGHT_JOIN).setSelect(select).setAlias(alias).addOns(ons));
+	}
+	
+	public Update joinRightAs(Select select, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(RIGHT_JOIN).setSelect(select).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Update joinRight(String table, On...ons)
+	{
+		return join(newJoin().setJoinType(RIGHT_JOIN).setTable(table).addOns(ons));
+	}
+	
+	public Update joinRightAs(String table, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(RIGHT_JOIN).setTable(table).setAlias(alias).addOns(ons));
+	}
+	
+	public Update joinOuter(String table1, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(OUTER_JOIN).setTable(table1).addOns(newOn().setTable1(table1).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Update joinOuterAs(String table1, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(OUTER_JOIN).setTable(table1).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Update joinOuterAs(Select select, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(OUTER_JOIN).setSelect(select).setAlias(alias).addOns(ons));
+	}
+	
+	public Update joinOuterAs(Select select, String alias, String name1, String table2, String name2)
+	{
+		return join(newJoin().setJoinType(OUTER_JOIN).setSelect(select).setAlias(alias).addOns(newOn().setTable1(alias).setName1(name1).setTable2(table2).setName2(name2)));
+	}
+	
+	public Update joinOuter(String table, On...ons)
+	{
+		return join(newJoin().setJoinType(OUTER_JOIN).setTable(table).addOns(ons));
+	}
+	
+	public Update joinOuterAs(String table, String alias, On...ons)
+	{
+		return join(newJoin().setJoinType(OUTER_JOIN).setTable(table).setAlias(alias).addOns(ons));
 	}
 	
 	public Update setSets(Collection<Set> sets)
@@ -528,6 +692,7 @@ public abstract class Update extends Sql
 		}
 		StringBuilder builder = new StringBuilder();
 		builder.append(UPDATE + tick(table));
+		builder.append(joins != null ? joins : "");
 		builder.append(LF + SET + list(sets));
 		builder.append(wheresValue);
 		builder.append(END);
