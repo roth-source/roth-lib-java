@@ -38,13 +38,20 @@ public class MysqlDb extends Jdbc implements MysqlDbWrapper, MysqlSqlFactory
 	protected boolean isDeadLockException(Exception e)
 	{
 		boolean deadLockExcepione = false;
-		if(e instanceof com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException)
+		try
 		{
-			deadLockExcepione = true;
+			if(e.getClass().equals(Class.forName("com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException")))
+			{
+				deadLockExcepione = true;
+			}
+			else if(e.getClass().equals(Class.forName("com.mysql.jdbc.exceptions.MySQLTransactionRollbackException")))
+			{
+				deadLockExcepione = true;
+			}
 		}
-		else if(e instanceof com.mysql.jdbc.exceptions.MySQLTransactionRollbackException)
+		catch(Throwable t)
 		{
-			deadLockExcepione = true;
+			
 		}
 		return deadLockExcepione;
 	}
