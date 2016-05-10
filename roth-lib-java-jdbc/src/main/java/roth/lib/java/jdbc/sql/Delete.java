@@ -606,6 +606,7 @@ public abstract class Delete extends Sql
 		}
 		StringBuilder builder = new StringBuilder();
 		builder.append(DELETE + tick(table));
+		builder.append(LF + FROM + tick(table));
 		builder.append(joins != null ? joins : "");
 		builder.append(wheresValue);
 		builder.append(END);
