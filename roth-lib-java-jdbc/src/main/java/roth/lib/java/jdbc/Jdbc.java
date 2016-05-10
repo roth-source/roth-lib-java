@@ -122,7 +122,7 @@ public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFa
 		this.mapperReflector = MapperReflector.get();
 	}
 	
-	protected abstract boolean isDeadLockException(Exception e);
+	protected abstract boolean isDeadLockException(SQLException e);
 	
 	public MapperType getMapperType()
 	{

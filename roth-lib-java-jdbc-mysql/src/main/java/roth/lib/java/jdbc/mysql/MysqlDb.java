@@ -1,5 +1,6 @@
 package roth.lib.java.jdbc.mysql;
 
+import java.sql.SQLException;
 import java.util.Properties;
 
 import roth.lib.java.jdbc.Jdbc;
@@ -8,6 +9,8 @@ import roth.lib.java.mapper.MapperType;
 
 public class MysqlDb extends Jdbc implements MysqlDbWrapper, MysqlSqlFactory
 {
+	protected static final int DEADLOCK = 1213;
+	protected static final int XA_DEADLOCK = 1614;
 	
 	public MysqlDb()
 	{
@@ -35,18 +38,19 @@ public class MysqlDb extends Jdbc implements MysqlDbWrapper, MysqlSqlFactory
 	}
 	
 	@Override
-	protected boolean isDeadLockException(Exception e)
+	protected boolean isDeadLockException(SQLException e)
 	{
 		boolean deadLockExcepione = false;
 		try
 		{
-			if(e.getClass().equals(Class.forName("com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException")))
+			switch(e.getErrorCode())
 			{
-				deadLockExcepione = true;
-			}
-			else if(e.getClass().equals(Class.forName("com.mysql.jdbc.exceptions.MySQLTransactionRollbackException")))
-			{
-				deadLockExcepione = true;
+				case DEADLOCK:
+				case XA_DEADLOCK:
+				{
+					deadLockExcepione = true;
+					break;
+				}
 			}
 		}
 		catch(Throwable t)
