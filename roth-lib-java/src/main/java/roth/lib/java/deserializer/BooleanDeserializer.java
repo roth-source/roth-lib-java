@@ -15,13 +15,25 @@ public class BooleanDeserializer extends PrimitiveDeserializer<Boolean>
 		Boolean object = isNullable() ? null : false;
 		try
 		{
-			object = Boolean.parseBoolean(value);
+			if("true".equalsIgnoreCase(value))
+			{
+				object = true;
+			}
+			else if("false".equalsIgnoreCase(value))
+			{
+				object = false;
+			}
 		}
 		catch(Exception e)
 		{
 			
 		}
 		return object;
+	}
+	
+	public static void main(String[] args)
+	{
+		System.out.println(new BooleanDeserializer(true).deserialize("null", null));
 	}
 	
 }
