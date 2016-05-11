@@ -116,8 +116,9 @@ public class XmlMapper extends Mapper
 		}
 	}
 	
-	protected void writeEntity(Writer writer, Object value, EntityReflector entityReflector) throws IOException
+	protected boolean writeEntity(Writer writer, Object value, EntityReflector entityReflector) throws IOException
 	{
+		boolean empty = true;
 		for(PropertyReflector propertyReflector : entityReflector.getPropertyReflectors(getMapperType()))
 		{
 			if(!hasContext() || !propertyReflector.isExcluded(getContext()))
@@ -125,8 +126,10 @@ public class XmlMapper extends Mapper
 				String propertyName = propertyReflector.getPropertyName(getMapperType());
 				Object propertyValue = ReflectionUtil.getFieldValue(propertyReflector.getField(), value);
 				writeProperty(writer, propertyName, propertyValue, propertyReflector);
+				empty = false;
 			}
 		}
+		return empty;
 	}
 	
 	protected void writeProperty(Writer writer, String name, Object value, PropertyReflector propertyReflector) throws IOException
@@ -151,8 +154,11 @@ public class XmlMapper extends Mapper
 				}
 				writeNewLine(writer);
 				writeOpenTag(writer, name, entityReflector.getAttributeMap(value, getMapperType()));
-				writeEntity(writer, value, entityReflector);
-				writeNewLine(writer);
+				boolean empty = writeEntity(writer, value, entityReflector);
+				if(!empty)
+				{
+					writeNewLine(writer);
+				}
 				writeCloseTag(writer, name);
 			}
 			else if(ReflectionUtil.isArray(value.getClass()) || ReflectionUtil.isCollection(value.getClass()))
@@ -172,7 +178,9 @@ public class XmlMapper extends Mapper
 				}
 				else if(!values.isEmpty())
 				{
+					decrementTabs();
 					writeArray(writer, name, values, propertyReflector);
+					incrementTabs();
 				}
 			}
 			else if(ReflectionUtil.isMap(value.getClass()))
@@ -417,6 +425,17 @@ public class XmlMapper extends Mapper
 		return map;
 	}
 	
+	public <T> T readEntity(Reader reader, EmptyTag emptyTag, Type type) throws Exception
+	{
+		EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
+		Class<T> klass = ReflectionUtil.getTypeClass(type);
+		Constructor<T> constructor = klass.getDeclaredConstructor();
+		constructor.setAccessible(true);
+		T model = constructor.newInstance();
+		entityReflector.setAttributeMap(model, getMapperType(), emptyTag.getAttributeMap());
+		return model;
+	}
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public <T> T readEntity(Reader reader, OpenTag openTag, Type type) throws Exception
 	{
@@ -508,6 +527,44 @@ public class XmlMapper extends Mapper
 				else
 				{
 					readUnmapped(reader, propertyOpenTag);
+				}
+			}
+			else if(tag instanceof EmptyTag)
+			{
+				EmptyTag propertyEmptyTag = (EmptyTag) tag;
+				PropertyReflector propertyReflector = entityReflector.getPropertyReflector(propertyEmptyTag.getName(), getMapperType(), getMapperReflector());
+				if(propertyReflector != null)
+				{
+					Field field = propertyReflector.getField();
+					Type fieldType = propertyReflector.getFieldType();
+					if(getMapperReflector().isEntity(fieldType))
+					{
+						
+						Object value = readEntity(reader, propertyEmptyTag, fieldType);
+						ReflectionUtil.setFieldValue(field, model, value);
+						setDeserializedName(model, propertyReflector.getFieldName());
+					}
+					else if(ReflectionUtil.isCollection(fieldType))
+					{
+						String elementsName = propertyReflector.getElementsName();
+						if(elementsName == null)
+						{
+							Object value = readEntity(reader, propertyEmptyTag, ReflectionUtil.getElementType(fieldType));
+							if(value != null)
+							{
+								Collection collection = (Collection) field.get(model);
+								if(collection == null)
+								{
+									Constructor<?> fieldConstructor = ReflectionUtil.getTypeClass(fieldType).getDeclaredConstructor();
+									fieldConstructor.setAccessible(true);
+									collection = (Collection) fieldConstructor.newInstance();
+									ReflectionUtil.setFieldValue(field, model, collection);
+									setDeserializedName(model, propertyReflector.getFieldName());
+								}
+								collection.add(value);
+							}
+						}
+					}
 				}
 			}
 			else if(tag instanceof CloseTag)
