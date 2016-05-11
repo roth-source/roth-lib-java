@@ -539,7 +539,6 @@ public class XmlMapper extends Mapper
 					Type fieldType = propertyReflector.getFieldType();
 					if(getMapperReflector().isEntity(fieldType))
 					{
-						
 						Object value = readEntity(reader, propertyEmptyTag, fieldType);
 						ReflectionUtil.setFieldValue(field, model, value);
 						setDeserializedName(model, propertyReflector.getFieldName());
