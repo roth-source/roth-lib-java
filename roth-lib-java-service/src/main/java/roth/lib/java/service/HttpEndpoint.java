@@ -269,7 +269,14 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 			{
 				e.printStackTrace();
 			}
-			exception(request, response, e);
+			try
+			{
+				exception(request, response, e);
+			}
+			catch(Throwable e2)
+			{
+				e2.printStackTrace();
+			}
 		}
 		
 		if(!errors.isEmpty())
