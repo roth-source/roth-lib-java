@@ -1,13 +1,20 @@
 package roth.lib.java.jdbc;
 
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.Driver;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -31,6 +38,10 @@ import roth.lib.java.mapper.MapperType;
 import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertyReflector;
+import roth.lib.java.time.Day;
+import roth.lib.java.time.Millisecond;
+import roth.lib.java.time.Month;
+import roth.lib.java.time.Year;
 
 public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFactory
 {
@@ -251,6 +262,11 @@ public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFa
 	public void setLogWriter(PrintWriter logWriter)
 	{
 		this.logWriter = logWriter;
+	}
+	
+	public boolean hasLogWriter()
+	{
+		return logWriter != null;
 	}
 	
 	@Override
@@ -625,14 +641,132 @@ public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFa
 	
 	public JdbcPreparedStatement prepareStatement(JdbcConnection connection, String sql, Collection<Object> values, List<String> generatedColumns) throws SQLException
 	{
+		JdbcPreparedStatement preparedStatement = null;
 		if(generatedColumns != null && !generatedColumns.isEmpty())
 		{
-			return setValues(connection.prepareStatement(sql, generatedColumns.toArray(new String[]{})), values);
+			preparedStatement = connection.prepareStatement(sql, generatedColumns.toArray(new String[0]));
 		}
 		else
 		{
-			return setValues(connection.prepareStatement(sql), values);
+			preparedStatement = connection.prepareStatement(sql);
 		}
+		if(hasLogWriter() && sql != null)
+		{
+			debugSql(sql, values, preparedStatement);
+		}
+		return setValues(preparedStatement, values);
+	}
+	
+	protected void debugSql(String sql, Collection<Object> values)
+	{
+		debugSql(sql, values, null);
+	}
+	
+	protected void debugSql(String sql, Collection<Object> values, JdbcPreparedStatement preparedStatement)
+	{
+		getLogWriter().println();
+		try
+		{
+			if(values != null && !values.isEmpty())
+			{
+				getLogWriter().println(String.format(sql.replaceAll("\\?", "%s"), serializeValues(values)));
+			}
+			else
+			{
+				getLogWriter().println(sql);
+			}
+		}
+		catch(Exception e)
+		{
+			if(preparedStatement != null)
+			{
+				getLogWriter().println(preparedStatement.toString());
+			}
+		}
+	}
+	
+	protected Object[] serializeValues(Collection<Object> values)
+	{
+		List<String> serializedValues = new List<String>().setAllowNull(true);
+		for(Object value : values)
+		{
+			if(value == null)
+			{
+				serializedValues.add(null);
+			}
+			else if(value instanceof String)
+			{
+				serializedValues.add(SINGLE_QUOTE + (String) value + SINGLE_QUOTE);
+			}
+			else if(value instanceof Enum)
+			{
+				serializedValues.add(SINGLE_QUOTE + value.toString() + SINGLE_QUOTE);
+			}
+			else if(value instanceof Number)
+			{
+				serializedValues.add(value.toString());
+			}
+			else if(value instanceof Boolean)
+			{
+				serializedValues.add(value.toString());
+			}
+			else if(value instanceof byte[])
+			{
+				serializedValues.add("''");
+			}
+			else if(value instanceof Blob)
+			{
+				serializedValues.add("''");
+			}
+			else if(value instanceof Clob)
+			{
+				serializedValues.add("''");
+			}
+			else if(value instanceof InputStream)
+			{
+				serializedValues.add("''");
+			}
+			else if(value instanceof Reader)
+			{
+				serializedValues.add("''");
+			}
+			else
+			{
+				if(value instanceof Year || value instanceof Month || value instanceof Day)
+				{
+					value = ((roth.lib.java.time.Time) value).toSqlDate();
+				}
+				else if(value instanceof roth.lib.java.time.Time)
+				{
+					value = ((roth.lib.java.time.Time) value).toSqlTimestamp();
+				}
+				else if(value instanceof Calendar)
+				{
+					value = new Timestamp(((Calendar) value).getTimeInMillis());
+				}
+				if(value instanceof java.sql.Date)
+				{
+					serializedValues.add(SINGLE_QUOTE + new SimpleDateFormat(Day.DEFAULT_PATTERN).format((java.sql.Date) value) + SINGLE_QUOTE);
+				}
+				else if(value instanceof java.sql.Time)
+				{
+					serializedValues.add(SINGLE_QUOTE + new SimpleDateFormat("HH:mm:ss.SSS").format((java.sql.Time) value) + SINGLE_QUOTE);
+				}
+				else if(value instanceof java.sql.Timestamp)
+				{
+					serializedValues.add(SINGLE_QUOTE + new SimpleDateFormat(Millisecond.DEFAULT_PATTERN).format((java.sql.Timestamp) value) + SINGLE_QUOTE);
+				}
+				else if(value instanceof java.util.Date)
+				{
+					serializedValues.add(SINGLE_QUOTE + new SimpleDateFormat(Millisecond.DEFAULT_PATTERN).format((java.util.Date) value) + SINGLE_QUOTE);
+				}
+				else
+				{
+					serializedValues.add("''");
+				}
+			}
+		}
+		return serializedValues.toArray(new String[0]);
 	}
 	
 	public JdbcPreparedStatement setValues(JdbcPreparedStatement preparedStatement, Collection<Object> values) throws SQLException
@@ -644,10 +778,6 @@ public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFa
 			{
 				preparedStatement.setObject(i++, value);
 			}
-		}
-		if(logWriter != null)
-		{
-			logWriter.println(NEW_LINE + preparedStatement.toString());
 		}
 		return preparedStatement;
 	}
