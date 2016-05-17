@@ -27,7 +27,12 @@ public class Map<K, V> extends LinkedHashMap<K, V>
 	{
 		return super.containsValue(value);
 	}
-
+	
+	public K key(int index)
+	{
+		return new List<K>().collection(super.keySet()).get(index);
+	}
+	
 	@Override
 	public V get(Object key)
 	{

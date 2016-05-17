@@ -21,6 +21,20 @@ var forEachList = forEachList || function(list, callback)
 
 var forEachMap = forEachMap || function(map, callback)
 {
-	
+	for(var i = 0; i < map.size(); i++)
+	{
+		var loop =
+		{
+			index 	: i,
+			length 	: map.size(),
+			first	: i == 0,
+			last	: i == map.size() - 1
+		};
+		var key = map.key(i);
+		if(isFalse(callback(map.get(key), key, loop)))
+		{
+			break;
+		}
+	}
 };
 
