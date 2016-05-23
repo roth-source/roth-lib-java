@@ -765,6 +765,18 @@ public class XmlMapper extends Mapper
 					}
 				}
 			}
+			else if(tag instanceof EmptyTag)
+			{
+				EmptyTag fieldEmptyTag = (EmptyTag) tag;
+				if(getMapperReflector().isEntity(elementType))
+				{
+					E value = readEntity(reader, fieldEmptyTag, elementType);
+					if(value != null)
+					{
+						collection.add(value);
+					}
+				}
+			}
 			else if(tag instanceof CloseTag)
 			{
 				break;
