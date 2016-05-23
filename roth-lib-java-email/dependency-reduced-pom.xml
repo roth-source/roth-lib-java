@@ -22,6 +22,11 @@
             <configuration>
               <createSourcesJar>true</createSourcesJar>
               <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
+              <artifactSet>
+                <excludes>
+                  <exclude>roth.lib.java:roth-lib-java:*</exclude>
+                </excludes>
+              </artifactSet>
             </configuration>
           </execution>
         </executions>
@@ -33,7 +38,7 @@
       <groupId>roth.lib.java</groupId>
       <artifactId>roth-lib-java</artifactId>
       <version>0.2.6-SNAPSHOT</version>
-      <scope>provided</scope>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>

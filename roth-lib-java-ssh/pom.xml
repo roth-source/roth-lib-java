@@ -34,6 +34,11 @@
 						<configuration>
 							<createSourcesJar>true</createSourcesJar>
 							<keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
+							<artifactSet>
+								<excludes>
+									<exclude>roth.lib.java:roth-lib-java:*</exclude>
+								</excludes>
+							</artifactSet>
 						</configuration>
 					</execution>
 				</executions>
