@@ -6,12 +6,13 @@ public interface SqlFactory
 	String END 				= ";";
 	String DOT 				= ".";
 	String ALL 				= "*";
-	String TICK 				= "`";
+	String TICK 			= "`";
 	String COMMA 			= ", ";
 	String EQ 				= " = ";
 	String PARAM 			= EQ + "?";
 	
 	String SELECT 			= " SELECT ";
+	String DISTINCT 		= "DISTINCT ";
 	String AS 				= " AS ";
 	String COLUMN 			= COMMA + LF + "        ";
 	String FROM 			= "   FROM ";

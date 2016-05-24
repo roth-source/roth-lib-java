@@ -6,6 +6,7 @@ import roth.lib.java.lang.List;
 @SuppressWarnings("serial")
 public abstract class Select extends Sql implements SqlFactory
 {
+	protected boolean distinct;
 	protected Columns columns;
 	protected From from;
 	protected Joins joins;
@@ -36,6 +37,12 @@ public abstract class Select extends Sql implements SqlFactory
 			this.columns = newColumns();
 		}
 		this.columns.addColumns(columns);
+		return this;
+	}
+	
+	public Select distinct()
+	{
+		distinct = true;
 		return this;
 	}
 	
@@ -1168,6 +1175,11 @@ public abstract class Select extends Sql implements SqlFactory
 			columnAll(from.alias());
 		}
 		StringBuilder builder = new StringBuilder();
+		builder.append(SELECT);
+		if(distinct)
+		{
+			builder.append(DISTINCT);
+		}
 		builder.append(columns);
 		builder.append(from);
 		builder.append(joins != null ? joins : "");

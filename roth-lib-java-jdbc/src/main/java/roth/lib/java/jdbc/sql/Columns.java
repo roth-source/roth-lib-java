@@ -28,7 +28,7 @@ public abstract class Columns extends Sql
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder();
-		String seperator = SELECT;
+		String seperator = "";
 		for(Column column : columns)
 		{
 			builder.append(seperator);
