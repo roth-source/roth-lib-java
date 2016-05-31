@@ -362,7 +362,8 @@ public class HtmlUtil implements Characters
 	
 	public static void main(String[] args)
 	{
-		String value = "&lt;test value=&quot;blah&quot;&gt;asdf&lt;/test&gt;";
+		String value = escape("<test value=\"blah\">asdf</test>");
+		System.out.println(value);
 		System.out.println(unescape(value));
 	}
 	
