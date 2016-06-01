@@ -327,7 +327,6 @@ public class HtmlUtil implements Characters
 	public static String unescape(Reader reader) throws IOException
 	{
 		StringBuilder builder = new StringBuilder();
-		StringBuilder escapedBuilder = null;
 		int b;
 		char c;
 		while((b = reader.read()) != -1)
@@ -335,22 +334,18 @@ public class HtmlUtil implements Characters
 			c = (char) b;
 			if(AMPERSAND == c)
 			{
-				escapedBuilder = new StringBuilder();
+				StringBuilder escapedBuilder = new StringBuilder();
 				escapedBuilder.append(AMPERSAND);
-			}
-			else if(SEMI_COLON == c)
-			{
+				while((b = reader.read()) != -1 && (c = (char) b) != SEMI_COLON)
+				{
+					escapedBuilder.append(c);
+				}	
 				escapedBuilder.append(SEMI_COLON);
 				Character unescapedCharacter = UNESCAPE_CHARACTER_MAP.get(escapedBuilder.toString());
 				if(unescapedCharacter != null)
 				{
 					builder.append(unescapedCharacter);
 				}
-				escapedBuilder = null;
-			}
-			else if(escapedBuilder != null)
-			{
-				escapedBuilder.append(c);
 			}
 			else
 			{
