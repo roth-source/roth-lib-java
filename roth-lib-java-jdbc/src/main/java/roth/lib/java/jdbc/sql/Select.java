@@ -1148,6 +1148,7 @@ public abstract class Select extends Sql implements SqlFactory
 	public List<Object> getValues()
 	{
 		List<Object> values = new List<Object>().allowNull();
+		values.addAll(from.getValues());
 		if(joins != null)
 		{
 			values.addAll(joins.getValues());

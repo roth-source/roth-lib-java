@@ -1,5 +1,7 @@
 package roth.lib.java.jdbc.sql;
 
+import roth.lib.java.lang.List;
+
 @SuppressWarnings("serial")
 public abstract class From extends Sql
 {
@@ -33,6 +35,19 @@ public abstract class From extends Sql
 	public String alias()
 	{
 		return alias != null ? alias : name;
+	}
+	
+	@Override
+	public List<Object> getValues()
+	{
+		if(select != null)
+		{
+			return select.getValues();
+		}
+		else
+		{
+			return super.getValues();
+		}
 	}
 	
 	@Override
