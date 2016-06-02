@@ -5,6 +5,7 @@ public abstract class From extends Sql
 {
 	protected String name;
 	protected String alias;
+	protected Select select;
 	
 	protected From()
 	{
@@ -23,6 +24,12 @@ public abstract class From extends Sql
 		return this;
 	}
 	
+	public From setSelect(Select select)
+	{
+		this.select = select;
+		return this;
+	}
+	
 	public String alias()
 	{
 		return alias != null ? alias : name;
@@ -31,7 +38,14 @@ public abstract class From extends Sql
 	@Override
 	public String toString()
 	{
-		return LF + FROM + tick(name) + (alias != null ? AS + tick(alias) : "");
+		if(select != null)
+		{
+			return LF + FROM + "(" + LF + select.toString(false) + ")" + AS + tick(alias);
+		}
+		else
+		{
+			return LF + FROM + tick(name) + (alias != null ? AS + tick(alias) : "");
+		}
 	}
 	
 }

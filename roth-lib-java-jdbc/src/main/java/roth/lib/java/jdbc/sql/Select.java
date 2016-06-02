@@ -97,6 +97,11 @@ public abstract class Select extends Sql implements SqlFactory
 		return from(newFrom().setName(name).setAlias(alias));
 	}
 	
+	public Select fromAs(Select select, String alias)
+	{
+		return from(newFrom().setSelect(select).setAlias(alias));
+	}
+	
 	public Select joins(Joins joins)
 	{
 		this.joins = joins;
