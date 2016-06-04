@@ -7,27 +7,28 @@
 				<div style="background-color:#fff;margin:0 auto;padding:20px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;-moz-box-shadow:0 0 4px 0 #ccc;-webkit-box-shadow:0 0 4px 0 #ccc;box-shadow:0 0 4px 0 #ccc;max-width:{{ width }}px;">
 					<h3 style="font-family:Helvetica,Arial,sans-serif;padding:0 0 15px 0;margin:0;color:#3b3b3b;font-weight:700;font-size:28px;text-align:center;">{{ title }}</h3>
 					<h6 style="font-family:Helvetica,Arial,sans-serif;padding:0 0 15px 0;margin:0;color:#444;font-weight:900;font-size:14px;text-align:center;text-transform:uppercase;"><span style="font-weight:200;">{{ from }}:</span> {{ companyName }}</h6>
-<table style="width:100%;border-collapse:collapse;" cellpadding="5">
-	<tr style="{{ row.stripe() }}">
-		<td>Name:</td>
-		<td><b>{{ name }}</b></td>
-	</tr>
-	<tr style="{{ row.stripe() }}">
-		<td>Company:</td>
-		<td><b>{{ companyName }}</b></td>
-	</tr>
-	<tr style="{{ row.stripe() }}">
-		<td>Username:</td>
-		<td><b>{{ username }}</b></td>
-	</tr>
-	<tr style="{{ row.stripe() }}">
-		<td>Temporary Password:</td>
-		<td><b>{{ password }}</b></td>
-	</tr>
-</table>
-<div style="padding:20px 0 0 0;margin:0;text-align:center;">
-	<a href="{{ loginUrl }}" style="margin:0;padding:10px 16px;color:#FFF;text-decoration:none;background-color:#9ecc74;font-size:16px;font-weight:700;text-align:center;cursor:pointer;display:inline-block;border-radius:2px;-moz-border-radius:2px;-webkit-border-radius:2px;">Login</a>
-</div>						{% if(profileUrl) { %}
+						<table style="width:100%;border-collapse:collapse;" cellpadding="5">
+							<tr style="{{ row.stripe() }}">
+								<td>Name:</td>
+								<td><b>{{ name }}</b></td>
+							</tr>
+							<tr style="{{ row.stripe() }}">
+								<td>Company:</td>
+								<td><b>{{ companyName }}</b></td>
+							</tr>
+							<tr style="{{ row.stripe() }}">
+								<td>Username:</td>
+								<td><b>{{ username }}</b></td>
+							</tr>
+							<tr style="{{ row.stripe() }}">
+								<td>Temporary Password:</td>
+								<td><b>{{ password }}</b></td>
+							</tr>
+						</table>
+						<div style="padding:20px 0 0 0;margin:0;text-align:center;">
+							<a href="{{ loginUrl }}" style="margin:0;padding:10px 16px;color:#FFF;text-decoration:none;background-color:#9ecc74;font-size:16px;font-weight:700;text-align:center;cursor:pointer;display:inline-block;border-radius:2px;-moz-border-radius:2px;-webkit-border-radius:2px;">Login</a>
+						</div>
+						{% if(isSet(profileUrl)) { %}
 						<div style="padding:20px 0 0 0;margin:0;text-align:center;">
 							<a href="{{ profileUrl }}" style="margin:0;padding:10px 16px;color:#FFF;text-decoration:none;background-color:#9ecc74;font-size:16px;font-weight:700;text-align:center;cursor:pointer;display:inline-block;border-radius:2px;-moz-border-radius:2px;-webkit-border-radius:2px;">Go to my Profile</a>
 						</div>
