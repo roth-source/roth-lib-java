@@ -89,7 +89,7 @@ var isBoolean = isBoolean || function(value)
 
 var isNumber = isNumber || function(value)
 {
-	return typeof value === "number";
+	return !isNaN(value);
 };
 
 
@@ -298,6 +298,7 @@ var CurrencyUtil = CurrencyUtil ||
 	
 	format : function(value, symbol, seperator, round)
 	{
+		value = parseInt(value);
 		if(isNumber(value))
 		{
 			var decimal = 2;
@@ -328,7 +329,7 @@ var CurrencyUtil = CurrencyUtil ||
 				value = parseFloat(value.replace(/[^0-9.]/g, ""));
 				if(!isNaN(value))
 				{
-					parsedValue = Math.floor(value * 100);
+					parsedValue = Math.round(value * 100);
 				}
 			}
 			catch(e)
@@ -1144,8 +1145,12 @@ var StringUtil = StringUtil ||
 			return replacement;
 		});
 		return value;
-	}
+	},
 	
+	stripHtml : function(value)
+	{
+		return value.replace(/<\/?[^>]+(>|$)/g, "");
+	}
 	
 };
 
