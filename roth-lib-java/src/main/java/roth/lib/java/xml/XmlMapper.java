@@ -7,11 +7,11 @@ import java.io.Writer;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map.Entry;
 
-import roth.lib.java.util.ReflectionUtil;
 import roth.lib.java.deserializer.Deserializer;
 import roth.lib.java.lang.List;
 import roth.lib.java.lang.Map;
@@ -22,6 +22,7 @@ import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.serializer.Serializer;
+import roth.lib.java.util.ReflectionUtil;
 import roth.lib.java.xml.tag.CloseTag;
 import roth.lib.java.xml.tag.CommentTag;
 import roth.lib.java.xml.tag.DeclarationTag;
@@ -154,10 +155,27 @@ public class XmlMapper extends Mapper
 				}
 				writeNewLine(writer);
 				writeOpenTag(writer, name, entityReflector.getAttributeMap(value, getMapperType()));
-				boolean empty = writeEntity(writer, value, entityReflector);
-				if(!empty)
+				if(value instanceof XmlValue)
 				{
-					writeNewLine(writer);
+					XmlValue<?> xmlValue = (XmlValue<?>) value;
+					Serializer<?> serializer = getSerializer(xmlValue.getValue().getClass(), propertyReflector);
+					if(serializer != null)
+					{
+						String timeFormat = getTimeFormat(propertyReflector);
+						String serializedValue = serializer.serialize(xmlValue.getValue(), timeFormat);
+						if(serializedValue != null)
+						{
+							writeValue(writer, serializedValue);
+						}
+					}
+				}
+				else
+				{
+					boolean empty = writeEntity(writer, value, entityReflector);
+					if(!empty)
+					{
+						writeNewLine(writer);
+					}
 				}
 				writeCloseTag(writer, name);
 			}
@@ -425,7 +443,7 @@ public class XmlMapper extends Mapper
 		return map;
 	}
 	
-	public <T> T readEntity(Reader reader, EmptyTag emptyTag, Type type) throws Exception
+	protected <T> T readEntity(Reader reader, EmptyTag emptyTag, Type type) throws Exception
 	{
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
 		Class<T> klass = ReflectionUtil.getTypeClass(type);
@@ -437,7 +455,7 @@ public class XmlMapper extends Mapper
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public <T> T readEntity(Reader reader, OpenTag openTag, Type type) throws Exception
+	protected <T> T readEntity(Reader reader, OpenTag openTag, Type type) throws Exception
 	{
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
 		Class<T> klass = ReflectionUtil.getTypeClass(type);
@@ -460,7 +478,15 @@ public class XmlMapper extends Mapper
 					Class<?> fieldClass = propertyReflector.getFieldClass();
 					if(getMapperReflector().isEntity(fieldType))
 					{
-						Object value = readEntity(reader, propertyOpenTag, fieldType);
+						Object value = null;
+						if(XmlValue.class.isAssignableFrom(fieldClass))
+						{
+							value = readXmlValue(reader, propertyOpenTag, fieldType);
+						}
+						else
+						{
+							value = readEntity(reader, propertyOpenTag, fieldType);
+						}
 						ReflectionUtil.setFieldValue(field, model, value);
 						setDeserializedName(model, propertyReflector.getFieldName());
 					}
@@ -575,6 +601,53 @@ public class XmlMapper extends Mapper
 		return model;
 	}
 	
+	protected <T> T readXmlValue(Reader reader, OpenTag openTag, Type type) throws Exception
+	{
+		EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
+		Class<T> klass = ReflectionUtil.getTypeClass(type);
+		Constructor<T> constructor = klass.getDeclaredConstructor();
+		constructor.setAccessible(true);
+		T model = constructor.newInstance();
+		entityReflector.setAttributeMap(model, getMapperType(), openTag.getAttributeMap());
+		PropertyReflector propertyReflector = entityReflector.getFieldReflector("value", getMapperType(), getMapperReflector());
+		if(propertyReflector != null)
+		{
+			Field field = propertyReflector.getField();
+			Type xmlValueType = klass.getGenericSuperclass();
+			if(xmlValueType instanceof ParameterizedType)
+			{
+				Type fieldType = ((ParameterizedType) xmlValueType).getActualTypeArguments()[0];
+				Class<?> fieldClass = ReflectionUtil.getTypeClass(fieldType);
+				Deserializer<?> deserializer = getDeserializer(fieldClass, propertyReflector);
+				if(deserializer != null)
+				{
+					String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
+					readTag(reader);
+					if(deserializer != null)
+					{
+						String timeFormat = getTimeFormat(propertyReflector);
+						value = propertyReflector.filter(value, getMapperType());
+						ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeFormat, fieldClass));
+						setDeserializedName(model, propertyReflector.getFieldName());
+					}
+				}
+				else
+				{
+					readUnmapped(reader, openTag);
+				}
+			}
+			else
+			{
+				readUnmapped(reader, openTag);
+			}
+		}
+		else
+		{
+			readUnmapped(reader, openTag);
+		}
+		return model;
+	}
+	
 	@SuppressWarnings("unchecked")
 	protected <T, K, E> T readMap(Reader reader, Type type, PropertyReflector propertyReflector) throws Exception
 	{
@@ -610,7 +683,15 @@ public class XmlMapper extends Mapper
 				}
 				if(getMapperReflector().isEntity(elementType))
 				{
-					E value = readEntity(reader, (OpenTag) tag, elementType);
+					E value = null;
+					if(XmlValue.class.isAssignableFrom(elementClass))
+					{
+						value = readXmlValue(reader, fieldOpenTag, elementType);
+					}
+					else
+					{
+						value = readEntity(reader, fieldOpenTag, elementType);
+					}
 					if(value != null)
 					{
 						map.put(key, value);
@@ -714,7 +795,15 @@ public class XmlMapper extends Mapper
 				OpenTag fieldOpenTag = (OpenTag) tag;
 				if(getMapperReflector().isEntity(elementType))
 				{
-					E value = readEntity(reader, fieldOpenTag, elementType);
+					E value = null;
+					if(XmlValue.class.isAssignableFrom(elementClass))
+					{
+						value = readXmlValue(reader, fieldOpenTag, elementType);
+					}
+					else
+					{
+						value = readEntity(reader, fieldOpenTag, elementType);
+					}
 					if(value != null)
 					{
 						collection.add(value);
@@ -794,7 +883,14 @@ public class XmlMapper extends Mapper
 		Class<E> elementClass = ReflectionUtil.getTypeClass(elementType);
 		if(getMapperReflector().isEntity(elementType))
 		{
-			element = readEntity(reader, tag, elementType);
+			if(XmlValue.class.isAssignableFrom(elementClass))
+			{
+				element = readXmlValue(reader, tag, elementType);
+			}
+			else
+			{
+				element = readEntity(reader, tag, elementType);
+			}
 		}
 		else if(ReflectionUtil.isCollection(elementType))
 		{

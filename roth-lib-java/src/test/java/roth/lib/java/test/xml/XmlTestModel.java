@@ -16,150 +16,152 @@ import roth.lib.java.xml.XmlModel;
 @SuppressWarnings("serial")
 public class XmlTestModel extends XmlModel
 {
+	@Property(name = "test-value")
+	protected XmlTestValue testValue;
 	
 	@Property(name = "attribute", attribute = true)
-	private String attribute = "test";
+	protected String attribute = "test";
 	
 	@Property(name = "null-primitive-boolean")
-	private boolean nullPrimitiveBoolean;
+	protected boolean nullPrimitiveBoolean;
 	
 	@Property(name = "null-primitive-byte")
-	private byte nullPrimitiveByte;
+	protected byte nullPrimitiveByte;
 	
 	@Property(name = "null-primitive-short")
-	private short nullPrimitiveShort;
+	protected short nullPrimitiveShort;
 	
 	@Property(name = "null-primitive-integer")
-	private int nullPrimitiveInteger;
+	protected int nullPrimitiveInteger;
 	
 	@Property(name = "null-primitive-long")
-	private long nullPrimitiveLong;
+	protected long nullPrimitiveLong;
 	
 	@Property(name = "null-primitive-float")
-	private float nullPrimitiveFloat;
+	protected float nullPrimitiveFloat;
 	
 	@Property(name = "null-primitive-double")
-	private double nullPrimitiveDouble;
+	protected double nullPrimitiveDouble;
 	
 	@Property(name = "null-primitive-character")
-	private char nullPrimitiveCharacter;
+	protected char nullPrimitiveCharacter;
 	
 	@Property(name = "null-wrapper-boolean")
-	private Boolean nullWrapperBoolean = null;
+	protected Boolean nullWrapperBoolean = null;
 	
 	@Property(name = "null-wrapper-byte")
-	private Byte nullWrapperByte;
+	protected Byte nullWrapperByte;
 	
 	@Property(name = "null-wrapper-short")
-	private Short nullWrapperShort;
+	protected Short nullWrapperShort;
 	
 	@Property(name = "null-wrapper-integer")
-	private Integer nullWrapperInteger;
+	protected Integer nullWrapperInteger;
 	
 	@Property(name = "null-wrapper-long")
-	private Long nullWrapperLong;
+	protected Long nullWrapperLong;
 	
 	@Property(name = "null-wrapper-float")
-	private Float nullWrapperFloat;
+	protected Float nullWrapperFloat;
 	
 	@Property(name = "null-wrapper-double")
-	private Double nullWrapperDouble;
+	protected Double nullWrapperDouble;
 	
 	@Property(name = "null-wrapper-character")
-	private Character nullWrapperCharacter;
+	protected Character nullWrapperCharacter;
 	
 	@Property(name = "null-string")
-	private String nullString;
+	protected String nullString;
 	
 	@Property(name = "null-date")
-	private Date nullDate;
+	protected Date nullDate;
 	
 	@Property(name = "null-calendar")
-	private Calendar nullCalendar;
+	protected Calendar nullCalendar;
 	
 	@Property(name = "test-boolean")
-	//private Boolean testBoolean = true;
-	private Boolean testBoolean;
+	//protected Boolean testBoolean = true;
+	protected Boolean testBoolean;
 	
 	@Property(name = "test-byte")
-	//private Byte testByte = 123;
-	private Byte testByte;
+	//protected Byte testByte = 123;
+	protected Byte testByte;
 	
 	@Property(name = "test-short")
-	//private Short testShort = 12345;
-	private Short testShort;
+	//protected Short testShort = 12345;
+	protected Short testShort;
 	
 	@Property(name = "test-integer")
-	//private Integer testInteger = 12345678;
-	private Integer testInteger;
+	//protected Integer testInteger = 12345678;
+	protected Integer testInteger;
 	
 	@Property(name = "test-long")
-	//private Long testLong = 123456789L;
-	private Long testLong;
+	//protected Long testLong = 123456789L;
+	protected Long testLong;
 	
 	@Property(name = "test-float")
-	//private Float testFloat = 1.23456789f;
-	private Float testFloat;
+	//protected Float testFloat = 1.23456789f;
+	protected Float testFloat;
 	
 	@Property(name = "test-double")
-	//private Double testDouble = 1.23456789d;
-	private Double testDouble;
+	//protected Double testDouble = 1.23456789d;
+	protected Double testDouble;
 	
 	@Property(name = "test-character")
-	//private Character testCharacter = 'a';
-	private Character testCharacter;
+	//protected Character testCharacter = 'a';
+	protected Character testCharacter;
 	
 	@Property(name = "test-string")
-	//private String testString = "<test>He said, \"He's nice & smart\"</test>";
-	private String testString;
+	//protected String testString = "<test>He said, \"He's nice & smart\"</test>";
+	protected String testString;
 	
 	@Property(name = "test-date")
-	//private Date testDate = new Date();
-	private Date testDate;
+	//protected Date testDate = new Date();
+	protected Date testDate;
 	
 	@Property(name = "test-calendar", exclude = "test")
-	private Calendar testCalendar = new GregorianCalendar();
-	//private Calendar testCalendar;
+	protected Calendar testCalendar = new GregorianCalendar();
+	//protected Calendar testCalendar;
 	
 	@Property(name = "test-model")
-	//private XmlSubModel testModel = new XmlSubModel();
-	private XmlSubModel testModel;
+	//protected XmlSubModel testModel = new XmlSubModel();
+	protected XmlSubModel testModel;
 	
 	@Property(name = "null-string-array")
-	private String[] nullStringArray;
+	protected String[] nullStringArray;
 	
 	@Property(name = "empty-string-array")
-	private String[] emptyStringArray = new String[]{};
+	protected String[] emptyStringArray = new String[]{};
 	
 	@Property(name = "test-string-array", elementsName = "element")
-	//private String[] testStringArray = new String[]{"one", "two", "three"};
-	private String[] testStringArray;
+	//protected String[] testStringArray = new String[]{"one", "two", "three"};
+	protected String[] testStringArray;
 	
 	@Property(name = "null-string-list", elementsName = "nullElement")
-	private List<String> nullStringList;
+	protected List<String> nullStringList;
 	
 	@Property(name = "empty-string-list")
-	private List<String> emptyStringList = new List<String>();
+	protected List<String> emptyStringList = new List<String>();
 	
 	@Property(name = "test-string-list", elementsName = "element")
-	//private List<String> testStringList = new List<String>(Arrays.asList(new String[]{"one", "two", "three"}));
-	private List<String> testStringList;
+	//protected List<String> testStringList = new List<String>(Arrays.asList(new String[]{"one", "two", "three"}));
+	protected List<String> testStringList;
 	
 	@Property(name = "null-string-map")
-	private Map<String, String> nullStringMap;
+	protected Map<String, String> nullStringMap;
 	
 	@Property(name = "empty-string-map")
-	private Map<String, String> emptyStringMap = new Map<String, String>();
+	protected Map<String, String> emptyStringMap = new Map<String, String>();
 	
 	@Property(name = "test-string-map")
-	private Map<String, String> testStringMap = new Map<String, String>();
+	protected Map<String, String> testStringMap = new Map<String, String>();
 	
 	@Property(name = "test-model-list", elementsName = "element")
-	//private List<XmlSubModel> testModelList = new List<XmlSubModel>(Arrays.asList(new XmlSubModel[]{new XmlSubModel(), new XmlSubModel()}));
-	private List<XmlSubModel> testModelList;
+	//protected List<XmlSubModel> testModelList = new List<XmlSubModel>(Arrays.asList(new XmlSubModel[]{new XmlSubModel(), new XmlSubModel()}));
+	protected List<XmlSubModel> testModelList;
 	
 	@Property(name = "test-model-map")
-	private Map<String, XmlSubModel> testModelMap = new Map<String, XmlSubModel>();
+	protected Map<String, XmlSubModel> testModelMap = new Map<String, XmlSubModel>();
 	
 	public XmlTestModel()
 	{
@@ -174,6 +176,8 @@ public class XmlTestModel extends XmlModel
 	
 	public void init()
 	{
+		testValue = new XmlTestValue().setType("ERROR");
+		testValue.setValue("TEST");
 		testBoolean = true;
 		testByte = 123;
 		testShort = 12345;

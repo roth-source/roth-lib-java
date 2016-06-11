@@ -29,7 +29,7 @@ public class XmlModel implements Serializable
 		return this;
 	}
 	
-	public XmlModel setAttributeS(Map<String, String> map)
+	public XmlModel setAttributes(Map<String, String> map)
 	{
 		attributeMap.putAll(map);
 		return this;
