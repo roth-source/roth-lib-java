@@ -96,7 +96,7 @@ public class Sftp implements AutoCloseable
 	{
 		try(FileInputStream input = new FileInputStream(source);)
 		{
-			put(input, dest + "/" + filename != null ? filename : source.getName());
+			put(input, dest + "/" + (filename != null ? filename : source.getName()));
 		}
 		catch(IOException e)
 		{
