@@ -488,10 +488,34 @@ public class List<E> extends LinkedList<E>
 		return builder.toString();
 	}
 	
+	public List<E> section(int index, int sections)
+	{
+		List<E> section = new List<E>();
+		int sectionSize = (int) Math.ceil(((double) size() / (double) sections));
+		int fromIndex = index * sectionSize;
+		int toIndex = Math.min(((index + 1) * sectionSize), size());
+		if(fromIndex < toIndex)
+		{
+			section = subList(fromIndex, toIndex);
+		}
+		return section;
+	}
+	
 	@SafeVarargs
 	public static <E> List<E> fromArray(E...array)
 	{
 		return new List<E>(array);
 	}
 	
+	/*
+	public static void main(String[] args)
+	{
+		int sections = 2;
+		List<Integer> list = new List<>(1, 2, 3, 4, 5, 6, 7);
+		for(int i = 0; i < sections; i++)
+		{
+			System.out.println(list.section(i, sections));
+		}
+	}
+	*/
 }
