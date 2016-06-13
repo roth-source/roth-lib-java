@@ -86,12 +86,17 @@ public class Sftp implements AutoCloseable
 			e.printStackTrace();
 		}
 	}
-
+	
 	public void put(File source, String dest)
+	{
+		put(source, dest, null);
+	}
+	
+	public void put(File source, String dest, String filename)
 	{
 		try(FileInputStream input = new FileInputStream(source);)
 		{
-			put(input, dest);
+			put(input, dest + "/" + filename != null ? filename : source.getName());
 		}
 		catch(IOException e)
 		{
