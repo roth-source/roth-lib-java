@@ -7,7 +7,8 @@ public abstract class From extends Sql
 {
 	protected String name;
 	protected String alias;
-	protected Select select;
+	protected List<Select> selects = new List<>();
+	protected String unionType;
 	
 	protected From()
 	{
@@ -28,7 +29,14 @@ public abstract class From extends Sql
 	
 	public From setSelect(Select select)
 	{
-		this.select = select;
+		this.selects.add(select);
+		return this;
+	}
+	
+	public From setUnionAllSelects(Select...selects)
+	{
+		this.selects.array(selects);
+		this.unionType = UNION_ALL;
 		return this;
 	}
 	
@@ -40,9 +48,14 @@ public abstract class From extends Sql
 	@Override
 	public List<Object> getValues()
 	{
-		if(select != null)
+		if(!selects.isEmpty())
 		{
-			return select.getValues();
+			List<Object> values = new List<>();
+			for(Select select : selects)
+			{
+				values.addAll(select.getValues());
+			}
+			return values;
 		}
 		else
 		{
@@ -53,9 +66,26 @@ public abstract class From extends Sql
 	@Override
 	public String toString()
 	{
-		if(select != null)
+		if(!selects.isEmpty())
 		{
-			return LF + FROM + "(" + LF + select.toString(false) + ")" + AS + tick(alias);
+			if(selects.size() > 1)
+			{
+				StringBuilder builder = new StringBuilder();
+				builder.append(LF + FROM + "(");
+				String seperator = null;
+				for(Select select : selects)
+				{
+					builder.append(seperator != null ? LF + seperator : "");
+					builder.append(LF + "(" + select.toString(false) + ")");
+					seperator = unionType;
+				}
+				builder.append(")" + AS + tick(alias));
+				return builder.toString();
+			}
+			else
+			{
+				return LF + FROM + "(" + LF + selects.getFirst().toString(false) + ")" + AS + tick(alias);
+			}
 		}
 		else
 		{
