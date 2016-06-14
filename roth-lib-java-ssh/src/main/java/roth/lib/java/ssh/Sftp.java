@@ -196,6 +196,32 @@ public class Sftp implements AutoCloseable
 		}
 	}
 	
+	public void rm(String path)
+	{
+		try
+		{
+			openChannelSftp();
+			channelSftp.rm(path);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void rmdir(String path)
+	{
+		try
+		{
+			openChannelSftp();
+			channelSftp.rmdir(path);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	public void closeChannelSftp()
 	{
 		if(channelSftp != null)
