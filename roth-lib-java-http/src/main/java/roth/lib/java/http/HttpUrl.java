@@ -48,7 +48,7 @@ public class HttpUrl implements Characters
 			"^(?<" 			+ PROTOCOL 	+ ">[" 		+ PROTOCOL_CHARS 		+ "]+)://" +
 			 "(?<" 			+ HOST 		+ ">[" 		+ HOST_CHARS 			+ "]+)" +
 			 "(?::(?<" 		+ PORT 		+ ">[" 		+ PORT_CHARS 			+ "]+))?" +
-			 "(?<" 			+ PATH 		+ ">/["		+ PATH_CHARS 			+ "]+)?" +
+			 "(?<" 			+ PATH 		+ ">/["		+ PATH_CHARS 			+ "]*)?" +
 			 "(?:\\?(?<" 	+ PARAM 	+ ">[" 		+ PARAM_CHARS 			+ "]+))?" + 
 			 "(?:#(?<" 		+ HASH 		+ ">[" 		+ HASH_CHARS 			+ "]+))?$"
 		);
