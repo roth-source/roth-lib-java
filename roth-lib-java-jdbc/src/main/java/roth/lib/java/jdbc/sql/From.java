@@ -50,7 +50,7 @@ public abstract class From extends Sql
 	{
 		if(!selects.isEmpty())
 		{
-			List<Object> values = new List<>();
+			List<Object> values = new List<>().allowNull();
 			for(Select select : selects)
 			{
 				values.addAll(select.getValues());
