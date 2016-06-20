@@ -355,6 +355,11 @@ public class HtmlUtil implements Characters
 		return builder.toString();
 	}
 	
+	public static String strip(String html)
+	{
+		return html != null ? html.replaceAll("<\\/?[^>]+(>|$)", "") : null;
+	}
+	
 	public static void main(String[] args)
 	{
 		String value = escape("<test value=\"blah\">asdf</test>");
