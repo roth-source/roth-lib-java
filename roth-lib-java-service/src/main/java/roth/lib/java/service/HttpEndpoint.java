@@ -57,7 +57,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 	protected static String ENDPOINT 							= "_endpoint";
 	protected static String SERVICE 							= "service";
 	protected static String METHOD 								= "method";
-	protected static Pattern SERVICE_METHOD_PATTERN 			= Pattern.compile("(?:^|/)(?<" + SERVICE + ">\\w+)/(?<" + METHOD + ">\\w+)(?:/|$)");
+	protected static Pattern SERVICE_METHOD_PATTERN 			= Pattern.compile("(?:^|/)(?<" + SERVICE + ">[\\w\\-]+)/(?<" + METHOD + ">[\\w]+)(?:/|$)");
 	protected static Pattern BOUNDARY_PATTERN					= Pattern.compile("boundary\\=(?:\")?(.+?)(?:\"|;|$)");
 	
 	protected static Map<String, ServiceReflector> serviceReflectorMap = new Map<String, ServiceReflector>();
