@@ -1,6 +1,7 @@
 package roth.lib.java.deserializer;
 
 import roth.lib.java.time.Year;
+import roth.lib.java.util.NumberUtil;
 
 public class YearDeserializer extends TemporalDeserializer<Year>
 {
@@ -22,7 +23,15 @@ public class YearDeserializer extends TemporalDeserializer<Year>
 			}
 			else
 			{
-				year = new Year(Long.parseLong(value));
+				Long time = NumberUtil.parseLong(value);
+				if(time != null && time > 9999L)
+				{
+					year = new Year(time);
+				}
+				else
+				{
+					year = Year.fromString(value);
+				}
 			}
 		}
 		catch(Exception e)

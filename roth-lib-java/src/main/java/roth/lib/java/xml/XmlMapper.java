@@ -18,6 +18,7 @@ import roth.lib.java.lang.Map;
 import roth.lib.java.mapper.Mapper;
 import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
+import roth.lib.java.reflector.AttributesReflector;
 import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertyReflector;
@@ -75,7 +76,7 @@ public class XmlMapper extends Mapper
 				}
 				writer.write(XML_HEADER);
 				writeNewLine(writer);
-				writeOpenTag(writer, rootName, entityReflector.getAttributeMap(value, getMapperType()));
+				writeOpenTag(writer, rootName, getAttributeMap(value, entityReflector));
 				writeEntity(writer, value, entityReflector);
 				writeNewLine(writer);
 				writeCloseTag(writer, rootName);
@@ -154,7 +155,7 @@ public class XmlMapper extends Mapper
 					name = propertyName;
 				}
 				writeNewLine(writer);
-				writeOpenTag(writer, name, entityReflector.getAttributeMap(value, getMapperType()));
+				writeOpenTag(writer, name, getAttributeMap(value, entityReflector));
 				if(value instanceof XmlValue)
 				{
 					XmlValue<?> xmlValue = (XmlValue<?>) value;
@@ -397,7 +398,7 @@ public class XmlMapper extends Mapper
 					Constructor<T> constructor = klass.getDeclaredConstructor();
 					constructor.setAccessible(true);
 					model = constructor.newInstance();
-					entityReflector.setAttributeMap(model, getMapperType(), ((EmptyTag) tag).getAttributeMap());
+					setAttributeMap(model, entityReflector, ((EmptyTag) tag).getAttributeMap());
 					break;
 				}
 				else if(tag instanceof CloseTag)
@@ -450,7 +451,7 @@ public class XmlMapper extends Mapper
 		Constructor<T> constructor = klass.getDeclaredConstructor();
 		constructor.setAccessible(true);
 		T model = constructor.newInstance();
-		entityReflector.setAttributeMap(model, getMapperType(), emptyTag.getAttributeMap());
+		setAttributeMap(model, entityReflector, emptyTag.getAttributeMap());
 		return model;
 	}
 	
@@ -462,7 +463,7 @@ public class XmlMapper extends Mapper
 		Constructor<T> constructor = klass.getDeclaredConstructor();
 		constructor.setAccessible(true);
 		T model = constructor.newInstance();
-		entityReflector.setAttributeMap(model, getMapperType(), openTag.getAttributeMap());
+		setAttributeMap(model, entityReflector, openTag.getAttributeMap());
 		readUntil(reader, LEFT_ANGLE_BRACKET);
 		Tag tag = null;
 		while((tag = readTag(reader)) != null)
@@ -536,13 +537,10 @@ public class XmlMapper extends Mapper
 						{
 							String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
 							readTag(reader);
-							if(deserializer != null)
-							{
-								String timeFormat = getTimeFormat(propertyReflector);
-								value = propertyReflector.filter(value, getMapperType());
-								ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeFormat, fieldClass));
-								setDeserializedName(model, propertyReflector.getFieldName());
-							}
+							String timeFormat = getTimeFormat(propertyReflector);
+							value = propertyReflector.filter(value, getMapperType());
+							ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeFormat, fieldClass));
+							setDeserializedName(model, propertyReflector.getFieldName());
 						}
 						else
 						{
@@ -601,6 +599,103 @@ public class XmlMapper extends Mapper
 		return model;
 	}
 	
+	@SuppressWarnings("unchecked")
+	protected Map<String, String> getAttributeMap(Object model, EntityReflector entityReflector)
+	{
+		Map<String, String> attributeMap = new Map<String, String>();
+		if(model != null)
+		{
+			AttributesReflector attributesReflector = entityReflector.getAttributesReflector();
+			if(attributesReflector != null)
+			{
+				try
+				{
+					Object attributesObject = attributesReflector.getField().get(model);
+					if(attributesObject instanceof Map)
+					{
+						attributeMap.putAll((Map<String, String>) attributesObject);
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			for(PropertyReflector attributeReflector : entityReflector.getAttributeReflectors(getMapperType()))
+			{
+				try
+				{
+					Object value = attributeReflector.getField().get(model);
+					if(value != null)
+					{
+						Serializer<?> serializer = getSerializer(value.getClass(), attributeReflector);
+						if(serializer != null)
+						{
+							String timeFormat = getTimeFormat(attributeReflector);
+							String serializedValue = serializer.serialize(value, timeFormat);
+							if(serializedValue != null)
+							{
+								attributeMap.put(attributeReflector.getPropertyName(getMapperType()), serializedValue);
+							}
+						}
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		return attributeMap;
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected void setAttributeMap(Object model, EntityReflector entityReflector, Map<String, String> attributeMap)
+	{
+		if(model != null && attributeMap != null && !attributeMap.isEmpty())
+		{
+			attributeMap = new Map<String, String>(attributeMap);
+			for(PropertyReflector attributeReflector : entityReflector.getAttributeReflectors(getMapperType()))
+			{
+				Field field = attributeReflector.getField();
+				Class<?> fieldClass = attributeReflector.getFieldClass();
+				Deserializer<?> deserializer = getDeserializer(fieldClass, attributeReflector);
+				if(deserializer != null)
+				{
+					String timeFormat = getTimeFormat(attributeReflector);
+					String name = attributeReflector.getPropertyName(getMapperType());
+					String value = attributeReflector.filter(attributeMap.get(name), getMapperType());
+					Object deserializedValue = deserializer.deserialize(value, timeFormat, fieldClass);
+					if(deserializedValue != null)
+					{
+						ReflectionUtil.setFieldValue(field, model, deserializedValue);
+					}
+					attributeMap.remove(name);
+				}
+			}
+			AttributesReflector attributesReflector = entityReflector.getAttributesReflector();
+			if(attributesReflector != null)
+			{
+				Field attributesField = attributesReflector.getField();
+				if(attributesField != null)
+				{
+					try
+					{
+						Object attributesObject = attributesField.get(model);
+						if(attributesObject instanceof Map)
+						{
+							((Map<String, String>) attributesObject).putAll(attributeMap);
+						}
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+	
 	protected <T> T readXmlValue(Reader reader, OpenTag openTag, Type type) throws Exception
 	{
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
@@ -608,7 +703,7 @@ public class XmlMapper extends Mapper
 		Constructor<T> constructor = klass.getDeclaredConstructor();
 		constructor.setAccessible(true);
 		T model = constructor.newInstance();
-		entityReflector.setAttributeMap(model, getMapperType(), openTag.getAttributeMap());
+		setAttributeMap(model, entityReflector, openTag.getAttributeMap());
 		PropertyReflector propertyReflector = entityReflector.getFieldReflector("value", getMapperType(), getMapperReflector());
 		if(propertyReflector != null)
 		{

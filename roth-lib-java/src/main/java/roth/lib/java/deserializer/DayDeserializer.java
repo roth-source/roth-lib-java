@@ -1,6 +1,7 @@
 package roth.lib.java.deserializer;
 
 import roth.lib.java.time.Day;
+import roth.lib.java.util.NumberUtil;
 
 public class DayDeserializer extends TemporalDeserializer<Day>
 {
@@ -22,7 +23,16 @@ public class DayDeserializer extends TemporalDeserializer<Day>
 			}
 			else
 			{
-				day = new Day(Long.parseLong(value));
+				Long time = NumberUtil.parseLong(value);
+				if(time != null)
+				{
+					day = new Day(time);
+				}
+				else
+				{
+					day = Day.fromString(value);
+				}
+				
 			}
 		}
 		catch(Exception e)

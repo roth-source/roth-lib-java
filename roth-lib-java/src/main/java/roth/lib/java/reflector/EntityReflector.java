@@ -8,7 +8,6 @@ import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Properties;
 import roth.lib.java.annotation.Property;
 import roth.lib.java.lang.List;
-import roth.lib.java.lang.Map;
 import roth.lib.java.mapper.MapperType;
 import roth.lib.java.util.AnnotationUtil;
 import roth.lib.java.util.ReflectionUtil;
@@ -226,91 +225,6 @@ public class EntityReflector
 			}
 		}
 		return name;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public Map<String, String> getAttributeMap(Object value, MapperType mapperType)
-	{
-		Map<String, String> attributeMap = new Map<String, String>();
-		if(value != null)
-		{
-			AttributesReflector attributesReflector = getAttributesReflector();
-			if(attributesReflector != null)
-			{
-				try
-				{
-					Object attributesObject = attributesReflector.getField().get(value);
-					if(attributesObject instanceof Map)
-					{
-						attributeMap.putAll((Map<String, String>) attributesObject);
-					}
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-			for(PropertyReflector propertyReflector : getAttributeReflectors(mapperType))
-			{
-				try
-				{
-					Object attributeValue = propertyReflector.getField().get(value);
-					if(attributeValue != null)
-					{
-						attributeMap.put(propertyReflector.getPropertyName(mapperType), attributeValue.toString());
-					}
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}
-		return attributeMap;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public void setAttributeMap(Object value, MapperType mapperType, Map<String, String> attributeMap)
-	{
-		if(value != null && attributeMap != null && !attributeMap.isEmpty())
-		{
-			attributeMap = new Map<String, String>(attributeMap);
-			for(PropertyReflector attributeReflector : getAttributeReflectors(mapperType))
-			{
-				String attributeName = attributeReflector.getPropertyName(mapperType);
-				String attributeValue = attributeMap.get(attributeName);
-				try
-				{
-					attributeReflector.getField().set(value, attributeValue);
-					attributeMap.remove(attributeName);
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-			
-			AttributesReflector attributesReflector = getAttributesReflector();
-			if(attributesReflector != null)
-			{
-				Field attributesField = attributesReflector.getField();
-				if(attributesField != null)
-				{
-					try
-					{
-						Object attributesObject = attributesField.get(value);
-						if(attributesObject instanceof Map)
-						{
-							((Map<String, String>) attributesObject).putAll(attributeMap);
-						}
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}
-		}
 	}
 	
 }

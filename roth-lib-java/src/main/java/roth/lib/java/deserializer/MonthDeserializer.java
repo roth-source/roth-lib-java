@@ -1,6 +1,7 @@
 package roth.lib.java.deserializer;
 
 import roth.lib.java.time.Month;
+import roth.lib.java.util.NumberUtil;
 
 public class MonthDeserializer extends TemporalDeserializer<Month>
 {
@@ -22,7 +23,15 @@ public class MonthDeserializer extends TemporalDeserializer<Month>
 			}
 			else
 			{
-				month = new Month(Long.parseLong(value));
+				Long time = NumberUtil.parseLong(value);
+				if(time != null)
+				{
+					month = new Month(time);
+				}
+				else
+				{
+					month = Month.fromString(value);
+				}
 			}
 		}
 		catch(Exception e)

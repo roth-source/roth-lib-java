@@ -3,12 +3,13 @@ package roth.lib.java.test.xml;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import roth.lib.java.lang.Map;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
 import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
 import roth.lib.java.mapper.MapperConfig;
+import roth.lib.java.time.Day;
 import roth.lib.java.xml.XmlMapper;
 import roth.lib.java.xml.XmlModel;
 
@@ -21,6 +22,9 @@ public class XmlTestModel extends XmlModel
 	
 	@Property(name = "attribute", attribute = true)
 	protected String attribute = "test";
+	
+	@Property(name = "day", attribute = true)
+	protected Day day;
 	
 	@Property(name = "null-primitive-boolean")
 	protected boolean nullPrimitiveBoolean;
@@ -176,6 +180,7 @@ public class XmlTestModel extends XmlModel
 	
 	public void init()
 	{
+		day = new Day();
 		testValue = new XmlTestValue().setType("ERROR");
 		testValue.setValue("TEST");
 		testBoolean = true;
