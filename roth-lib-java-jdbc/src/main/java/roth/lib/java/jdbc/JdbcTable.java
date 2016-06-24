@@ -103,6 +103,16 @@ public abstract class JdbcTable<T> implements SqlFactory
 		return findBy(select().wheres(wheres));
 	}
 	
+	public T findBy(Where where, Order order)
+	{
+		return findBy(newWheres().andWhere(where), order);
+	}
+	
+	public T findBy(Wheres wheres, Order order)
+	{
+		return findBy(select().wheres(wheres).order(order));
+	}
+	
 	public T findBy(Where where, Columns columns)
 	{
 		return findBy(newWheres().andWhere(where), columns);
