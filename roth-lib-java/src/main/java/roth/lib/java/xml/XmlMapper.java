@@ -74,7 +74,7 @@ public class XmlMapper extends Mapper
 				{
 					rootName = "root";
 				}
-				writer.write(XML_HEADER);
+				writeXmlHeader(writer);
 				writeNewLine(writer);
 				writeOpenTag(writer, rootName, getAttributeMap(value, entityReflector));
 				writeEntity(writer, value, entityReflector);
@@ -104,7 +104,7 @@ public class XmlMapper extends Mapper
 		if(map == null) throw new IllegalArgumentException("Map cannot be null");
 		try
 		{
-			writer.write(XML_HEADER);
+			writeXmlHeader(writer);
 			writeNewLine(writer);
 			writeOpenTag(writer, rootName);
 			writeMap(writer, map, null);
@@ -116,6 +116,11 @@ public class XmlMapper extends Mapper
 		{
 			throw new XmlException(e);
 		}
+	}
+	
+	protected void writeXmlHeader(Writer writer) throws IOException
+	{
+		writer.write(XML_HEADER);
 	}
 	
 	protected boolean writeEntity(Writer writer, Object value, EntityReflector entityReflector) throws IOException
