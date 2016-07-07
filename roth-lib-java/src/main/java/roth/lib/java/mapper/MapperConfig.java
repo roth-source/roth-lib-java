@@ -19,6 +19,7 @@ public class MapperConfig implements Characters
 	protected char qualifier = QUOTE;
 	protected Map<Class<?>, Serializer<?>> serializerMap = new Map<Class<?>, Serializer<?>>();
 	protected Map<Class<?>, Deserializer<?>> deserializerMap = new Map<Class<?>, Deserializer<?>>();
+	protected boolean writeXmlHeader = true;
 	
 	public MapperConfig()
 	{
@@ -67,6 +68,11 @@ public class MapperConfig implements Characters
 	public char getQualifier()
 	{
 		return qualifier;
+	}
+	
+	public boolean isWriteXmlHeader()
+	{
+		return writeXmlHeader;
 	}
 	
 	public Serializer<?> getSerializer(Class<?> klass)
@@ -137,6 +143,12 @@ public class MapperConfig implements Characters
 	public MapperConfig setQualifier(Character qualifier)
 	{
 		this.qualifier = qualifier;
+		return this;
+	}
+	
+	public MapperConfig setWriteXmlHeader(boolean writeXmlHeader)
+	{
+		this.writeXmlHeader = writeXmlHeader;
 		return this;
 	}
 	

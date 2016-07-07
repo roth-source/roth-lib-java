@@ -120,7 +120,10 @@ public class XmlMapper extends Mapper
 	
 	protected void writeXmlHeader(Writer writer) throws IOException
 	{
-		writer.write(XML_HEADER);
+		if(getMapperConfig().isWriteXmlHeader())
+		{
+			writer.write(XML_HEADER);
+		}
 	}
 	
 	protected boolean writeEntity(Writer writer, Object value, EntityReflector entityReflector) throws IOException
