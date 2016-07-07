@@ -176,7 +176,10 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 													service.clearErrors();
 													if(authorized)
 													{
-														errors.addAll(validate(request, response, methodRequest, requestMapper.getMapperType()));
+														if(methodRequest != null && requestMapper != null)
+														{
+															errors.addAll(validate(request, response, methodRequest, requestMapper.getMapperType()));
+														}
 														if(errors.isEmpty())
 														{
 															service.setResponseContentType(responseContentType);
