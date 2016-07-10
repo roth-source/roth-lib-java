@@ -198,6 +198,11 @@ public abstract class HttpService
 		return csrfToken;
 	}
 	
+	public String getIp()
+	{
+		return getHttpServletRequest().getRemoteAddr();
+	}
+	
 	public static String readableName(String name)
 	{
 		StringBuilder builder = new StringBuilder();
