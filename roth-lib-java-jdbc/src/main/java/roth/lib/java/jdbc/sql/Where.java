@@ -75,6 +75,24 @@ public abstract class Where extends Condition
 		}
 		else
 		{
+			if(OP_EQ.equals(opType))
+			{
+				Object value = getValues().getFirst();
+				if(value == null)
+				{
+					opType = OP_IS_NULL;
+					values.clear();
+				}
+			}
+			else if(OP_NE.equals(opType))
+			{
+				Object value = getValues().getFirst();
+				if(value == null)
+				{
+					opType = OP_IS_NOT_NULL;
+					values.clear();
+				}
+			}
 			StringBuilder builder = new StringBuilder();
 			if(table != null)
 			{
