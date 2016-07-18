@@ -816,6 +816,16 @@ public class PropertyReflector
 		return property.required();
 	}
 	
+	public boolean hasTrimLength()
+	{
+		return property.trimLength() > 0;
+	}
+	
+	public boolean hasMaxLength()
+	{
+		return property.maxLength() > 0;
+	}
+	
 	protected List<Class<? extends Validator>> getValidate()
 	{
 		return new List<Class<? extends Validator>>(property.validate());

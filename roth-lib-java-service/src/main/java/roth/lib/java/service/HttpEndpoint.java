@@ -59,6 +59,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 	protected static String METHOD 								= "method";
 	protected static Pattern SERVICE_METHOD_PATTERN 			= Pattern.compile("(?:^|/)(?<" + SERVICE + ">[\\w\\-]+)/(?<" + METHOD + ">[\\w]+)(?:/|$)");
 	protected static Pattern BOUNDARY_PATTERN					= Pattern.compile("boundary\\=(?:\")?(.+?)(?:\"|;|$)");
+	protected static String MAX_LENGTH_ERROR 					= "%d exceeds max length of %d characters";
 	
 	protected static Map<String, ServiceReflector> serviceReflectorMap = new Map<String, ServiceReflector>();
 	
@@ -583,6 +584,27 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 							if(!blank && propertyValue instanceof String)
 							{
 								blank = ((String) propertyValue).isEmpty();
+								if(!blank)
+								{
+									if(propertyReflector.hasTrimLength())
+									{
+										int trimLength = propertyReflector.getProperty().trimLength();
+										if(((String) propertyValue).length() > trimLength)
+										{
+											propertyValue = ((String) propertyValue).substring(0, trimLength);
+											ReflectionUtil.setFieldValue(propertyReflector.getField(), value, propertyValue);
+										}
+									}
+									else if(propertyReflector.hasMaxLength())
+									{
+										int length = ((String) propertyValue).length();
+										int maxLength = propertyReflector.getProperty().maxLength();
+										if(length > maxLength)
+										{
+											errors.add(HttpErrorType.REQUEST_FIELD_INVALID.error().setContext(path + propertyName).setMessage(String.format(MAX_LENGTH_ERROR, length, maxLength)));
+										}
+									}
+								}
 							}
 							if(!blank)
 							{
