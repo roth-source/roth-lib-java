@@ -76,5 +76,7 @@ public @interface Property
 	// VALIDATION
 	boolean required() default false;
 	Class<? extends Validator>[] validate() default {};
+	int trimLength() default 0;
+	int maxLength() default 0;
 	
 }

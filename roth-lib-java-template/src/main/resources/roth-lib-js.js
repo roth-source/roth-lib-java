@@ -157,10 +157,14 @@ var inMap = inMap || function(value, map)
 };
 
 
-var forEach = forEach || function(object, callback)
+var forEach = forEach || function(object, callback, thisArg)
 {
 	if(isFunction(callback))
 	{
+		if(!isSet(thisArg))
+		{
+			thisArg = this;
+		}
 		if(isArray(object))
 		{
 			for(var i in object)
@@ -172,7 +176,7 @@ var forEach = forEach || function(object, callback)
 					first	: i == 0,
 					last	: i == object.length - 1
 				};
-				if(isFalse(callback(object[i], i, loop)))
+				if(isFalse(callback.call(thisArg, object[i], i, loop)))
 				{
 					break;
 				}
@@ -191,7 +195,7 @@ var forEach = forEach || function(object, callback)
 					first	: i == 0,
 					last	: i == keys.length - 1
 				};
-				if(isFalse(callback(object[key], key, loop)))
+				if(isFalse(callback.call(thisArg, object[key], key, loop)))
 				{
 					break;
 				}
@@ -371,7 +375,8 @@ var CurrencyUtil = CurrencyUtil ||
 		}
 		return parsedValue;
 	}
-		
+	
+	
 };
 
 
@@ -1090,7 +1095,31 @@ var ObjectUtil = ObjectUtil ||
 			}
 		}
 		return object;
+	},
+	
+	
+	equals : function(object1, object2)
+	{
+		var equals = false;
+		if(!isSet(object1) && !isSet(object2))
+		{
+			equals = true;
+		}
+		else if(isArray(object1) && isArray(object2))
+		{
+			equals = JSON.stringify(object1) == JSON.stringify(object2);
+		}
+		else if(isObject(object1) && isObject(object2))
+		{
+			equals = JSON.stringify(object1) == JSON.stringify(object2);
+		}
+		else
+		{
+			equals = object1 == object2;
+		}
+		return equals;
 	}
+	
 	
 };
 
@@ -1160,7 +1189,7 @@ var StringUtil = StringUtil ||
 	
 	capitalize : function(value)
 	{
-		return value.charAt(0).toUpperCase() + value.slice(1);
+		return isValidString(value) ? value.charAt(0).toUpperCase() + value.slice(1) : "";
 	},
 	
 	
@@ -1178,6 +1207,7 @@ var StringUtil = StringUtil ||
 		});
 		return value;
 	},
+	
 	
 	stripHtml : function(value)
 	{
