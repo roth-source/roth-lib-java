@@ -540,7 +540,11 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 						Type propertyType = propertyReflector.getFieldType();
 						String propertyName = propertyReflector.getPropertyName(mapperType);
 						Object propertyValue = propertyReflector.getField().get(value);
-						if(ReflectionUtil.isArray(propertyType) || ReflectionUtil.isCollection(propertyType))
+						if(getMapperReflector().isEntity(propertyType))
+						{
+							errors.addAll(validate(request, response, propertyValue, mapperType, path + propertyName + DOT));
+						}
+						else if(ReflectionUtil.isArray(propertyType) || ReflectionUtil.isCollection(propertyType))
 						{
 							if(propertyValue != null && !byte[].class.isAssignableFrom(propertyReflector.getFieldClass()))
 							{
@@ -573,7 +577,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 									}
 									if(elementName != null)
 									{
-										errors.addAll(validate(request, response, elementEntry.getValue(), mapperType, path + elementName + DOT));
+										errors.addAll(validate(request, response, elementEntry.getValue(), mapperType, path + propertyName + DOT + elementName + DOT));
 									}
 								}
 							}
