@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import roth.lib.java.lang.List;
 
@@ -436,6 +437,13 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 	public String format(String pattern)
 	{
 		return new SimpleDateFormat(pattern).format(toDate());
+	}
+	
+	public String format(String pattern, String timeZone)
+	{
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+		simpleDateFormat.setTimeZone(TimeZone.getTimeZone(timeZone));
+		return simpleDateFormat.format(toDate());
 	}
 	
 	public boolean isWeekend()
