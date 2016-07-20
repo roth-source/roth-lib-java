@@ -12,7 +12,7 @@ public class DataUrlDeserializer extends Deserializer<DataUrl>
 	}
 	
 	@Override
-	public DataUrl deserialize(String value, String timeFormat)
+	public DataUrl deserialize(String value)
 	{
 		return DataUrlUtil.parse(value);
 	}

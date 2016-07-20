@@ -12,6 +12,7 @@ import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
 import roth.lib.java.serializer.Serializer;
 import roth.lib.java.serializer.VoidSerializer;
+import roth.lib.java.time.TimeZone;
 import roth.lib.java.util.AnnotationUtil;
 import roth.lib.java.util.ReflectionUtil;
 import roth.lib.java.validate.Validator;
@@ -846,6 +847,11 @@ public class PropertyReflector
 			}
 		}
 		return validators;
+	}
+	
+	public TimeZone getTimeZone()
+	{
+		return property.timeZone();
 	}
 	
 }

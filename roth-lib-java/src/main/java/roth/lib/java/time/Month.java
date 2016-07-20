@@ -1,6 +1,5 @@
 package roth.lib.java.time;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -133,25 +132,29 @@ public class Month extends Time
 	}
 	
 	@Override
-	public String toString()
+	public String getDefaultPattern()
 	{
-		return format(DEFAULT_PATTERN);
+		return DEFAULT_PATTERN;
 	}
 	
-	@Override
-	public String format(String pattern)
+	public static Month parse(String value)
 	{
-		return new SimpleDateFormat(pattern != null ? pattern : DEFAULT_PATTERN).format(toDate());
+		return parse(value, TimeZone.DEFAULT);
 	}
 	
-	public static Month fromString(String value)
+	public static Month parse(String value, TimeZone timeZone)
 	{
-		return new Month(parseCalendar(value, DEFAULT_PATTERN));
+		return parse(value, timeZone, DEFAULT_PATTERN);
 	}
 	
 	public static Month parse(String value, String pattern)
 	{
-		return new Month(parseCalendar(value, pattern != null ? pattern : DEFAULT_PATTERN));
+		return parse(value, TimeZone.DEFAULT, pattern);
+	}
+	
+	public static Month parse(String value, TimeZone timeZone, String pattern)
+	{
+		return new Month(parseCalendar(value, timeZone, pattern != null ? pattern : DEFAULT_PATTERN));
 	}
 	
 	@Override

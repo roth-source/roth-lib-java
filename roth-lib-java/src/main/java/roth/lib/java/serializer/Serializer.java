@@ -1,5 +1,7 @@
 package roth.lib.java.serializer;
 
+import roth.lib.java.time.TimeZone;
+
 public abstract class Serializer<T>
 {
 	
@@ -8,18 +10,18 @@ public abstract class Serializer<T>
 		
 	}
 	
-	public boolean isEscapable(Object value, String timeFormat)
+	public boolean isEscapable(Object value, TimeZone timeZone, String timeFormat)
 	{
 		return false;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public String serialize(Object value, String timeFormat)
+	public String serialize(Object value, TimeZone timeZone, String timeFormat)
 	{
-		return serializeValue((T) value, timeFormat);
+		return serializeValue((T) value, timeZone, timeFormat);
 	}
 	
-	public String serializeValue(T value, String timeFormat)
+	public String serializeValue(T value, TimeZone timeZone, String timeFormat)
 	{
 		return serializeValue((T) value);
 	}

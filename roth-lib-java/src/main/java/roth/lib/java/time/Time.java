@@ -1,11 +1,9 @@
 package roth.lib.java.time;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 import roth.lib.java.lang.List;
 
@@ -124,6 +122,11 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 	protected static Calendar toCalendar(long timestamp)
 	{
 		return toCalendar(new Date(timestamp));
+	}
+	
+	public String getDefaultPattern()
+	{
+		return null;
 	}
 	
 	public int getYear()
@@ -409,12 +412,22 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 		return new Time(parseCalendar(value, pattern));
 	}
 	
+	public static Time parse(String value, TimeZone timeZone, String pattern)
+	{
+		return new Time(parseCalendar(value, timeZone, pattern));
+	}
+	
 	public static Calendar parseCalendar(String value, String pattern)
+	{
+		return parseCalendar(value, TimeZone.DEFAULT, pattern);
+	}
+	
+	public static Calendar parseCalendar(String value, TimeZone timeZone, String pattern)
 	{
 		Calendar calendar = null;
 		try
 		{
-			Date date = new SimpleDateFormat(pattern).parse(value);
+			Date date = timeZone.getFormatter(pattern).parse(value);
 			if(date != null)
 			{
 				calendar = new GregorianCalendar();
@@ -431,19 +444,22 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 	@Override
 	public String toString()
 	{
-		return String.valueOf(toTimestamp());
+		return getDefaultPattern() != null ? format(getDefaultPattern()) : String.valueOf(toTimestamp());
+	}
+	
+	public String format(TimeZone timeZone)
+	{
+		return format(getDefaultPattern(), timeZone);
 	}
 	
 	public String format(String pattern)
 	{
-		return new SimpleDateFormat(pattern).format(toDate());
+		return format(pattern, TimeZone.DEFAULT);
 	}
 	
-	public String format(String pattern, String timeZone)
+	public String format(String pattern, TimeZone timeZone)
 	{
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-		simpleDateFormat.setTimeZone(TimeZone.getTimeZone(timeZone));
-		return simpleDateFormat.format(toDate());
+		return (pattern != null || getDefaultPattern() != null) ? timeZone.getFormatter(pattern != null ? pattern : getDefaultPattern()).format(toDate()) : String.valueOf(toTimestamp());
 	}
 	
 	public boolean isWeekend()
@@ -516,6 +532,19 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 	public Time clone()
 	{
 		return new Time((Calendar) calendar.clone());
+	}
+	
+	public static void main(String[] args)
+	{
+		TimeZone timeZone = TimeZone.UTC;
+		System.out.println(new Year().format(timeZone));
+		System.out.println(new Month().format(timeZone));
+		System.out.println(new Day().format(timeZone));
+		System.out.println(new Hour().format(timeZone));
+		System.out.println(new Minute().format(timeZone));
+		System.out.println(new Second().format(timeZone));
+		System.out.println(new Millisecond().format(timeZone));
+		System.out.println(new Time().format(timeZone));
 	}
 	
 }

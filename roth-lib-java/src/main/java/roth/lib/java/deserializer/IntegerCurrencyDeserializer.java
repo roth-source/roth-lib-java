@@ -8,7 +8,7 @@ public class IntegerCurrencyDeserializer extends Deserializer<Integer>
 {
 	
 	@Override
-	public Integer deserialize(String value, String timeFormat)
+	public Integer deserialize(String value)
 	{
 		BigDecimal number = CurrencyUtil.parse(value);
 		return number != null ? number.intValue() : null;

@@ -10,7 +10,7 @@ public class FloatDeserializer extends PrimitiveDeserializer<Float>
 	}
 	
 	@Override
-	public Float deserialize(String value, String timeFormat)
+	public Float deserialize(String value)
 	{
 		Float object = isNullable() ? null : 0f;
 		try

@@ -206,7 +206,7 @@ public abstract class JdbcModel extends Model implements SqlFactory
 				{
 					Field field = propertyReflector.getField();
 					Object oldValue = field.get(this);
-					Object newValue = deserializer.deserialize(value, propertyReflector.getTimeFormat(db.getMapperType()), propertyReflector.getFieldClass());
+					Object newValue = deserializer.deserialize(value, propertyReflector.getTimeZone(), propertyReflector.getTimeFormat(db.getMapperType()), propertyReflector.getFieldClass());
 					setDirty(name, oldValue, newValue);
 					field.set(this, newValue);
 				}

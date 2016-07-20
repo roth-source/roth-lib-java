@@ -12,7 +12,7 @@ public class BigDecimalDeserializer extends Deserializer<BigDecimal>
 	}
 	
 	@Override
-	public BigDecimal deserialize(String value, String timeFormat)
+	public BigDecimal deserialize(String value)
 	{
 		BigDecimal object = null;
 		try

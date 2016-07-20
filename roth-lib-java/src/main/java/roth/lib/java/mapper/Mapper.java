@@ -24,6 +24,7 @@ import roth.lib.java.lang.Map;
 import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.serializer.Serializer;
+import roth.lib.java.time.TimeZone;
 import roth.lib.java.type.MimeType;
 
 public abstract class Mapper implements Characters
@@ -92,6 +93,11 @@ public abstract class Mapper implements Characters
 	public String getTimeFormat(PropertyReflector propertyReflector)
 	{
 		return propertyReflector != null ? propertyReflector.getTimeFormat(getMapperType()) : null;
+	}
+	
+	public TimeZone getTimeZone(PropertyReflector propertyReflector)
+	{
+		return propertyReflector != null ? propertyReflector.getTimeZone() : TimeZone.DEFAULT;
 	}
 	
 	public Serializer<?> getSerializer(Class<?> klass)

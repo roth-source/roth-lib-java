@@ -1,7 +1,8 @@
 package roth.lib.java.deserializer;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import roth.lib.java.time.TimeZone;
 
 public class DateDeserializer extends TemporalDeserializer<Date>
 {
@@ -12,14 +13,14 @@ public class DateDeserializer extends TemporalDeserializer<Date>
 	}
 	
 	@Override
-	public Date deserialize(String value, String timeFormat)
+	public Date deserialize(String value, TimeZone timeZone, String timeFormat)
 	{
 		Date date = null;
 		try
 		{
 			if(timeFormat != null && !timeFormat.isEmpty() && !"timestamp".equalsIgnoreCase(timeFormat))
 			{
-				date = new SimpleDateFormat(timeFormat).parse(value);
+				date = timeZone.getFormatter(timeFormat).parse(value);
 			}
 			else
 			{

@@ -10,7 +10,7 @@ public class ByteDeserializer extends PrimitiveDeserializer<Byte>
 	}
 	
 	@Override
-	public Byte deserialize(String value, String timeFormat)
+	public Byte deserialize(String value)
 	{
 		Byte object = isNullable() ? null : (byte) 0;
 		try

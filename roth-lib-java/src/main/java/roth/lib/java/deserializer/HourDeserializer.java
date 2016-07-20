@@ -1,6 +1,7 @@
 package roth.lib.java.deserializer;
 
 import roth.lib.java.time.Hour;
+import roth.lib.java.time.TimeZone;
 
 public class HourDeserializer extends TemporalDeserializer<Hour>
 {
@@ -11,14 +12,14 @@ public class HourDeserializer extends TemporalDeserializer<Hour>
 	}
 	
 	@Override
-	public Hour deserialize(String value, String timeFormat)
+	public Hour deserialize(String value, TimeZone timeZone, String timeFormat)
 	{
 		Hour hour = null;
 		try
 		{
 			if(timeFormat != null && !timeFormat.isEmpty() && !"timestamp".equalsIgnoreCase(timeFormat))
 			{
-				hour = Hour.parse(value, timeFormat);
+				hour = Hour.parse(value, timeZone, timeFormat);
 			}
 			else
 			{

@@ -1,6 +1,7 @@
 package roth.lib.java.deserializer;
 
 import roth.lib.java.time.Day;
+import roth.lib.java.time.TimeZone;
 import roth.lib.java.util.NumberUtil;
 
 public class DayDeserializer extends TemporalDeserializer<Day>
@@ -12,14 +13,14 @@ public class DayDeserializer extends TemporalDeserializer<Day>
 	}
 	
 	@Override
-	public Day deserialize(String value, String timeFormat)
+	public Day deserialize(String value, TimeZone timeZone, String timeFormat)
 	{
 		Day day = null;
 		try
 		{
 			if(timeFormat != null && !timeFormat.isEmpty() && !"timestamp".equalsIgnoreCase(timeFormat))
 			{
-				day = Day.parse(value, timeFormat);
+				day = Day.parse(value, timeZone, timeFormat);
 			}
 			else
 			{
@@ -30,7 +31,7 @@ public class DayDeserializer extends TemporalDeserializer<Day>
 				}
 				else
 				{
-					day = Day.fromString(value);
+					day = Day.parse(value, timeZone);
 				}
 				
 			}

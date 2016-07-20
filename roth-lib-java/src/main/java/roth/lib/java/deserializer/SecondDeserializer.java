@@ -1,6 +1,7 @@
 package roth.lib.java.deserializer;
 
 import roth.lib.java.time.Second;
+import roth.lib.java.time.TimeZone;
 
 public class SecondDeserializer extends TemporalDeserializer<Second>
 {
@@ -11,14 +12,14 @@ public class SecondDeserializer extends TemporalDeserializer<Second>
 	}
 	
 	@Override
-	public Second deserialize(String value, String timeFormat)
+	public Second deserialize(String value, TimeZone timeZone, String timeFormat)
 	{
 		Second second = null;
 		try
 		{
 			if(timeFormat != null && !timeFormat.isEmpty() && !"timestamp".equalsIgnoreCase(timeFormat))
 			{
-				second = Second.parse(value, timeFormat);
+				second = Second.parse(value, timeZone, timeFormat);
 			}
 			else
 			{

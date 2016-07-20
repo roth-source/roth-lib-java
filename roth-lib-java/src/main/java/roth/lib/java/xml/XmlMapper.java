@@ -23,6 +23,7 @@ import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.serializer.Serializer;
+import roth.lib.java.time.TimeZone;
 import roth.lib.java.util.ReflectionUtil;
 import roth.lib.java.xml.tag.CloseTag;
 import roth.lib.java.xml.tag.CommentTag;
@@ -170,8 +171,9 @@ public class XmlMapper extends Mapper
 					Serializer<?> serializer = getSerializer(xmlValue.getValue().getClass(), propertyReflector);
 					if(serializer != null)
 					{
+						TimeZone timeZone = getTimeZone(propertyReflector);
 						String timeFormat = getTimeFormat(propertyReflector);
-						String serializedValue = serializer.serialize(xmlValue.getValue(), timeFormat);
+						String serializedValue = serializer.serialize(xmlValue.getValue(), timeZone, timeFormat);
 						if(serializedValue != null)
 						{
 							writeValue(writer, serializedValue);
@@ -227,8 +229,9 @@ public class XmlMapper extends Mapper
 				Serializer<?> serializer = getSerializer(value.getClass(), propertyReflector);
 				if(serializer != null)
 				{
+					TimeZone timeZone = getTimeZone(propertyReflector);
 					String timeFormat = getTimeFormat(propertyReflector);
-					String serializedValue = serializer.serialize(value, timeFormat);
+					String serializedValue = serializer.serialize(value, timeZone, timeFormat);
 					if(serializedValue != null)
 					{
 						writeNewLine(writer);
@@ -316,8 +319,9 @@ public class XmlMapper extends Mapper
 				Serializer<?> serializer = getSerializer(key.getClass(), propertyReflector);
 				if(serializer != null)
 				{
+					TimeZone timeZone = getTimeZone(propertyReflector);
 					String timeFormat = getTimeFormat(propertyReflector);
-					name = serializer.serialize(key, timeFormat);
+					name = serializer.serialize(key, timeZone, timeFormat);
 				}
 			}
 			if(name != null)
@@ -545,9 +549,10 @@ public class XmlMapper extends Mapper
 						{
 							String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
 							readTag(reader);
+							TimeZone timeZone = getTimeZone(propertyReflector);
 							String timeFormat = getTimeFormat(propertyReflector);
 							value = propertyReflector.filter(value, getMapperType());
-							ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeFormat, fieldClass));
+							ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeZone, timeFormat, fieldClass));
 							setDeserializedName(model, propertyReflector.getFieldName());
 						}
 						else
@@ -639,8 +644,9 @@ public class XmlMapper extends Mapper
 						Serializer<?> serializer = getSerializer(value.getClass(), attributeReflector);
 						if(serializer != null)
 						{
+							TimeZone timeZone = getTimeZone(attributeReflector);
 							String timeFormat = getTimeFormat(attributeReflector);
-							String serializedValue = serializer.serialize(value, timeFormat);
+							String serializedValue = serializer.serialize(value, timeZone, timeFormat);
 							if(serializedValue != null)
 							{
 								attributeMap.put(attributeReflector.getPropertyName(getMapperType()), serializedValue);
@@ -670,10 +676,11 @@ public class XmlMapper extends Mapper
 				Deserializer<?> deserializer = getDeserializer(fieldClass, attributeReflector);
 				if(deserializer != null)
 				{
+					TimeZone timeZone = getTimeZone(attributeReflector);
 					String timeFormat = getTimeFormat(attributeReflector);
 					String name = attributeReflector.getPropertyName(getMapperType());
 					String value = attributeReflector.filter(attributeMap.get(name), getMapperType());
-					Object deserializedValue = deserializer.deserialize(value, timeFormat, fieldClass);
+					Object deserializedValue = deserializer.deserialize(value, timeZone, timeFormat, fieldClass);
 					if(deserializedValue != null)
 					{
 						ReflectionUtil.setFieldValue(field, model, deserializedValue);
@@ -728,9 +735,10 @@ public class XmlMapper extends Mapper
 					readTag(reader);
 					if(deserializer != null)
 					{
+						TimeZone timeZone = getTimeZone(propertyReflector);
 						String timeFormat = getTimeFormat(propertyReflector);
 						value = propertyReflector.filter(value, getMapperType());
-						ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeFormat, fieldClass));
+						ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeZone, timeFormat, fieldClass));
 						setDeserializedName(model, propertyReflector.getFieldName());
 					}
 				}
@@ -781,8 +789,9 @@ public class XmlMapper extends Mapper
 				Deserializer<?> keyDeserializer = getDeserializer(keyClass, propertyReflector);
 				if(keyDeserializer != null)
 				{
+					TimeZone timeZone = getTimeZone(propertyReflector);
 					String timeFormat = getTimeFormat(propertyReflector);
-					key = (K) keyDeserializer.deserialize(fieldOpenTag.getName(), timeFormat);
+					key = (K) keyDeserializer.deserialize(fieldOpenTag.getName(), timeZone, timeFormat);
 				}
 				if(getMapperReflector().isEntity(elementType))
 				{
@@ -833,9 +842,10 @@ public class XmlMapper extends Mapper
 						readTag(reader);
 						if(deserializer != null)
 						{
+							TimeZone timeZone = getTimeZone(propertyReflector);
 							String timeFormat = getTimeFormat(propertyReflector);
 							value = propertyReflector.filter(value, getMapperType());
-							E deserializedValue = deserializer.deserialize(value, timeFormat, elementClass);
+							E deserializedValue = deserializer.deserialize(value, timeZone, timeFormat, elementClass);
 							if(deserializedValue != null)
 							{
 								map.put(key, deserializedValue);
@@ -943,9 +953,10 @@ public class XmlMapper extends Mapper
 					{
 						String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
 						readTag(reader);
+						TimeZone timeZone = getTimeZone(propertyReflector);
 						String timeFormat = getTimeFormat(propertyReflector);
 						value = propertyReflector.filter(value, getMapperType());
-						E deserializedValue = deserializer.deserialize(value, timeFormat, elementClass);
+						E deserializedValue = deserializer.deserialize(value, timeZone, timeFormat, elementClass);
 						if(deserializedValue != null)
 						{
 							collection.add(deserializedValue);
@@ -1014,9 +1025,10 @@ public class XmlMapper extends Mapper
 			{
 				String value = readEscaped(reader, LEFT_ANGLE_BRACKET);
 				readTag(reader);
+				TimeZone timeZone = getTimeZone(propertyReflector);
 				String timeFormat = getTimeFormat(propertyReflector);
 				value = propertyReflector.filter(value, getMapperType());
-				element = deserializer.deserialize(value, timeFormat, elementClass);
+				element = deserializer.deserialize(value, timeZone, timeFormat, elementClass);
 			}
 			else
 			{

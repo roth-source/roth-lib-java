@@ -1,6 +1,7 @@
 package roth.lib.java.deserializer;
 
 import roth.lib.java.time.Month;
+import roth.lib.java.time.TimeZone;
 import roth.lib.java.util.NumberUtil;
 
 public class MonthDeserializer extends TemporalDeserializer<Month>
@@ -12,14 +13,14 @@ public class MonthDeserializer extends TemporalDeserializer<Month>
 	}
 	
 	@Override
-	public Month deserialize(String value, String timeFormat)
+	public Month deserialize(String value, TimeZone timeZone, String timeFormat)
 	{
 		Month month = null;
 		try
 		{
 			if(timeFormat != null && !timeFormat.isEmpty() && !"timestamp".equalsIgnoreCase(timeFormat))
 			{
-				month = Month.parse(value, timeFormat);
+				month = Month.parse(value, timeZone, timeFormat);
 			}
 			else
 			{
@@ -30,7 +31,7 @@ public class MonthDeserializer extends TemporalDeserializer<Month>
 				}
 				else
 				{
-					month = Month.fromString(value);
+					month = Month.parse(value, timeZone);
 				}
 			}
 		}

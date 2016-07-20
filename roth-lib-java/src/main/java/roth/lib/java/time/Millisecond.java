@@ -1,6 +1,5 @@
 package roth.lib.java.time;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -156,25 +155,29 @@ public class Millisecond extends Time
 	}
 	
 	@Override
-	public String toString()
+	public String getDefaultPattern()
 	{
-		return format(DEFAULT_PATTERN);
+		return DEFAULT_PATTERN;
 	}
 	
-	@Override
-	public String format(String pattern)
+	public static Millisecond parse(String value)
 	{
-		return new SimpleDateFormat(pattern != null ? pattern : DEFAULT_PATTERN).format(toDate());
+		return parse(value, TimeZone.DEFAULT);
 	}
 	
-	public static Millisecond fromString(String value)
+	public static Millisecond parse(String value, TimeZone timeZone)
 	{
-		return new Millisecond(parseCalendar(value, DEFAULT_PATTERN));
+		return parse(value, timeZone, DEFAULT_PATTERN);
 	}
 	
 	public static Millisecond parse(String value, String pattern)
 	{
-		return new Millisecond(parseCalendar(value, pattern != null ? pattern : DEFAULT_PATTERN));
+		return parse(value, TimeZone.DEFAULT, pattern);
+	}
+	
+	public static Millisecond parse(String value, TimeZone timeZone, String pattern)
+	{
+		return new Millisecond(parseCalendar(value, timeZone, pattern != null ? pattern : DEFAULT_PATTERN));
 	}
 	
 	@Override

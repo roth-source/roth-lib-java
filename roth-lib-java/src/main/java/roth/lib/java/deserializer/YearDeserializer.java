@@ -1,5 +1,6 @@
 package roth.lib.java.deserializer;
 
+import roth.lib.java.time.TimeZone;
 import roth.lib.java.time.Year;
 import roth.lib.java.util.NumberUtil;
 
@@ -12,14 +13,14 @@ public class YearDeserializer extends TemporalDeserializer<Year>
 	}
 	
 	@Override
-	public Year deserialize(String value, String timeFormat)
+	public Year deserialize(String value, TimeZone timeZone, String timeFormat)
 	{
 		Year year = null;
 		try
 		{
 			if(timeFormat != null && !timeFormat.isEmpty() && !"timestamp".equalsIgnoreCase(timeFormat))
 			{
-				year = Year.parse(value, timeFormat);
+				year = Year.parse(value, timeZone, timeFormat);
 			}
 			else
 			{
@@ -30,7 +31,7 @@ public class YearDeserializer extends TemporalDeserializer<Year>
 				}
 				else
 				{
-					year = Year.fromString(value);
+					year = Year.parse(value, timeZone);
 				}
 			}
 		}

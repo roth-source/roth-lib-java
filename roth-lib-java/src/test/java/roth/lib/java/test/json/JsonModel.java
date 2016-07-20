@@ -46,7 +46,6 @@ public class JsonModel
 	@Property(name = "test_millisecond")
 	private Millisecond testMillisecond = new Millisecond();
 	
-	
 	@Property(name = "null_primitive_boolean")
 	private boolean nullPrimitiveBoolean;
 	

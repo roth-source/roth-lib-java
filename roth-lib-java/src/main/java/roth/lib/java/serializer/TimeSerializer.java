@@ -1,6 +1,7 @@
 package roth.lib.java.serializer;
 
 import roth.lib.java.time.Time;
+import roth.lib.java.time.TimeZone;
 
 public class TimeSerializer extends TemporalSerializer<Time>
 {
@@ -11,9 +12,9 @@ public class TimeSerializer extends TemporalSerializer<Time>
 	}
 	
 	@Override
-	public boolean isEscapable(Object value, String timeFormat)
+	public boolean isEscapable(Object value, TimeZone timeZone, String timeFormat)
 	{
-		boolean escapable = super.isEscapable(value, timeFormat);
+		boolean escapable = super.isEscapable(value, timeZone, timeFormat);
 		if(!escapable && !Time.class.equals(value.getClass()))
 		{
 			escapable = !"timestamp".equalsIgnoreCase(timeFormat);
@@ -22,7 +23,7 @@ public class TimeSerializer extends TemporalSerializer<Time>
 	}
 	
 	@Override
-	public String serializeValue(Time time, String timeFormat)
+	public String serializeValue(Time time, TimeZone timeZone, String timeFormat)
 	{
 		String value = null;
 		try
@@ -37,12 +38,12 @@ public class TimeSerializer extends TemporalSerializer<Time>
 					}
 					else
 					{
-						value = time.format(timeFormat);
+						value = time.format(timeFormat, timeZone);
 					}
 				}
 				else
 				{
-					value = time.toString();
+					value = time.format(timeZone);
 				}
 			}
 		}

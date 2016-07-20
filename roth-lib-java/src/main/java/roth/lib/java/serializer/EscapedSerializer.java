@@ -1,5 +1,7 @@
 package roth.lib.java.serializer;
 
+import roth.lib.java.time.TimeZone;
+
 public class EscapedSerializer<T> extends Serializer<T>
 {
 	
@@ -9,7 +11,7 @@ public class EscapedSerializer<T> extends Serializer<T>
 	}
 	
 	@Override
-	public boolean isEscapable(Object value, String timeFormat)
+	public boolean isEscapable(Object value, TimeZone timeZone, String timeFormat)
 	{
 		return true;
 	}

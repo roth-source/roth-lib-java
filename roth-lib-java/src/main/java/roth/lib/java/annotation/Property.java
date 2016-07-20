@@ -11,6 +11,7 @@ import roth.lib.java.deserializer.VoidDeserializer;
 import roth.lib.java.filter.Filterer;
 import roth.lib.java.serializer.Serializer;
 import roth.lib.java.serializer.VoidSerializer;
+import roth.lib.java.time.TimeZone;
 import roth.lib.java.validate.Validator;
 
 @Target({FIELD}) 
@@ -34,6 +35,7 @@ public @interface Property
 	// SERIAL
 	boolean serial() default true;
 	String serialName() default "";
+	TimeZone timeZone() default TimeZone.DEFAULT;
 	String timeFormat() default "";
 	Class<? extends Filterer>[] filter() default {};
 	Class<? extends Deserializer<?>> deserializer() default VoidDeserializer.class;

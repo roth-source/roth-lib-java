@@ -25,6 +25,7 @@ import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.serializer.Serializer;
+import roth.lib.java.time.TimeZone;
 import roth.lib.java.util.ReflectionUtil;
 
 public class TableMapper extends Mapper
@@ -142,8 +143,9 @@ public class TableMapper extends Mapper
 			Serializer<?> serializer = propertyReflector.getSerializer(getMapperType(), getMapperReflector(), getMapperConfig());
 			if(serializer != null)
 			{
+				TimeZone timeZone = getTimeZone(propertyReflector);
 				String timeFormat = getTimeFormat(propertyReflector);
-				serializedValue = serializer.serialize(value, timeFormat);
+				serializedValue = serializer.serialize(value, timeZone, timeFormat);
 			}
 		}
 		if(serializedValue != null)
@@ -341,9 +343,10 @@ public class TableMapper extends Mapper
 							if(!value.isEmpty())
 							{
 								model = model != null ? model : constructor.newInstance();
+								TimeZone timeZone = getTimeZone(propertyReflector);
 								String timeFormat = getTimeFormat(propertyReflector);
 								value = propertyReflector.filter(value, getMapperType());
-								Object deserializedValue = deserializer.deserialize(value, timeFormat, propertyReflector.getFieldClass());
+								Object deserializedValue = deserializer.deserialize(value, timeZone, timeFormat, propertyReflector.getFieldClass());
 								ReflectionUtil.setFieldValue(propertyReflector.getField(), model, deserializedValue);
 							}
 						}

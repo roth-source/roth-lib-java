@@ -1,7 +1,8 @@
 package roth.lib.java.serializer;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
+import roth.lib.java.time.TimeZone;
 
 public class CalendarSerializer extends TemporalSerializer<Calendar>
 {
@@ -12,16 +13,16 @@ public class CalendarSerializer extends TemporalSerializer<Calendar>
 	}
 	
 	@Override
-	public String serializeValue(Calendar calendar, String timeFormat)
+	public String serializeValue(Calendar calendar, TimeZone timeZone, String timeFormat)
 	{
 		String value = null;
 		try
 		{
 			if(calendar != null)
 			{
-				if(isEscapable(calendar, timeFormat))
+				if(isEscapable(calendar, timeZone, timeFormat))
 				{
-					value = new SimpleDateFormat(timeFormat).format(calendar.getTime());
+					value = timeZone.getFormatter(timeFormat).format(calendar.getTime());
 				}
 				else
 				{

@@ -9,7 +9,7 @@ public class StringDeserializer extends Deserializer<String>
 	}
 	
 	@Override
-	public String deserialize(String value, String timeFormat)
+	public String deserialize(String value)
 	{
 		return value;
 	}

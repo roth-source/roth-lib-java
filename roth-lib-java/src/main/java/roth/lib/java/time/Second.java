@@ -1,6 +1,5 @@
 package roth.lib.java.time;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -148,25 +147,29 @@ public class Second extends Time
 	}
 	
 	@Override
-	public String toString()
+	public String getDefaultPattern()
 	{
-		return format(DEFAULT_PATTERN);
+		return DEFAULT_PATTERN;
 	}
 	
-	@Override
-	public String format(String pattern)
+	public static Second parse(String value)
 	{
-		return new SimpleDateFormat(pattern != null ? pattern : DEFAULT_PATTERN).format(toDate());
+		return parse(value, TimeZone.DEFAULT);
 	}
 	
-	public static Second fromString(String value)
+	public static Second parse(String value, TimeZone timeZone)
 	{
-		return new Second(parseCalendar(value, DEFAULT_PATTERN));
+		return parse(value, timeZone, DEFAULT_PATTERN);
 	}
 	
 	public static Second parse(String value, String pattern)
 	{
-		return new Second(parseCalendar(value, pattern != null ? pattern : DEFAULT_PATTERN));
+		return parse(value, TimeZone.DEFAULT, pattern);
+	}
+	
+	public static Second parse(String value, TimeZone timeZone, String pattern)
+	{
+		return new Second(parseCalendar(value, timeZone, pattern != null ? pattern : DEFAULT_PATTERN));
 	}
 	
 	@Override

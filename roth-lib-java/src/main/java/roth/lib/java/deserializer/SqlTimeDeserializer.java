@@ -1,7 +1,8 @@
 package roth.lib.java.deserializer;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
+
+import roth.lib.java.time.TimeZone;
 
 public class SqlTimeDeserializer extends TemporalDeserializer<Timestamp>
 {
@@ -12,14 +13,14 @@ public class SqlTimeDeserializer extends TemporalDeserializer<Timestamp>
 	}
 	
 	@Override
-	public Timestamp deserialize(String value, String timeFormat)
+	public Timestamp deserialize(String value, TimeZone timeZone, String timeFormat)
 	{
 		Timestamp timestamp = null;
 		try
 		{
 			if(timeFormat != null && !timeFormat.isEmpty() && !"timestamp".equalsIgnoreCase(timeFormat))
 			{
-				timestamp = new Timestamp(new SimpleDateFormat(timeFormat).parse(value).getTime());
+				timestamp = new Timestamp(timeZone.getFormatter(timeFormat).parse(value).getTime());
 			}
 			else
 			{

@@ -10,7 +10,7 @@ public class BooleanDeserializer extends PrimitiveDeserializer<Boolean>
 	}
 	
 	@Override
-	public Boolean deserialize(String value, String timeFormat)
+	public Boolean deserialize(String value)
 	{
 		Boolean object = isNullable() ? null : false;
 		try
@@ -33,7 +33,7 @@ public class BooleanDeserializer extends PrimitiveDeserializer<Boolean>
 	
 	public static void main(String[] args)
 	{
-		System.out.println(new BooleanDeserializer(true).deserialize("null", null));
+		System.out.println(new BooleanDeserializer(true).deserialize("null"));
 	}
 	
 }

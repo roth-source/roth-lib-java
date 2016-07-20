@@ -21,6 +21,7 @@ import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertiesReflector;
 import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.serializer.Serializer;
+import roth.lib.java.time.TimeZone;
 import roth.lib.java.util.ReflectionUtil;
 
 public class JsonMapper extends Mapper
@@ -206,9 +207,10 @@ public class JsonMapper extends Mapper
 				Serializer<?> serializer = getSerializer(value.getClass(), propertyReflector);
 				if(serializer != null)
 				{
+					TimeZone timeZone = getTimeZone(propertyReflector);
 					String timeFormat = getTimeFormat(propertyReflector);
-					boolean escapable = serializer.isEscapable(value, timeFormat);
-					String serializedValue = serializer.serialize(value, timeFormat);
+					boolean escapable = serializer.isEscapable(value, timeZone, timeFormat);
+					String serializedValue = serializer.serialize(value, timeZone, timeFormat);
 					if(serializedValue != null)
 					{
 						seperator = writeSeperator(writer, seperator);
@@ -309,9 +311,10 @@ public class JsonMapper extends Mapper
 					Serializer<?> serializer = getSerializer(value.getClass(), propertyReflector);
 					if(serializer != null)
 					{
+						TimeZone timeZone = getTimeZone(propertyReflector);
 						String timeFormat = getTimeFormat(propertyReflector);
-						boolean escapable = serializer.isEscapable(value, timeFormat);
-						String serializedValue = serializer.serialize(value, timeFormat);
+						boolean escapable = serializer.isEscapable(value, timeZone, timeFormat);
+						String serializedValue = serializer.serialize(value, timeZone, timeFormat);
 						if(serializedValue != null)
 						{
 							incrementTabs();
@@ -353,8 +356,9 @@ public class JsonMapper extends Mapper
 				Serializer<?> serializer = getSerializer(key.getClass(), propertyReflector);
 				if(serializer != null)
 				{
+					TimeZone timeZone = getTimeZone(propertyReflector);
 					String timeFormat = getTimeFormat(propertyReflector);
-					name = serializer.serialize(key, timeFormat);
+					name = serializer.serialize(key, timeZone, timeFormat);
 				}
 			}
 			if(name != null)
@@ -541,9 +545,10 @@ public class JsonMapper extends Mapper
 							Deserializer<?> deserializer = getDeserializer(fieldClass, propertyReflector);
 							if(deserializer != null)
 							{
+								TimeZone timeZone = getTimeZone(propertyReflector);
 								String timeFormat = getTimeFormat(propertyReflector);
 								value = propertyReflector.filter(value, getMapperType());
-								ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeFormat, fieldClass));
+								ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeZone, timeFormat, fieldClass));
 								setDeserializedName(model, propertyReflector.getFieldName());
 							}
 						}
@@ -598,9 +603,10 @@ public class JsonMapper extends Mapper
 								Deserializer<?> deserializer = getDeserializer(fieldClass, propertyReflector);
 								if(deserializer != null)
 								{
+									TimeZone timeZone = getTimeZone(propertyReflector);
 									String timeFormat = getTimeFormat(propertyReflector);
 									value = propertyReflector.filter(value, getMapperType());
-									ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeFormat, fieldClass));
+									ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeZone, timeFormat, fieldClass));
 									setDeserializedName(model, propertyReflector.getFieldName());
 								}
 							}
@@ -754,7 +760,7 @@ public class JsonMapper extends Mapper
 						Deserializer<?> deserializer = getDeserializer(keyClass, propertyReflector);
 						if(deserializer != null)
 						{
-							key = (K) deserializer.deserialize(name, null);
+							key = (K) deserializer.deserialize(name, getTimeZone(propertyReflector), null);
 						}
 					}
 					else
@@ -920,9 +926,10 @@ public class JsonMapper extends Mapper
 						Deserializer<?> deserializer = getDeserializer(elementClass, propertyReflector);
 						if(deserializer != null)
 						{
+							TimeZone timeZone = getTimeZone(propertyReflector);
 							String timeFormat = getTimeFormat(propertyReflector);
 							value = propertyReflector.filter(value, getMapperType());
-							Object object = deserializer.deserialize(value, timeFormat, elementClass);
+							Object object = deserializer.deserialize(value, timeZone, timeFormat, elementClass);
 							if(object != null && elementClass.isAssignableFrom(object.getClass()))
 							{
 								collection.add((E) object);
@@ -957,9 +964,10 @@ public class JsonMapper extends Mapper
 						Deserializer<?> deserializer = getDeserializer(elementClass, propertyReflector);
 						if(deserializer != null)
 						{
+							TimeZone timeZone = getTimeZone(propertyReflector);
 							String timeFormat = getTimeFormat(propertyReflector);
 							value = propertyReflector.filter(value, getMapperType());
-							Object object = deserializer.deserialize(value, timeFormat, elementClass);
+							Object object = deserializer.deserialize(value, timeZone, timeFormat, elementClass);
 							if(object != null && elementClass.isAssignableFrom(object.getClass()))
 							{
 								collection.add((E) object);

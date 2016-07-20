@@ -1,8 +1,9 @@
 package roth.lib.java.deserializer;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import roth.lib.java.time.TimeZone;
 
 public class CalendarDeserializer extends TemporalDeserializer<Calendar>
 {
@@ -13,7 +14,7 @@ public class CalendarDeserializer extends TemporalDeserializer<Calendar>
 	}
 	
 	@Override
-	public GregorianCalendar deserialize(String value, String timeFormat)
+	public GregorianCalendar deserialize(String value, TimeZone timeZone, String timeFormat)
 	{
 		GregorianCalendar calendar = null;
 		try
@@ -21,7 +22,7 @@ public class CalendarDeserializer extends TemporalDeserializer<Calendar>
 			calendar = new GregorianCalendar();
 			if(timeFormat != null && !timeFormat.isEmpty() && !"timestamp".equalsIgnoreCase(timeFormat))
 			{
-				calendar.setTime(new SimpleDateFormat(timeFormat).parse(value));
+				calendar.setTime(timeZone.getFormatter(timeFormat).parse(value));
 			}
 			else
 			{

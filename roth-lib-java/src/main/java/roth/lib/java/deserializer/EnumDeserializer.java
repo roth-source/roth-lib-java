@@ -1,5 +1,6 @@
 package roth.lib.java.deserializer;
 
+import roth.lib.java.time.TimeZone;
 import roth.lib.java.util.EnumUtil;
 
 public class EnumDeserializer extends Deserializer<Enum<?>>
@@ -12,15 +13,9 @@ public class EnumDeserializer extends Deserializer<Enum<?>>
 	
 	@Override
 	@SuppressWarnings("unchecked")
-	public Enum<?> deserialize(String value, String timeFormat, Class<?> klass)
+	public Enum<?> deserialize(String value, TimeZone timeZone, String timeFormat, Class<?> klass)
 	{
 		return EnumUtil.fromString(value, (Class<Enum<?>>) klass);
-	}
-	
-	@Override
-	public Enum<?> deserialize(String value, String timeFormat)
-	{
-		return null;
 	}
 	
 }
