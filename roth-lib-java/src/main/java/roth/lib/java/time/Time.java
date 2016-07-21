@@ -470,7 +470,7 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 	
 	public boolean isHoliday()
 	{
-		return HOLIDAYS.contains(toDay());
+		return HOLIDAYS.contains(clone().toDay());
 	}
 	
 	public boolean isWeekendOrHoliday()
