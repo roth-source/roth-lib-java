@@ -430,11 +430,42 @@ public class List<E> extends LinkedList<E>
 	}
 
 	@Override
-	public boolean equals(Object o)
+	public boolean equals(Object object)
 	{
-		return super.equals(o);
+		return super.equals(object);
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	public boolean equals(List<E> list)
+	{
+		boolean equals = false;
+		if(list != null)
+		{
+			if(size() == list.size())
+			{
+				List<E> list1 = (List<E>) this.clone();
+				List<E> list2 = (List<E>) list.clone();
+				Iterator<E> iterator = list1.iterator();
+				while(iterator.hasNext())
+				{
+					E element = iterator.next();
+					int index = list2.indexOf(element);
+					if(index > -1)
+					{
+						iterator.remove();
+						list2.remove(index);
+					}
+					else
+					{
+						break;
+					}
+				}
+				equals = list1.isEmpty() && list2.isEmpty();
+			}
+		}
+		return equals;
+	}
+	
 	@Override
 	public int hashCode()
 	{
@@ -507,15 +538,4 @@ public class List<E> extends LinkedList<E>
 		return new List<E>(array);
 	}
 	
-	/*
-	public static void main(String[] args)
-	{
-		int sections = 2;
-		List<Integer> list = new List<>(1, 2, 3, 4, 5, 6, 7);
-		for(int i = 0; i < sections; i++)
-		{
-			System.out.println(list.section(i, sections));
-		}
-	}
-	*/
 }
