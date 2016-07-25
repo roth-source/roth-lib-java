@@ -62,28 +62,4 @@ public class Text implements Serializable, Cloneable
 		return this;
 	}
 	
-	@Override
-	@SuppressWarnings("unchecked")
-	protected Text clone()
-	{
-		Text text = new Text();
-		if(type != null)
-		{
-			text.type = (TreeMap<String, TreeMap<String, Object>>) type.clone();
-		}
-		if(layout != null)
-		{
-			text.layout = (TreeMap<String, TreeMap<String, Object>>) layout.clone();
-		}
-		if(page != null)
-		{
-			text.page = (TreeMap<String, TreeMap<String, Object>>) page.clone();
-		}
-		if(component != null)
-		{
-			text.component = (TreeMap<String, TreeMap<String, Object>>) component.clone();
-		}
-		return text;
-	}
-	
 }
