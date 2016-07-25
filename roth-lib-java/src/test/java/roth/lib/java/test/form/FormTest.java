@@ -53,7 +53,7 @@ public class FormTest
 	protected static void deserializeMap()
 	{
 		String data = "test_boolean=true&test_byte=123&test_short=12345&test_integer=12345678&test_long=123456789&test_float=1.2345679&test_double=1.2345679&test_character=a&test_string=test&test_date=2015-01-12+14%3A05%3A01&test_calendar=2015-01-12+14%3A05%3A01";
-		Map<String, Object> map = new FormMapper(mapperConfig).setPrettyPrint(true).deserialize(data);
+		java.util.Map<String, Object> map = new FormMapper(mapperConfig).setPrettyPrint(true).deserialize(data);
 		System.out.println(map);
 	}
 	

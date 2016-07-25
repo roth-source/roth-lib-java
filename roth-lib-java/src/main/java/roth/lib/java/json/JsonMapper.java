@@ -713,7 +713,7 @@ public class JsonMapper extends Mapper
 	@SuppressWarnings("unchecked")
 	protected <T, K, E> T readMap(Reader reader, Type type, PropertyReflector propertyReflector) throws Exception
 	{
-		Map<K, E> map = null;
+		java.util.Map<K, E> map = null;
 		Class<T> klass = ReflectionUtil.getTypeClass(type);
 		Type keyType = ReflectionUtil.getKeyType(type);
 		Class<K> keyClass = ReflectionUtil.getTypeClass(keyType);
@@ -730,7 +730,7 @@ public class JsonMapper extends Mapper
 		{
 			Constructor<T> constructor = klass.getDeclaredConstructor();
 			constructor.setAccessible(true);
-			map = (Map<K, E>) constructor.newInstance();
+			map = (java.util.Map<K, E>) constructor.newInstance();
 		}
 		int b;
 		char c;

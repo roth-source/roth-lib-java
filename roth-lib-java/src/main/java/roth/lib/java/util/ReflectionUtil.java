@@ -177,7 +177,7 @@ public class ReflectionUtil
 	public static boolean isMap(Type type)
 	{
 		Class<?> klass = getTypeClass(type);
-		return Map.class.isAssignableFrom(klass);
+		return java.util.Map.class.isAssignableFrom(klass);
 	}
 	
 	public static Type getKeyType(Type type)
@@ -217,15 +217,14 @@ public class ReflectionUtil
 		return elementType;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static List<?> asCollection(Object value)
 	{
-		return (value instanceof Collection) ? new List<Object>().collection((Collection<Object>) value) : new List<Object>((Object[]) value);
+		return (value instanceof Collection) ? new List<Object>().collection((Collection<?>) value) : new List<Object>((Object[]) value);
 	}
 	
 	public static Map<?, ?> asMap(Object value)
 	{
-		return (value instanceof Map) ? new Map<Object, Object>((Map<?, ?>) value) : new Map<Object, Object>();
+		return (value instanceof java.util.Map) ? new Map<Object, Object>((java.util.Map<?, ?>) value) : new Map<Object, Object>();
 	}
 	
 	public static <T extends Annotation> boolean hasAnnotation(Class<?> klass, Method method, Class<T> annotationClass)
