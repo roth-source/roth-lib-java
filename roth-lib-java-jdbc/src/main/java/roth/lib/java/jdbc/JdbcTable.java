@@ -442,7 +442,7 @@ public abstract class JdbcTable<T> implements SqlFactory
 	{
 		List<Class<?>> filterClasses = new List<>();
 		Class<?> superClass = _class.getSuperclass();
-		if(superClass != null && !JdbcModel.class.equals(superClass))
+		if(superClass != null)
 		{
 			filterClasses.addAll(getFilterClasses(superClass));
 		}
