@@ -1,5 +1,7 @@
 package roth.lib.java.jdbc;
 
+import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Collection;
 
@@ -19,11 +21,22 @@ import roth.lib.java.lang.Map;
 
 public abstract class JdbcTable<T> implements SqlFactory
 {
+	protected static final String COUNT_AGGREGATE = "count(*)";
+	protected static final String COUNT_ALIAS = "count";
+	protected static final String FILTER_METHOD = "filter";
+	
 	protected Class<T> klass;
+	protected Object request;
 	
 	protected JdbcTable(Class<T> klass)
 	{
 		this.klass = klass;
+	}
+	
+	protected JdbcTable(Class<T> klass, Object request)
+	{
+		this.klass = klass;
+		this.request = request;
 	}
 	
 	public abstract Jdbc getDb();
@@ -145,7 +158,7 @@ public abstract class JdbcTable<T> implements SqlFactory
 	
 	public <C> C findBy(Select select, Class<C> klass)
 	{
-		return getDb().query(select, klass);
+		return getDb().query(filter(select), klass);
 	}
 	
 	public <C> C findBy(String sql, Class<C> klass)
@@ -240,7 +253,7 @@ public abstract class JdbcTable<T> implements SqlFactory
 	
 	public <C> List<C> findAllBy(Select select, Class<C> klass)
 	{
-		return getDb().queryAll(select, klass);
+		return getDb().queryAll(filter(select), klass);
 	}
 	
 	public <C> List<C> findAllBy(String sql, Class<C> klass)
@@ -280,7 +293,7 @@ public abstract class JdbcTable<T> implements SqlFactory
 	
 	public <C> void callback(Select select, Callback<C> callback, Class<C> klass)
 	{
-		getDb().queryAll(select, callback.setKlass(klass));
+		getDb().queryAll(filter(select), callback.setKlass(klass));
 	}
 	
 	public <C> void callback(String sql, Callback<C> callback, Class<C> klass)
@@ -391,14 +404,78 @@ public abstract class JdbcTable<T> implements SqlFactory
 	public int count(Select select)
 	{
 		int count = 0;
-		select.columns(newColumns().addColumns(newColumn().setSql("count(*)").setAlias("count")));
-		Map<String, Object> results = getDb().query(select);
-		Object object = results.get("count");
+		select.columns(newColumns().addColumns(newColumn().setSql(COUNT_AGGREGATE).setAlias(COUNT_ALIAS)));
+		Map<String, Object> results = getDb().query(filter(select));
+		Object object = results.get(COUNT_ALIAS);
 		if(object instanceof Number)
 		{
 			count = ((Number) object).intValue();
 		}
 		return count;
+	}
+	
+	protected Select filter(Select select)
+	{
+		if(request != null)
+		{
+			for(Class<?> filterClass : getFilterClasses(request.getClass()))
+			{
+				Method filterMethod = getFilterMethod(getClass(), filterClass);
+				if(filterMethod != null)
+				{
+					try
+					{
+						filterMethod.setAccessible(true);
+						filterMethod.invoke(this, select, filterClass.cast(request));
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return select;
+	}
+	
+	protected List<Class<?>> getFilterClasses(Class<?> _class)
+	{
+		List<Class<?>> filterClasses = new List<>();
+		Class<?> superClass = _class.getSuperclass();
+		if(superClass != null && !JdbcModel.class.equals(superClass))
+		{
+			filterClasses.addAll(getFilterClasses(superClass));
+		}
+		for(Class<?> filterClass : _class.getInterfaces())
+		{
+			if(!Serializable.class.equals(filterClass))
+			{
+				filterClasses.add(filterClass);
+			}
+		}
+		return filterClasses;
+	}
+	
+	protected Method getFilterMethod(Class<?> _class, Class<?> filterClass)
+	{
+		Method filterMethod = null;
+		try
+		{
+			filterMethod = _class.getDeclaredMethod(FILTER_METHOD, Select.class, filterClass);
+		}
+		catch(Exception e)
+		{
+			
+		}
+		if(filterMethod == null)
+		{
+			Class<?> superClass = _class.getSuperclass();
+			if(superClass != null && !JdbcTable.class.equals(superClass))
+			{
+				filterMethod = getFilterMethod(superClass, filterClass);
+			}
+		}
+		return filterMethod;
 	}
 	
 }
