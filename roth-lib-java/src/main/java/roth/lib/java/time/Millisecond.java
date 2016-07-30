@@ -70,18 +70,70 @@ public class Millisecond extends Time
 		super(calendar);
 	}
 	
+	@Override
+	public Millisecond setYear(int year)
+	{
+		super.setYear(year);
+		return this;
+	}
+	
+	@Override
+	public Millisecond setMonth(int month)
+	{
+		super.setMonth(month);
+		return this;
+	}
+	
+	@Override
+	public Millisecond setDay(int day)
+	{
+		super.setDay(day);
+		return this;
+	}
+	
+	@Override
+	public Millisecond setHour(int hour)
+	{
+		super.setHour(hour);
+		return this;
+	}
+	
+	@Override
+	public Millisecond setMinute(int minute)
+	{
+		super.setMinute(minute);
+		return this;
+	}
+	
+	@Override
+	public Millisecond setSecond(int second)
+	{
+		super.setSecond(second);
+		return this;
+	}
+	
+	@Override
+	public Millisecond setMillisecond(int millisecond)
+	{
+		super.setMillisecond(millisecond);
+		return this;
+	}
+	
+	@Override
 	public Millisecond addYears(int years)
 	{
 		super.addYears(years);
 		return this;
 	}
 	
+	@Override
 	public Millisecond subtractYears(int years)
 	{
 		super.subtractYears(years);
 		return this;
 	}
 	
+	@Override
 	public Millisecond addMonths(int months)
 	{
 		super.addMonths(months);
@@ -94,60 +146,70 @@ public class Millisecond extends Time
 		return this;
 	}
 	
+	@Override
 	public Millisecond addDays(int days)
 	{
 		super.addDays(days);
 		return this;
 	}
 	
+	@Override
 	public Millisecond subtractDays(int days)
 	{
 		super.subtractDays(days);
 		return this;
 	}
 	
+	@Override
 	public Millisecond addHours(int hours)
 	{
 		super.addHours(hours);
 		return this;
 	}
 	
+	@Override
 	public Millisecond subtractHours(int hours)
 	{
 		super.subtractHours(hours);
 		return this;
 	}
 	
+	@Override
 	public Millisecond addMinutes(int minutes)
 	{
 		super.addMinutes(minutes);
 		return this;
 	}
 	
+	@Override
 	public Millisecond subtractMinutes(int minutes)
 	{
 		super.subtractMinutes(minutes);
 		return this;
 	}
 	
+	@Override
 	public Millisecond addSeconds(int seconds)
 	{
 		super.addSeconds(seconds);
 		return this;
 	}
 	
+	@Override
 	public Millisecond subtractSeconds(int seconds)
 	{
 		super.subtractSeconds(seconds);
 		return this;
 	}
 	
+	@Override
 	public Millisecond addMilliseconds(int milliseconds)
 	{
 		super.addMilliseconds(milliseconds);
 		return this;
 	}
 	
+	@Override
 	public Millisecond subtractMilliseconds(int milliseconds)
 	{
 		super.subtractMilliseconds(milliseconds);

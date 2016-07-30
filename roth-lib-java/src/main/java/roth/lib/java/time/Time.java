@@ -462,6 +462,16 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 		return (pattern != null || getDefaultPattern() != null) ? timeZone.getFormatter(pattern != null ? pattern : getDefaultPattern()).format(toDate()) : String.valueOf(toTimestamp());
 	}
 	
+	public boolean isToday()
+	{
+		return isSameDay(new Day());
+	}
+	
+	public boolean isSameDay(Day day)
+	{
+		return clone().toDay().equals(day);
+	}
+	
 	public boolean isWeekend()
 	{
 		int dayOfWeek = toCalendar().get(Calendar.DAY_OF_WEEK);

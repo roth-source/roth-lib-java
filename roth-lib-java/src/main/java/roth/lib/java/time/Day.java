@@ -54,84 +54,147 @@ public class Day extends Time
 		setMillisecond(0);
 	}
 	
+	@Override
+	public Day setYear(int year)
+	{
+		super.setYear(year);
+		return this;
+	}
+	
+	@Override
+	public Day setMonth(int month)
+	{
+		super.setMonth(month);
+		return this;
+	}
+	
+	@Override
+	public Day setDay(int day)
+	{
+		super.setDay(day);
+		return this;
+	}
+	
+	@Override
+	public Day setHour(int hour)
+	{
+		super.setHour(hour);
+		return this;
+	}
+	
+	@Override
+	public Day setMinute(int minute)
+	{
+		super.setMinute(minute);
+		return this;
+	}
+	
+	@Override
+	public Day setSecond(int second)
+	{
+		super.setSecond(second);
+		return this;
+	}
+	
+	@Override
+	public Day setMillisecond(int millisecond)
+	{
+		super.setMillisecond(millisecond);
+		return this;
+	}
+	
+	@Override
 	public Day addYears(int years)
 	{
 		super.addYears(years);
 		return this;
 	}
 	
+	@Override
 	public Day subtractYears(int years)
 	{
 		super.subtractYears(years);
 		return this;
 	}
 	
+	@Override
 	public Day addMonths(int months)
 	{
 		super.addMonths(months);
 		return this;
 	}
 	
+	@Override
 	public Day subtractMonths(int months)
 	{
 		super.subtractMonths(months);
 		return this;
 	}
 	
+	@Override
 	public Day addDays(int days)
 	{
 		super.addDays(days);
 		return this;
 	}
 	
+	@Override
 	public Day subtractDays(int days)
 	{
 		super.subtractDays(days);
 		return this;
 	}
 	
+	@Override
 	public Day addHours(int hours)
 	{
 		super.addHours(hours);
 		return this;
 	}
 	
+	@Override
 	public Day subtractHours(int hours)
 	{
 		super.subtractHours(hours);
 		return this;
 	}
 	
+	@Override
 	public Day addMinutes(int minutes)
 	{
 		super.addMinutes(minutes);
 		return this;
 	}
 	
+	@Override
 	public Day subtractMinutes(int minutes)
 	{
 		super.subtractMinutes(minutes);
 		return this;
 	}
 	
+	@Override
 	public Day addSeconds(int seconds)
 	{
 		super.addSeconds(seconds);
 		return this;
 	}
 	
+	@Override
 	public Day subtractSeconds(int seconds)
 	{
 		super.subtractSeconds(seconds);
 		return this;
 	}
 	
+	@Override
 	public Day addMilliseconds(int milliseconds)
 	{
 		super.addMilliseconds(milliseconds);
 		return this;
 	}
 	
+	@Override
 	public Day subtractMilliseconds(int milliseconds)
 	{
 		super.subtractMilliseconds(milliseconds);

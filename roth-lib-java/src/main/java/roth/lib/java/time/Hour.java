@@ -47,84 +47,147 @@ public class Hour extends Time
 		setMillisecond(0);
 	}
 	
+	@Override
+	public Hour setYear(int year)
+	{
+		super.setYear(year);
+		return this;
+	}
+	
+	@Override
+	public Hour setMonth(int month)
+	{
+		super.setMonth(month);
+		return this;
+	}
+	
+	@Override
+	public Hour setDay(int day)
+	{
+		super.setDay(day);
+		return this;
+	}
+	
+	@Override
+	public Hour setHour(int hour)
+	{
+		super.setHour(hour);
+		return this;
+	}
+	
+	@Override
+	public Hour setMinute(int minute)
+	{
+		super.setMinute(minute);
+		return this;
+	}
+	
+	@Override
+	public Hour setSecond(int second)
+	{
+		super.setSecond(second);
+		return this;
+	}
+	
+	@Override
+	public Hour setMillisecond(int millisecond)
+	{
+		super.setMillisecond(millisecond);
+		return this;
+	}
+	
+	@Override
 	public Hour addYears(int years)
 	{
 		super.addYears(years);
 		return this;
 	}
 	
+	@Override
 	public Hour subtractYears(int years)
 	{
 		super.subtractYears(years);
 		return this;
 	}
 	
+	@Override
 	public Hour addMonths(int months)
 	{
 		super.addMonths(months);
 		return this;
 	}
 	
+	@Override
 	public Hour subtractMonths(int months)
 	{
 		super.subtractMonths(months);
 		return this;
 	}
 	
+	@Override
 	public Hour addDays(int days)
 	{
 		super.addDays(days);
 		return this;
 	}
 	
+	@Override
 	public Hour subtractDays(int days)
 	{
 		super.subtractDays(days);
 		return this;
 	}
 	
+	@Override
 	public Hour addHours(int hours)
 	{
 		super.addHours(hours);
 		return this;
 	}
 	
+	@Override
 	public Hour subtractHours(int hours)
 	{
 		super.subtractHours(hours);
 		return this;
 	}
 	
+	@Override
 	public Hour addMinutes(int minutes)
 	{
 		super.addMinutes(minutes);
 		return this;
 	}
 	
+	@Override
 	public Hour subtractMinutes(int minutes)
 	{
 		super.subtractMinutes(minutes);
 		return this;
 	}
 	
+	@Override
 	public Hour addSeconds(int seconds)
 	{
 		super.addSeconds(seconds);
 		return this;
 	}
 	
+	@Override
 	public Hour subtractSeconds(int seconds)
 	{
 		super.subtractSeconds(seconds);
 		return this;
 	}
 	
+	@Override
 	public Hour addMilliseconds(int milliseconds)
 	{
 		super.addMilliseconds(milliseconds);
 		return this;
 	}
 	
+	@Override
 	public Hour subtractMilliseconds(int milliseconds)
 	{
 		super.subtractMilliseconds(milliseconds);
