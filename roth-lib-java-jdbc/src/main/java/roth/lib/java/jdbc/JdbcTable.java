@@ -1,6 +1,6 @@
 package roth.lib.java.jdbc;
 
-import java.io.Serializable;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -138,7 +138,12 @@ public abstract class JdbcTable<T> implements SqlFactory
 	
 	public T findBy(Select select)
 	{
-		return findBy(select, klass);
+		return findBy(select, (List<Class<?>>) null);
+	}
+	
+	public T findBy(Select select, List<Class<?>> filterInterfaces)
+	{
+		return findBy(select, klass, filterInterfaces);
 	}
 	
 	public T findBy(String sql)
@@ -158,7 +163,12 @@ public abstract class JdbcTable<T> implements SqlFactory
 	
 	public <C> C findBy(Select select, Class<C> klass)
 	{
-		return getDb().query(filter(select), klass);
+		return findBy(select, klass, (List<Class<?>>) null);
+	}
+	
+	public <C> C findBy(Select select, Class<C> klass, List<Class<?>> filterInterfaces)
+	{
+		return getDb().query(filter(select, filterInterfaces), klass);
 	}
 	
 	public <C> C findBy(String sql, Class<C> klass)
@@ -233,7 +243,12 @@ public abstract class JdbcTable<T> implements SqlFactory
 	
 	public List<T> findAllBy(Select select)
 	{
-		return findAllBy(select, klass);
+		return findAllBy(select, (List<Class<?>>) null);
+	}
+	
+	public List<T> findAllBy(Select select, List<Class<?>> filterInterfaces)
+	{
+		return findAllBy(select, klass, filterInterfaces);
 	}
 	
 	public List<T> findAllBy(String sql)
@@ -253,7 +268,12 @@ public abstract class JdbcTable<T> implements SqlFactory
 	
 	public <C> List<C> findAllBy(Select select, Class<C> klass)
 	{
-		return getDb().queryAll(filter(select), klass);
+		return findAllBy(select, klass, (List<Class<?>>) null);
+	}
+	
+	public <C> List<C> findAllBy(Select select, Class<C> klass, List<Class<?>> filterInterfaces)
+	{
+		return getDb().queryAll(filter(select, filterInterfaces), klass);
 	}
 	
 	public <C> List<C> findAllBy(String sql, Class<C> klass)
@@ -273,7 +293,12 @@ public abstract class JdbcTable<T> implements SqlFactory
 	
 	public void callback(Select select, Callback<T> callback)
 	{
-		callback(select, callback.setKlass(klass));
+		callback(select, callback, (List<Class<?>>) null);
+	}
+	
+	public void callback(Select select, Callback<T> callback, List<Class<?>> filterInterfaces)
+	{
+		callback(select, callback.setKlass(klass), filterInterfaces);
 	}
 	
 	public void callback(String sql, Callback<T> callback)
@@ -293,7 +318,12 @@ public abstract class JdbcTable<T> implements SqlFactory
 	
 	public <C> void callback(Select select, Callback<C> callback, Class<C> klass)
 	{
-		getDb().queryAll(filter(select), callback.setKlass(klass));
+		callback(select, callback, klass, (List<Class<?>>) null);
+	}
+	
+	public <C> void callback(Select select, Callback<C> callback, Class<C> klass, List<Class<?>> filterInterfaces)
+	{
+		getDb().queryAll(filter(select, filterInterfaces), callback.setKlass(klass));
 	}
 	
 	public <C> void callback(String sql, Callback<C> callback, Class<C> klass)
@@ -403,9 +433,14 @@ public abstract class JdbcTable<T> implements SqlFactory
 	
 	public int count(Select select)
 	{
+		return count(select, (List<Class<?>>) null);
+	}
+	
+	public int count(Select select, List<Class<?>> filterInterfaces)
+	{
 		int count = 0;
 		select.columns(newColumns().addColumns(newColumn().setSql(COUNT_AGGREGATE).setAlias(COUNT_ALIAS)));
-		Map<String, Object> results = getDb().query(filter(select));
+		Map<String, Object> results = getDb().query(filter(select, filterInterfaces));
 		Object object = results.get(COUNT_ALIAS);
 		if(object instanceof Number)
 		{
@@ -414,46 +449,43 @@ public abstract class JdbcTable<T> implements SqlFactory
 		return count;
 	}
 	
-	protected Select filter(Select select)
+	protected Select filter(Select select, List<Class<?>> filterInterfaces)
 	{
-		if(request != null)
+		if(request != null && filterInterfaces != null)
 		{
-			for(Class<?> filterClass : getFilterClasses(request.getClass()))
+			boolean first = true;
+			PrintWriter writer = getDb().getLogWriter();
+			for(Class<?> filterInterface : filterInterfaces)
 			{
-				Method filterMethod = getFilterMethod(getClass(), filterClass);
-				if(filterMethod != null)
+				if(filterInterface.isAssignableFrom(request.getClass()))
 				{
-					try
+					Method filterMethod = getFilterMethod(getClass(), filterInterface);
+					if(filterMethod != null)
 					{
-						filterMethod.setAccessible(true);
-						filterMethod.invoke(this, select, filterClass.cast(request));
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
+						try
+						{
+							filterMethod.setAccessible(true);
+							filterMethod.invoke(this, select, filterInterface.cast(request));
+							if(writer != null)
+							{
+								if(first)
+								{
+									writer.println();
+									writer.println("FILTERS");
+									first = false;
+								}
+								writer.println("- " + filterInterface.getSimpleName());
+							}
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
 					}
 				}
 			}
 		}
 		return select;
-	}
-	
-	protected List<Class<?>> getFilterClasses(Class<?> _class)
-	{
-		List<Class<?>> filterClasses = new List<>();
-		Class<?> superClass = _class.getSuperclass();
-		if(superClass != null)
-		{
-			filterClasses.addAll(getFilterClasses(superClass));
-		}
-		for(Class<?> filterClass : _class.getInterfaces())
-		{
-			if(!Serializable.class.equals(filterClass))
-			{
-				filterClasses.add(filterClass);
-			}
-		}
-		return filterClasses;
 	}
 	
 	protected Method getFilterMethod(Class<?> _class, Class<?> filterClass)
