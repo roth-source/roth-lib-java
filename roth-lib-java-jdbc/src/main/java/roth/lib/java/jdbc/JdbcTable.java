@@ -451,38 +451,49 @@ public abstract class JdbcTable<T> implements SqlFactory
 	
 	protected Select filter(Select select, List<Class<?>> filterInterfaces)
 	{
-		if(request != null && filterInterfaces != null)
+		if(filterInterfaces != null && !filterInterfaces.isEmpty())
 		{
-			boolean first = true;
-			PrintWriter writer = getDb().getLogWriter();
-			for(Class<?> filterInterface : filterInterfaces)
+			if(request != null)
 			{
-				if(filterInterface.isAssignableFrom(request.getClass()))
+				int applied = 0;
+				PrintWriter writer = getDb().getLogWriter();
+				for(Class<?> filterInterface : filterInterfaces)
 				{
-					Method filterMethod = getFilterMethod(getClass(), filterInterface);
-					if(filterMethod != null)
+					if(filterInterface.isAssignableFrom(request.getClass()))
 					{
-						try
+						Method filterMethod = getFilterMethod(getClass(), filterInterface);
+						if(filterMethod != null)
 						{
-							filterMethod.setAccessible(true);
-							filterMethod.invoke(this, select, filterInterface.cast(request));
-							if(writer != null)
+							try
 							{
-								if(first)
+								filterMethod.setAccessible(true);
+								filterMethod.invoke(this, select, filterInterface.cast(request));
+								if(writer != null)
 								{
-									writer.println();
-									writer.println("FILTERS");
-									first = false;
+									if(applied == 0)
+									{
+										writer.println();
+										writer.println("FILTERS");
+										applied++;
+									}
+									writer.println("- " + filterInterface.getSimpleName());
 								}
-								writer.println("- " + filterInterface.getSimpleName());
 							}
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
+							catch(Exception e)
+							{
+								e.printStackTrace();
+							}
 						}
 					}
 				}
+				if(applied == 0)
+				{
+					throw new JdbcException("No filters applied");
+				}
+			}
+			else
+			{
+				throw new JdbcException("Request object not set");
 			}
 		}
 		return select;
