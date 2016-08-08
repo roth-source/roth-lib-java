@@ -52,33 +52,43 @@ public abstract class JdbcModel extends Model implements SqlFactory
 	{
 		state = State.DELETED;
 	}
-	
-	public void preInsert(JdbcConnection connection)
+
+	public void preSave(JdbcConnection connection) throws SQLException
 	{
 		// override to implement
 	}
 	
-	public void postInsert(JdbcConnection connection, int result)
+	public void postSave(JdbcConnection connection, int result) throws SQLException
 	{
 		// override to implement
 	}
 	
-	public void preUpdate(JdbcConnection connection)
+	public void preInsert(JdbcConnection connection) throws SQLException
 	{
 		// override to implement
 	}
 	
-	public void postUpdate(JdbcConnection connection, int result)
+	public void postInsert(JdbcConnection connection, int result) throws SQLException
 	{
 		// override to implement
 	}
 	
-	public void preDelete(JdbcConnection connection)
+	public void preUpdate(JdbcConnection connection) throws SQLException
 	{
 		// override to implement
 	}
 	
-	public void postDelete(JdbcConnection connection, int result)
+	public void postUpdate(JdbcConnection connection, int result) throws SQLException
+	{
+		// override to implement
+	}
+	
+	public void preDelete(JdbcConnection connection) throws SQLException
+	{
+		// override to implement
+	}
+	
+	public void postDelete(JdbcConnection connection, int result) throws SQLException
 	{
 		// override to implement
 	}
@@ -133,8 +143,11 @@ public abstract class JdbcModel extends Model implements SqlFactory
 	{
 		if(isNew())
 		{
+			preSave(connection);
 			preInsert(connection);
-			postInsert(connection, getDb().executeInsert(this, connection));
+			int result = getDb().executeInsert(this, connection);
+			postInsert(connection, result);
+			postSave(connection, result);
 		}
 		return (T) this;
 	}
@@ -169,8 +182,11 @@ public abstract class JdbcModel extends Model implements SqlFactory
 	{
 		if(isPersisted() && isDirty())
 		{
+			preSave(connection);
 			preUpdate(connection);
-			postUpdate(connection, getDb().executeUpdate(this, connection));
+			int result = getDb().executeUpdate(this, connection);
+			postUpdate(connection, result);
+			postSave(connection, result);
 		}
 		return (T) this;
 	}
