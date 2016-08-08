@@ -53,32 +53,32 @@ public abstract class JdbcModel extends Model implements SqlFactory
 		state = State.DELETED;
 	}
 	
-	public void preInsert()
+	public void preInsert(JdbcConnection connection)
 	{
 		// override to implement
 	}
 	
-	public void postInsert(int result)
+	public void postInsert(JdbcConnection connection, int result)
 	{
 		// override to implement
 	}
 	
-	public void preUpdate()
+	public void preUpdate(JdbcConnection connection)
 	{
 		// override to implement
 	}
 	
-	public void postUpdate(int result)
+	public void postUpdate(JdbcConnection connection, int result)
 	{
 		// override to implement
 	}
 	
-	public void preDelete()
+	public void preDelete(JdbcConnection connection)
 	{
 		// override to implement
 	}
 	
-	public void postDelete(int result)
+	public void postDelete(JdbcConnection connection, int result)
 	{
 		// override to implement
 	}
@@ -107,8 +107,24 @@ public abstract class JdbcModel extends Model implements SqlFactory
 	{
 		if(isNew())
 		{
-			preInsert();
-			postInsert(getDb().executeInsert(this));
+			try(JdbcConnection connection = getDb().getConnection())
+			{
+				try
+				{
+					insert(connection);
+					connection.commit();
+				}
+				catch(SQLException e)
+				{
+					connection.rollback();
+					connection.close();
+					throw e;
+				}
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
 		}
 		return (T) this;
 	}
@@ -117,8 +133,8 @@ public abstract class JdbcModel extends Model implements SqlFactory
 	{
 		if(isNew())
 		{
-			preInsert();
-			postInsert(getDb().executeInsert(this, connection));
+			preInsert(connection);
+			postInsert(connection, getDb().executeInsert(this, connection));
 		}
 		return (T) this;
 	}
@@ -127,8 +143,24 @@ public abstract class JdbcModel extends Model implements SqlFactory
 	{
 		if(isPersisted() && isDirty())
 		{
-			preUpdate();
-			postUpdate(getDb().executeUpdate(this));
+			try(JdbcConnection connection = getDb().getConnection())
+			{
+				try
+				{
+					update(connection);
+					connection.commit();
+				}
+				catch(SQLException e)
+				{
+					connection.rollback();
+					connection.close();
+					throw e;
+				}
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
 		}
 		return (T) this;
 	}
@@ -137,8 +169,8 @@ public abstract class JdbcModel extends Model implements SqlFactory
 	{
 		if(isPersisted() && isDirty())
 		{
-			preUpdate();
-			postUpdate(getDb().executeUpdate(this, connection));
+			preUpdate(connection);
+			postUpdate(connection, getDb().executeUpdate(this, connection));
 		}
 		return (T) this;
 	}
@@ -147,8 +179,24 @@ public abstract class JdbcModel extends Model implements SqlFactory
 	{
 		if(isPersisted())
 		{
-			preDelete();
-			postDelete(getDb().executeDelete(this));
+			try(JdbcConnection connection = getDb().getConnection())
+			{
+				try
+				{
+					delete(connection);
+					connection.commit();
+				}
+				catch(SQLException e)
+				{
+					connection.rollback();
+					connection.close();
+					throw e;
+				}
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
 		}
 		return (T) this;
 	}
@@ -157,8 +205,8 @@ public abstract class JdbcModel extends Model implements SqlFactory
 	{
 		if(isPersisted())
 		{
-			preDelete();
-			postDelete(getDb().executeDelete(this, connection));
+			preDelete(connection);
+			postDelete(connection, getDb().executeDelete(this, connection));
 		}
 		return (T) this;
 	}
