@@ -26,6 +26,16 @@ public class HttpClient
 			{
 				setSslSocketFactory((HttpsURLConnection) connection);
 			}
+			Integer connectionTimeout = getConnectionTimeout();
+			if(connectionTimeout != null)
+			{
+				connection.setConnectTimeout(connectionTimeout);
+			}
+			Integer readTimeout = getReadTimeout();
+			if(readTimeout != null)
+			{
+				connection.setReadTimeout(readTimeout);
+			}
 			return new HttpConnection(url, (HttpURLConnection) connection, debug);
 		}
 		else
@@ -47,6 +57,16 @@ public class HttpClient
 	public HttpResponse<?> connect(HttpRequest<?> request, boolean debug) throws IOException
 	{
 		return connection(request.getUrl(), debug).connect(request);
+	}
+	
+	public Integer getConnectionTimeout()
+	{
+		return null;
+	}
+	
+	public Integer getReadTimeout()
+	{
+		return null;
 	}
 	
 }
