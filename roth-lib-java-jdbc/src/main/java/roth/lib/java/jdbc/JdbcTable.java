@@ -468,13 +468,13 @@ public abstract class JdbcTable<T> implements SqlFactory
 							{
 								filterMethod.setAccessible(true);
 								filterMethod.invoke(this, select, filterInterface.cast(request));
+								applied++;
 								if(writer != null)
 								{
 									if(applied == 0)
 									{
 										writer.println();
 										writer.println("FILTERS");
-										applied++;
 									}
 									writer.println("- " + filterInterface.getSimpleName());
 								}
