@@ -125,6 +125,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 									if(methodReflector != null)
 									{
 										responseMapper.setContext(methodReflector.getContext());
+										responseMapper.setPrettyPrint(methodReflector.isPrettyPrint());
 										if(methodReflector.isHttpMethodImplemented(httpMethod))
 										{
 											boolean hasAjax = methodReflector.isAjax();

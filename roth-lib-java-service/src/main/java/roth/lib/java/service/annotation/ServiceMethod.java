@@ -20,5 +20,6 @@ public @interface ServiceMethod
 	boolean put() 				default false;
 	boolean delete() 			default false;
 	boolean gzippedInput() 		default false;
+	boolean prettyPrint() 		default false;
 	
 }

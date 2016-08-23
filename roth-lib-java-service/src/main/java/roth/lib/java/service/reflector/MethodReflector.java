@@ -117,6 +117,11 @@ public class MethodReflector
 		return serviceMethod.gzippedInput();
 	}
 	
+	public boolean isPrettyPrint()
+	{
+		return serviceMethod.prettyPrint();
+	}
+	
 	public Method getMethod()
 	{
 		return method;
