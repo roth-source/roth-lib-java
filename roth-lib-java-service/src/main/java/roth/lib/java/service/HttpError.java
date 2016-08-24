@@ -18,6 +18,11 @@ public class HttpError implements Serializable
 	@Property(name = "context")
 	protected String context;
 	
+	public HttpError()
+	{
+		
+	}
+	
 	public HttpError(HttpErrorType type)
 	{
 		this(type.name());
