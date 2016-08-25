@@ -27,14 +27,14 @@ public class HttpUrl implements Characters
 	public static final String NUM_CHARS			= "0-9";
 	public static final String ALPHA_NUM_CHARS		= ALPHA_CHARS + NUM_CHARS;
 	public static final String DOT_DASH_CHARS		= ".\\-";
-	public static final String SPECIAL_CHARS		= DOT_DASH_CHARS + "_~%/";
+	public static final String SPECIAL_CHARS		= DOT_DASH_CHARS + "+_~%/";
 	
 	public static final String PROTOCOL_CHARS		= ALPHA_NUM_CHARS;
 	public static final String HOST_CHARS			= ALPHA_NUM_CHARS + DOT_DASH_CHARS;
 	public static final String PORT_CHARS			= NUM_CHARS;
 	public static final String PATH_CHARS			= ALPHA_NUM_CHARS + SPECIAL_CHARS;
 	public static final String PARAM_CHARS			= ALPHA_NUM_CHARS + SPECIAL_CHARS + "=&";
-	public static final String HASH_CHARS			= ALPHA_NUM_CHARS + SPECIAL_CHARS;
+	public static final String HASH_CHARS			= ALPHA_NUM_CHARS + SPECIAL_CHARS + "=&,:;";
 	public static final String PARAM_NAME_CHARS		= ALPHA_NUM_CHARS + SPECIAL_CHARS;
 	public static final String PARAM_VALUE_CHARS	= ALPHA_NUM_CHARS + SPECIAL_CHARS;
 	
@@ -341,6 +341,13 @@ public class HttpUrl implements Characters
 			builder.append(hash);
 		}
 		return builder.toString();
+	}
+	
+	public static void main(String[] args)
+	{
+		String value = "";
+		HttpUrl url = new HttpUrl(value);
+		System.out.println(url.getHost());
 	}
 	
 }
