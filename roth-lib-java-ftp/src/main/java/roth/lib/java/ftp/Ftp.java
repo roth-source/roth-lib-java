@@ -1,6 +1,7 @@
 package roth.lib.java.ftp;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,7 +15,6 @@ import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
 
 import roth.lib.java.lang.List;
-import roth.lib.java.util.IoUtil;
 
 public class Ftp implements AutoCloseable
 {
@@ -256,7 +256,9 @@ public class Ftp implements AutoCloseable
 		try
 		{
 			connect();
-			return IoUtil.toBytes(client.retrieveFileStream(filename));
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			client.retrieveFile(filename, output);
+			return output.toByteArray();
 		}
 		catch(IOException e)
 		{
