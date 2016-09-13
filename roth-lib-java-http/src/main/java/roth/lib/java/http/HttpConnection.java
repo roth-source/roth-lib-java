@@ -114,7 +114,10 @@ public class HttpConnection implements Characters
 		if(!HttpMethod.GET.equals(request.getMethod()) && request.hasOutputter())
 		{
 			connection.setDoOutput(true);
-			request.getOutputter().output(getOutputStream());
+			try(OutputStream output = getOutputStream())
+			{
+				request.getOutputter().output(output);
+			}
 		}
 		connection.connect();
 		HttpResponse<T> response = new HttpResponse<T>();
@@ -124,19 +127,22 @@ public class HttpConnection implements Characters
 		{
 			if(inputter != null)
 			{
-				if(debug)
+				try(InputStream input = getInputStream())
 				{
-					ByteArrayOutputStream output = readAll(getInputStream());
-					response.setInput(new ByteArrayInputStream(output.toByteArray()));
-					response.setBody(new String(output.toByteArray(), UTF_8));
-					if(inputter != null)
+					if(debug)
 					{
-						response.setEntity(inputter.input(response.getInput()));
+						ByteArrayOutputStream output = readAll(input);
+						response.setInput(new ByteArrayInputStream(output.toByteArray()));
+						response.setBody(new String(output.toByteArray(), UTF_8));
+						if(inputter != null)
+						{
+							response.setEntity(inputter.input(response.getInput()));
+						}
 					}
-				}
-				else
-				{
-					response.setEntity(inputter.input(getInputStream()));
+					else
+					{
+						response.setEntity(inputter.input(input));
+					}
 				}
 			}
 			else
