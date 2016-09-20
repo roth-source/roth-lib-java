@@ -30,6 +30,8 @@ import roth.lib.java.util.ReflectionUtil;
 
 public class TableMapper extends Mapper
 {
+	protected static final String FORMULA_PATTERN = "^([\\=\\+\\-\\@])";
+	protected static final String FORMULA_ESCAPE = "'$1";
 	
 	public TableMapper()
 	{
@@ -150,6 +152,7 @@ public class TableMapper extends Mapper
 		}
 		if(serializedValue != null)
 		{
+			serializedValue = serializedValue.replaceFirst(FORMULA_PATTERN, FORMULA_ESCAPE);
 			if(isEscaped(serializedValue))
 			{
 				writer.write(getMapperConfig().getQualifier());
