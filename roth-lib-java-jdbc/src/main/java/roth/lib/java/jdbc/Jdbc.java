@@ -206,6 +206,10 @@ public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFa
 					throw new SQLException(e);
 				}
 			}
+			if(connection == null)
+			{
+				throw new SQLException(String.format("could not get connection within timeout of %d seconds", loginTimeout));
+			}
 		}
 		return connection;
 	}
