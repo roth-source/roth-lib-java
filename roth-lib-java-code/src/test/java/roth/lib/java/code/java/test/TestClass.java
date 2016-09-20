@@ -25,26 +25,23 @@ package roth.lib.java.code.java.test;
 
 import static java.io.File.separator;
 import static javax.annotation.processing.Completions.of;
-import static roth.lib.java.code.java.JavaTag.WILDCARD;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Serializable;
 import java.util.Arrays;
-import roth.lib.java.lang.Map;
 
 import javax.naming.NamingException;
 
-import javafx.util.converter.CharacterStringConverter;
-import roth.lib.java.code.java.JavaCompilationUnit;
 import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
 
 /**
  * Class comments
  * @author User
  *
  */
-@SuppressWarnings({"serial", "restriction"})
+@SuppressWarnings({"serial"})
 public abstract class TestClass<T extends List<? extends String[]>> extends Object implements Serializable
 {
 	/**
@@ -229,11 +226,11 @@ public abstract class TestClass<T extends List<? extends String[]>> extends Obje
 		{
 			e.printStackTrace();
 		}
-		JavaCompilationUnit unit = new JavaCompilationUnit();
-		unit.getClass();
+		//JavaCompilationUnit unit = new JavaCompilationUnit();
+		//unit.getClass();
 		of("test");
-		WILDCARD.name();
-		new CharacterStringConverter().toString();
+		//WILDCARD.name();
+		//new CharacterStringConverter().toString();
 		
 	}
 	
