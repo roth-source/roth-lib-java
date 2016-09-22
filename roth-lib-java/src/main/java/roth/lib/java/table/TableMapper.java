@@ -1,6 +1,7 @@
 package roth.lib.java.table;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,6 +33,10 @@ public class TableMapper extends Mapper
 {
 	protected static final String FORMULA_PATTERN = "^([\\=\\+\\-\\@])";
 	protected static final String FORMULA_ESCAPE = "'$1";
+	protected static final char BYTE_ORDER_MARK = (char) 0xFEFF;
+	
+	
+	protected List<String> columns = new List<>();
 	
 	public TableMapper()
 	{
@@ -51,6 +56,11 @@ public class TableMapper extends Mapper
 	public TableMapper(MapperReflector mapperReflector, MapperConfig mapperConfig)
 	{
 		super(MapperType.TABLE, mapperReflector, mapperConfig);
+	}
+	
+	public List<String> getColumns()
+	{
+		return columns;
 	}
 	
 	@Override
@@ -221,7 +231,15 @@ public class TableMapper extends Mapper
 		List<T> list = new List<T>();
 		try
 		{
-			if(getMapperConfig().isSerializeHeader())
+			if(!getMapperConfig().isDeserializeColumnOrder())
+			{
+				List<String> missingColumns = missingColumns(reader, klass);
+				if(!missingColumns.isEmpty())
+				{
+					throw new TableException(String.format("Missing columns %s", missingColumns.toString()));
+				}
+			}
+			else if(getMapperConfig().isSerializeHeader())
 			{
 				readUntil(reader, NEW_LINE);
 			}
@@ -230,6 +248,10 @@ public class TableMapper extends Mapper
 			{
 				list.add(entity);
 			}
+		}
+		catch(TableException e)
+		{
+			throw e;
 		}
 		catch(Exception e)
 		{
@@ -245,7 +267,15 @@ public class TableMapper extends Mapper
 		T model = null;
 		try
 		{
-			if(getMapperConfig().isSerializeHeader())
+			if(!getMapperConfig().isDeserializeColumnOrder())
+			{
+				List<String> missingColumns = missingColumns(reader, type);
+				if(!missingColumns.isEmpty())
+				{
+					throw new TableException(String.format("Missing columns %s", missingColumns.toString()));
+				}
+			}
+			else if(getMapperConfig().isSerializeHeader())
 			{
 				readUntil(reader, NEW_LINE);
 			}
@@ -258,11 +288,112 @@ public class TableMapper extends Mapper
 				model = readEntity(reader, type);
 			}
 		}
+		catch(TableException e)
+		{
+			throw e;
+		}
 		catch(Exception e)
 		{
 			throw new TableException(e);
 		}
 		return model;
+	}
+	
+	public void readColumns(Reader reader, Type type) throws Exception
+	{
+		char delimiter = getMapperConfig().getDelimiter();
+		char qualifier = getMapperConfig().getQualifier();
+		int b;
+		char c;
+		StringBuilder builder = new StringBuilder();
+		read: while((b = reader.read()) > -1)
+		{
+			c = (char) b;
+			switch(c)
+			{
+				case BYTE_ORDER_MARK:
+				case CARRIAGE_RETURN:
+				{
+					break;
+				}
+				default:
+				{
+					if(delimiter == c || NEW_LINE == c)
+					{
+						getColumns().add(builder.toString().trim());
+						builder.setLength(0);
+						if(NEW_LINE == c)
+						{
+							break read;
+						}
+					}
+					else if(qualifier == c)
+					{
+						builder.append(readEscaped(reader, qualifier));
+					}
+					else
+					{
+						builder.append(c);
+					}
+					break;
+				}
+			}
+		}
+	}
+	
+	public List<String> missingColumns(byte[] bytes, Type type) throws Exception
+	{
+		return missingColumns(new ByteArrayInputStream(bytes), type);
+	}
+	
+	public List<String> missingColumns(String data, Type type) throws Exception
+	{
+		return missingColumns(new StringReader(data), type);
+	}
+	
+	public List<String> missingColumns(InputStream input, Type type) throws Exception
+	{
+		return missingColumns(new InputStreamReader(input, UTF_8), type);
+	}
+	
+	public List<String> missingColumns(File file, Type type) throws Exception
+	{
+		try(FileInputStream input = new FileInputStream(file))
+		{
+			return missingColumns(input, type);
+		}
+		catch(IOException e)
+		{
+			throw new MapperException(e);
+		}
+	}
+	
+	public List<String> missingColumns(Reader reader, Type type) throws Exception
+	{
+		List<String> missingColumns = new List<>();
+		readColumns(reader, type);
+		EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
+		List<PropertyReflector> propertyReflectors = entityReflector.getPropertyReflectors(getMapperType());
+		for(PropertyReflector propertyReflector : propertyReflectors)
+		{
+			if(propertyReflector.isRequired())
+			{
+				String name = propertyReflector.getPropertyName(getMapperType());
+				boolean found = false;
+				for(String column : getColumns())
+				{
+					if(column.equalsIgnoreCase(name))
+					{
+						found = true;
+					}
+				}
+				if(!found)
+				{
+					missingColumns.add(name);
+				}
+			}
+		}
+		return missingColumns;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -330,6 +461,7 @@ public class TableMapper extends Mapper
 			c = (char) b;
 			switch(c)
 			{
+				case BYTE_ORDER_MARK:
 				case CARRIAGE_RETURN:
 				{
 					break;
@@ -338,19 +470,30 @@ public class TableMapper extends Mapper
 				{
 					if(delimiter == c || NEW_LINE == c)
 					{
-						PropertyReflector propertyReflector = propertyReflectors.get(i++);
-						Deserializer<?> deserializer = propertyReflector.getDeserializer(getMapperType(), getMapperReflector(), getMapperConfig());
-						if(deserializer != null)
+						PropertyReflector propertyReflector = null;
+						if(!getMapperConfig().isDeserializeColumnOrder())
 						{
-							String value = builder.toString();
-							if(!value.isEmpty())
+							propertyReflector = entityReflector.getPropertyReflector(getColumns().get(i++), getMapperType(), getMapperReflector());
+						}
+						else
+						{
+							propertyReflector = propertyReflectors.get(i++);
+						}
+						if(propertyReflector != null)
+						{
+							Deserializer<?> deserializer = propertyReflector.getDeserializer(getMapperType(), getMapperReflector(), getMapperConfig());
+							if(deserializer != null)
 							{
-								model = model != null ? model : constructor.newInstance();
-								TimeZone timeZone = getTimeZone(propertyReflector);
-								String timeFormat = getTimeFormat(propertyReflector);
-								value = propertyReflector.filter(value, getMapperType());
-								Object deserializedValue = deserializer.deserialize(value, timeZone, timeFormat, propertyReflector.getFieldClass());
-								ReflectionUtil.setFieldValue(propertyReflector.getField(), model, deserializedValue);
+								String value = builder.toString();
+								if(!value.isEmpty())
+								{
+									model = model != null ? model : constructor.newInstance();
+									TimeZone timeZone = getTimeZone(propertyReflector);
+									String timeFormat = getTimeFormat(propertyReflector);
+									value = propertyReflector.filter(value, getMapperType());
+									Object deserializedValue = deserializer.deserialize(value, timeZone, timeFormat, propertyReflector.getFieldClass());
+									ReflectionUtil.setFieldValue(propertyReflector.getField(), model, deserializedValue);
+								}
 							}
 						}
 						builder.setLength(0);

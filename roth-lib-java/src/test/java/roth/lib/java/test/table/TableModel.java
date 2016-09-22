@@ -14,43 +14,43 @@ import roth.lib.java.time.Time;
 @SuppressWarnings("serial")
 public class TableModel implements Serializable
 {
-	@Property(name = "transactionTime", tableName = "TransactionDateTime", tableTimeFormat = "M/d/yyy h:mm:ss a")
+	@Property(name = "transactionTime", tableName = "TransactionDateTime", tableTimeFormat = "M/d/yyy h:mm:ss a", required = true)
 	protected Time transactionTime;
 	
-	@Property(name = "accountNum", tableName = "account_num")
+	@Property(name = "accountNum", tableName = "account_num", required = true)
 	protected String accountNum;
 	
-	@Property(name = "transId", tableName = "Trans_Id")
+	@Property(name = "transId", tableName = "Trans_Id", required = true)
 	protected String transId;
 	
-	@Property(name = "attNum", tableName = "att_num")
+	@Property(name = "attNum", tableName = "att_num", required = true)
 	protected String attNum;
 	
-	@Property(name = "transactionType", tableName = "TransactionType")
+	@Property(name = "transactionType", tableName = "TransactionType", required = true)
 	protected String transactionType;
 	
-	@Property(name = "amount", tableName = "Amount", tableFilter = NumberFilterer.class, tableDeserializer = IntegerCurrencyDeserializer.class)
+	@Property(name = "amount", tableName = "Amount", required = true, tableFilter = NumberFilterer.class, tableDeserializer = IntegerCurrencyDeserializer.class)
 	protected Integer amount;
 	
-	@Property(name = "netAmount", tableName = "NetAmount", tableFilter = NumberFilterer.class, tableDeserializer = IntegerCurrencyDeserializer.class)
+	@Property(name = "netAmount", tableName = "NetAmount", required = true, tableFilter = NumberFilterer.class, tableDeserializer = IntegerCurrencyDeserializer.class)
 	protected Integer netAmount;
 	
-	@Property(name = "invNum", tableName = "inv_num", tableFilter = TrimFilterer.class)
+	@Property(name = "invNum", tableName = "inv_num", required = true, tableFilter = TrimFilterer.class)
 	protected String invNum;
 	
-	@Property(name = "details", tableName = "Details")
+	@Property(name = "details", tableName = "Details", required = true)
 	protected String details;
 	
-	@Property(name = "achReturnCode", tableName = "AchReturnCode")
+	@Property(name = "achReturnCode", tableName = "AchReturnCode", required = true)
 	protected String achReturnCode;
 
-	@Property(name = "returnCodeDescription", tableName = "ReturnCodeDescription")
+	@Property(name = "returnCodeDescription", tableName = "ReturnCodeDescription", required = true)
 	protected String returnCodeDescription;
 	
-	@Property(name = "chargeBackResponeCode", tableName = "ChargeBackResponeCode")
+	@Property(name = "chargeBackResponeCode", tableName = "ChargeBackResponeCode", required = true)
 	protected String chargeBackResponeCode;
 	
-	@Property(name = "responeCodeDescription", tableName = "ResponeCodeDescription")
+	@Property(name = "responeCodeDescription", tableName = "ResponeCodeDescription", required = true)
 	protected String responeCodeDescription;
 	
 	public TableModel()

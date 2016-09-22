@@ -15,6 +15,7 @@ public class MapperConfig implements Characters
 	protected boolean serializeEmptyArray = true;
 	protected boolean serializeEmptyMap = true;
 	protected boolean serializeHeader = true;
+	protected boolean deserializeColumnOrder = true;
 	protected char delimiter = COMMA;
 	protected char qualifier = QUOTE;
 	protected Map<Class<?>, Serializer<?>> serializerMap = new Map<Class<?>, Serializer<?>>();
@@ -58,6 +59,11 @@ public class MapperConfig implements Characters
 	public boolean isSerializeHeader()
 	{
 		return serializeHeader;
+	}
+	
+	public boolean isDeserializeColumnOrder()
+	{
+		return deserializeColumnOrder;
 	}
 	
 	public char getDelimiter()
@@ -131,6 +137,12 @@ public class MapperConfig implements Characters
 	public MapperConfig setSerializeHeader(boolean serializeHeader)
 	{
 		this.serializeHeader = serializeHeader;
+		return this;
+	}
+	
+	public MapperConfig setDeserializeColumnOrder(boolean deserializeColumnOrder)
+	{
+		this.deserializeColumnOrder = deserializeColumnOrder;
 		return this;
 	}
 	
