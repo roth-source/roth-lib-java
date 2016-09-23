@@ -385,6 +385,7 @@ public class TableMapper extends Mapper
 					if(column.equalsIgnoreCase(name))
 					{
 						found = true;
+						break;
 					}
 				}
 				if(!found)
