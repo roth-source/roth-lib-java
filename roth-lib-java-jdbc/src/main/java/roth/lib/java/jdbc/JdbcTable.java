@@ -27,6 +27,7 @@ public abstract class JdbcTable<T> implements SqlFactory
 	
 	protected Class<T> klass;
 	protected Object request;
+	protected JdbcConnection connection;
 	
 	protected JdbcTable(Class<T> klass)
 	{
@@ -39,7 +40,18 @@ public abstract class JdbcTable<T> implements SqlFactory
 		this.request = request;
 	}
 	
+	protected JdbcTable(Class<T> klass, JdbcConnection connection)
+	{
+		this.klass = klass;
+		this.connection = connection;
+	}
+	
 	public abstract Jdbc getDb();
+	
+	public JdbcConnection getConnection()
+	{
+		return connection;
+	}
 	
 	public String tableName()
 	{
@@ -168,22 +180,82 @@ public abstract class JdbcTable<T> implements SqlFactory
 	
 	public <C> C findBy(Select select, Class<C> klass, List<Class<?>> filterInterfaces)
 	{
-		return getDb().query(filter(select, filterInterfaces), klass);
+		JdbcConnection connection = getConnection();
+		if(connection != null)
+		{
+			try
+			{
+				return getDb().query(filter(select, filterInterfaces), klass, connection);
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
+		}
+		else
+		{
+			return getDb().query(filter(select, filterInterfaces), klass);
+		}
 	}
 	
 	public <C> C findBy(String sql, Class<C> klass)
 	{
-		return getDb().query(sql, klass);
+		JdbcConnection connection = getConnection();
+		if(connection != null)
+		{
+			try
+			{
+				return getDb().query(sql, klass, connection);
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
+		}
+		else
+		{
+			return getDb().query(sql, klass);
+		}
 	}
 	
 	public <C> C findBy(String sql, Collection<Object> values, Class<C> klass)
 	{
-		return getDb().query(sql, values, klass);
+		JdbcConnection connection = getConnection();
+		if(connection != null)
+		{
+			try
+			{
+				return getDb().query(sql, values, klass, connection);
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
+		}
+		else
+		{
+			return getDb().query(sql, values, klass);
+		}
 	}
 	
 	public <C> C findBy(String sql, Map<String, Object> valueMap, Class<C> klass)
 	{
-		return getDb().query(sql, valueMap, klass);
+		JdbcConnection connection = getConnection();
+		if(connection != null)
+		{
+			try
+			{
+				return getDb().query(sql, valueMap, klass, connection);
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
+		}
+		else
+		{
+			return getDb().query(sql, valueMap, klass);
+		}
 	}
 	
 	public List<T> findAll()
@@ -273,22 +345,82 @@ public abstract class JdbcTable<T> implements SqlFactory
 	
 	public <C> List<C> findAllBy(Select select, Class<C> klass, List<Class<?>> filterInterfaces)
 	{
-		return getDb().queryAll(filter(select, filterInterfaces), klass);
+		JdbcConnection connection = getConnection();
+		if(connection != null)
+		{
+			try
+			{
+				return getDb().queryAll(filter(select, filterInterfaces), klass, connection);
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
+		}
+		else
+		{
+			return getDb().queryAll(filter(select, filterInterfaces), klass);
+		}
 	}
 	
 	public <C> List<C> findAllBy(String sql, Class<C> klass)
 	{
-		return getDb().queryAll(sql, klass);
+		JdbcConnection connection = getConnection();
+		if(connection != null)
+		{
+			try
+			{
+				return getDb().queryAll(sql, klass, connection);
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
+		}
+		else
+		{
+			return getDb().queryAll(sql, klass);
+		}
 	}
 	
 	public <C> List<C> findAllBy(String sql, Collection<Object> values, Class<C> klass)
 	{
-		return getDb().queryAll(sql, values, klass);
+		JdbcConnection connection = getConnection();
+		if(connection != null)
+		{
+			try
+			{
+				return getDb().queryAll(sql, values, klass, connection);
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
+		}
+		else
+		{
+			return getDb().queryAll(sql, values, klass);
+		}
 	}
 	
 	public <C> List<C> findAllBy(String sql, Map<String, Object> valueMap, Class<C> klass)
 	{
-		return getDb().queryAll(sql, valueMap, klass);
+		JdbcConnection connection = getConnection();
+		if(connection != null)
+		{
+			try
+			{
+				return getDb().queryAll(sql, valueMap, klass, connection);
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
+		}
+		else
+		{
+			return getDb().queryAll(sql, valueMap, klass);
+		}
 	}
 	
 	public void callback(Select select, Callback<T> callback)
@@ -323,22 +455,82 @@ public abstract class JdbcTable<T> implements SqlFactory
 	
 	public <C> void callback(Select select, Callback<C> callback, Class<C> klass, List<Class<?>> filterInterfaces)
 	{
-		getDb().queryAll(filter(select, filterInterfaces), callback.setKlass(klass));
+		JdbcConnection connection = getConnection();
+		if(connection != null)
+		{
+			try
+			{
+				getDb().queryAll(filter(select, filterInterfaces), callback.setKlass(klass), connection);
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
+		}
+		else
+		{
+			getDb().queryAll(filter(select, filterInterfaces), callback.setKlass(klass));
+		}
 	}
 	
 	public <C> void callback(String sql, Callback<C> callback, Class<C> klass)
 	{
-		getDb().queryAll(sql, callback.setKlass(klass));
+		JdbcConnection connection = getConnection();
+		if(connection != null)
+		{
+			try
+			{
+				getDb().queryAll(sql, callback.setKlass(klass), connection);
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
+		}
+		else
+		{
+			getDb().queryAll(sql, callback.setKlass(klass));
+		}
 	}
 	
 	public <C> void callback(String sql, Collection<Object> values, Callback<C> callback, Class<C> klass)
 	{
-		getDb().queryAll(sql, values, callback.setKlass(klass));
+		JdbcConnection connection = getConnection();
+		if(connection != null)
+		{
+			try
+			{
+				getDb().queryAll(sql, values, callback.setKlass(klass), connection);
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
+		}
+		else
+		{
+			getDb().queryAll(sql, values, callback.setKlass(klass));
+		}
 	}
 	
 	public <C> void callback(String sql, Map<String, Object> valueMap, Callback<C> callback, Class<C> klass)
 	{
-		getDb().queryAll(sql, valueMap, callback.setKlass(klass));
+		JdbcConnection connection = getConnection();
+		if(connection != null)
+		{
+			try
+			{
+				getDb().queryAll(sql, valueMap, callback.setKlass(klass), connection);
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
+		}
+		else
+		{
+			getDb().queryAll(sql, valueMap, callback.setKlass(klass));
+		}
 	}
 	
 	public int executeInsert(Insert insert)
@@ -440,7 +632,24 @@ public abstract class JdbcTable<T> implements SqlFactory
 	{
 		int count = 0;
 		select.columns(newColumns().addColumns(newColumn().setSql(COUNT_AGGREGATE).setAlias(COUNT_ALIAS)));
-		Map<String, Object> results = getDb().query(filter(select, filterInterfaces));
+		Map<String, Object> results = null;
+		JdbcConnection connection = getConnection();
+		if(connection != null)
+		{
+			try
+			{
+				results = getDb().query(filter(select, filterInterfaces), connection);
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
+		}
+		else
+		{
+			results = getDb().query(filter(select, filterInterfaces));
+		}
+		
 		Object object = results.get(COUNT_ALIAS);
 		if(object instanceof Number)
 		{

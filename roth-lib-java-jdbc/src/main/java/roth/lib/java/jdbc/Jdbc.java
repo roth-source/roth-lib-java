@@ -839,6 +839,29 @@ public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFa
 		return !models.isEmpty() ? models.get(0) : null;
 	}
 	
+	public <T> T query(Select select, Class<T> klass, JdbcConnection connection) throws SQLException
+	{
+		select.limit(1);
+		return query(select.toString(), select.getValues(), klass, connection);
+	}
+	
+	public <T> T query(String sql, Class<T> klass, JdbcConnection connection) throws SQLException
+	{
+		return query(sql, (Collection<Object>) null, klass, connection);
+	}
+	
+	public <T> T query(String sql, Map<String, Object> valueMap, Class<T> klass, JdbcConnection connection) throws SQLException
+	{
+		List<T> models = queryAll(sql, valueMap, klass, connection);
+		return !models.isEmpty() ? models.get(0) : null;
+	}
+	
+	public <T> T query(String sql, Collection<Object> values, Class<T> klass, JdbcConnection connection) throws SQLException
+	{
+		List<T> models = queryAll(sql, values, klass, connection);
+		return !models.isEmpty() ? models.get(0) : null;
+	}
+	
 	public <T> List<T> queryAll(Select select, Class<T> klass)
 	{
 		return queryAll(select.toString(), select.getValues(), klass);
@@ -988,6 +1011,29 @@ public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFa
 	public Map<String, Object> query(String sql, Collection<Object> values)
 	{
 		List<Map<String, Object>> maps = queryAll(sql, values);
+		return !maps.isEmpty() ? maps.get(0) : null;
+	}
+	
+	public Map<String, Object> query(Select select, JdbcConnection connection) throws SQLException
+	{
+		select.limit(1);
+		return query(select.toString(), select.getValues(), connection);
+	}
+	
+	public Map<String, Object> query(String sql, JdbcConnection connection) throws SQLException
+	{
+		return query(sql, (Collection<Object>) null, connection);
+	}
+	
+	public Map<String, Object> query(String sql, Map<String, Object> valueMap, JdbcConnection connection) throws SQLException
+	{
+		List<Map<String, Object>> maps = queryAll(sql, valueMap, connection);
+		return !maps.isEmpty() ? maps.get(0) : null;
+	}
+	
+	public Map<String, Object> query(String sql, Collection<Object> values, JdbcConnection connection) throws SQLException
+	{
+		List<Map<String, Object>> maps = queryAll(sql, values, connection);
 		return !maps.isEmpty() ? maps.get(0) : null;
 	}
 	
