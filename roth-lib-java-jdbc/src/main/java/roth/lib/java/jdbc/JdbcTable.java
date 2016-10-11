@@ -26,12 +26,18 @@ public abstract class JdbcTable<T> implements SqlFactory
 	protected static final String FILTER_METHOD = "filter";
 	
 	protected Class<T> klass;
-	protected Object request;
 	protected JdbcConnection connection;
+	protected Object request;
 	
 	protected JdbcTable(Class<T> klass)
 	{
 		this.klass = klass;
+	}
+	
+	protected JdbcTable(Class<T> klass, JdbcConnection connection)
+	{
+		this.klass = klass;
+		this.connection = connection;
 	}
 	
 	protected JdbcTable(Class<T> klass, Object request)
@@ -40,10 +46,11 @@ public abstract class JdbcTable<T> implements SqlFactory
 		this.request = request;
 	}
 	
-	protected JdbcTable(Class<T> klass, JdbcConnection connection)
+	protected JdbcTable(Class<T> klass, JdbcConnection connection, Object request)
 	{
 		this.klass = klass;
 		this.connection = connection;
+		this.request = request;
 	}
 	
 	public abstract Jdbc getDb();

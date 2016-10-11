@@ -12,14 +12,19 @@ public abstract class MysqlDbTable<T> extends JdbcTable<T> implements MysqlSqlFa
 		super(klass);
 	}
 	
+	protected MysqlDbTable(Class<T> klass, JdbcConnection connection)
+	{
+		super(klass, connection);
+	}
+	
 	protected MysqlDbTable(Class<T> klass, Object request)
 	{
 		super(klass, request);
 	}
 	
-	protected MysqlDbTable(Class<T> klass, JdbcConnection connection)
+	protected MysqlDbTable(Class<T> klass, JdbcConnection connection, Object request)
 	{
-		super(klass, connection);
+		super(klass, connection, request);
 	}
 	
 }
