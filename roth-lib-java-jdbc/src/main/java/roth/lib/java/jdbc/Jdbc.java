@@ -877,7 +877,8 @@ public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFa
 		List<T> models = new List<T>();
 		try(JdbcConnection connection = getConnection())
 		{
-			models = queryAll(sql, valueMap, klass, connection); 
+			models = queryAll(sql, valueMap, klass, connection);
+			connection.commit();
 		}
 		catch(SQLException e)
 		{
@@ -891,7 +892,8 @@ public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFa
 		List<T> models = new List<T>();
 		try(JdbcConnection connection = getConnection())
 		{
-			models = queryAll(sql, values, klass, connection); 
+			models = queryAll(sql, values, klass, connection);
+			connection.commit();
 		}
 		catch(SQLException e)
 		{
@@ -923,7 +925,6 @@ public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFa
 			try(JdbcResultSet resultSet = preparedStatement.executeQuery())
 			{
 				List<T> result = fromDb(resultSet, klass);
-				connection.commit();
 				return result;
 			}
 		}
@@ -943,7 +944,8 @@ public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFa
 	{
 		try(JdbcConnection connection = getConnection())
 		{
-			queryAll(sql, valueMap, callback, connection); 
+			queryAll(sql, valueMap, callback, connection);
+			connection.commit();
 		}
 		catch(SQLException e)
 		{
@@ -955,7 +957,8 @@ public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFa
 	{
 		try(JdbcConnection connection = getConnection())
 		{
-			queryAll(sql, values, callback, connection); 
+			queryAll(sql, values, callback, connection);
+			connection.commit();
 		}
 		catch(SQLException e)
 		{
@@ -986,7 +989,6 @@ public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFa
 			try(JdbcResultSet resultSet = preparedStatement.executeQuery())
 			{
 				fromDb(resultSet, callback);
-				connection.commit();
 			}
 		}
 	}
@@ -1047,7 +1049,8 @@ public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFa
 		List<Map<String, Object>> maps = new List<Map<String, Object>>();
 		try(JdbcConnection connection = getConnection())
 		{
-			maps = queryAll(sql, valueMap, connection); 
+			maps = queryAll(sql, valueMap, connection);
+			connection.commit();
 		}
 		catch(SQLException e)
 		{
@@ -1061,7 +1064,8 @@ public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFa
 		List<Map<String, Object>> maps = new List<Map<String, Object>>();
 		try(JdbcConnection connection = getConnection())
 		{
-			maps = queryAll(sql, values, connection); 
+			maps = queryAll(sql, values, connection);
+			connection.commit();
 		}
 		catch(SQLException e)
 		{
@@ -1092,9 +1096,8 @@ public abstract class Jdbc implements DataSource, JdbcWrapper, Characters, SqlFa
 		{
 			try(JdbcResultSet resultSet = preparedStatement.executeQuery())
 			{
-				 List<Map<String, Object>> result = fromDb(resultSet);
-				 connection.commit();
-				 return result;
+				List<Map<String, Object>> result = fromDb(resultSet);
+				return result;
 			}
 		}
 	}
