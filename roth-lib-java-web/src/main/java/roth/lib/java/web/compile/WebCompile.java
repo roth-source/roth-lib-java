@@ -51,6 +51,7 @@ public class WebCompile implements Characters
 	protected static String PAGE					= "page";
 	protected static String COMPONENT				= "component";
 	protected static String SOURCE					= "source";
+	protected static String RETURN_VIEW				= "return View;";
 	protected static String OPEN_CLOSURE			= "(function(){";
 	protected static String CLOSE_CLOSURE			= "})();";
 	
@@ -412,7 +413,8 @@ public class WebCompile implements Characters
 						writer.print(EQUAL);
 						writer.print(SPACE);
 						writer.print(OPEN_CLOSURE);
-						writer.print(viewScript);
+						writer.println(viewScript);
+						writer.println(RETURN_VIEW);
 						writer.print(CLOSE_CLOSURE);
 						writer.println();
 					}
