@@ -194,7 +194,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 															{
 																if(e.getCause() != null)
 																{
-																	errors.add(service.exception(HttpErrorType.SERVICE_EXCEPTION.error(), e.getCause()));
+																	errors.add(service.exception(HttpErrorType.SERVICE_EXCEPTION.error(e), e.getCause()));
 																}
 															}
 															errors.addAll(service.getErrors());

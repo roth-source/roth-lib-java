@@ -25,4 +25,9 @@ public enum HttpErrorType
 		return new HttpError(this);
 	}
 	
+	public HttpError error(Throwable e)
+	{
+		return new HttpError(this).setMessage(e.getMessage());
+	}
+	
 }
