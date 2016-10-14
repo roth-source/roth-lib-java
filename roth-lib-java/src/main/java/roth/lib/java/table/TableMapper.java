@@ -241,10 +241,12 @@ public class TableMapper extends Mapper
 			}
 			else if(getMapperConfig().isSerializeHeader())
 			{
-				readUntil(reader, NEW_LINE);
+				readUntil(reader, NEW_LINE, CARRIAGE_RETURN);
+				peekNewLine(reader);
 			}
+			int row = 0;
 			T entity = null;
-			while((entity = readEntity(reader, klass)) != null)
+			while((entity = readEntity(reader, klass, ++row)) != null)
 			{
 				list.add(entity);
 			}
@@ -277,7 +279,8 @@ public class TableMapper extends Mapper
 			}
 			else if(getMapperConfig().isSerializeHeader())
 			{
-				readUntil(reader, NEW_LINE);
+				readUntil(reader, NEW_LINE, CARRIAGE_RETURN);
+				peekNewLine(reader);
 			}
 			if(ReflectionUtil.isArray(type) || ReflectionUtil.isCollection(type))
 			{
@@ -285,7 +288,7 @@ public class TableMapper extends Mapper
 			}
 			else
 			{
-				model = readEntity(reader, type);
+				model = readEntity(reader, type, 1);
 			}
 		}
 		catch(TableException e)
@@ -306,38 +309,47 @@ public class TableMapper extends Mapper
 		int b;
 		char c;
 		StringBuilder builder = new StringBuilder();
-		read: while((b = reader.read()) > -1)
+		read:
 		{
-			c = (char) b;
-			switch(c)
+			do
 			{
-				case BYTE_ORDER_MARK:
-				case CARRIAGE_RETURN:
+				b = reader.read();
+				c = (char) b;
+				switch(c)
 				{
-					break;
-				}
-				default:
-				{
-					if(delimiter == c || NEW_LINE == c)
+					case BYTE_ORDER_MARK:
 					{
-						getColumns().add(builder.toString().trim());
-						builder.setLength(0);
-						if(NEW_LINE == c)
+						break;
+					}
+					default:
+					{
+						if(delimiter == c || NEW_LINE == c || CARRIAGE_RETURN == c || b == -1)
 						{
-							break read;
+							getColumns().add(builder.toString().trim());
+							builder.setLength(0);
+							if(NEW_LINE == c)
+							{
+								break read;
+							}
+							else if(CARRIAGE_RETURN == c)
+							{
+								peekNewLine(reader);
+								break read;
+							}
 						}
+						else if(qualifier == c)
+						{
+							builder.append(readEscaped(reader, qualifier));
+						}
+						else
+						{
+							builder.append(c);
+						}
+						break;
 					}
-					else if(qualifier == c)
-					{
-						builder.append(readEscaped(reader, qualifier));
-					}
-					else
-					{
-						builder.append(c);
-					}
-					break;
 				}
 			}
+			while(b > -1);
 		}
 	}
 	
@@ -435,15 +447,16 @@ public class TableMapper extends Mapper
 			constructor.setAccessible(true);
 			collection = (Collection<E>) constructor.newInstance();
 		}
+		int row = 0;
 		E entity = null;
-		while((entity = readEntity(reader, elementType)) != null)
+		while((entity = readEntity(reader, elementType, ++row)) != null)
 		{
 			collection.add(entity);
 		}
 		return (T) collection;
 	}
 	
-	protected <T> T readEntity(Reader reader, Type type) throws Exception
+	protected <T> T readEntity(Reader reader, Type type, int row) throws Exception
 	{
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
 		List<PropertyReflector> propertyReflectors = entityReflector.getPropertyReflectors(getMapperType());
@@ -453,67 +466,83 @@ public class TableMapper extends Mapper
 		T model = null;
 		char delimiter = getMapperConfig().getDelimiter();
 		char qualifier = getMapperConfig().getQualifier();
-		int i = 0;
+		int column = 0;
 		int b;
 		char c;
 		StringBuilder builder = new StringBuilder();
-		read: while((b = reader.read()) > -1)
+		read:
 		{
-			c = (char) b;
-			switch(c)
+			do
 			{
-				case BYTE_ORDER_MARK:
-				case CARRIAGE_RETURN:
+				b = reader.read();
+				c = (char) b;
+				switch(c)
 				{
-					break;
-				}
-				default:
-				{
-					if(delimiter == c || NEW_LINE == c)
+					case BYTE_ORDER_MARK:
 					{
-						PropertyReflector propertyReflector = null;
-						if(!getMapperConfig().isDeserializeColumnOrder())
+						break;
+					}
+					default:
+					{
+						if(delimiter == c || NEW_LINE == c || CARRIAGE_RETURN == c || b == -1)
 						{
-							propertyReflector = entityReflector.getPropertyReflector(getColumns().get(i++), getMapperType(), getMapperReflector());
+							PropertyReflector propertyReflector = null;
+							if(!getMapperConfig().isDeserializeColumnOrder())
+							{
+								propertyReflector = entityReflector.getPropertyReflector(getColumns().get(column++), getMapperType(), getMapperReflector());
+							}
+							else
+							{
+								propertyReflector = propertyReflectors.get(column++);
+							}
+							if(propertyReflector != null)
+							{
+								Deserializer<?> deserializer = propertyReflector.getDeserializer(getMapperType(), getMapperReflector(), getMapperConfig());
+								if(deserializer != null)
+								{
+									String value = builder.toString();
+									if(!value.isEmpty())
+									{
+										model = model != null ? model : constructor.newInstance();
+										TimeZone timeZone = getTimeZone(propertyReflector);
+										String timeFormat = getTimeFormat(propertyReflector);
+										value = propertyReflector.filter(value, getMapperType());
+										try
+										{
+											Object deserializedValue = deserializer.deserialize(value, timeZone, timeFormat, propertyReflector.getFieldClass());
+											ReflectionUtil.setFieldValue(propertyReflector.getField(), model, deserializedValue);
+										}
+										catch(Exception e)
+										{
+											throw new TableException(row, column, e);
+										}
+									}
+								}
+							}
+							builder.setLength(0);
+							if(NEW_LINE == c)
+							{
+								break read;
+							}
+							else if(CARRIAGE_RETURN == c)
+							{
+								peekNewLine(reader);
+								break read;
+							}
+						}
+						else if(qualifier == c)
+						{
+							builder.append(readEscaped(reader, qualifier));
 						}
 						else
 						{
-							propertyReflector = propertyReflectors.get(i++);
+							builder.append(c);
 						}
-						if(propertyReflector != null)
-						{
-							Deserializer<?> deserializer = propertyReflector.getDeserializer(getMapperType(), getMapperReflector(), getMapperConfig());
-							if(deserializer != null)
-							{
-								String value = builder.toString();
-								if(!value.isEmpty())
-								{
-									model = model != null ? model : constructor.newInstance();
-									TimeZone timeZone = getTimeZone(propertyReflector);
-									String timeFormat = getTimeFormat(propertyReflector);
-									value = propertyReflector.filter(value, getMapperType());
-									Object deserializedValue = deserializer.deserialize(value, timeZone, timeFormat, propertyReflector.getFieldClass());
-									ReflectionUtil.setFieldValue(propertyReflector.getField(), model, deserializedValue);
-								}
-							}
-						}
-						builder.setLength(0);
-						if(NEW_LINE == c)
-						{
-							break read;
-						}
+						break;
 					}
-					else if(qualifier == c)
-					{
-						builder.append(readEscaped(reader, qualifier));
-					}
-					else
-					{
-						builder.append(c);
-					}
-					break;
 				}
 			}
+			while(b > -1);
 		}
 		return model;
 	}
@@ -540,6 +569,24 @@ public class TableMapper extends Mapper
 			builder.append(c);
 		}
 		return builder.toString();
+	}
+	
+	protected void peekNewLine(Reader reader)
+	{
+		try
+		{
+			reader.mark(1);
+			int b = reader.read();
+			char c = (char) b;
+			if(NEW_LINE != c)
+			{
+				reader.reset();
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
