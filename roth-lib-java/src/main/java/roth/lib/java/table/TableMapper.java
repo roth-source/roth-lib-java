@@ -382,6 +382,7 @@ public class TableMapper extends Mapper
 	
 	public List<String> missingColumns(Reader reader, Type type) throws Exception
 	{
+		reader = reader instanceof BufferedReader ? reader : new BufferedReader(reader); 
 		List<String> missingColumns = new List<>();
 		readColumns(reader, type);
 		EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
