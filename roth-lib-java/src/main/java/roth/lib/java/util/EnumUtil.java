@@ -18,9 +18,9 @@ public class EnumUtil
 	public static <T extends Enum<?>> T fromString(String name, Class<T> klass)
 	{
 		T value = fromString(name, klass, "fromString");
-		if(value == null)
+		if(value == null && name != null)
 		{
-			value = fromString(name, klass, "valueOf");
+			value = fromString(name.toUpperCase(), klass, "valueOf");
 		}
 		return value;
 	}

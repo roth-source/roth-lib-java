@@ -14,7 +14,8 @@ public class MapperConfig implements Characters
 	protected boolean serializeNulls = false;
 	protected boolean serializeEmptyArray = true;
 	protected boolean serializeEmptyMap = true;
-	protected boolean serializeHeader = true;
+	protected boolean tableHeader = true;
+	protected boolean tableTrim = true;
 	protected boolean deserializeColumnOrder = true;
 	protected char delimiter = COMMA;
 	protected char qualifier = QUOTE;
@@ -56,9 +57,14 @@ public class MapperConfig implements Characters
 		return serializeEmptyMap;
 	}
 	
-	public boolean isSerializeHeader()
+	public boolean isTableHeader()
 	{
-		return serializeHeader;
+		return tableHeader;
+	}
+	
+	public boolean isTableTrim()
+	{
+		return tableTrim;
 	}
 	
 	public boolean isDeserializeColumnOrder()
@@ -134,9 +140,15 @@ public class MapperConfig implements Characters
 		return this;
 	}
 	
-	public MapperConfig setSerializeHeader(boolean serializeHeader)
+	public MapperConfig setTableHeader(boolean tableHeader)
 	{
-		this.serializeHeader = serializeHeader;
+		this.tableHeader = tableHeader;
+		return this;
+	}
+	
+	public MapperConfig setTableTrim(boolean tableTrim)
+	{
+		this.tableTrim = tableTrim;
 		return this;
 	}
 	

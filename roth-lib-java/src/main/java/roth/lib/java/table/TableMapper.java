@@ -112,7 +112,7 @@ public class TableMapper extends Mapper
 	
 	protected void writeHeader(Writer writer, EntityReflector entityReflector) throws Exception
 	{
-		if(getMapperConfig().isSerializeHeader())
+		if(getMapperConfig().isTableHeader())
 		{
 			String seperator = BLANK;
 			for(PropertyReflector propertyReflector : entityReflector.getPropertyReflectors(getMapperType()))
@@ -239,7 +239,7 @@ public class TableMapper extends Mapper
 					throw new TableException(String.format("Missing columns %s", missingColumns.toString()));
 				}
 			}
-			else if(getMapperConfig().isSerializeHeader())
+			else if(getMapperConfig().isTableHeader())
 			{
 				readUntil(reader, NEW_LINE, CARRIAGE_RETURN);
 				peekNewLine(reader);
@@ -277,7 +277,7 @@ public class TableMapper extends Mapper
 					throw new TableException(String.format("Missing columns %s", missingColumns.toString()));
 				}
 			}
-			else if(getMapperConfig().isSerializeHeader())
+			else if(getMapperConfig().isTableHeader())
 			{
 				readUntil(reader, NEW_LINE, CARRIAGE_RETURN);
 				peekNewLine(reader);
@@ -504,6 +504,10 @@ public class TableMapper extends Mapper
 									String value = builder.toString();
 									if(!value.isEmpty())
 									{
+										if(getMapperConfig().isTableTrim())
+										{
+											value = value.trim();
+										}
 										model = model != null ? model : constructor.newInstance();
 										TimeZone timeZone = getTimeZone(propertyReflector);
 										String timeFormat = getTimeFormat(propertyReflector);
