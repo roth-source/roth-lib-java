@@ -360,11 +360,15 @@ public class HtmlUtil implements Characters
 		return html != null ? html.replaceAll("<\\/?[^>]+(>|$)", "") : null;
 	}
 	
+	public static String safe(String html)
+	{
+		return html != null ? html.replaceAll("(?i)<(?:script|style)[^>]*>[\\s\\S]*?(?:</(?:script|style)[^>]*>|$)", "") : null;
+	}
+	
 	public static void main(String[] args)
 	{
-		String value = escape("<test value=\"blah\">asdf</test>");
-		System.out.println(value);
-		System.out.println(unescape(value));
+		String html = "<html><body><div><style value=\"blah\">asdf\ntest</style>\n</div></body></html>";
+		System.out.println(safe(html));
 	}
 	
 }
