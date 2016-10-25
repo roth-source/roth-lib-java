@@ -1,4 +1,4 @@
 #!/bin/bash
 
 mvn clean;
-mvn -T 4 deploy;
+mvn -T 4 -DskipTests deploy;
