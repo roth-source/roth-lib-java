@@ -85,7 +85,7 @@ public abstract class Havings extends Conditions
 		StringBuilder builder = new StringBuilder();
 		if(!nested && !conditions.isEmpty())
 		{
-			builder.append(LF + WHERE);
+			builder.append(LF + HAVING);
 		}
 		boolean first = true;
 		for(Condition condition : conditions)
