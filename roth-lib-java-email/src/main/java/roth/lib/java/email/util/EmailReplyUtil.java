@@ -1,6 +1,7 @@
 package roth.lib.java.email.util;
 
 import java.io.File;
+import java.util.ListIterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,7 +47,7 @@ public class EmailReplyUtil
 		while(matcher.find())
 		{
 			String line = value.substring(index, matcher.start()).trim();
-			if(!isSignature(line))
+			if(!(replyLines.isEmpty() && line.isEmpty()) && !isSignature(line))
 			{
 				if(!isQuoteHeader(value.substring(index)))
 				{
@@ -58,6 +59,18 @@ public class EmailReplyUtil
 				}
 			}
 			index = matcher.end();
+		}
+		ListIterator<String> replyLinesIterator = replyLines.listIterator(replyLines.size());
+		while(replyLinesIterator.hasPrevious())
+		{
+			if(replyLinesIterator.previous().isEmpty())
+			{
+				replyLinesIterator.remove();
+			}
+			else
+			{
+				break;
+			}
 		}
 		return replyLines;
 	}
@@ -83,8 +96,8 @@ public class EmailReplyUtil
 	
 	public static void main(String[] args)
 	{
-		//System.out.println(parse(FileUtil.toString(new File("dev/test-hotmail.txt"))));
-		System.out.println(format(parse(FileUtil.toString(new File("dev/test-gmail.txt")))));
+		System.out.println(format(parse(FileUtil.toString(new File("dev/test-hotmail.txt")))));
+		//System.out.println(format(parse(FileUtil.toString(new File("dev/test-gmail.txt")))));
 		//System.out.println(parse(FileUtil.toString(new File("dev/test-yahoo.txt"))));
 	}
 	
