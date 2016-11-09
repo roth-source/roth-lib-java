@@ -22,6 +22,7 @@
 			<groupId>com.sun.mail</groupId>
 			<artifactId>javax.mail</artifactId>
 			<version>1.5.6</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -42,6 +43,7 @@
 							<artifactSet>
 								<excludes>
 									<exclude>roth.lib.java:roth-lib-java:*</exclude>
+									<exclude>com.sun.mail:javax.mail:*</exclude>
 								</excludes>
 							</artifactSet>
 						</configuration>
