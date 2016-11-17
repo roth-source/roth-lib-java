@@ -7,6 +7,7 @@ import java.util.GregorianCalendar;
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
 import roth.lib.java.form.FormMapper;
+import roth.lib.java.lang.List;
 import roth.lib.java.mapper.MapperConfig;
 
 @Entity(name = "model")
@@ -102,6 +103,9 @@ public class FormModel
 	
 	@Property(name = "test_calendar", exclude = "test")
 	private Calendar testCalendar = new GregorianCalendar();
+	
+	@Property(name = "test_list")
+	private List<String> testList = new List<>("one", "two", "three");
 	
 	protected FormModel()
 	{

@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 
 import roth.lib.java.Generic;
 import roth.lib.java.deserializer.Deserializer;
+import roth.lib.java.lang.List;
 import roth.lib.java.lang.Map;
 import roth.lib.java.mapper.Mapper;
 import roth.lib.java.mapper.MapperConfig;
@@ -26,7 +27,6 @@ import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.serializer.Serializer;
-import roth.lib.java.time.TimeZone;
 import roth.lib.java.type.MimeType;
 import roth.lib.java.util.IdUtil;
 import roth.lib.java.util.IoUtil;
@@ -138,7 +138,6 @@ public class FormMapper extends Mapper implements FormBoundary
 				{
 					if(!hasContext() || !propertyReflector.isExcluded(getContext()))
 					{
-						Class<?> propertyClass = propertyReflector.getFieldClass();
 						String propertyName = propertyReflector.getPropertyName(getMapperType());
 						if(propertyName != null)
 						{
@@ -160,26 +159,17 @@ public class FormMapper extends Mapper implements FormBoundary
 									writeFile(dataOutput, propertyName, formFile.getFilename(), input, formFile.getContentType());
 								}
 							}
+							else if(fieldValue != null && (ReflectionUtil.isArray(fieldValue.getClass()) || ReflectionUtil.isCollection(fieldValue.getClass())))
+							{
+								List<?> elementValues = ReflectionUtil.asCollection(fieldValue);
+								for(Object elementValue : elementValues)
+								{
+									writeProperty(dataOutput, propertyName, elementValue, propertyReflector);
+								}
+							}
 							else
 							{
-								Serializer<?> serializer = getSerializer(propertyClass, propertyReflector);
-								if(serializer != null)
-								{
-									String serializedValue = null;
-									if(fieldValue != null)
-									{
-										String timeFormat = getTimeFormat(propertyReflector);
-										serializedValue = serializer.serialize(fieldValue, getTimeZone(propertyReflector), timeFormat);
-									}
-									else if(getMapperConfig().isSerializeNulls())
-									{
-										serializedValue = BLANK;
-									}
-									if(serializedValue != null)
-									{
-										writeField(dataOutput, propertyName, serializedValue);
-									}
-								}
+								writeProperty(dataOutput, propertyName, fieldValue, propertyReflector);
 							}
 						}
 					}
@@ -232,25 +222,17 @@ public class FormMapper extends Mapper implements FormBoundary
 							writeFile(dataOutput, propertyName, formFile.getFilename(), input, formFile.getContentType());
 						}
 					}
+					else if(fieldValue != null && (ReflectionUtil.isArray(fieldValue.getClass()) || ReflectionUtil.isCollection(fieldValue.getClass())))
+					{
+						List<?> elementValues = ReflectionUtil.asCollection(fieldValue);
+						for(Object elementValue : elementValues)
+						{
+							writeProperty(dataOutput, propertyName, elementValue, null);
+						}
+					}
 					else
 					{
-						String serializedValue = null;
-						if(fieldValue != null)
-						{
-							Serializer<?> serializer = getSerializer(fieldValue.getClass());
-							if(serializer != null)
-							{
-								serializedValue = serializer.serialize(fieldValue, TimeZone.DEFAULT, null);
-							}
-						}
-						else if(getMapperConfig().isSerializeNulls())
-						{
-							serializedValue = BLANK;
-						}
-						if(serializedValue != null)
-						{
-							writeField(dataOutput, propertyName, serializedValue);
-						}
+						writeProperty(dataOutput, propertyName, fieldValue, null);
 					}
 				}
 				dataOutput.writeChars(PREFIX);
@@ -268,6 +250,31 @@ public class FormMapper extends Mapper implements FormBoundary
 		else
 		{
 			super.serialize(map, output);
+		}
+	}
+	
+	protected void writeProperty(DataOutputStream output, String name, Object value, PropertyReflector propertyReflector) throws IOException
+	{
+		String serializedValue = null;
+		if(value != null)
+		{
+			Serializer<?> serializer = getSerializer(value.getClass(), propertyReflector);
+			if(serializer != null)
+			{
+				if(value != null)
+				{
+					String timeFormat = getTimeFormat(propertyReflector);
+					serializedValue = serializer.serialize(value, getTimeZone(propertyReflector), timeFormat);
+				}
+			}
+		}
+		else if(getMapperConfig().isSerializeNulls())
+		{
+			serializedValue = BLANK;
+		}
+		if(serializedValue != null)
+		{
+			writeField(output, name, serializedValue);
 		}
 	}
 	
@@ -327,28 +334,21 @@ public class FormMapper extends Mapper implements FormBoundary
 			{
 				if(!hasContext() || !propertyReflector.isExcluded(getContext()))
 				{
-					Class<?> propertyClass = propertyReflector.getFieldClass();
 					String propertyName = propertyReflector.getPropertyName(getMapperType());
 					if(propertyName != null)
 					{
-						Serializer<?> serializer = getSerializer(propertyClass, propertyReflector);
-						if(serializer != null)
+						Object fieldValue = ReflectionUtil.getFieldValue(propertyReflector.getField(), value);
+						if(fieldValue != null && (ReflectionUtil.isArray(fieldValue.getClass()) || ReflectionUtil.isCollection(fieldValue.getClass())))
 						{
-							String serializedValue = null;
-							Object fieldValue = ReflectionUtil.getFieldValue(propertyReflector.getField(), value);
-							if(fieldValue != null)
+							List<?> elementValues = ReflectionUtil.asCollection(fieldValue);
+							for(Object elementValue : elementValues)
 							{
-								String timeFormat = getTimeFormat(propertyReflector);
-								serializedValue = serializer.serialize(fieldValue, getTimeZone(propertyReflector), timeFormat);
+								seperator = writeProperty(writer, propertyName, elementValue, seperator, propertyReflector);
 							}
-							else if(getMapperConfig().isSerializeNulls())
-							{
-								serializedValue = BLANK;
-							}
-							if(serializedValue != null)
-							{
-								seperator = writeField(writer, propertyName, serializedValue, seperator);
-							}
+						}
+						else
+						{
+							seperator = writeProperty(writer, propertyName, fieldValue, seperator, propertyReflector);
 						}
 					}
 				}
@@ -371,23 +371,21 @@ public class FormMapper extends Mapper implements FormBoundary
 			for(Entry<String, ?> entry : map.entrySet())
 			{
 				String propertyName = entry.getKey();
-				Object fieldValue = entry.getValue();
-				String serializedValue = null;
-				if(fieldValue != null)
+				if(propertyName != null)
 				{
-					Serializer<?> serializer = getSerializer(fieldValue.getClass());
-					if(serializer != null)
+					Object fieldValue = entry.getValue();
+					if(fieldValue != null && (ReflectionUtil.isArray(fieldValue.getClass()) || ReflectionUtil.isCollection(fieldValue.getClass())))
 					{
-						serializedValue = serializer.serialize(fieldValue, TimeZone.DEFAULT, null);
+						List<?> elementValues = ReflectionUtil.asCollection(fieldValue);
+						for(Object elementValue : elementValues)
+						{
+							seperator = writeProperty(writer, propertyName, elementValue, seperator, null);
+						}
 					}
-				}
-				else if(getMapperConfig().isSerializeNulls())
-				{
-					serializedValue = BLANK;
-				}
-				if(serializedValue != null)
-				{
-					seperator = writeField(writer, propertyName, serializedValue, seperator);
+					else
+					{
+						seperator = writeProperty(writer, propertyName, fieldValue, seperator, null);
+					}
 				}
 			}
 			writer.flush();
@@ -396,6 +394,32 @@ public class FormMapper extends Mapper implements FormBoundary
 		{
 			throw new FormException(e);
 		}
+	}
+	
+	protected String writeProperty(Writer writer, String name, Object value, String seperator, PropertyReflector propertyReflector) throws IOException
+	{
+		String serializedValue = null;
+		if(value != null)
+		{
+			Serializer<?> serializer = getSerializer(value.getClass(), propertyReflector);
+			if(serializer != null)
+			{
+				if(value != null)
+				{
+					String timeFormat = getTimeFormat(propertyReflector);
+					serializedValue = serializer.serialize(value, getTimeZone(propertyReflector), timeFormat);
+				}
+			}
+		}
+		else if(getMapperConfig().isSerializeNulls())
+		{
+			serializedValue = BLANK;
+		}
+		if(serializedValue != null)
+		{
+			seperator = writeField(writer, name, serializedValue, seperator);
+		}
+		return seperator;
 	}
 	
 	protected String writeField(Writer writer, String name, String value, String seperator) throws IOException

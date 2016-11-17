@@ -2,6 +2,8 @@ package roth.lib.java.test.form;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
+
+import roth.lib.java.lang.List;
 import roth.lib.java.lang.Map;
 
 import roth.lib.java.form.FormMapper;
@@ -14,16 +16,16 @@ public class FormTest
 	public static void main(String[] args)
 	{
 		//serializeModel();
-		//serializeMap();
+		serializeMap();
 		//deserializeModel();
 		//deserializeMap();
-		prettyPrint();
+		//prettyPrint();
 	}
 	
 	protected static void serializeModel()
 	{
 		FormModel model = new FormModel();
-		new FormMapper(mapperConfig).serialize(model, System.out);
+		new FormMapper(mapperConfig).setPrettyPrint(true).serialize(model, System.out);
 	}
 	
 	protected static void serializeMap()
@@ -40,7 +42,8 @@ public class FormTest
 		map.put("test_string", "test");
 		map.put("test_date", new Date());
 		map.put("test_calendar", new GregorianCalendar());
-		new FormMapper(mapperConfig).serialize(map, System.out);
+		map.put("test_list", new List<String>("one", "two", "three"));
+		new FormMapper(mapperConfig).setPrettyPrint(true).serialize(map, System.out);
 	}
 	
 	protected static void deserializeModel()
