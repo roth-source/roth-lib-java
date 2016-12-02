@@ -26,9 +26,9 @@ import roth.lib.java.util.ReflectionUtil;
 
 public class JsonMapper extends Mapper
 {
-	protected static String NULL 	= "null";
-	protected static String TRUE 	= "true";
-	protected static String FALSE	= "false";
+	protected static String NULL_LITERAL 	= "null";
+	protected static String TRUE 			= "true";
+	protected static String FALSE			= "false";
 	
 	public JsonMapper()
 	{
@@ -146,7 +146,7 @@ public class JsonMapper extends Mapper
 				seperator = writeSeperator(writer, seperator);
 				writeNewLine(writer);
 				writePropertyName(writer, name);
-				writer.write(NULL);
+				writer.write(NULL_LITERAL);
 			}
 			else if(getMapperReflector().isEntity(value.getClass()))
 			{
@@ -223,7 +223,7 @@ public class JsonMapper extends Mapper
 						seperator = writeSeperator(writer, seperator);
 						writeNewLine(writer);
 						writePropertyName(writer, name);
-						writer.write(NULL);
+						writer.write(NULL_LITERAL);
 					}
 				}
 			}
@@ -253,7 +253,7 @@ public class JsonMapper extends Mapper
 					incrementTabs();
 					seperator = writeSeperator(writer, seperator);
 					writeNewLine(writer);
-					writer.write(NULL);
+					writer.write(NULL_LITERAL);
 					decrementTabs();
 				}
 				else if(getMapperReflector().isEntity(value.getClass()))
@@ -328,7 +328,7 @@ public class JsonMapper extends Mapper
 							incrementTabs();
 							seperator = writeSeperator(writer, seperator);
 							writeNewLine(writer);
-							writer.write(NULL);
+							writer.write(NULL_LITERAL);
 							decrementTabs();
 						}
 					}
@@ -392,7 +392,7 @@ public class JsonMapper extends Mapper
 	{
 		if(value == null)
 		{
-			writer.write(NULL);
+			writer.write(NULL_LITERAL);
 		}
 		else if(!escapable)
 		{
@@ -443,6 +443,38 @@ public class JsonMapper extends Mapper
 					case FORM_FEED:
 					{
 						writer.write("\\f");
+						break;
+					}
+					case NULL:
+					case START_OF_HEADING:
+					case START_OF_TEXT:
+					case END_OF_TEXT:
+					case END_OF_TRANSMISSION:
+					case ENQUIRY:
+					case ACKNOWLEDGE:
+					case BELL:
+					case VERTICAL_TAB:
+					case SHIFT_OUT:
+					case SHIFT_IN:
+					case DATA_LINK_ESCAPE:
+					case DEVICE_CONTROL_1:
+					case DEVICE_CONTROL_2:
+					case DEVICE_CONTROL_3:
+					case DEVICE_CONTROL_4:
+					case NEGATIVE_ACKNOWLEDGE:
+					case SYNCHRONOUS_IDLE:
+					case END_OF_BLOCK:
+					case CANCEL:
+					case END_OF_MEDIUM:
+					case SUBSTITUTE:
+					case ESCAPE:
+					case FILE_SEPERATOR:
+					case GROUP_SEPERATOR:
+					case RECORD_SEPERATOR:
+					case UNIT_SEPERATOR:
+					case DELETE:
+					{
+						writer.write(String.format("\\u%04x", (int) c));
 						break;
 					}
 					default:
@@ -598,7 +630,7 @@ public class JsonMapper extends Mapper
 						{
 							Field field = propertyReflector.getField();
 							Class<?> fieldClass = propertyReflector.getFieldClass();
-							if(!NULL.equalsIgnoreCase(value))
+							if(!NULL_LITERAL.equalsIgnoreCase(value))
 							{
 								Deserializer<?> deserializer = getDeserializer(fieldClass, propertyReflector);
 								if(deserializer != null)
@@ -622,7 +654,7 @@ public class JsonMapper extends Mapper
 							PropertiesReflector propertiesReflector = entityReflector.getPropertiesReflector();
 							if(propertiesReflector != null)
 							{
-								propertiesReflector.put(model, name, !NULL.equalsIgnoreCase(value) ? value : null);
+								propertiesReflector.put(model, name, !NULL_LITERAL.equalsIgnoreCase(value) ? value : null);
 							}
 						}
 						name = null;
@@ -784,7 +816,7 @@ public class JsonMapper extends Mapper
 					if(name != null)
 					{
 						String value = builder.toString();
-						if(NULL.equalsIgnoreCase(value))
+						if(NULL_LITERAL.equalsIgnoreCase(value))
 						{
 							map.put(key, null);
 						}
@@ -921,7 +953,7 @@ public class JsonMapper extends Mapper
 				case SINGLE_QUOTE:
 				{
 					String value = readEscaped(reader, c);
-					if(value != null && !value.trim().isEmpty() && !NULL.equalsIgnoreCase(value))
+					if(value != null && !value.trim().isEmpty() && !NULL_LITERAL.equalsIgnoreCase(value))
 					{
 						Deserializer<?> deserializer = getDeserializer(elementClass, propertyReflector);
 						if(deserializer != null)
@@ -959,7 +991,7 @@ public class JsonMapper extends Mapper
 				case RIGHT_BRACKET:
 				{
 					String value = builder.toString();
-					if(value != null && !value.trim().isEmpty() && !NULL.equalsIgnoreCase(value))
+					if(value != null && !value.trim().isEmpty() && !NULL_LITERAL.equalsIgnoreCase(value))
 					{
 						Deserializer<?> deserializer = getDeserializer(elementClass, propertyReflector);
 						if(deserializer != null)
