@@ -669,6 +669,7 @@ public abstract class JdbcTable<T> implements SqlFactory
 	{
 		if(filterInterfaces != null && !filterInterfaces.isEmpty())
 		{
+			// if the request object is not set, it will not try to apply filters
 			if(request != null)
 			{
 				int applied = 0;
@@ -706,10 +707,6 @@ public abstract class JdbcTable<T> implements SqlFactory
 				{
 					throw new JdbcException("No filters applied");
 				}
-			}
-			else
-			{
-				throw new JdbcException("Request object not set");
 			}
 		}
 		return select;

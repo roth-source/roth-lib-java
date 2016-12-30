@@ -6,6 +6,8 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
+import java.sql.SQLNonTransientConnectionException;
+import java.sql.SQLTransientConnectionException;
 import java.util.Enumeration;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -194,7 +196,13 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 															{
 																if(e.getCause() != null)
 																{
-																	errors.add(service.exception(HttpErrorType.SERVICE_EXCEPTION.error(e), e.getCause()));
+																	Throwable cause = e.getCause();
+																	HttpErrorType errorType = HttpErrorType.SERVICE_EXCEPTION;
+																	if(cause instanceof SQLNonTransientConnectionException || cause instanceof SQLTransientConnectionException)
+																	{
+																		errorType = HttpErrorType.DATABASE_CONNECTION_EXCEPTION;
+																	}
+																	errors.add(service.exception(errorType.error(cause), cause));
 																}
 															}
 															errors.addAll(service.getErrors());
