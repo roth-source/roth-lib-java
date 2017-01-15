@@ -9,6 +9,7 @@ import roth.lib.java.type.MimeType;
 @SuppressWarnings("serial")
 public class DataUrl implements Serializable, Characters
 {
+	protected String mime;
 	protected MimeType mimeType;
 	protected Charset charset = UTF_8;
 	boolean base64 = true;
@@ -44,9 +45,17 @@ public class DataUrl implements Serializable, Characters
 		return new String(bytes, charset != null ? charset : UTF_8);
 	}
 	
+	public DataUrl setMime(String mime)
+	{
+		this.mime = mime;
+		this.mimeType = MimeType.fromString(mime);
+		return this;
+	}
+	
 	public DataUrl setMimeType(MimeType mimeType)
 	{
 		this.mimeType = mimeType;
+		this.mime = mimeType != null ? mimeType.toString() : null;
 		return this;
 	}
 	
@@ -73,7 +82,11 @@ public class DataUrl implements Serializable, Characters
 	{
 		StringBuilder builder = new StringBuilder();
 		builder.append("data:");
-		if(mimeType != null)
+		if(mime != null)
+		{
+			builder.append(mime);
+		}
+		else if(mimeType != null)
 		{
 			builder.append(mimeType.toString());
 		}

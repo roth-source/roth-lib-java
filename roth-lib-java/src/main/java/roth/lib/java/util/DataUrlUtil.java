@@ -7,15 +7,14 @@ import java.util.regex.Pattern;
 
 import roth.lib.java.Characters;
 import roth.lib.java.DataUrl;
-import roth.lib.java.type.MimeType;
 
 public class DataUrlUtil implements Characters
 {
-	protected static String MIME_TYPE = "mimeType";
+	protected static String MIME = "mime";
 	protected static String CHARSET = "charset";
 	protected static String CHARSET_REPLACE = "charset=";
 	protected static String BASE_64 = "base64";
-	protected static Pattern pattern = Pattern.compile(String.format("^data:(?<%s>[^;]+?)?(?<%s>;%s\\S+?)?(?<%s>;base64)?,", MIME_TYPE, CHARSET, CHARSET_REPLACE, BASE_64));
+	protected static Pattern pattern = Pattern.compile(String.format("^data:(?<%s>[^;]+?)?(?<%s>;%s\\S+?)?(?<%s>;base64)?,", MIME, CHARSET, CHARSET_REPLACE, BASE_64));
 	
 	protected DataUrlUtil()
 	{
@@ -29,12 +28,12 @@ public class DataUrlUtil implements Characters
 		if(matcher.find())
 		{
 			dataUrl = new DataUrl();
-			String mimeTypeCapture = matcher.group(MIME_TYPE);
-			if(mimeTypeCapture != null)
+			String mimeCapture = matcher.group(MIME);
+			if(mimeCapture != null)
 			{
 				try
 				{
-					dataUrl.setMimeType(MimeType.fromString(mimeTypeCapture));
+					dataUrl.setMime(mimeCapture);
 				}
 				catch(Exception e)
 				{
