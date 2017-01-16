@@ -123,31 +123,21 @@ public class HttpConnection implements Characters
 		HttpResponse<T> response = new HttpResponse<T>();
 		response.parseStatus(connection);
 		response.setHeaders(getResponseHeaders());
-		if(response.isSuccess())
+		if(inputter != null)
 		{
-			if(inputter != null)
+			try(InputStream input = getAnyStream())
 			{
-				try(InputStream input = getInputStream())
+				if(debug || !response.isSuccess())
 				{
-					if(debug)
-					{
-						ByteArrayOutputStream output = readAll(input);
-						response.setInput(new ByteArrayInputStream(output.toByteArray()));
-						response.setBody(new String(output.toByteArray(), UTF_8));
-						if(inputter != null)
-						{
-							response.setEntity(inputter.input(response.getInput()));
-						}
-					}
-					else
-					{
-						response.setEntity(inputter.input(input));
-					}
+					ByteArrayOutputStream output = readAll(input);
+					response.setInput(new ByteArrayInputStream(output.toByteArray()));
+					response.setBody(new String(output.toByteArray(), UTF_8));
+					response.setEntity(inputter.input(response.getInput()));
 				}
-			}
-			else
-			{
-				response.setInput(getAnyStream());
+				else
+				{
+					response.setEntity(inputter.input(input));
+				}
 			}
 		}
 		else

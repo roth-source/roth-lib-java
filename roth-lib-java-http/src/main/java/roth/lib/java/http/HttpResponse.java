@@ -20,7 +20,6 @@ public class HttpResponse<T> implements Characters
 	protected String body;
 	protected T entity;
 	protected InputStream input;
-	protected String error;
 	
 	public HttpResponse()
 	{
@@ -57,11 +56,6 @@ public class HttpResponse<T> implements Characters
 		return input;
 	}
 	
-	public String getError()
-	{
-		return error;
-	}
-	
 	public HttpResponse<T> setVersion(HttpVersion version)
 	{
 		this.version = version;
@@ -95,12 +89,6 @@ public class HttpResponse<T> implements Characters
 	public HttpResponse<T> setInput(InputStream input)
 	{
 		this.input = input;
-		return this;
-	}
-	
-	public HttpResponse<T> setError(String error)
-	{
-		this.error = error;
 		return this;
 	}
 	

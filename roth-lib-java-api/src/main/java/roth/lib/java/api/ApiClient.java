@@ -1,7 +1,6 @@
 package roth.lib.java.api;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
 
@@ -23,7 +22,6 @@ import roth.lib.java.outputter.Outputter;
 import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.serializer.Serializer;
 import roth.lib.java.type.MimeType;
-import roth.lib.java.util.IoUtil;
 
 public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient implements Characters
 {
@@ -861,7 +859,6 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient impl
 			}
 			if(!response.isSuccess())
 			{
-				readError(response);
 				checkError(response);
 			}
 			checkResponse(response);
@@ -881,21 +878,6 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient impl
 	protected void logResponse(String response)
 	{
 		getLogWriter().println(response);
-	}
-	
-	protected <T extends ApiResponse> void readError(HttpResponse<T> response)
-	{
-		try
-		{
-			try(InputStream input = response.getInput())
-			{
-				response.setError(IoUtil.toString(input));
-			}
-		}
-		catch(Exception e)
-		{
-			
-		}
 	}
 	
 	protected <T extends ApiResponse> void checkError(HttpResponse<T> response)
