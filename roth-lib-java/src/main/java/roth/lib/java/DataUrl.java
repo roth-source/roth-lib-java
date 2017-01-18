@@ -20,6 +20,11 @@ public class DataUrl implements Serializable, Characters
 		
 	}
 	
+	public String getMime()
+	{
+		return mime;
+	}
+	
 	public MimeType getMimeType()
 	{
 		return mimeType;
