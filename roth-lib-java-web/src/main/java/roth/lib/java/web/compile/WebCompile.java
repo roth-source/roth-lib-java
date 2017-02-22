@@ -11,6 +11,7 @@ import roth.lib.java.Characters;
 import roth.lib.java.lang.Map;
 import roth.lib.java.template.Template;
 import roth.lib.java.util.FileUtil;
+import roth.lib.java.util.IdUtil;
 import roth.lib.java.util.IoUtil;
 
 public class WebCompile implements Characters
@@ -246,6 +247,13 @@ public class WebCompile implements Characters
 			{
 				compileApp(appDir);
 			}
+		}
+		File cacheFile = new File(getWebAppDir(), "script/cache.js");
+		try(PrintWriter writer = new PrintWriter(cacheFile))
+		{
+			writer.println();
+			writer.println(String.format("roth.lib.js.cache.key = \"%s\";", IdUtil.uuid('k')));
+			writer.println();
 		}
 	}
 	
