@@ -38,6 +38,7 @@ import roth.lib.java.deserializer.StringDeserializer;
 import roth.lib.java.deserializer.TimeDeserializer;
 import roth.lib.java.deserializer.YearDeserializer;
 import roth.lib.java.form.FormMapper;
+import roth.lib.java.form.MultipartFormMapper;
 import roth.lib.java.json.JsonMapper;
 import roth.lib.java.lang.Map;
 import roth.lib.java.lang.Set;
@@ -225,6 +226,11 @@ public class MapperReflector
 				mapper = getFormMapper(mapperConfig);
 				break;
 			}
+			case MULTIPART_FORM:
+			{
+				mapper = getMultipartFormMapper(mapperConfig);
+				break;
+			}
 			case TABLE:
 			{
 				mapper = getTableMapper(mapperConfig);
@@ -267,6 +273,11 @@ public class MapperReflector
 	public FormMapper getFormMapper(MapperConfig mapperConfig)
 	{
 		return new FormMapper(mapperConfig);
+	}
+	
+	public MultipartFormMapper getMultipartFormMapper(MapperConfig mapperConfig)
+	{
+		return new MultipartFormMapper(mapperConfig);
 	}
 	
 	public TableMapper getTableMapper()

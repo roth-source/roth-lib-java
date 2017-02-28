@@ -95,6 +95,11 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient impl
 				contentType = MimeType.APPLICATION_X_WWW_FORM_URLENCODED;
 				break;
 			}
+			case MULTIPART_FORM:
+			{
+				contentType = MimeType.MULTIPART_FORM_DATA;
+				break;
+			}
 			case TABLE:
 			case MYSQL:
 			{
@@ -122,6 +127,11 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient impl
 			case FORM:
 			{
 				contentType = MimeType.APPLICATION_X_WWW_FORM_URLENCODED;
+				break;
+			}
+			case MULTIPART_FORM:
+			{
+				contentType = MimeType.MULTIPART_FORM_DATA;
 				break;
 			}
 			case TABLE:

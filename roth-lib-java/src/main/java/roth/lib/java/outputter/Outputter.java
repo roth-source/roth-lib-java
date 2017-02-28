@@ -29,18 +29,23 @@ public abstract class Outputter
 		return this;
 	}
 	
-	public void output(OutputStream output) throws IOException
+	public void wrap(OutputStream output) throws IOException
 	{
 		if(gzip)
 		{
 			GZIPOutputStream gzipOutput = new GZIPOutputStream(output);
-			output(new OutputStreamWriter(gzipOutput, Characters.UTF_8));
+			output(gzipOutput);
 			gzipOutput.finish();
 		}
 		else
 		{
-			output(new OutputStreamWriter(output, Characters.UTF_8));
+			output(output);
 		}
+	}
+	
+	public void output(OutputStream output) throws IOException
+	{
+		output(new OutputStreamWriter(output, Characters.UTF_8));
 	}
 	
 	public void output(Writer writer) throws IOException

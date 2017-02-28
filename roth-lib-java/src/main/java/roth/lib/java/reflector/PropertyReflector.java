@@ -96,6 +96,7 @@ public class PropertyReflector
 				break;
 			}
 			case FORM:
+			case MULTIPART_FORM:
 			{
 				property = isForm();
 				if(property)
@@ -150,6 +151,7 @@ public class PropertyReflector
 				break;
 			}
 			case FORM:
+			case MULTIPART_FORM:
 			{
 				name = getFormName();
 				if(name == null)
@@ -219,6 +221,7 @@ public class PropertyReflector
 				break;
 			}
 			case FORM:
+			case MULTIPART_FORM:
 			{
 				timeFormat = getFormTimeFormat();
 				break;
@@ -240,6 +243,7 @@ public class PropertyReflector
 				case JSON:
 				case XML:
 				case FORM:
+				case MULTIPART_FORM:
 				case TABLE:
 				{
 					timeFormat = getTimeFormat();
@@ -291,6 +295,7 @@ public class PropertyReflector
 				break;
 			}
 			case FORM:
+			case MULTIPART_FORM:
 			{
 				if(hasFormFilter())
 				{
@@ -318,6 +323,7 @@ public class PropertyReflector
 				case JSON:
 				case XML:
 				case FORM:
+				case MULTIPART_FORM:
 				case TABLE:
 				{
 					filterers = getFilterers(getFilter());
@@ -370,6 +376,7 @@ public class PropertyReflector
 				break;
 			}
 			case FORM:
+			case MULTIPART_FORM:
 			{
 				serializer = getFormSerializer();
 				break;
@@ -391,6 +398,7 @@ public class PropertyReflector
 				case JSON:
 				case XML:
 				case FORM:
+				case MULTIPART_FORM:
 				case TABLE:
 				{
 					serializer = getSerializer();
@@ -434,6 +442,7 @@ public class PropertyReflector
 				break;
 			}
 			case FORM:
+			case MULTIPART_FORM:
 			{
 				deserializer = getFormDeserializer();
 				break;
@@ -455,6 +464,7 @@ public class PropertyReflector
 				case JSON:
 				case XML:
 				case FORM:
+				case MULTIPART_FORM:
 				case TABLE:
 				{
 					deserializer = getDeserializer();

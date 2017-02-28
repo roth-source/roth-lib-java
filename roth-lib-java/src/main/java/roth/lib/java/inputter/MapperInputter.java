@@ -1,7 +1,7 @@
 package roth.lib.java.inputter;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 
 import roth.lib.java.mapper.MapperConfig;
@@ -72,9 +72,9 @@ public class MapperInputter<T> extends Inputter<T>
 	}
 	
 	@Override
-	public T input(BufferedReader reader) throws IOException
+	public T input(InputStream input) throws IOException
 	{
-		return getMapperReflector().getMapper(getMapperType(), getMapperConfig()).deserialize(reader, getType());
+		return getMapperReflector().getMapper(getMapperType(), getMapperConfig()).deserialize(input, getType());
 	}
 	
 }

@@ -116,7 +116,7 @@ public class HttpConnection implements Characters
 			connection.setDoOutput(true);
 			try(OutputStream output = getOutputStream())
 			{
-				request.getOutputter().output(output);
+				request.getOutputter().wrap(output);
 			}
 		}
 		connection.connect();
@@ -155,7 +155,7 @@ public class HttpConnection implements Characters
 		if(request.hasOutputter())
 		{
 			connection.setDoOutput(true);
-			request.getOutputter().output(getOutputStream());
+			request.getOutputter().wrap(getOutputStream());
 		}
 		connection.connect();
 		HttpResponse<?> response = new HttpResponse<>();

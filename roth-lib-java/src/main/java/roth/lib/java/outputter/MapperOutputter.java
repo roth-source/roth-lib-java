@@ -1,7 +1,7 @@
 package roth.lib.java.outputter;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import roth.lib.java.mapper.MapperConfig;
 import roth.lib.java.mapper.MapperType;
@@ -71,14 +71,14 @@ public class MapperOutputter<T> extends Outputter
 	}
 	
 	@Override
-	public void output(BufferedWriter writer) throws IOException
+	public void output(OutputStream output) throws IOException
 	{
 		T value = getValue();
 		if(value != null)
 		{
-			getMapperReflector().getMapper(getMapperType(), getMapperConfig()).serialize(value, writer);
+			getMapperReflector().getMapper(getMapperType(), getMapperConfig()).serialize(value, output);
 		}
-		writer.flush();
+		output.flush();
 	}
 	
 }

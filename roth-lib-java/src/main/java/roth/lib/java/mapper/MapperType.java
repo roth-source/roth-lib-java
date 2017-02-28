@@ -6,6 +6,7 @@ public enum MapperType
 	JSON,
 	XML,
 	FORM,
+	MULTIPART_FORM,
 	TABLE,
 	;
 	

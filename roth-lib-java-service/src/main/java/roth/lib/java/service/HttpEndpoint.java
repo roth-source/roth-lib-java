@@ -1,5 +1,6 @@
 package roth.lib.java.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import roth.lib.java.Characters;
 import roth.lib.java.form.FormMapper;
+import roth.lib.java.form.MultipartFormMapper;
 import roth.lib.java.http.HttpMethod;
 import roth.lib.java.http.HttpUrl;
 import roth.lib.java.lang.List;
@@ -147,12 +149,12 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 														service.setRequestContentType(requestContentType);
 														requestMapper = getRequestMapper(request, response, requestContentType);
 														requestMapper.setContext(methodReflector.getContext()).setContentType(requestContentType);
-														if(requestMapper instanceof FormMapper && MimeType.MULTIPART_FORM_DATA.equals(requestContentType))
+														if(requestMapper instanceof MultipartFormMapper)
 														{
 															Matcher matcher = BOUNDARY_PATTERN.matcher(request.getHeader(CONTENT_TYPE_HEADER));
 															if(matcher.find())
 															{
-																((FormMapper) requestMapper).setBoundary(matcher.group(1));
+																((MultipartFormMapper) requestMapper).setBoundary(matcher.group(1));
 															}
 														}
 														service.setRequestMapper(requestMapper);
@@ -496,9 +498,13 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 				break;
 			}
 			case APPLICATION_X_WWW_FORM_URLENCODED:
-			case MULTIPART_FORM_DATA:
 			{
 				mapper = getMapperReflector().getMapper(MapperType.FORM, getMapperConfig());
+				break;
+			}
+			case MULTIPART_FORM_DATA:
+			{
+				mapper = getMapperReflector().getMapper(MapperType.MULTIPART_FORM, getMapperConfig());
 				break;
 			}
 			default:
@@ -675,7 +681,9 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		builder.append(NEW_LINE);
 		if(methodRequest != null && mapper != null)
 		{
-			builder.append(mapper.setPrettyPrint(true).serialize(methodRequest));
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			mapper.setPrettyPrint(true).serialize(methodRequest, output);
+			builder.append(output.toString());
 			builder.append(NEW_LINE);
 			builder.append(NEW_LINE);
 		}
@@ -703,7 +711,9 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		builder.append(NEW_LINE);
 		if(methodResponse != null && mapper != null)
 		{
-			builder.append(mapper.setPrettyPrint(true).serialize(methodResponse));
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			mapper.setPrettyPrint(true).serialize(methodResponse);
+			builder.append(output.toString());
 			builder.append(NEW_LINE);
 			builder.append(NEW_LINE);
 		}
