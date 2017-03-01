@@ -15,8 +15,8 @@ public class FormTest
 	
 	public static void main(String[] args)
 	{
-		//serializeModel();
-		serializeMap();
+		serializeModel();
+		//serializeMap();
 		//deserializeModel();
 		//deserializeMap();
 		//prettyPrint();

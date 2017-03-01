@@ -1,8 +1,8 @@
 package roth.lib.java.form;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,7 +13,6 @@ import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.Map.Entry;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import roth.lib.java.Generic;
@@ -28,7 +27,6 @@ import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.serializer.Serializer;
 import roth.lib.java.type.MimeType;
-import roth.lib.java.util.IdUtil;
 import roth.lib.java.util.IoUtil;
 import roth.lib.java.util.ReflectionUtil;
 
@@ -63,14 +61,11 @@ public class MultipartFormMapper extends Mapper
 	public MultipartFormMapper(MapperReflector mapperReflector, MapperConfig mapperConfig)
 	{
 		super(MapperType.MULTIPART_FORM, mapperReflector, mapperConfig);
+		boundary = mapperConfig.getBoundary();
 	}
 	
 	public String getBoundary()
 	{
-		if(boundary == null)
-		{
-			boundary = IdUtil.random(10);
-		}
 		return boundary;
 	}
 	
@@ -315,19 +310,21 @@ public class MultipartFormMapper extends Mapper
 	@Override
 	public <T> T deserialize(InputStream input, Type type)
 	{
+		throw new UnsupportedOperationException();
+		/*
 		T entity = null;
 		if(boundary == null) throw new IllegalArgumentException("Boundary cannot be null");
 		try
 		{
-			BufferedInputStream bufferedInput = input instanceof BufferedInputStream ? (BufferedInputStream) input : new BufferedInputStream(input);
+			DataInputStream dataInput = input instanceof DataInputStream ? (DataInputStream) input : new DataInputStream(input);
 			EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
 			Class<T> klass = ReflectionUtil.getTypeClass(type);
 			Constructor<T> constructor = klass.getDeclaredConstructor();
 			constructor.setAccessible(true);
 			entity = constructor.newInstance();
-			readFirst(bufferedInput);
+			readFirst(dataInput);
 			String headers = null;
-			while((headers = readHeaders(bufferedInput)) != null)
+			while((headers = readHeaders(dataInput)) != null)
 			{
 				String name = null;
 				String filename = null;
@@ -347,7 +344,7 @@ public class MultipartFormMapper extends Mapper
 						}
 					}
 				}
-				byte[] bytes = readValue(bufferedInput);
+				byte[] bytes = readValue(dataInput);
 				if(filename == null)
 				{
 					setValue(entity, entityReflector.getPropertyReflector(name, getMapperType(), getMapperReflector()), new String(bytes, UTF_8));
@@ -372,6 +369,7 @@ public class MultipartFormMapper extends Mapper
 			throw new FormException(e);
 		}
 		return entity;
+		*/
 	}
 	
 	@Override
@@ -400,7 +398,7 @@ public class MultipartFormMapper extends Mapper
 		throw new UnsupportedOperationException();
 	}
 	
-	protected String readHeaders(BufferedInputStream input) throws IOException
+	protected String readHeaders(DataInputStream input) throws IOException
 	{
 		byte[] newlines = (CRLF + CRLF).getBytes();
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -435,7 +433,7 @@ public class MultipartFormMapper extends Mapper
 			}
 		}
 		byte[] headers = output.toByteArray();
-		if(!(headers.length >= 2 && headers[0] == DASH && headers[1] == DASH))
+		if(headers.length > 0 && !(headers.length >= 2 && headers[0] == DASH && headers[1] == DASH))
 		{
 			return new String(headers, UTF_8);
 		}
@@ -445,17 +443,17 @@ public class MultipartFormMapper extends Mapper
 		}
 	}
 	
-	protected void readFirst(BufferedInputStream input) throws IOException
+	protected void readFirst(DataInputStream input) throws IOException
 	{
 		readValue(input, BLANK);
 	}
 	
-	protected byte[] readValue(BufferedInputStream input) throws IOException
+	protected byte[] readValue(DataInputStream input) throws IOException
 	{
 		return readValue(input, CRLF);
 	}
 	
-	protected byte[] readValue(BufferedInputStream input, String newline) throws IOException
+	protected byte[] readValue(DataInputStream input, String newline) throws IOException
 	{
 		byte[] boundary = (newline + PREFIX + this.boundary).getBytes();
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -532,8 +530,8 @@ public class MultipartFormMapper extends Mapper
 	{
 		try
 		{
-			String form = IoUtil.toString(reader);
-			return form;
+			//String form = IoUtil.toString(reader);
+			return null;
 		}
 		catch(Exception e)
 		{

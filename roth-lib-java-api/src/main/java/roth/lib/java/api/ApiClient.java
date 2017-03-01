@@ -1,5 +1,6 @@
 package roth.lib.java.api;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
@@ -171,12 +172,16 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient impl
 	
 	protected String debugRequest(ApiRequest apiRequest)
 	{
-		return getMapperReflector().getMapper(getRequestMapperType(), getMapperConfig()).setPrettyPrint(true).serialize(apiRequest);
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		getMapperReflector().getMapper(getRequestMapperType(), getMapperConfig()).setPrettyPrint(true).serialize(apiRequest, output);
+		return output.toString();
 	}
 	
 	protected String debugResponse(ApiResponse apiResponse)
 	{
-		return getMapperReflector().getMapper(getResponseMapperType(), getMapperConfig()).setPrettyPrint(true).serialize(apiResponse);
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		getMapperReflector().getMapper(getResponseMapperType(), getMapperConfig()).setPrettyPrint(true).serialize(apiResponse, output);
+		return output.toString();
 	}
 	
 	protected String debugBody(String body)
@@ -806,7 +811,14 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient impl
 			MimeType requestContentType = getRequestContentType();
 			if(requestContentType != null)
 			{
-				httpHeaders.setContentType(requestContentType);
+				if(MapperType.MULTIPART_FORM.equals(getRequestMapperType()))
+				{
+					httpHeaders.setContentType(requestContentType, getMapperConfig().getBoundary());
+				}
+				else
+				{
+					httpHeaders.setContentType(requestContentType);
+				}
 			}
 			MimeType responseContentType = getResponseContentType();
 			if(requestContentType != null)

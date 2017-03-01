@@ -107,9 +107,13 @@ public class FormModel
 	@Property(name = "test_list")
 	private List<String> testList = new List<>("one", "two", "three");
 	
+	@Property(name = "test_sub_list")
+	private List<FormSubModel> testSubList = new List<>();
+	
 	protected FormModel()
 	{
-		
+		testSubList.add(new FormSubModel("one_1", "one_2", "one_3"));
+		testSubList.add(new FormSubModel("two_1", "two_2", "two_3"));
 	}
 	
 	@Override

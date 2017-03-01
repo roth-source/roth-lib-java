@@ -6,6 +6,7 @@ import roth.lib.java.Characters;
 import roth.lib.java.deserializer.Deserializer;
 import roth.lib.java.lang.Map;
 import roth.lib.java.serializer.Serializer;
+import roth.lib.java.util.IdUtil;
 
 public class MapperConfig implements Characters
 {
@@ -22,6 +23,7 @@ public class MapperConfig implements Characters
 	protected Map<Class<?>, Serializer<?>> serializerMap = new Map<Class<?>, Serializer<?>>();
 	protected Map<Class<?>, Deserializer<?>> deserializerMap = new Map<Class<?>, Deserializer<?>>();
 	protected boolean writeXmlHeader = true;
+	protected String boundary = IdUtil.random(10);
 	
 	public MapperConfig()
 	{
@@ -85,6 +87,11 @@ public class MapperConfig implements Characters
 	public boolean isWriteXmlHeader()
 	{
 		return writeXmlHeader;
+	}
+	
+	public String getBoundary()
+	{
+		return boundary;
 	}
 	
 	public Serializer<?> getSerializer(Class<?> klass)
@@ -173,6 +180,12 @@ public class MapperConfig implements Characters
 	public MapperConfig setWriteXmlHeader(boolean writeXmlHeader)
 	{
 		this.writeXmlHeader = writeXmlHeader;
+		return this;
+	}
+	
+	public MapperConfig setBoundary(String boundary)
+	{
+		this.boundary = boundary;
 		return this;
 	}
 	

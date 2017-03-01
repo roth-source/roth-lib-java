@@ -70,6 +70,11 @@ public class MapperOutputter<T> extends Outputter
 		return this;
 	}
 	
+	public String getBoundary()
+	{
+		return getMapperConfig().getBoundary();
+	}
+	
 	@Override
 	public void output(OutputStream output) throws IOException
 	{

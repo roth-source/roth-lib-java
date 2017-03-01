@@ -194,6 +194,19 @@ public class HttpHeaders implements Characters
 		return this;
 	}
 	
+	public HttpHeaders setContentType(MimeType contentType, String boundary)
+	{
+		if(boundary != null)
+		{
+			setContentType(contentType.toString() + "; boundary=" + boundary);
+		}
+		else
+		{
+			setContentType(contentType.toString());
+		}
+		return this;
+	}
+	
 	public HttpHeaders setContentType(String contentType)
 	{
 		setHeader(CONTENT_TYPE, contentType);

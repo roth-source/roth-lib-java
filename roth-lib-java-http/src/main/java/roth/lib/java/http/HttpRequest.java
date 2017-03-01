@@ -1,6 +1,7 @@
 package roth.lib.java.http;
 
 import roth.lib.java.Characters;
+import roth.lib.java.outputter.MapperOutputter;
 import roth.lib.java.outputter.Outputter;
 
 public class HttpRequest<T> implements Characters
@@ -80,6 +81,16 @@ public class HttpRequest<T> implements Characters
 	{
 		this.outputter = outputter;
 		return this;
+	}
+	
+	public String getBoundary()
+	{
+		String boundary = null;
+		if(outputter != null && outputter instanceof MapperOutputter)
+		{
+			boundary = ((MapperOutputter<?>) outputter).getBoundary();
+		}
+		return boundary;
 	}
 	
 	@Override
