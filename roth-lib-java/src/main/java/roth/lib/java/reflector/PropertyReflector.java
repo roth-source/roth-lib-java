@@ -106,6 +106,7 @@ public class PropertyReflector
 				break;
 			}
 			case TABLE:
+			case FIXED_WIDTH_TABLE:
 			{
 				property = isTable();
 				if(property)
@@ -161,6 +162,7 @@ public class PropertyReflector
 				break;
 			}
 			case TABLE:
+			case FIXED_WIDTH_TABLE:
 			{
 				name = getTableName();
 				if(name == null)
@@ -227,6 +229,7 @@ public class PropertyReflector
 				break;
 			}
 			case TABLE:
+			case FIXED_WIDTH_TABLE:
 			{
 				timeFormat = getTableTimeFormat();
 				break;
@@ -245,6 +248,7 @@ public class PropertyReflector
 				case FORM:
 				case MULTIPART_FORM:
 				case TABLE:
+				case FIXED_WIDTH_TABLE:
 				{
 					timeFormat = getTimeFormat();
 					break;
@@ -304,6 +308,7 @@ public class PropertyReflector
 				break;
 			}
 			case TABLE:
+			case FIXED_WIDTH_TABLE:
 			{
 				if(hasTableFilter())
 				{
@@ -325,6 +330,7 @@ public class PropertyReflector
 				case FORM:
 				case MULTIPART_FORM:
 				case TABLE:
+				case FIXED_WIDTH_TABLE:
 				{
 					filterers = getFilterers(getFilter());
 					break;
@@ -382,6 +388,7 @@ public class PropertyReflector
 				break;
 			}
 			case TABLE:
+			case FIXED_WIDTH_TABLE:
 			{
 				serializer = getTableSerializer();
 				break;
@@ -400,6 +407,7 @@ public class PropertyReflector
 				case FORM:
 				case MULTIPART_FORM:
 				case TABLE:
+				case FIXED_WIDTH_TABLE:
 				{
 					serializer = getSerializer();
 					break;
@@ -448,6 +456,7 @@ public class PropertyReflector
 				break;
 			}
 			case TABLE:
+			case FIXED_WIDTH_TABLE:
 			{
 				deserializer = getTableDeserializer();
 				break;
@@ -466,6 +475,7 @@ public class PropertyReflector
 				case FORM:
 				case MULTIPART_FORM:
 				case TABLE:
+				case FIXED_WIDTH_TABLE:
 				{
 					deserializer = getDeserializer();
 					break;
@@ -820,6 +830,16 @@ public class PropertyReflector
 		{
 			return null;
 		}
+	}
+	
+	public boolean hasWidth()
+	{
+		return property.width() > 0;
+	}
+	
+	public int getWidth()
+	{
+		return property.width();
 	}
 	
 	public boolean isRequired()

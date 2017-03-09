@@ -102,6 +102,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient impl
 				break;
 			}
 			case TABLE:
+			case FIXED_WIDTH_TABLE:
 			case MYSQL:
 			{
 				break;
@@ -136,6 +137,7 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient impl
 				break;
 			}
 			case TABLE:
+			case FIXED_WIDTH_TABLE:
 			case MYSQL:
 			{
 				break;

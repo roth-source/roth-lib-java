@@ -8,6 +8,7 @@ public enum MapperType
 	FORM,
 	MULTIPART_FORM,
 	TABLE,
+	FIXED_WIDTH_TABLE,
 	;
 	
 }

@@ -74,6 +74,7 @@ public @interface Property
 	Class<? extends Filterer>[] tableFilter() default {};
 	Class<? extends Deserializer<?>> tableDeserializer() default VoidDeserializer.class;
 	Class<? extends Serializer<?>> tableSerializer() default VoidSerializer.class;
+	int width() default 0;
 	
 	// VALIDATION
 	boolean required() default false;

@@ -29,38 +29,27 @@ import roth.lib.java.serializer.Serializer;
 import roth.lib.java.time.TimeZone;
 import roth.lib.java.util.ReflectionUtil;
 
-public class TableMapper extends Mapper
+public class FixedWidthTableMapper extends Mapper
 {
-	protected static final String FORMULA_PATTERN = "^([\\=\\+\\-\\@])";
-	protected static final String FORMULA_ESCAPE = "'$1";
-	protected static final char BYTE_ORDER_MARK = (char) 0xFEFF;
 	
-	
-	protected List<String> columns = new List<>();
-	
-	public TableMapper()
+	public FixedWidthTableMapper()
 	{
 		this(MapperReflector.get());
 	}
 	
-	public TableMapper(MapperConfig mapperConfig)
+	public FixedWidthTableMapper(MapperConfig mapperConfig)
 	{
 		this(MapperReflector.get(), mapperConfig);
 	}
 	
-	public TableMapper(MapperReflector mapperReflector)
+	public FixedWidthTableMapper(MapperReflector mapperReflector)
 	{
 		this(mapperReflector, MapperConfig.get());
 	}
 	
-	public TableMapper(MapperReflector mapperReflector, MapperConfig mapperConfig)
+	public FixedWidthTableMapper(MapperReflector mapperReflector, MapperConfig mapperConfig)
 	{
 		super(MapperType.TABLE, mapperReflector, mapperConfig);
-	}
-	
-	public List<String> getColumns()
-	{
-		return columns;
 	}
 	
 	@Override
@@ -162,7 +151,6 @@ public class TableMapper extends Mapper
 		}
 		if(serializedValue != null)
 		{
-			serializedValue = serializedValue.replaceFirst(FORMULA_PATTERN, FORMULA_ESCAPE);
 			if(isEscaped(serializedValue))
 			{
 				writer.write(getMapperConfig().getQualifier());
@@ -231,19 +219,6 @@ public class TableMapper extends Mapper
 		List<T> list = new List<T>();
 		try
 		{
-			if(!getMapperConfig().isDeserializeColumnOrder())
-			{
-				List<String> missingColumns = missingColumns(reader, klass);
-				if(!missingColumns.isEmpty())
-				{
-					throw new TableException(String.format("Missing columns %s", missingColumns.toString()));
-				}
-			}
-			else if(getMapperConfig().isTableHeader())
-			{
-				readUntil(reader, NEW_LINE, CARRIAGE_RETURN);
-				peekNewLine(reader);
-			}
 			int row = 0;
 			T entity = null;
 			while((entity = readEntity(reader, klass, ++row)) != null)
@@ -262,16 +237,16 @@ public class TableMapper extends Mapper
 		return list;
 	}
 
-	public List<List<String>> deserializeList(String data)
+	public List<List<String>> deserializeList(String data, List<Integer> widths)
 	{
-		return deserializeList(new StringReader(data));
+		return deserializeList(new StringReader(data), widths);
 	}
 	
-	public List<List<String>> deserializeList(File file)
+	public List<List<String>> deserializeList(File file, List<Integer> widths)
 	{
 		try(FileInputStream input = new FileInputStream(file))
 		{
-			return deserializeList(input);
+			return deserializeList(input, widths);
 		}
 		catch(IOException e)
 		{
@@ -279,25 +254,20 @@ public class TableMapper extends Mapper
 		}
 	}
 	
-	public List<List<String>> deserializeList(InputStream input)
+	public List<List<String>> deserializeList(InputStream input, List<Integer> widths)
 	{
-		return deserializeList(new InputStreamReader(input, UTF_8));
+		return deserializeList(new InputStreamReader(input, UTF_8), widths);
 	}
 	
-	public List<List<String>> deserializeList(Reader reader)
+	public List<List<String>> deserializeList(Reader reader, List<Integer> widths)
 	{
 		reader = reader instanceof BufferedReader ? reader : new BufferedReader(reader); 
 		List<List<String>> list = new List<>();
 		try
 		{
-			if(getMapperConfig().isTableHeader())
-			{
-				readUntil(reader, NEW_LINE, CARRIAGE_RETURN);
-				peekNewLine(reader);
-			}
 			int row = 0;
 			List<String> recordList = null;
-			while((recordList = readList(reader, ++row)) != null)
+			while((recordList = readList(reader, widths, ++row)) != null)
 			{
 				list.add(recordList);
 			}
@@ -320,19 +290,6 @@ public class TableMapper extends Mapper
 		T model = null;
 		try
 		{
-			if(!getMapperConfig().isDeserializeColumnOrder())
-			{
-				List<String> missingColumns = missingColumns(reader, type);
-				if(!missingColumns.isEmpty())
-				{
-					throw new TableException(String.format("Missing columns %s", missingColumns.toString()));
-				}
-			}
-			else if(getMapperConfig().isTableHeader())
-			{
-				readUntil(reader, NEW_LINE, CARRIAGE_RETURN);
-				peekNewLine(reader);
-			}
 			if(ReflectionUtil.isArray(type) || ReflectionUtil.isCollection(type))
 			{
 				model = readArray(reader, type);
@@ -351,114 +308,6 @@ public class TableMapper extends Mapper
 			throw new TableException(e);
 		}
 		return model;
-	}
-	
-	public void readColumns(Reader reader, Type type) throws Exception
-	{
-		char delimiter = getMapperConfig().getDelimiter();
-		char qualifier = getMapperConfig().getQualifier();
-		int b;
-		char c;
-		StringBuilder builder = new StringBuilder();
-		read:
-		{
-			do
-			{
-				b = reader.read();
-				c = (char) b;
-				switch(c)
-				{
-					case BYTE_ORDER_MARK:
-					{
-						break;
-					}
-					default:
-					{
-						if(delimiter == c || NEW_LINE == c || CARRIAGE_RETURN == c || b == -1)
-						{
-							getColumns().add(builder.toString().trim());
-							builder.setLength(0);
-							if(NEW_LINE == c)
-							{
-								break read;
-							}
-							else if(CARRIAGE_RETURN == c)
-							{
-								peekNewLine(reader);
-								break read;
-							}
-						}
-						else if(qualifier == c)
-						{
-							builder.append(readEscaped(reader, qualifier));
-						}
-						else
-						{
-							builder.append(c);
-						}
-						break;
-					}
-				}
-			}
-			while(b > -1);
-		}
-	}
-	
-	public List<String> missingColumns(byte[] bytes, Type type) throws Exception
-	{
-		return missingColumns(new ByteArrayInputStream(bytes), type);
-	}
-	
-	public List<String> missingColumns(String data, Type type) throws Exception
-	{
-		return missingColumns(new StringReader(data), type);
-	}
-	
-	public List<String> missingColumns(InputStream input, Type type) throws Exception
-	{
-		return missingColumns(new InputStreamReader(input, UTF_8), type);
-	}
-	
-	public List<String> missingColumns(File file, Type type) throws Exception
-	{
-		try(FileInputStream input = new FileInputStream(file))
-		{
-			return missingColumns(input, type);
-		}
-		catch(IOException e)
-		{
-			throw new MapperException(e);
-		}
-	}
-	
-	public List<String> missingColumns(Reader reader, Type type) throws Exception
-	{
-		reader = reader instanceof BufferedReader ? reader : new BufferedReader(reader); 
-		List<String> missingColumns = new List<>();
-		readColumns(reader, type);
-		EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
-		List<PropertyReflector> propertyReflectors = entityReflector.getPropertyReflectors(getMapperType());
-		for(PropertyReflector propertyReflector : propertyReflectors)
-		{
-			if(propertyReflector.isRequired())
-			{
-				String name = propertyReflector.getPropertyName(getMapperType());
-				boolean found = false;
-				for(String column : getColumns())
-				{
-					if(column.equalsIgnoreCase(name))
-					{
-						found = true;
-						break;
-					}
-				}
-				if(!found)
-				{
-					missingColumns.add(name);
-				}
-			}
-		}
-		return missingColumns;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -515,205 +364,47 @@ public class TableMapper extends Mapper
 		Class<T> klass = ReflectionUtil.getTypeClass(type);
 		Constructor<T> constructor = klass.getDeclaredConstructor();
 		constructor.setAccessible(true);
-		T model = null;
-		char delimiter = getMapperConfig().getDelimiter();
-		char qualifier = getMapperConfig().getQualifier();
-		int column = 0;
-		int b;
-		char c;
-		StringBuilder builder = new StringBuilder();
-		read:
+		T model = constructor.newInstance();
+		for(PropertyReflector propertyReflector : propertyReflectors)
 		{
-			do
-			{
-				b = reader.read();
-				c = (char) b;
-				switch(c)
-				{
-					case BYTE_ORDER_MARK:
-					{
-						break;
-					}
-					default:
-					{
-						if(delimiter == c || NEW_LINE == c || CARRIAGE_RETURN == c || b == -1)
-						{
-							PropertyReflector propertyReflector = null;
-							if(!getMapperConfig().isDeserializeColumnOrder())
-							{
-								propertyReflector = entityReflector.getPropertyReflector(getColumns().get(column++), getMapperType(), getMapperReflector());
-							}
-							else
-							{
-								propertyReflector = propertyReflectors.get(column++);
-							}
-							if(propertyReflector != null)
-							{
-								Deserializer<?> deserializer = propertyReflector.getDeserializer(getMapperType(), getMapperReflector(), getMapperConfig());
-								if(deserializer != null)
-								{
-									String value = builder.toString();
-									if(!value.isEmpty())
-									{
-										if(getMapperConfig().isTableTrim())
-										{
-											value = value.trim();
-										}
-										model = model != null ? model : constructor.newInstance();
-										TimeZone timeZone = getTimeZone(propertyReflector);
-										String timeFormat = getTimeFormat(propertyReflector);
-										value = propertyReflector.filter(value, getMapperType());
-										try
-										{
-											Object deserializedValue = deserializer.deserialize(value, timeZone, timeFormat, propertyReflector.getFieldClass());
-											ReflectionUtil.setFieldValue(propertyReflector.getField(), model, deserializedValue);
-										}
-										catch(Exception e)
-										{
-											throw new TableException(row, column, e);
-										}
-									}
-								}
-							}
-							builder.setLength(0);
-							if(NEW_LINE == c)
-							{
-								break read;
-							}
-							else if(CARRIAGE_RETURN == c)
-							{
-								peekNewLine(reader);
-								break read;
-							}
-						}
-						else if(qualifier == c)
-						{
-							builder.append(readEscaped(reader, qualifier));
-						}
-						else
-						{
-							builder.append(c);
-						}
-						break;
-					}
-				}
-			}
-			while(b > -1);
+			String value = read(reader, propertyReflector.getWidth());
 		}
+		readUntil(reader, NEW_LINE, CARRIAGE_RETURN);
 		return model;
 	}
 	
-	protected List<String> readList(Reader reader, int row) throws Exception
+	protected List<String> readList(Reader reader, List<Integer> widths, int row) throws Exception
 	{
 		List<String> list = null;
-		char delimiter = getMapperConfig().getDelimiter();
-		char qualifier = getMapperConfig().getQualifier();
-		int column = 0;
-		int b;
-		char c;
-		StringBuilder builder = new StringBuilder();
-		read:
+		for(Integer width : widths)
 		{
-			do
-			{
-				b = reader.read();
-				c = (char) b;
-				switch(c)
-				{
-					case BYTE_ORDER_MARK:
-					{
-						break;
-					}
-					default:
-					{
-						if(delimiter == c || NEW_LINE == c || CARRIAGE_RETURN == c || b == -1)
-						{
-							String value = builder.toString();
-							if(!value.isEmpty())
-							{
-								if(getMapperConfig().isTableTrim())
-								{
-									value = value.trim();
-								}
-							}
-							if(value.isEmpty())
-							{
-								value = null;
-							}
-							if(list == null)
-							{
-								list = new List<String>().allowNull();
-							}
-							list.add(value);
-							column = column + 1;
-							builder.setLength(0);
-							if(NEW_LINE == c)
-							{
-								break read;
-							}
-							else if(CARRIAGE_RETURN == c)
-							{
-								peekNewLine(reader);
-								break read;
-							}
-						}
-						else if(qualifier == c)
-						{
-							builder.append(readEscaped(reader, qualifier));
-						}
-						else
-						{
-							builder.append(c);
-						}
-						break;
-					}
-				}
-			}
-			while(b > -1);
+			String value = read(reader, width);
+			
 		}
+		readUntil(reader, NEW_LINE, CARRIAGE_RETURN);
 		return list;
 	}
 	
-	protected String readEscaped(Reader reader, char qualifier) throws Exception
+	protected String read(Reader reader, int width)
 	{
 		StringBuilder builder = new StringBuilder();
-		int b;
-		char c;
-		while((b = reader.read()) > -1)
-		{
-			c = (char) b;
-			if(qualifier == c)
-			{
-				reader.mark(1);
-				b = reader.read();
-				c = (char) b;
-				if(qualifier != c)
-				{
-					reader.reset();
-					break;
-				}
-			}
-			builder.append(c);
-		}
-		return builder.toString();
-	}
-	
-	protected void peekNewLine(Reader reader)
-	{
 		try
 		{
-			reader.mark(1);
-			int b = reader.read();
-			char c = (char) b;
-			if(NEW_LINE != c)
+			int i = 0;
+			int b;
+			char c;
+			while((b = reader.read()) > -1 && i++ < width)
 			{
-				reader.reset();
+				c = (char) b;
+				builder.append(c);
 			}
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			
 		}
+		String value = builder.toString();
+		return !value.isEmpty() ? value : null;
 	}
 	
 	@Override
