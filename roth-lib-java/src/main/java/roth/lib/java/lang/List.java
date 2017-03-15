@@ -12,6 +12,8 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
+import roth.lib.java.util.EnumUtil;
+
 @SuppressWarnings("serial")
 public class List<E> extends LinkedList<E>
 {
@@ -509,10 +511,10 @@ public class List<E> extends LinkedList<E>
 		String seperater = "";
 		for(E element : this)
 		{
-			if(element != null)
+			if(element != null || allowNull)
 			{
 				builder.append(seperater);
-				builder.append(element.toString());
+				builder.append(element != null ? element.toString() : "null");
 				seperater = ",";
 			}
 		}
@@ -536,6 +538,24 @@ public class List<E> extends LinkedList<E>
 	public static <E> List<E> fromArray(E...array)
 	{
 		return new List<E>(array);
+	}
+	
+	public static <T extends Enum<?>> List<T> fromString(String values, Class<T> klass)
+	{
+		return fromString(values, klass, ",");
+	}
+	
+	public static <T extends Enum<?>> List<T> fromString(String values, Class<T> klass, String seperator)
+	{
+		List<T> list = new List<>();
+		if(values != null)
+		{
+			for(String value : values.split(seperator))
+			{
+				list.add(EnumUtil.fromString(value, klass));
+			}
+		}
+		return list;
 	}
 	
 }

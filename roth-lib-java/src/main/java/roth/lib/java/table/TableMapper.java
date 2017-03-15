@@ -671,7 +671,32 @@ public class TableMapper extends Mapper
 			}
 			while(b > -1);
 		}
+		if(isNullList(list))
+		{
+			if(b == -1)
+			{
+				list = null;
+			}
+			else
+			{
+				list = new List<>();
+			}
+		}
 		return list;
+	}
+	
+	protected boolean isNullList(List<String> list)
+	{
+		boolean nullList = false;
+		if(list != null && list.size() == 1)
+		{
+			String value = list.get(0);
+			if(value == null)
+			{
+				nullList = true;
+			}
+		}
+		return nullList;
 	}
 	
 	protected String readEscaped(Reader reader, char qualifier) throws Exception
