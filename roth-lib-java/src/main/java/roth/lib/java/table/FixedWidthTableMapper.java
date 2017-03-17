@@ -1,7 +1,6 @@
 package roth.lib.java.table;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,7 +14,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.Collection;
 
-import roth.lib.java.deserializer.Deserializer;
 import roth.lib.java.lang.List;
 import roth.lib.java.lang.Map;
 import roth.lib.java.mapper.Mapper;
@@ -266,10 +264,13 @@ public class FixedWidthTableMapper extends Mapper
 		try
 		{
 			int row = 0;
-			List<String> recordList = null;
-			while((recordList = readList(reader, widths, ++row)) != null)
+			while(!isEof(reader))
 			{
-				list.add(recordList);
+				List<String> recordList = readList(reader, widths, ++row);
+				if(recordList != null)
+				{
+					list.add(recordList);
+				}
 			}
 		}
 		catch(TableException e)
@@ -367,7 +368,7 @@ public class FixedWidthTableMapper extends Mapper
 		T model = constructor.newInstance();
 		for(PropertyReflector propertyReflector : propertyReflectors)
 		{
-			String value = read(reader, propertyReflector.getWidth());
+			read(reader, propertyReflector.getWidth());
 		}
 		readUntil(reader, NEW_LINE, CARRIAGE_RETURN);
 		return model;
@@ -375,14 +376,38 @@ public class FixedWidthTableMapper extends Mapper
 	
 	protected List<String> readList(Reader reader, List<Integer> widths, int row) throws Exception
 	{
-		List<String> list = null;
-		for(Integer width : widths)
+		List<String> list = new List<String>().allowNull();
+		try
 		{
-			String value = read(reader, width);
-			
+			for(Integer width : widths)
+			{
+				String value = read(reader, width);
+				list.add(value);
+			}
+		}
+		catch(Exception e)
+		{
+			list = null;
 		}
 		readUntil(reader, NEW_LINE, CARRIAGE_RETURN);
 		return list;
+	}
+	
+	protected boolean isEof(Reader reader)
+	{
+		boolean eof = false;
+		try
+		{
+			reader.mark(1);
+			int b = reader.read();
+			eof = b == -1;
+			reader.reset();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return eof;
 	}
 	
 	protected String read(Reader reader, int width)
@@ -393,7 +418,7 @@ public class FixedWidthTableMapper extends Mapper
 			int i = 0;
 			int b;
 			char c;
-			while((b = reader.read()) > -1 && i++ < width)
+			while(i++ < width && (b = reader.read()) > -1)
 			{
 				c = (char) b;
 				builder.append(c);
