@@ -371,7 +371,7 @@ public class FixedWidthTableMapper extends Mapper
 			read(reader, propertyReflector.getWidth());
 		}
 		readUntil(reader, NEW_LINE, CARRIAGE_RETURN);
-		peekRead(reader, NEW_LINE, CARRIAGE_RETURN);
+		peekRead(reader, NEW_LINE);
 		return model;
 	}
 	
@@ -391,7 +391,7 @@ public class FixedWidthTableMapper extends Mapper
 			list = null;
 		}
 		readUntil(reader, NEW_LINE, CARRIAGE_RETURN);
-		peekRead(reader, NEW_LINE, CARRIAGE_RETURN);
+		peekRead(reader, NEW_LINE);
 		return list;
 	}
 	
