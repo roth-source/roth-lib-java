@@ -754,6 +754,7 @@ public class JsonMapper extends Mapper
 			keyClass = (Class<K>) String.class;
 		}
 		Type elementType = ReflectionUtil.getElementType(type);
+		Class<K> elementClass = ReflectionUtil.getTypeClass(elementType);
 		if(klass.isAssignableFrom(Map.class))
 		{
 			map = new Map<K, E>();
@@ -792,13 +793,28 @@ public class JsonMapper extends Mapper
 						Deserializer<?> deserializer = getDeserializer(keyClass, propertyReflector);
 						if(deserializer != null)
 						{
-							key = (K) deserializer.deserialize(name, getTimeZone(propertyReflector), null);
+							key = (K) deserializer.deserialize(name, getTimeZone(propertyReflector), null, keyClass);
 						}
 					}
 					else
 					{
 						String value = readEscaped(reader, c);
-						map.put(key, (E) value);
+						Deserializer<?> deserializer = getDeserializer(elementClass, propertyReflector);
+						if(deserializer != null)
+						{
+							TimeZone timeZone = getTimeZone(propertyReflector);
+							String timeFormat = getTimeFormat(propertyReflector);
+							value = propertyReflector.filter(value, getMapperType());
+							try
+							{
+								E element = (E) deserializer.deserialize(value, timeZone, timeFormat, elementClass);
+								map.put(key, element);
+							}
+							catch(Exception e)
+							{
+								
+							}
+						}
 						key = null;
 						name = null;
 					}
@@ -816,28 +832,22 @@ public class JsonMapper extends Mapper
 					if(name != null)
 					{
 						String value = builder.toString();
-						if(NULL_LITERAL.equalsIgnoreCase(value))
+						Deserializer<?> deserializer = getDeserializer(elementClass, propertyReflector);
+						if(deserializer != null)
 						{
-							map.put(key, null);
-						}
-						else if(TRUE.equalsIgnoreCase(value) || FALSE.equalsIgnoreCase(value))
-						{
-							map.put(key, (E) new Boolean(value));
-						}
-						else
-						{
-							E number = (E) value;
+							TimeZone timeZone = getTimeZone(propertyReflector);
+							String timeFormat = getTimeFormat(propertyReflector);
+							value = propertyReflector.filter(value, getMapperType());
 							try
 							{
-								number = (E) new Double(value);
+								E element = (E) deserializer.deserialize(value, timeZone, timeFormat, elementClass);
+								map.put(key, element);
 							}
 							catch(Exception e)
 							{
 								
 							}
-							map.put(key, number);
 						}
-						builder.setLength(0);
 						key = null;
 						name = null;
 					}

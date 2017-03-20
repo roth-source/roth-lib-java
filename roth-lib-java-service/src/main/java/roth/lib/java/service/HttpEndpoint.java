@@ -712,7 +712,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		if(methodResponse != null && mapper != null)
 		{
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			mapper.setPrettyPrint(true).serialize(methodResponse);
+			mapper.setPrettyPrint(true).serialize(methodResponse, output);
 			builder.append(output.toString());
 			builder.append(NEW_LINE);
 			builder.append(NEW_LINE);
