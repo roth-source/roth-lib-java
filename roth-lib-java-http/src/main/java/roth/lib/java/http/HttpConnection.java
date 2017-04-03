@@ -223,13 +223,16 @@ public class HttpConnection implements Characters
 	protected ByteArrayOutputStream readAll(InputStream input) throws IOException
 	{
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		byte[] buffer = new byte[1024];
-		int n = 0;
-		while((n = input.read(buffer)) != -1)
+		if(input != null)
 		{
-			output.write(buffer, 0, n);
+			byte[] buffer = new byte[1024];
+			int n = 0;
+			while((n = input.read(buffer)) != -1)
+			{
+				output.write(buffer, 0, n);
+			}
+			output.flush();
 		}
-		output.flush();
 		return output;
 	}
 	

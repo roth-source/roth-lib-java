@@ -1212,6 +1212,12 @@ var StringUtil = StringUtil ||
 	stripHtml : function(value)
 	{
 		return value.replace(/<\/?[^>]+(>|$)/g, "");
+	},
+	
+	
+	startsWith : function(value, pattern)
+	{
+		return isSet(value) ? new RegExp("^" + pattern).test(value) : false;
 	}
 	
 };
