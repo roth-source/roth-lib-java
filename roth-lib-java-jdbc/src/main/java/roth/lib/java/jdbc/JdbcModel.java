@@ -115,40 +115,34 @@ public abstract class JdbcModel extends Model implements SqlFactory
 	
 	public <T extends JdbcModel> T insert()
 	{
-		if(isNew())
+		try(JdbcConnection connection = getDb().getConnection())
 		{
-			try(JdbcConnection connection = getDb().getConnection())
+			try
 			{
-				try
-				{
-					insert(connection);
-					connection.commit();
-				}
-				catch(SQLException e)
-				{
-					connection.rollback();
-					connection.close();
-					throw e;
-				}
+				insert(connection);
+				connection.commit();
 			}
 			catch(SQLException e)
 			{
-				throw new JdbcException(e);
+				connection.rollback();
+				connection.close();
+				throw e;
 			}
+		}
+		catch(SQLException e)
+		{
+			throw new JdbcException(e);
 		}
 		return (T) this;
 	}
 	
 	public <T extends JdbcModel> T insert(JdbcConnection connection) throws SQLException
 	{
-		if(isNew())
-		{
-			preSave(connection);
-			preInsert(connection);
-			int result = getDb().executeInsert(this, connection);
-			postInsert(connection, result);
-			postSave(connection, result);
-		}
+		preSave(connection);
+		preInsert(connection);
+		int result = getDb().executeInsert(this, connection);
+		postInsert(connection, result);
+		postSave(connection, result);
 		return (T) this;
 	}
 	
