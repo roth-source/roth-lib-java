@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.sql.SQLNonTransientConnectionException;
@@ -33,8 +34,8 @@ import roth.lib.java.reflector.EntityReflector;
 import roth.lib.java.reflector.MapperReflector;
 import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.service.annotation.Service;
+import roth.lib.java.service.annotation.ServiceMethod;
 import roth.lib.java.service.reflector.MethodReflector;
-import roth.lib.java.service.reflector.ServiceReflector;
 import roth.lib.java.type.MimeType;
 import roth.lib.java.util.EnumUtil;
 import roth.lib.java.util.ReflectionUtil;
@@ -65,7 +66,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 	protected static Pattern BOUNDARY_PATTERN					= Pattern.compile("boundary\\=(?:\")?(.+?)(?:\"|;|$)");
 	protected static String MAX_LENGTH_ERROR 					= "%d exceeds max length of %d characters";
 	
-	protected static Map<String, ServiceReflector> serviceReflectorMap = new Map<String, ServiceReflector>();
+	protected static Map<HttpServiceMethod, MethodReflector> methodReflectorMap = new Map<HttpServiceMethod, MethodReflector>();
 	
 	protected MapperReflector mapperReflector = MapperReflector.get();
 	protected MapperConfig mapperConfig = MapperConfig.get();
@@ -78,7 +79,17 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 			String serviceName = service.name();
 			if(serviceName != null && !serviceName.isEmpty())
 			{
-				serviceReflectorMap.put(serviceName, new ServiceReflector(serviceClass, serviceName));
+				for(Method method : serviceClass.getDeclaredMethods())
+				{
+					ServiceMethod serviceMethod = method.getDeclaredAnnotation(ServiceMethod.class);
+					if(serviceMethod != null)
+					{
+						MethodReflector methodReflector = new MethodReflector(serviceClass, method, serviceMethod);
+						String methodName = methodReflector.getMethodName();
+						HttpServiceMethod httpServiceMethod = new HttpServiceMethod(serviceName, methodName);
+						methodReflectorMap.put(httpServiceMethod, methodReflector);
+					}
+				}
 			}
 		}
 	}
@@ -120,14 +131,14 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 						{
 							if(!ENDPOINT.equalsIgnoreCase(serviceMethod.getServiceName()))
 							{
-								HttpService service = getAnnotatedService(request, response, serviceMethod.getServiceName());
-								if(service != null)
+								MethodReflector methodReflector = getMethodReflector(request, response, serviceMethod);
+								if(methodReflector != null)
 								{
-									service.setServletContext(request.getServletContext()).setHttpServletRequest(request).setHttpServletResponse(response);
-									service.setService(serviceMethod.getServiceName()).setMethod(serviceMethod.getMethodName());
-									MethodReflector methodReflector = getMethodReflector(request, response, service.getClass(), serviceMethod.getServiceName(), serviceMethod.getMethodName());
-									if(methodReflector != null)
+									HttpService service = methodReflector.getService();
+									if(service != null)
 									{
+										service.setServletContext(request.getServletContext()).setHttpServletRequest(request).setHttpServletResponse(response);
+										service.setService(serviceMethod.getServiceName()).setMethod(serviceMethod.getMethodName());
 										responseMapper.setContext(methodReflector.getContext());
 										responseMapper.setPrettyPrint(methodReflector.isPrettyPrint());
 										if(methodReflector.isHttpMethodImplemented(httpMethod))
@@ -244,12 +255,12 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 									}
 									else
 									{
-										errors.add(HttpErrorType.SERVICE_METHOD_MISSING.error());
+										errors.add(HttpErrorType.SERVICE_NOT_IMPLEMENTED.error());
 									}
 								}
 								else
 								{
-									errors.add(HttpErrorType.SERVICE_NOT_IMPLEMENTED.error());
+									errors.add(HttpErrorType.SERVICE_METHOD_MISSING.error());
 								}
 							}
 							else
@@ -358,46 +369,9 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		return serviceMethod;
 	}
 	
-	protected final HttpService getAnnotatedService(HttpServletRequest request, HttpServletResponse response, String serviceName)
+	protected MethodReflector getMethodReflector(HttpServletRequest request, HttpServletResponse response, HttpServiceMethod serviceMethod)
 	{
-		HttpService service = null;
-		ServiceReflector serviceReflector = serviceReflectorMap.get(serviceName);
-		if(serviceReflector != null)
-		{
-			service = serviceReflector.service();
-		}
-		if(service == null)
-		{
-			service = getService(request, response, serviceName);
-		}
-		return service;
-	}
-	
-	protected HttpService getService(HttpServletRequest request, HttpServletResponse response, String serviceName)
-	{
-		return null;
-	}
-	
-	protected ServiceReflector getServiceReflector(HttpServletRequest request, HttpServletResponse response, Class<? extends HttpService> serviceClass, String serviceName)
-	{
-		ServiceReflector serviceReflector = serviceReflectorMap.get(serviceName);
-		if(serviceReflector == null)
-		{
-			serviceReflector = new ServiceReflector(serviceClass, serviceName);
-			serviceReflectorMap.put(serviceName, serviceReflector);
-		}
-		return serviceReflector;
-	}
-	
-	protected MethodReflector getMethodReflector(HttpServletRequest request, HttpServletResponse response, Class<? extends HttpService> serviceClass, String serviceName, String methodName)
-	{
-		MethodReflector methodReflector = null;
-		ServiceReflector serviceReflector = getServiceReflector(request, response, serviceClass, serviceName);
-		if(serviceReflector != null)
-		{
-			methodReflector = serviceReflector.getMethodReflectorMap().get(methodName);
-		}
-		return methodReflector;
+		return methodReflectorMap.get(serviceMethod);
 	}
 	
 	protected MapperReflector getMapperReflector()

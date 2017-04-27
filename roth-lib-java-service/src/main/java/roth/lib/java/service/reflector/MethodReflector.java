@@ -11,15 +11,34 @@ import roth.lib.java.util.AnnotationUtil;
 
 public class MethodReflector
 {
-	protected ServiceReflector serviceReflector;
+	protected Class<? extends HttpService> serviceClass;
 	protected Method method;
 	protected ServiceMethod serviceMethod;
 	
-	public MethodReflector(ServiceReflector serviceReflector, Method method, ServiceMethod serviceMethod)
+	public MethodReflector(Class<? extends HttpService> serviceClass, Method method, ServiceMethod serviceMethod)
 	{
-		this.serviceReflector = serviceReflector;
+		this.serviceClass = serviceClass;
 		this.method = method;
 		this.serviceMethod = serviceMethod;
+	}
+	
+	public Class<? extends HttpService> getServiceClass()
+	{
+		return serviceClass;
+	}
+	
+	public HttpService getService()
+	{
+		HttpService service = null;
+		try
+		{
+			service = serviceClass.newInstance();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return service;
 	}
 	
 	public String getMethodName()
