@@ -541,12 +541,19 @@ public class TableMapper extends Mapper
 							PropertyReflector propertyReflector = null;
 							if(!getMapperConfig().isDeserializeColumnOrder())
 							{
-								propertyReflector = entityReflector.getPropertyReflector(getColumns().get(column++), getMapperType(), getMapperReflector());
+								if(column < getColumns().size())
+								{
+									propertyReflector = entityReflector.getPropertyReflector(getColumns().get(column), getMapperType(), getMapperReflector());
+								}
 							}
 							else
 							{
-								propertyReflector = propertyReflectors.get(column++);
+								if(column < propertyReflectors.size())
+								{
+									propertyReflector = propertyReflectors.get(column);
+								}
 							}
+							column++;
 							if(propertyReflector != null)
 							{
 								Deserializer<?> deserializer = propertyReflector.getDeserializer(getMapperType(), getMapperReflector(), getMapperConfig());
