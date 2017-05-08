@@ -13,6 +13,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
+import java.nio.CharBuffer;
 
 import roth.lib.java.Callback;
 import roth.lib.java.Characters;
@@ -446,6 +447,34 @@ public abstract class Mapper implements Characters
 			
 		}
 		return builder.toString();
+	}
+	
+	public static boolean matches(Reader reader, String match)
+	{
+		boolean matches = false;
+		if(reader.markSupported())
+		{
+			try
+			{
+				reader.mark(match.length());
+				CharBuffer buffer = CharBuffer.allocate(match.length());
+				reader.read(buffer);
+				buffer.rewind();
+				if(match.equalsIgnoreCase(buffer.toString()))
+				{
+					matches = true;
+				}
+				else
+				{
+					reader.reset();
+				}
+			}
+			catch(Exception e)
+			{
+				
+			}
+		}
+		return matches;
 	}
 	
 	public static String tabs(int tabs)

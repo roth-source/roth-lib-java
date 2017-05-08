@@ -25,6 +25,7 @@ import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.serializer.Serializer;
 import roth.lib.java.time.TimeZone;
 import roth.lib.java.util.ReflectionUtil;
+import roth.lib.java.xml.tag.CdataTag;
 import roth.lib.java.xml.tag.CloseTag;
 import roth.lib.java.xml.tag.CommentTag;
 import roth.lib.java.xml.tag.DeclarationTag;
@@ -178,6 +179,14 @@ public class XmlMapper extends Mapper
 						{
 							writeValue(writer, serializedValue);
 						}
+					}
+				}
+				else if(value instanceof XmlCdata)
+				{
+					XmlCdata xmlCdata = (XmlCdata) value;
+					if(xmlCdata != null)
+					{
+						writer.write("<![CDATA[ " + xmlCdata.getCdata() + " ]]>");
 					}
 				}
 				else
@@ -496,6 +505,10 @@ public class XmlMapper extends Mapper
 						{
 							value = readXmlValue(reader, propertyOpenTag, fieldType);
 						}
+						else if(XmlCdata.class.isAssignableFrom(fieldClass))
+						{
+							value = readXmlCdata(reader, propertyOpenTag, fieldType);
+						}
 						else
 						{
 							value = readEntity(reader, propertyOpenTag, fieldType);
@@ -759,6 +772,28 @@ public class XmlMapper extends Mapper
 		return model;
 	}
 	
+	protected <T> T readXmlCdata(Reader reader, OpenTag openTag, Type type) throws Exception
+	{
+		EntityReflector entityReflector = getMapperReflector().getEntityReflector(type);
+		Class<T> klass = ReflectionUtil.getTypeClass(type);
+		Constructor<T> constructor = klass.getDeclaredConstructor();
+		constructor.setAccessible(true);
+		T model = constructor.newInstance();
+		setAttributeMap(model, entityReflector, openTag.getAttributeMap());
+		PropertyReflector propertyReflector = entityReflector.getFieldReflector("cdata", getMapperType(), getMapperReflector());
+		if(propertyReflector != null)
+		{
+			Field field = propertyReflector.getField();
+			ReflectionUtil.setFieldValue(field, model, readCdata(reader));
+			setDeserializedName(model, propertyReflector.getFieldName());
+		}
+		else
+		{
+			readUnmapped(reader, openTag);
+		}
+		return model;
+	}
+	
 	@SuppressWarnings("unchecked")
 	protected <T, K, E> T readMap(Reader reader, Type type, PropertyReflector propertyReflector) throws Exception
 	{
@@ -799,6 +834,10 @@ public class XmlMapper extends Mapper
 					if(XmlValue.class.isAssignableFrom(elementClass))
 					{
 						value = readXmlValue(reader, fieldOpenTag, elementType);
+					}
+					else if(XmlCdata.class.isAssignableFrom(elementClass))
+					{
+						value = readXmlCdata(reader, fieldOpenTag, elementType);
 					}
 					else
 					{
@@ -913,6 +952,10 @@ public class XmlMapper extends Mapper
 					{
 						value = readXmlValue(reader, fieldOpenTag, elementType);
 					}
+					else if(XmlCdata.class.isAssignableFrom(elementClass))
+					{
+						value = readXmlCdata(reader, fieldOpenTag, elementType);
+					}
 					else
 					{
 						value = readEntity(reader, fieldOpenTag, elementType);
@@ -1001,6 +1044,10 @@ public class XmlMapper extends Mapper
 			{
 				element = readXmlValue(reader, tag, elementType);
 			}
+			else if(XmlCdata.class.isAssignableFrom(elementClass))
+			{
+				element = readXmlCdata(reader, tag, elementType);
+			}
 			else
 			{
 				element = readEntity(reader, tag, elementType);
@@ -1060,8 +1107,16 @@ public class XmlMapper extends Mapper
 					}
 					case EXCLAMATION:
 					{
-						String value = readUntil(reader, "-->");
-						tag = new CommentTag(value.replaceAll("^--", "").replaceAll("-->$", "").trim());
+						if(matches(reader, "[CDATA["))
+						{
+							String value = readUntil(reader, "]]>");
+							tag = new CdataTag(value.replaceAll("]]>$", "").trim());
+						}
+						else
+						{
+							String value = readUntil(reader, "-->");
+							tag = new CommentTag(value.replaceAll("^--", "").replaceAll("-->$", "").trim());
+						}
 						break read;
 					}
 					case SLASH:
@@ -1228,6 +1283,15 @@ public class XmlMapper extends Mapper
 			}
 		}
 		return builder.toString();
+	}
+	
+	
+	protected String readCdata(Reader reader) throws IOException
+	{
+		readUntil(reader, "<![CDATA[");
+		String value = readUntil(reader, "]]>").replaceAll("]]>$", "").trim();
+		readUntil(reader, LEFT_ANGLE_BRACKET);
+		return value;
 	}
 	
 	protected void readUnmapped(Reader reader, OpenTag openTag) throws IOException
