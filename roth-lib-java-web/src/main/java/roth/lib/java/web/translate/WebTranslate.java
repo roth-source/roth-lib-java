@@ -3,19 +3,28 @@ package roth.lib.java.web.translate;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import roth.lib.java.Characters;
 import roth.lib.java.json.JsonMapper;
+import roth.lib.java.lang.List;
 import roth.lib.java.lang.Map;
 import roth.lib.java.lang.Set;
 import roth.lib.java.mapper.MapperConfig;
+import roth.lib.java.util.FileUtil;
 
 public class WebTranslate implements Characters
 {
+	protected static String MODULE					= "module";
+	protected static String TYPE					= "type";
+	protected static String NAME					= "name";
+	protected static String FIELD					= "field";
+	protected static String VALUE					= "value";
 	protected static Pattern LANG_PATTERN			= Pattern.compile("^(?:\\S+_)?([A-Za-z]{2})\\.json");
+	protected static Pattern DATA_TEXT_PATTERN		= Pattern.compile("data-text(?:-attr)?(?:\\s+)?=(?:\\s+)?['\"](?:\\w+:)?(?<" + VALUE + ">[\\w\\.]+?)['\"]");
+	protected static Pattern FULL_TEXT_PATTERN		= Pattern.compile("text\\.(?<" + VALUE + ">[\\w]+\\.[\\w]+\\.[\\w\\.]+)(?:\\W|$)");
+	protected static Pattern VALUE_PATTERN			= Pattern.compile("(?<" + MODULE + ">\\w+)\\.(?<" + TYPE + ">\\w+)\\.(?<" + NAME + ">\\w+)(?:\\.(?<" + FIELD + ">\\w+))?");
 	
 	protected static String USER_DIR_DEFAULT		= "user.dir";
 	protected static String WEB_APP_DEFAULT			= "src/main/webapp";
@@ -37,7 +46,7 @@ public class WebTranslate implements Characters
 	protected static String PAGE_DIR				= "pageDir";
 	protected static String COMPONENT_DIR			= "componentDir";
 	
-	protected MapperConfig mapperConfig = new MapperConfig();
+	protected MapperConfig mapperConfig = new MapperConfig().setSerializeEmptyArray(false).setSerializeEmptyMap(false).setSerializeNulls(false);
 	protected JsonMapper jsonMapper = new JsonMapper();
 	protected File projectDir;
 	protected File webAppDir;
@@ -182,31 +191,267 @@ public class WebTranslate implements Characters
 		System.out.println("Checking translations of app " + app);
 		System.out.println("--------------------------------------------------------------------");
 		System.out.println();
-		Map<String, Map<String, Text>> textMap = getTextMap(appDir);
-		Set<String> langs = getLangs(textMap);
-		System.out.println();
-		System.out.println("--------------------------------------------------------------------");
-		System.out.println("Missing File Report (" + langs.toString() + ")");
-		System.out.println("--------------------------------------------------------------------");
-		System.out.println();
-		missingFileReport(textMap, langs);
-		System.out.println();
-		System.out.println("--------------------------------------------------------------------");
-		System.out.println("Missing Translation Report");
-		System.out.println("--------------------------------------------------------------------");
-		System.out.println();
-		missingTranslationReport(textMap);
+		Map<String, Text> textMap = getTextMap(appDir);
+		Map<String, List<Translation>> translationsMap = getTranslationsMap(appDir);
+		for(Entry<String, Text> textEntry : textMap.entrySet())
+		{
+			String module = textEntry.getKey();
+			Text text = textEntry.getValue();
+			List<Translation> translations = translationsMap.get(module);
+			if(translations != null)
+			{
+				for(Translation translation : translations)
+				{
+					List<String> missing = getMissing(text, translation);
+					if(!missing.isEmpty())
+					{
+						System.out.println();
+						System.out.println("--------------------------------------------------------------------");
+						System.out.println("Missing translations " + translation.getFile().getName());
+						System.out.println("--------------------------------------------------------------------");
+						System.out.println();
+						for(String name : missing)
+						{
+							System.out.println(name);
+						}
+					}
+					List<String> unused = getUnused(text, translation);
+					if(!unused.isEmpty())
+					{
+						System.out.println();
+						System.out.println("--------------------------------------------------------------------");
+						System.out.println("Unused translations " + translation.getFile().getName());
+						System.out.println("--------------------------------------------------------------------");
+						System.out.println();
+						for(String name : unused)
+						{
+							System.out.println(name);
+						}
+					}
+				}
+			}
+		}
 	}
 	
-	protected Map<String, Map<String, Text>> getTextMap(File appDir)
+	protected List<String> getMissing(Text text, Translation translation)
 	{
-		Map<String, Map<String, Text>> textMap = new Map<>();
+		List<String> missing = new List<>();
+		missing.addAll(getMissing(text.getTypes(), translation.getTypeFieldMapMap()));
+		missing.addAll(getMissing("layout", text.getLayoutFieldsMap(), translation.getLayoutFieldMapMap()));
+		missing.addAll(getMissing("page", text.getPageFieldsMap(), translation.getPageFieldMapMap()));
+		missing.addAll(getMissing("component", text.getComponentFieldsMap(), translation.getComponentFieldMapMap()));
+		return missing;
+	}
+	
+	protected List<String> getMissing(Set<String> types, Map<String, Map<String, Object>> translationFieldMapMap)
+	{
+		List<String> missing = new List<>();
+		for(String type : types)
+		{
+			Map<String, Object> translationFieldMap = translationFieldMapMap.get(type);
+			if(translationFieldMap == null)
+			{
+				missing.add("type." + type);
+			}
+		}
+		return missing;
+	}
+	
+	protected List<String> getMissing(String type, Map<String, Set<String>> textFieldsMap, Map<String, Map<String, Object>> translationFieldMapMap)
+	{
+		List<String> missing = new List<>();
+		for(Entry<String, Set<String>> textFieldsEntry : textFieldsMap.entrySet())
+		{
+			String name = textFieldsEntry.getKey();
+			Map<String, Object> translationFieldMap = translationFieldMapMap.get(name);
+			if(translationFieldMap == null)
+			{
+				translationFieldMap = new Map<>();
+				translationFieldMapMap.put(name, translationFieldMap);
+			}
+			Set<String> fields = textFieldsEntry.getValue();
+			for(String field : fields)
+			{
+				if(!translationFieldMap.containsKey(field))
+				{
+					missing.add(type + "." + name + "." + field);
+				}
+			}
+		}
+		return missing;
+	}
+	
+	protected List<String> getUnused(Text text, Translation translation)
+	{
+		List<String> unused = new List<>();
+		unused.addAll(getUnused(text.getTypes(), translation.getTypeFieldMapMap()));
+		unused.addAll(getUnused("layout", text.getLayoutFieldsMap(), translation.getLayoutFieldMapMap()));
+		unused.addAll(getUnused("page", text.getPageFieldsMap(), translation.getPageFieldMapMap()));
+		unused.addAll(getUnused("component", text.getComponentFieldsMap(), translation.getComponentFieldMapMap()));
+		return unused;
+	}
+
+	protected List<String> getUnused(Set<String> types, Map<String, Map<String, Object>> translationFieldMapMap)
+	{
+		List<String> unused = new List<>();
+		for(String type : translationFieldMapMap.keySet())
+		{
+			if(!types.contains(type))
+			{
+				unused.add("type." + type);
+			}
+		}
+		return unused;
+	}
+	
+	protected List<String> getUnused(String type, Map<String, Set<String>> textFieldsMap, Map<String, Map<String, Object>> translationFieldMapMap)
+	{
+		List<String> unused = new List<>();
+		for(Entry<String, Map<String, Object>> translationFieldMapEntry : translationFieldMapMap.entrySet())
+		{
+			String name = translationFieldMapEntry.getKey();
+			Set<String> textFields = textFieldsMap.get(name);
+			if(textFields == null)
+			{
+				textFields = new Set<>();
+				textFieldsMap.put(name, textFields);
+			}
+			Map<String, Object> fieldMap = translationFieldMapEntry.getValue();
+			for(String field : fieldMap.keySet())
+			{
+				if(!textFields.contains(field))
+				{
+					unused.add(type + "." + name + "." + field);
+				}
+			}
+		}
+		return unused;
+	}
+	
+	protected Map<String, Text> getTextMap(File appDir)
+	{
+		System.out.println();
+		System.out.println("--------------------------------------------------------------------");
+		System.out.println("Values");
+		System.out.println("--------------------------------------------------------------------");
+		System.out.println();
+		Map<String, Text> textMap = new Map<>();
+		for(String value : getValues(appDir))
+		{
+			Matcher matcher = VALUE_PATTERN.matcher(value);
+			if(matcher.find())
+			{
+				String module = matcher.group(MODULE);
+				String type = matcher.group(TYPE);
+				String name = matcher.group(NAME);
+				String field = matcher.group(FIELD);
+				Text text = textMap.get(module);
+				if(text == null)
+				{
+					text = new Text();
+					textMap.put(module, text);
+				}
+				switch(type)
+				{
+					case "type":
+					{
+						text.addType(name);
+						break;
+					}
+					case "layout":
+					{
+						text.addLayoutField(name, field);
+						break;
+					}
+					case "page":
+					{
+						text.addPageField(name, field);
+						break;
+					}
+					case "component":
+					{
+						text.addComponentField(name, field);
+						break;
+					}
+				}
+			}
+		}
+		System.out.println();
+		return textMap;
+	}
+	
+	protected Set<String> getValues(File appDir)
+	{
+		Set<String> values = new Set<>();
 		for(File moduleDir : appDir.listFiles())
 		{
 			if(moduleDir.isDirectory())
 			{
 				String module = moduleDir.getName();
-				Map<String, Text> moduleTextMap = new Map<>();
+				File layoutDir = getLayoutDir(moduleDir);
+				if(layoutDir.exists() && layoutDir.list().length > 0)
+				{
+					values.addAll(getTypeValue(module, layoutDir));
+				}
+				File pageDir = getPageDir(moduleDir);
+				if(pageDir.exists() && pageDir.list().length > 0)
+				{
+					values.addAll(getTypeValue(module, pageDir));
+				}
+				File componentDir = getComponentDir(moduleDir);
+				if(componentDir.exists() && componentDir.list().length > 0)
+				{
+					values.addAll(getTypeValue(module, componentDir));
+				}
+				File mixinDir = getMixinDir(moduleDir);
+				if(mixinDir.exists() && mixinDir.list().length > 0)
+				{
+					values.addAll(getTypeValue(module, mixinDir));
+				}
+			}
+		}
+		return values;
+	}
+	
+	protected Set<String> getTypeValue(String module, File dir)
+	{
+		Set<String> values = new Set<>();
+		String type = dir.getName();
+		for(File file : dir.listFiles())
+		{
+			if(file.isFile() && (file.getName().endsWith(".html") || (file.getName().endsWith(".js"))))
+			{
+				String name = file.getName().replaceAll("(\\.html|\\.js)$", "");
+				String contents = FileUtil.toString(file);
+				Matcher matcher = DATA_TEXT_PATTERN.matcher(contents);
+				while(matcher.find())
+				{
+					String value = matcher.group(VALUE);
+					if(!value.contains("."))
+					{
+						value = module + "." + type + "." + name + "." + value;
+					}
+					values.add(value);
+				}
+				matcher = FULL_TEXT_PATTERN.matcher(contents);
+				while(matcher.find())
+				{
+					String value = matcher.group(VALUE);
+					values.add(value);
+				}
+			}
+		}
+		return values;
+	}
+	
+	protected Map<String, List<Translation>> getTranslationsMap(File appDir)
+	{
+		Map<String, List<Translation>> translationsMap = new Map<>();
+		for(File moduleDir : appDir.listFiles())
+		{
+			if(moduleDir.isDirectory())
+			{
+				String module = moduleDir.getName();
 				File textDir = getTextDir(moduleDir);
 				if(textDir.exists() && textDir.list().length > 0)
 				{
@@ -214,190 +459,22 @@ public class WebTranslate implements Characters
 					{
 						if(file.isFile() && !file.isHidden() && file.getName().endsWith(".json"))
 						{
-							System.out.println(file.getAbsolutePath());
-							Matcher matcher = LANG_PATTERN.matcher(file.getName());
-							if(matcher.find())
+							Translation translation = jsonMapper.deserialize(file, Translation.class);
+							translation.setFile(file);
+							List<Translation> translations = translationsMap.get(module);
+							if(translations == null)
 							{
-								String lang = matcher.group(1).toLowerCase();
-								Text text = jsonMapper.deserialize(file, Text.class);
-								jsonMapper.serialize(text, file);
-								moduleTextMap.put(lang, text.setFile(file));
+								translations = new List<>();
+								translationsMap.put(module, translations);
 							}
-						}
-					}
-				}
-				if(!moduleTextMap.isEmpty())
-				{
-					textMap.put(module, moduleTextMap);
-				}
-			}
-		}
-		return textMap;
-	}
-	
-	protected Set<String> getLangs(Map<String, Map<String, Text>> textMap)
-	{
-		Set<String> langs = new Set<>();
-		for(Map<String, Text> moduleTextMap : textMap.values())
-		{
-			for(String lang : moduleTextMap.keySet())
-			{
-				langs.add(lang);
-			}
-		}
-		return langs;
-	}
-	
-	protected void missingFileReport(Map<String, Map<String, Text>> textMap, Set<String> langs)
-	{
-		for(Entry<String, Map<String, Text>> textEntry : textMap.entrySet())
-		{
-			String module = textEntry.getKey();
-			Set<String> moduleLangs = new Set<String>().collection(langs);
-			for(String lang : textEntry.getValue().keySet())
-			{
-				moduleLangs.remove(lang);
-			}
-			if(!moduleLangs.isEmpty())
-			{
-				System.out.println(module + " missing " + moduleLangs.toString());
-			}
-		}
-	}
-	
-	protected void missingTranslationReport(Map<String, Map<String, Text>> textMap)
-	{
-		for(Entry<String, Map<String, Text>> textEntry : textMap.entrySet())
-		{
-			missingTranslationReport(textEntry.getKey(), textEntry.getValue());
-		}
-	}
-	
-	protected void missingTranslationReport(String module, Map<String, Text> moduleTextMap)
-	{
-		Set<String> missingTranslations = new Set<>();
-		for(Entry<String, Text> moduleTextEntry1 : moduleTextMap.entrySet())
-		{
-			String lang1 = moduleTextEntry1.getKey();
-			Text text1 = moduleTextEntry1.getValue();
-			for(Entry<String, Text> moduleTextEntry2 : moduleTextMap.entrySet())
-			{
-				String lang2 = moduleTextEntry2.getKey();
-				if(!lang1.equals(lang2))
-				{
-					Text text2 = moduleTextEntry2.getValue();
-					missingTranslations.addAll(getMissingTranslations(text1, text2));
-				}
-			}
-		}
-		for(String missingTranslation : missingTranslations)
-		{
-			System.out.println(missingTranslation);
-		}
-	}
-	
-	protected Set<String> getMissingTranslations(Text text1, Text text2)
-	{
-		Set<String> missingTranslations = new Set<>();
-		String filename = text2.getFile().getName().replaceFirst("\\.json$", "");
-		missingTranslations.addAll(getMissingTranslations(filename, "type", text1.getType(), text2.getType()));
-		missingTranslations.addAll(getMissingTranslations(filename, "layout", text1.getLayout(), text2.getLayout()));
-		missingTranslations.addAll(getMissingTranslations(filename, "page", text1.getPage(), text2.getPage()));
-		missingTranslations.addAll(getMissingTranslations(filename, "component", text1.getComponent(), text2.getComponent()));
-		return missingTranslations;
-	}
-	
-	@SuppressWarnings("unchecked")
-	protected Set<String> getMissingTranslations(String filename, String type, TreeMap<String, TreeMap<String, Object>> map1, TreeMap<String, TreeMap<String, Object>> map2)
-	{
-		Set<String> missingTranslations = new Set<>();
-		if(map1 != null)
-		{
-			for(Entry<String, TreeMap<String, Object>> mapEntry : map1.entrySet())
-			{
-				String typeName = mapEntry.getKey();
-				for(Entry<String, Object> entry : mapEntry.getValue().entrySet())
-				{
-					String name = entry.getKey();
-					Object value1 = entry.getValue();
-					if(value1 != null)
-					{
-						Object value2 = getValue(map2, typeName, name);
-						if(value2 == null)
-						{
-							missingTranslations.add(filename + ":" + type + "." + typeName + "." + name);
-						}
-						else if(value1 instanceof Map)
-						{
-							Set<String> keys1 = ((Map<String, ?>) value1).keySet();
-							Set<String> keys2 = ((Map<String, ?>) value2).keySet();
-							for(String key : keys1)
-							{
-								if(!keys2.contains(key))
-								{
-									missingTranslations.add(filename + ":" + type + "." + typeName + "." + name + "." + key);
-								}
-							}
+							translations.add(translation);
 						}
 					}
 				}
 			}
 		}
-		return missingTranslations;
+		return translationsMap;
 	}
-	
-	protected Object getValue(TreeMap<String, TreeMap<String, Object>> map, String typeName, String name)
-	{
-		Object value = null;
-		if(map != null)
-		{
-			TreeMap<String, Object> typeMap = map.get(typeName);
-			if(typeMap != null)
-			{
-				value = typeMap.get(name);
-			}
-		}
-		return value;
-	}
-	
-	protected void translateModule(File moduleDir) throws Exception
-	{
-		String module = moduleDir.getName();
-		System.out.println("Translating module " + module);
-		
-		
-		File textDir = getTextDir(moduleDir);
-		if(textDir.exists() && textDir.list().length > 0)
-		{
-			System.out.println("Texts");
-		}
-
-		File mixinDir = getMixinDir(moduleDir);
-		if(mixinDir.exists() && mixinDir.list().length > 0)
-		{
-			System.out.println("Mixins");
-			
-		}
-		
-		File layoutDir = getLayoutDir(moduleDir);
-		if(layoutDir.exists() && layoutDir.list().length > 0)
-		{
-			System.out.println("Layouts");
-		}
-		
-		File pageDir = getPageDir(moduleDir);
-		if(pageDir.exists() && pageDir.list().length > 0)
-		{
-			System.out.println("Pages");
-		}
-		
-		File componentDir = getComponentDir(moduleDir);
-		if(componentDir.exists() && componentDir.list().length > 0)
-		{
-			System.out.println("Components");
-		}
-	}
-	
 	
 	public static void main(String[] args) throws Exception
 	{

@@ -583,6 +583,17 @@ public class JsonMapper extends Mapper
 								ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeZone, timeFormat, fieldClass));
 								setDeserializedName(model, propertyReflector.getFieldName());
 							}
+							else
+							{
+								try
+								{
+									ReflectionUtil.setFieldValue(field, model, value);
+								}
+								catch(Exception e)
+								{
+									e.printStackTrace();
+								}
+							}
 						}
 						else
 						{
@@ -640,6 +651,17 @@ public class JsonMapper extends Mapper
 									value = propertyReflector.filter(value, getMapperType());
 									ReflectionUtil.setFieldValue(field, model, deserializer.deserialize(value, timeZone, timeFormat, fieldClass));
 									setDeserializedName(model, propertyReflector.getFieldName());
+								}
+								else
+								{
+									try
+									{
+										ReflectionUtil.setFieldValue(field, model, value);
+									}
+									catch(Exception e)
+									{
+										e.printStackTrace();
+									}
 								}
 							}
 							else
@@ -790,7 +812,7 @@ public class JsonMapper extends Mapper
 					if(name == null)
 					{
 						name = readEscaped(reader, c);
-						Deserializer<?> deserializer = getDeserializer(keyClass, propertyReflector);
+						Deserializer<?> deserializer = getDeserializer(keyClass, null);
 						if(deserializer != null)
 						{
 							key = (K) deserializer.deserialize(name, getTimeZone(propertyReflector), null, keyClass);
@@ -813,6 +835,17 @@ public class JsonMapper extends Mapper
 							catch(Exception e)
 							{
 								
+							}
+						}
+						else
+						{
+							try
+							{
+								map.put(key, (E) value);
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
 							}
 						}
 						key = null;
@@ -846,6 +879,17 @@ public class JsonMapper extends Mapper
 							catch(Exception e)
 							{
 								
+							}
+						}
+						else
+						{
+							try
+							{
+								map.put(key, (E) value);
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
 							}
 						}
 						key = null;
