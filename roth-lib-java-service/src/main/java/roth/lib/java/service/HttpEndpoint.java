@@ -47,7 +47,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 {
 	protected static String ORIGIN 								= "Origin";
 	protected static String ANY 								= "*";
-	protected static String X_CSRF_TOKEN						= "X-Csrf-Token";
+	protected static List<String> EXPOSED_HEADERS				= new List<>(HttpService.X_SESSION, HttpService.X_CSRF_TOKEN);
 	protected static String ACCESS_CONTROL_ALLOW_ORIGIN 		= "Access-Control-Allow-Origin";
 	protected static String ACCESS_CONTROL_ALLOW_CREDENTIALS 	= "Access-Control-Allow-Credentials";
 	protected static String ACCESS_CONTROL_ALLOW_METHODS 		= "Access-Control-Allow-Methods";
@@ -120,7 +120,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 					response.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, ANY);
 				}
 				response.setHeader(ACCESS_CONTROL_ALLOW_METHODS, ALLOWED_METHODS);
-				response.setHeader(ACCESS_CONTROL_EXPOSE_HEADERS, X_CSRF_TOKEN);
+				response.setHeader(ACCESS_CONTROL_EXPOSE_HEADERS, EXPOSED_HEADERS.toString());
 				HttpMethod httpMethod = HttpMethod.fromString(request.getMethod());
 				if(httpMethod != null)
 				{
