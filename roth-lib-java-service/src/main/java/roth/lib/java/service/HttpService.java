@@ -1,12 +1,10 @@
 package roth.lib.java.service;
 
-import roth.lib.java.lang.List;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
+import roth.lib.java.lang.List;
 import roth.lib.java.mapper.Mapper;
 import roth.lib.java.service.reflector.MethodReflector;
 import roth.lib.java.type.MimeType;
@@ -14,6 +12,8 @@ import roth.lib.java.util.IdUtil;
 
 public abstract class HttpService
 {
+	public static String X_SESSION				= "X-Session";
+	public static String SESSION				= "session";
 	public static String X_CSRF_TOKEN			= "X-Csrf-Token";
 	public static String CSRF_TOKEN				= "csrfToken";
 	
@@ -151,51 +151,31 @@ public abstract class HttpService
 		return this;
 	}
 	
-	public HttpSession initSession()
-	{
-		HttpSession session = getSession(false);
-		if(session != null)
-		{
-			session.invalidate();
-		}
-		session = getSession(true);
-		String csrfToken = generateCsrfToken();
-		session.setAttribute(CSRF_TOKEN, csrfToken);
-		httpServletResponse.setHeader(X_CSRF_TOKEN, csrfToken);
-		return session;
-	}
-	
-	public HttpSession getSession(boolean create)
-	{
-		return httpServletRequest.getSession(true);
-	}
-	
 	public String generateCsrfToken()
 	{
 		return IdUtil.random(10);
 	}
 	
-	public boolean isValidCsrfToken(Object request, boolean dev)
+	public boolean isValidCsrfToken()
 	{
-		String requestCsrfToken = getRequestCsrfToken(request, dev);
+		String requestCsrfToken = getRequestCsrfToken();
 		String sessionCsrfToken = getSessionCsrfToken();
 		return requestCsrfToken != null && sessionCsrfToken != null && requestCsrfToken.equals(sessionCsrfToken);
 	}
 	
-	public String getRequestCsrfToken(Object request, boolean dev)
+	public String getRequestCsrfToken()
 	{
 		return httpServletRequest.getParameter(CSRF_TOKEN);
+	}
+
+	public String getRequestSessionId()
+	{
+		return httpServletRequest.getParameter(SESSION);
 	}
 	
 	public String getSessionCsrfToken()
 	{
-		String csrfToken = null;
-		Object csrfTokenObject = getSession(true).getAttribute(CSRF_TOKEN);
-		if(csrfTokenObject != null && csrfTokenObject instanceof String)
-		{
-			csrfToken = (String) csrfTokenObject;
-		}
-		return csrfToken;
+		return null;
 	}
 	
 	public String getIp()

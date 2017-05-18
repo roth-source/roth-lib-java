@@ -1,10 +1,10 @@
 package roth.lib.java.service;
 
 import java.io.Serializable;
-import roth.lib.java.lang.List;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
+import roth.lib.java.lang.List;
 
 @Entity
 @SuppressWarnings("serial")

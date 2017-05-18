@@ -185,7 +185,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 												{
 													debugRequest = getDebugRequest(request, methodRequest, requestMapper);
 												}
-												boolean validCsrf = !(ajaxAuthenticated && methodReflector.isAuthenticated() && !service.isValidCsrfToken(methodRequest, dev));
+												boolean validCsrf = !(ajaxAuthenticated && methodReflector.isAuthenticated() && !service.isValidCsrfToken());
 												if(validCsrf)
 												{
 													boolean authorized = !methodReflector.isAuthenticated() || service.isAuthorized(methodReflector, methodRequest);
