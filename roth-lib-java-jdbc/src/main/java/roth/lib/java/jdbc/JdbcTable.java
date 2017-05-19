@@ -21,6 +21,8 @@ import roth.lib.java.lang.Map;
 
 public abstract class JdbcTable<T> implements SqlFactory
 {
+	protected static final String EXISTS_ALIAS = "exists";
+	protected static final String SELECT_EXISTS = SELECT + EXISTS + "(\n%s\n)" + AS + "`" + EXISTS_ALIAS + "`;";
 	protected static final String COUNT_AGGREGATE = "count(*)";
 	protected static final String COUNT_ALIAS = "count";
 	protected static final String FILTER_METHOD = "filter";
@@ -656,13 +658,47 @@ public abstract class JdbcTable<T> implements SqlFactory
 		{
 			results = getDb().query(filter(select, filterInterfaces));
 		}
-		
 		Object object = results.get(COUNT_ALIAS);
 		if(object instanceof Number)
 		{
 			count = ((Number) object).intValue();
 		}
 		return count;
+	}
+	
+	public boolean has(Select select)
+	{
+		return has(select, (List<Class<?>>) null);
+	}
+	
+	public boolean has(Select select, List<Class<?>> filterInterfaces)
+	{
+		boolean exists = false;
+		Select filteredSelect = filter(select, filterInterfaces);
+		String sql = String.format(SELECT_EXISTS, filteredSelect.toString(false));
+		Map<String, Object> results = null;
+		JdbcConnection connection = getConnection();
+		if(connection != null)
+		{
+			try
+			{
+				results = getDb().query(sql, filteredSelect.getValues(), connection);
+			}
+			catch(SQLException e)
+			{
+				throw new JdbcException(e);
+			}
+		}
+		else
+		{
+			results = getDb().query(sql, filteredSelect.getValues());
+		}
+		Object object = results.get(EXISTS_ALIAS);
+		if(object instanceof Number)
+		{
+			exists = ((Number) object).intValue() > 0;
+		}
+		return exists;
 	}
 	
 	protected Select filter(Select select, List<Class<?>> filterInterfaces)

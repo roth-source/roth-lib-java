@@ -37,6 +37,7 @@ public interface SqlFactory
 	String SET				= "    SET ";
 	String DELETE 			= " DELETE ";
 	String UNION_ALL 		= "  UNION ALL ";
+	String EXISTS 			= "EXISTS ";
 	
 	String OP_EQ			= " = ?";
 	String OP_NE			= " != ?";
