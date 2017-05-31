@@ -25,6 +25,17 @@ public abstract class Columns extends Sql
 	}
 	
 	@Override
+	public List<Object> getValues()
+	{
+		List<Object> values = new List<Object>().allowNull();
+		for(Column column : columns)
+		{
+			values.addAll(column.getValues());
+		}
+		return values;
+	}
+	
+	@Override
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder();

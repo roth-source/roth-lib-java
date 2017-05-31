@@ -8,6 +8,7 @@ import roth.lib.java.lang.List;
 public abstract class Where extends Condition
 {
 	protected String sql;
+	protected Select select;
 	protected String table;
 	protected String name;
 	protected String opType;
@@ -16,7 +17,7 @@ public abstract class Where extends Condition
 	{
 		
 	}
-
+	
 	@Override
 	public Where setLogicType(String logicType)
 	{
@@ -27,6 +28,12 @@ public abstract class Where extends Condition
 	public Where setSql(String sql)
 	{
 		this.sql = sql;
+		return this;
+	}
+	
+	public Where setSelect(Select select)
+	{
+		this.select = select;
 		return this;
 	}
 	
@@ -61,6 +68,19 @@ public abstract class Where extends Condition
 	}
 	
 	@Override
+	public List<Object> getValues()
+	{
+		if(select != null)
+		{
+			return select.getValues();
+		}
+		else
+		{
+			return super.getValues();
+		}
+	}
+	
+	@Override
 	public String toString()
 	{
 		return toString(false);
@@ -69,9 +89,17 @@ public abstract class Where extends Condition
 	@Override
 	public String toString(boolean nested)
 	{
+		StringBuilder builder = new StringBuilder();
 		if(sql != null)
 		{
-			return sql;
+			if(select != null)
+			{
+				builder.append(String.format(sql, select.toString(false)));
+			}
+			else
+			{
+				builder.append(sql);
+			}
 		}
 		else
 		{
@@ -93,7 +121,6 @@ public abstract class Where extends Condition
 					values.clear();
 				}
 			}
-			StringBuilder builder = new StringBuilder();
 			if(table != null)
 			{
 				builder.append(tick(table));
@@ -101,8 +128,8 @@ public abstract class Where extends Condition
 			}
 			builder.append(tick(name));
 			builder.append(opType);
-			return builder.toString();
 		}
+		return builder.toString();
 	}
 	
 }

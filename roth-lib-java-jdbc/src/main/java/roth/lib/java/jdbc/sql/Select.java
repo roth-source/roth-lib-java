@@ -81,6 +81,16 @@ public abstract class Select extends Sql implements SqlFactory
 		return column(newColumn().setTable(table).setName(name).setAlias(alias));
 	}
 	
+	public Select columnExistsAs(Select select, String alias)
+	{
+		return column(newColumn().setSql(EXISTS_SQL).setSelect(select).setAlias(alias));
+	}
+	
+	public Select columnNotExistsAs(Select select, String alias)
+	{
+		return column(newColumn().setSql(NOT_EXISTS_SQL).setSelect(select).setAlias(alias));
+	}
+	
 	public Select from(From from)
 	{
 		this.from = from;
@@ -475,6 +485,16 @@ public abstract class Select extends Sql implements SqlFactory
 		return where(newWhere().setTable(table).setName(name).setOpType(OP_IS_NOT_NULL));
 	}
 	
+	public Select whereExists(Select select)
+	{
+		return where(newWhere().setSql(EXISTS_SQL).setSelect(select));
+	}
+	
+	public Select whereNotExists(Select select)
+	{
+		return where(newWhere().setSql(NOT_EXISTS_SQL).setSelect(select));
+	}
+	
 	public Select orWhere(Where where)
 	{
 		Wheres wheres = nestedWheres.peekLast();
@@ -664,6 +684,16 @@ public abstract class Select extends Sql implements SqlFactory
 	public Select orWhereIsNotNull(String table, String name)
 	{
 		return orWhere(newWhere().setTable(table).setName(name).setOpType(OP_IS_NOT_NULL));
+	}
+	
+	public Select orWhereExists(Select select)
+	{
+		return orWhere(newWhere().setSql(EXISTS_SQL).setSelect(select));
+	}
+	
+	public Select orWhereNotExists(Select select)
+	{
+		return orWhere(newWhere().setSql(NOT_EXISTS_SQL).setSelect(select));
 	}
 	
 	public Select groups(Groups groups)
@@ -1153,7 +1183,14 @@ public abstract class Select extends Sql implements SqlFactory
 	public List<Object> getValues()
 	{
 		List<Object> values = new List<Object>().allowNull();
-		values.addAll(from.getValues());
+		if(from != null)
+		{
+			values.addAll(from.getValues());
+		}
+		if(columns != null)
+		{
+			values.addAll(columns.getValues());
+		}
 		if(joins != null)
 		{
 			values.addAll(joins.getValues());
@@ -1177,10 +1214,6 @@ public abstract class Select extends Sql implements SqlFactory
 	
 	public String toString(boolean end)
 	{
-		if(from == null) 
-		{
-			throw new IllegalArgumentException("from cannot be null");
-		}
 		if(columns == null)
 		{
 			columnAll(from.alias());
@@ -1192,7 +1225,7 @@ public abstract class Select extends Sql implements SqlFactory
 			builder.append(DISTINCT);
 		}
 		builder.append(columns);
-		builder.append(from);
+		builder.append(from != null ? from : "");
 		builder.append(joins != null ? joins : "");
 		builder.append(wheres != null ? wheres : "");
 		builder.append(groups != null ? groups : "");

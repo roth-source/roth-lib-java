@@ -1,9 +1,12 @@
 package roth.lib.java.jdbc.sql;
 
+import roth.lib.java.lang.List;
+
 @SuppressWarnings("serial")
 public abstract class Column extends Sql
 {
 	protected String sql;
+	protected Select select;
 	protected String table;
 	protected String name;
 	protected String alias;
@@ -12,10 +15,16 @@ public abstract class Column extends Sql
 	{
 		
 	}
-
+	
 	public Column setSql(String sql)
 	{
 		this.sql = sql;
+		return this;
+	}
+	
+	public Column setSelect(Select select)
+	{
+		this.select = select;
 		return this;
 	}
 	
@@ -38,12 +47,32 @@ public abstract class Column extends Sql
 	}
 	
 	@Override
+	public List<Object> getValues()
+	{
+		if(select != null)
+		{
+			return select.getValues();
+		}
+		else
+		{
+			return super.getValues();
+		}
+	}
+	
+	@Override
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder();
 		if(sql != null)
 		{
-			builder.append(sql);
+			if(select != null)
+			{
+				builder.append(String.format(sql, select.toString(false)));
+			}
+			else
+			{
+				builder.append(sql);
+			}
 		}
 		else if(name != null)
 		{

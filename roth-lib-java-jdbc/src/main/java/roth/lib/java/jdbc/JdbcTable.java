@@ -22,7 +22,6 @@ import roth.lib.java.lang.Map;
 public abstract class JdbcTable<T> implements SqlFactory
 {
 	protected static final String EXISTS_ALIAS = "exists";
-	protected static final String SELECT_EXISTS = SELECT + EXISTS + "(\n%s\n)" + AS + "`" + EXISTS_ALIAS + "`;";
 	protected static final String COUNT_AGGREGATE = "count(*)";
 	protected static final String COUNT_ALIAS = "count";
 	protected static final String FILTER_METHOD = "filter";
@@ -674,15 +673,15 @@ public abstract class JdbcTable<T> implements SqlFactory
 	public boolean has(Select select, List<Class<?>> filterInterfaces)
 	{
 		boolean exists = false;
-		Select filteredSelect = filter(select, filterInterfaces);
-		String sql = String.format(SELECT_EXISTS, filteredSelect.toString(false));
+		Select existsSelect = newSelect();
+		existsSelect.columnExistsAs(filter(select, filterInterfaces), EXISTS_ALIAS);
 		Map<String, Object> results = null;
 		JdbcConnection connection = getConnection();
 		if(connection != null)
 		{
 			try
 			{
-				results = getDb().query(sql, filteredSelect.getValues(), connection);
+				results = getDb().query(existsSelect, connection);
 			}
 			catch(SQLException e)
 			{
@@ -691,7 +690,7 @@ public abstract class JdbcTable<T> implements SqlFactory
 		}
 		else
 		{
-			results = getDb().query(sql, filteredSelect.getValues());
+			results = getDb().query(existsSelect);
 		}
 		Object object = results.get(EXISTS_ALIAS);
 		if(object instanceof Number)

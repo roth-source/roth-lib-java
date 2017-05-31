@@ -38,6 +38,9 @@ public interface SqlFactory
 	String DELETE 			= " DELETE ";
 	String UNION_ALL 		= "  UNION ALL ";
 	String EXISTS 			= "EXISTS ";
+	String EXISTS_SQL 		= EXISTS + "(\n%s\n   )";
+	String NOT_EXISTS 		= "NOT EXISTS ";
+	String NOT_EXISTS_SQL 	= NOT_EXISTS + "(\n%s\n   )";
 	
 	String OP_EQ			= " = ?";
 	String OP_NE			= " != ?";
