@@ -438,22 +438,22 @@ public abstract class JdbcTable<T> implements SqlFactory
 	
 	public void callback(Select select, Callback<T> callback, List<Class<?>> filterInterfaces)
 	{
-		callback(select, callback.setKlass(klass), filterInterfaces);
+		callback(select, callback.setKlass(klass), klass, filterInterfaces);
 	}
 	
 	public void callback(String sql, Callback<T> callback)
 	{
-		callback(sql, callback.setKlass(klass));
+		callback(sql, callback.setKlass(klass), klass);
 	}
 	
 	public void callback(String sql, Collection<Object> values, Callback<T> callback)
 	{
-		callback(sql, values, callback.setKlass(klass));
+		callback(sql, values, callback.setKlass(klass), klass);
 	}
 	
 	public void callback(String sql, Map<String, Object> valueMap, Callback<T> callback)
 	{
-		callback(sql, valueMap, callback.setKlass(klass));
+		callback(sql, valueMap, callback.setKlass(klass), klass);
 	}
 	
 	public <C> void callback(Select select, Callback<C> callback, Class<C> klass)
