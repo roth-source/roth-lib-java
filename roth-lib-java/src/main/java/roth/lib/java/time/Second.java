@@ -14,6 +14,12 @@ public class Second extends Time
 		this(new GregorianCalendar());
 	}
 	
+	public Second(TimeZone timeZone)
+	{
+		this();
+		setTimeZone(timeZone);
+	}
+	
 	public Second(int second)
 	{
 		this();

@@ -14,6 +14,12 @@ public class Minute extends Time
 		this(new GregorianCalendar());
 	}
 	
+	public Minute(TimeZone timeZone)
+	{
+		this();
+		setTimeZone(timeZone);
+	}
+	
 	public Minute(int minute)
 	{
 		this();

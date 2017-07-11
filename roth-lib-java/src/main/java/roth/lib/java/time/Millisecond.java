@@ -13,6 +13,12 @@ public class Millisecond extends Time
 		super();
 	}
 	
+	public Millisecond(TimeZone timeZone)
+	{
+		this();
+		setTimeZone(timeZone);
+	}
+	
 	public Millisecond(int millisecond)
 	{
 		this();

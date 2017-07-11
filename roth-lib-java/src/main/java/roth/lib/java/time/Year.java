@@ -14,6 +14,12 @@ public class Year extends Time
 		this(new GregorianCalendar());
 	}
 	
+	public Year(TimeZone timeZone)
+	{
+		this();
+		setTimeZone(timeZone);
+	}
+	
 	public Year(int year)
 	{
 		this();

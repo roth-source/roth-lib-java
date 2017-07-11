@@ -14,6 +14,12 @@ public class Day extends Time
 		this(new GregorianCalendar());
 	}
 	
+	public Day(TimeZone timeZone)
+	{
+		this();
+		setTimeZone(timeZone);
+	}
+	
 	public Day(int day)
 	{
 		this();

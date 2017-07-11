@@ -98,7 +98,20 @@ public abstract class Mapper implements Characters
 	
 	public TimeZone getTimeZone(PropertyReflector propertyReflector)
 	{
-		return propertyReflector != null ? propertyReflector.getTimeZone() : TimeZone.DEFAULT;
+		TimeZone timeZone = null;
+		if(propertyReflector != null)
+		{
+			timeZone = propertyReflector.getTimeZone();
+		}
+		if(timeZone == null || timeZone.isNull())
+		{
+			timeZone = mapperConfig.getTimeZone();
+		}
+		if(timeZone == null || timeZone.isNull())
+		{
+			timeZone = TimeZone.DEFAULT;
+		}
+		return timeZone;
 	}
 	
 	public Serializer<?> getSerializer(Class<?> klass)

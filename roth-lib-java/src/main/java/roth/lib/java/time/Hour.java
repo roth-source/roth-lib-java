@@ -14,6 +14,12 @@ public class Hour extends Time
 		this(new GregorianCalendar());
 	}
 	
+	public Hour(TimeZone timeZone)
+	{
+		this();
+		setTimeZone(timeZone);
+	}
+	
 	public Hour(int hour)
 	{
 		this();

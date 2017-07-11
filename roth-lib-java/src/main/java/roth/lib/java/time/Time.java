@@ -100,6 +100,12 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 		this.calendar = calendar;
 	}
 	
+	public Time(TimeZone timeZone)
+	{
+		this();
+		setTimeZone(timeZone);
+	}
+	
 	public Time(int year, int month, int day, int hour, int minute, int second, int millisecond)
 	{
 		this();
@@ -405,6 +411,23 @@ public class Time implements Serializable, Comparable<Time>, Cloneable
 	public Millisecond toMillisecond()
 	{
 		return new Millisecond(calendar);
+	}
+	
+	public Time setTimeZone(TimeZone timeZone)
+	{
+		calendar.setTimeZone(timeZone.getJavaTimeZone());
+		return this;
+	}
+	
+	public Time setTimeZone(java.util.TimeZone javaTimeZone)
+	{
+		calendar.setTimeZone(javaTimeZone);
+		return this;
+	}
+	
+	public TimeZone getTimeZone()
+	{
+		return TimeZone.get(calendar.getTimeZone());
 	}
 	
 	public static Time parse(String value, String pattern)

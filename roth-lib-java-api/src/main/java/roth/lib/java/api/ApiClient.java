@@ -65,6 +65,18 @@ public abstract class ApiClient<ApiRequest, ApiResponse> extends HttpClient impl
 		return mapperConfig;
 	}
 	
+	public ApiClient<ApiRequest, ApiResponse> setMapperReflector(MapperReflector mapperReflector)
+	{
+		this.mapperReflector = mapperReflector;
+		return this;
+	}
+	
+	public ApiClient<ApiRequest, ApiResponse> setMapperConfig(MapperConfig mapperConfig)
+	{
+		this.mapperConfig = mapperConfig;
+		return this;
+	}
+	
 	public boolean isDebug()
 	{
 		return debug;

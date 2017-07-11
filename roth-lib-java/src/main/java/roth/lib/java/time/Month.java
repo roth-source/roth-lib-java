@@ -14,6 +14,12 @@ public class Month extends Time
 		this(new GregorianCalendar());
 	}
 	
+	public Month(TimeZone timeZone)
+	{
+		this();
+		setTimeZone(timeZone);
+	}
+	
 	public Month(int month)
 	{
 		this();

@@ -6,6 +6,7 @@ import roth.lib.java.Characters;
 import roth.lib.java.deserializer.Deserializer;
 import roth.lib.java.lang.Map;
 import roth.lib.java.serializer.Serializer;
+import roth.lib.java.time.TimeZone;
 import roth.lib.java.util.IdUtil;
 
 public class MapperConfig implements Characters
@@ -24,6 +25,7 @@ public class MapperConfig implements Characters
 	protected Map<Class<?>, Deserializer<?>> deserializerMap = new Map<Class<?>, Deserializer<?>>();
 	protected boolean writeXmlHeader = true;
 	protected String boundary = IdUtil.random(10);
+	protected TimeZone timeZone = TimeZone.DEFAULT;
 	
 	public MapperConfig()
 	{
@@ -198,6 +200,17 @@ public class MapperConfig implements Characters
 	public <T> MapperConfig putDeserializer(Class<T> klass, Deserializer<T> deserializer)
 	{
 		deserializerMap.put(klass, deserializer);
+		return this;
+	}
+	
+	public TimeZone getTimeZone()
+	{
+		return timeZone;
+	}
+	
+	public MapperConfig setTimeZone(TimeZone timeZone)
+	{
+		this.timeZone = timeZone;
 		return this;
 	}
 	

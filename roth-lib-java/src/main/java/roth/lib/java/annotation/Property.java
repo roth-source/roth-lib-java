@@ -35,7 +35,7 @@ public @interface Property
 	// SERIAL
 	boolean serial() default true;
 	String serialName() default "";
-	TimeZone timeZone() default TimeZone.DEFAULT;
+	TimeZone timeZone() default TimeZone.NULL;
 	String timeFormat() default "";
 	Class<? extends Filterer>[] filter() default {};
 	Class<? extends Deserializer<?>> deserializer() default VoidDeserializer.class;

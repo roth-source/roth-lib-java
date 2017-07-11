@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 
 public enum TimeZone
 {
+	NULL								(null, null),
 	DEFAULT								(java.util.TimeZone.getDefault().getID(), java.util.TimeZone.getDefault()),
 	UTC									("UTC"),
 	ACT									("ACT"),
@@ -589,6 +590,11 @@ public enum TimeZone
 		return javaTimeZone;
 	}
 	
+	public boolean isNull()
+	{
+		return NULL.equals(this);
+	}
+	
 	public SimpleDateFormat getFormatter(String pattern)
 	{
 		SimpleDateFormat formatter = new SimpleDateFormat(pattern);
@@ -607,7 +613,21 @@ public enum TimeZone
 		TimeZone timeZone = DEFAULT;
 		for(TimeZone tempTimeZone : values())
 		{
-			if(tempTimeZone.getName().equalsIgnoreCase(value))
+			if(!tempTimeZone.isNull() && tempTimeZone.name.equalsIgnoreCase(value))
+			{
+				timeZone = tempTimeZone;
+				break;
+			}
+		}
+		return timeZone;
+	}
+	
+	public static TimeZone get(java.util.TimeZone javaTimeZone)
+	{
+		TimeZone timeZone = DEFAULT;
+		for(TimeZone tempTimeZone : values())
+		{
+			if(!tempTimeZone.isNull() && tempTimeZone.javaTimeZone.equals(javaTimeZone))
 			{
 				timeZone = tempTimeZone;
 				break;
