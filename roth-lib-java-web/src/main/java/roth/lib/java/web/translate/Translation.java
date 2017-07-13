@@ -2,6 +2,8 @@ package roth.lib.java.web.translate;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import roth.lib.java.annotation.Entity;
 import roth.lib.java.annotation.Property;
@@ -11,6 +13,9 @@ import roth.lib.java.lang.Map;
 @SuppressWarnings("serial")
 public class Translation implements Serializable, Cloneable
 {
+	protected static String LANG = "lang";
+	protected static Pattern LANG_PATTERN = Pattern.compile("_(?<" + LANG + ">\\w{2})\\.json");
+	
 	@Property(name = "type")
 	protected Map<String, Map<String, Object>> typeFieldMapMap = new Map<>();
 	
@@ -79,6 +84,21 @@ public class Translation implements Serializable, Cloneable
 	{
 		this.file = file;
 		return this;
+	}
+	
+	public String getLang()
+	{
+		String lang = null;
+		Matcher matcher = LANG_PATTERN.matcher(file.getName());
+		if(matcher.find())
+		{
+			lang = matcher.group(LANG);
+			if(lang != null)
+			{
+				lang = lang.toLowerCase();
+			}
+		}
+		return lang;
 	}
 	
 }

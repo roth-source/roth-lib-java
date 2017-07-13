@@ -179,7 +179,7 @@ public class TableMapper extends Mapper
 	protected boolean isEscaped(String value)
 	{
 		boolean escaped = false;
-		List<Character> escapeCharacters = new List<Character>(getMapperConfig().getDelimiter(), getMapperConfig().getQualifier(), CARRIAGE_RETURN, NEW_LINE);
+		List<Character> escapeCharacters = new List<Character>(getMapperConfig().getDelimiter(), getMapperConfig().getQualifier(), CARRIAGE_RETURN, NEW_LINE, SEMI_COLON);
 		for(Character escapeCharacter : escapeCharacters)
 		{
 			if(value.contains(String.valueOf(escapeCharacter)))
