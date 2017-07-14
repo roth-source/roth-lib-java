@@ -357,12 +357,22 @@ public class HtmlUtil implements Characters
 	
 	public static String strip(String html)
 	{
-		return html != null ? html.replaceAll("<\\/?[^>]+(>|$)", "") : null;
+		return strip(html, BLANK);
+	}
+	
+	public static String strip(String html, String replacement)
+	{
+		return html != null ? html.replaceAll("<\\/?[^>]+(>|$)", replacement) : null;
 	}
 	
 	public static String safe(String html)
 	{
-		return html != null ? html.replaceAll("(?i)<(?:script|style)[^>]*>[\\s\\S]*?(?:</(?:script|style)[^>]*>|$)", "") : null;
+		return safe(html, BLANK);
+	}
+	
+	public static String safe(String html, String replacement)
+	{
+		return html != null ? html.replaceAll("(?i)<(?:script|style)[^>]*>[\\s\\S]*?(?:</(?:script|style)[^>]*>|$)", replacement) : null;
 	}
 	
 	public static void main(String[] args)
