@@ -97,6 +97,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response)
 	{
+		HttpService service = null;
 		Object methodResponse = null;
 		String debugRequest = "";
 		List<HttpError> errors = new List<HttpError>();
@@ -134,7 +135,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 								MethodReflector methodReflector = getMethodReflector(request, response, serviceMethod);
 								if(methodReflector != null)
 								{
-									HttpService service = methodReflector.getService();
+									service = methodReflector.getService();
 									if(service != null)
 									{
 										service.setServletContext(request.getServletContext()).setHttpServletRequest(request).setHttpServletResponse(response);
@@ -325,9 +326,18 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 				e.printStackTrace();
 			}
 		}
-		if(dev)
+		if(dev || (service != null && service.isDebug()))
 		{
-			System.out.println(debugRequest + getDebugResponse(response, methodResponse, responseMapper));
+			String debugResponse = getDebugResponse(response, methodResponse, responseMapper);
+			if(dev)
+			{
+				System.out.println(debugRequest + debugResponse);
+			}
+			if(service != null && service.isDebug())
+			{
+				service.debugRequest(debugRequest);
+				service.debugResponse(debugResponse);
+			}
 		}
 	}
 	

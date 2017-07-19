@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Random;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -502,6 +503,11 @@ public class List<E> extends LinkedList<E>
 	public boolean retainAll(Collection<?> c)
 	{
 		return super.retainAll(c);
+	}
+	
+	public E getRandom()
+	{
+		return !isEmpty() ? get(new Random().nextInt(size())) : null;
 	}
 	
 	@Override

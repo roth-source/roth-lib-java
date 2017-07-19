@@ -206,4 +206,19 @@ public abstract class HttpService
 
 	public abstract HttpError exception(HttpError error, Throwable e);
 	
+	public boolean isDebug()
+	{
+		return false;
+	}
+	
+	public void debugRequest(String request)
+	{
+		
+	}
+	
+	public void debugResponse(String response)
+	{
+		
+	}
+	
 }
