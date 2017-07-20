@@ -182,7 +182,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 														}
 													}
 												}
-												if(dev)
+												if(dev || (service != null && service.isDebug()))
 												{
 													debugRequest = getDebugRequest(request, methodRequest, requestMapper);
 												}
