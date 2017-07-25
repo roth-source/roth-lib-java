@@ -131,7 +131,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 						serviceMethod = getServiceMethod(request, response);
 						if(serviceMethod != null)
 						{
-							log(serviceMethod.getServiceName(), serviceMethod.getMethodName());
+							log(serviceMethod.getServiceName(), serviceMethod.getMethodName(), request);
 							if(!ENDPOINT.equalsIgnoreCase(serviceMethod.getServiceName()))
 							{
 								MethodReflector methodReflector = getMethodReflector(request, response, serviceMethod);
@@ -705,7 +705,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		return builder.toString();
 	}
 	
-	public void log(String service, String method)
+	public void log(String service, String method, HttpServletRequest request)
 	{
 		
 	}
