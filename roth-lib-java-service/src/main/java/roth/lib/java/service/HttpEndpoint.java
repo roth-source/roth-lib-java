@@ -100,6 +100,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		HttpService service = null;
 		Object methodResponse = null;
 		String debugRequest = "";
+		HttpServiceMethod serviceMethod = null;
 		List<HttpError> errors = new List<HttpError>();
 		MimeType requestContentType = getRequestContentType(request, response);
 		MimeType responseContentType = getResponseContentType(request, response);
@@ -127,7 +128,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 				{
 					if(SUPPORTED_METHODS.contains(httpMethod))
 					{
-						HttpServiceMethod serviceMethod = getServiceMethod(request, response);
+						serviceMethod = getServiceMethod(request, response);
 						if(serviceMethod != null)
 						{
 							if(!ENDPOINT.equalsIgnoreCase(serviceMethod.getServiceName()))
@@ -333,10 +334,9 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 			{
 				System.out.println(debugRequest + debugResponse);
 			}
-			if(service != null && service.isDebug())
+			if(service != null && service.isDebug() && serviceMethod != null)
 			{
-				service.debugRequest(debugRequest);
-				service.debugResponse(debugResponse);
+				service.debug(serviceMethod.getServiceName(), serviceMethod.getMethodName(), debugRequest, debugResponse);
 			}
 		}
 	}

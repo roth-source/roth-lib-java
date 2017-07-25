@@ -211,12 +211,7 @@ public abstract class HttpService
 		return false;
 	}
 	
-	public void debugRequest(String request)
-	{
-		
-	}
-	
-	public void debugResponse(String response)
+	public void debug(String service, String method, String request, String response)
 	{
 		
 	}
