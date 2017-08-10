@@ -21,5 +21,7 @@ public @interface ServiceMethod
 	boolean delete() 			default false;
 	boolean gzippedInput() 		default false;
 	boolean prettyPrint() 		default false;
+	boolean debugRequest() 		default true;
+	boolean debugResponse() 	default true;
 	
 }

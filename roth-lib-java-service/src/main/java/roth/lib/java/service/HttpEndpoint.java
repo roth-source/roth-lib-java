@@ -101,6 +101,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		Object methodResponse = null;
 		String debugRequest = "";
 		HttpServiceMethod serviceMethod = null;
+		MethodReflector methodReflector = null;
 		List<HttpError> errors = new List<HttpError>();
 		MimeType requestContentType = getRequestContentType(request, response);
 		MimeType responseContentType = getResponseContentType(request, response);
@@ -134,7 +135,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 							log(serviceMethod.getServiceName(), serviceMethod.getMethodName(), request);
 							if(!ENDPOINT.equalsIgnoreCase(serviceMethod.getServiceName()))
 							{
-								MethodReflector methodReflector = getMethodReflector(request, response, serviceMethod);
+								methodReflector = getMethodReflector(request, response, serviceMethod);
 								if(methodReflector != null)
 								{
 									service = methodReflector.getService();
@@ -330,10 +331,21 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		}
 		if(dev || (service != null && service.isDebug()))
 		{
-			String debugResponse = getDebugResponse(response, methodResponse, responseMapper);
+			String debugResponse = null;
+			if(methodReflector != null)
+			{
+				if(!methodReflector.isDebugRequest())
+				{
+					debugRequest = null;
+				}
+				if(methodReflector.isDebugResponse())
+				{
+					debugResponse = getDebugResponse(response, methodResponse, responseMapper);
+				}
+			}
 			if(dev)
 			{
-				System.out.println(debugRequest + debugResponse);
+				System.out.println((debugRequest != null ? debugRequest : "") + (debugResponse != null ? debugResponse : ""));
 			}
 			if(service != null && service.isDebug() && serviceMethod != null)
 			{

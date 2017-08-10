@@ -146,6 +146,16 @@ public class MethodReflector
 		return method;
 	}
 	
+	public boolean isDebugRequest()
+	{
+		return serviceMethod.debugRequest();
+	}
+	
+	public boolean isDebugResponse()
+	{
+		return serviceMethod.debugResponse();
+	}
+	
 	public Parameter getParameter()
 	{
 		Parameter parameter = null;
