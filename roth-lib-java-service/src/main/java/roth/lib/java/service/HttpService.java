@@ -4,7 +4,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import roth.lib.java.http.HttpUrl;
 import roth.lib.java.lang.List;
+import roth.lib.java.lang.Map;
 import roth.lib.java.mapper.Mapper;
 import roth.lib.java.service.reflector.MethodReflector;
 import roth.lib.java.type.MimeType;
@@ -27,6 +29,7 @@ public abstract class HttpService
 	protected Mapper responseMapper;
 	protected String service;
 	protected String method;
+	protected Map<String, String> paramMap = new Map<>();
 	
 	public HttpService()
 	{
@@ -97,6 +100,11 @@ public abstract class HttpService
 		return method;
 	}
 	
+	public Map<String, String> getParamMap()
+	{
+		return paramMap;
+	}
+	
 	public HttpService setServletContext(ServletContext servletContext)
 	{
 		this.servletContext = servletContext;
@@ -106,6 +114,7 @@ public abstract class HttpService
 	public HttpService setHttpServletRequest(HttpServletRequest httpServletRequest)
 	{
 		this.httpServletRequest = httpServletRequest;
+		this.paramMap = HttpUrl.parseParamMap(httpServletRequest.getQueryString());
 		return this;
 	}
 	
@@ -165,12 +174,12 @@ public abstract class HttpService
 	
 	public String getRequestCsrfToken()
 	{
-		return httpServletRequest.getParameter(CSRF_TOKEN);
+		return paramMap.get(CSRF_TOKEN);
 	}
 
 	public String getRequestSessionId()
 	{
-		return httpServletRequest.getParameter(SESSION);
+		return paramMap.get(SESSION);
 	}
 	
 	public String getSessionCsrfToken()
