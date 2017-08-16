@@ -147,7 +147,7 @@ public class WebTranslateImport implements Characters
 		{
 			for(File file : importDir.listFiles())
 			{
-				if(file.isFile())
+				if(file.isFile() && !file.isHidden())
 				{
 					if(!file.getName().startsWith(IMPORTED))
 					{
@@ -258,8 +258,6 @@ public class WebTranslateImport implements Characters
 								}
 								System.out.println("Saving " + textFile.getName());
 								jsonMapper.serialize(translation, textFile);
-								file.renameTo(new File(file.getParentFile(), IMPORTED + new Day().format("yyyyMMdd") + "_" + file.getName()));
-								
 							}
 							else
 							{
@@ -281,6 +279,7 @@ public class WebTranslateImport implements Characters
 			{
 				System.err.println("Can't find app dir " + appDir.getAbsolutePath());
 			}
+			file.renameTo(new File(file.getParentFile(), IMPORTED + new Day().format("yyyyMMdd") + "_" + file.getName()));
 		}
 		else
 		{
