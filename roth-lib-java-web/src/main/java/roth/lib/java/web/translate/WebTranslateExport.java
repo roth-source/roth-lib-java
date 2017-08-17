@@ -29,7 +29,7 @@ public class WebTranslateExport implements Characters
 	protected static final Pattern DATA_TEXT_PATTERN		= Pattern.compile("data-text(?:-attr)?(?:\\s+)?=(?:\\s+)?['\"](?:\\w+:)?(?<" + VALUE + ">[\\w\\.]+?)['\"]");
 	protected static final Pattern FULL_TEXT_PATTERN		= Pattern.compile("text\\.(?<" + VALUE + ">[\\w]+\\.[\\w]+\\.[\\w\\.]+)(?:\\W|$)");
 	protected static final Pattern VALUE_PATTERN			= Pattern.compile("(?<" + MODULE + ">\\w+)\\.(?<" + TYPE + ">\\w+)\\.(?<" + NAME + ">\\w+)(?:\\.(?<" + FIELD + ">\\w+))?");
-	protected static final String TRANSLATE_NAME			= "translate_%s_%s.csv";
+	protected static final String TRANSLATE_NAME			= "%s_%s_%s.csv";
 	
 	protected static final String USER_DIR_DEFAULT			= "user.dir";
 	protected static final String WEB_APP_DEFAULT			= "src/main/webapp";
@@ -220,6 +220,7 @@ public class WebTranslateExport implements Characters
 	
 	protected void translateApp(File appDir) throws Exception
 	{
+		String project = projectDir.getName();
 		String app = appDir.getName();
 		System.out.println("--------------------------------------------------------------------");
 		System.out.println("Checking translations of app " + app);
@@ -326,7 +327,7 @@ public class WebTranslateExport implements Characters
 				{
 					String lang = langTranslatesEntry.getKey();
 					List<Translate> translates = langTranslatesEntry.getValue();
-					String name = String.format(TRANSLATE_NAME, app, lang);
+					String name = String.format(TRANSLATE_NAME, project, app, lang);
 					File file = new File(exportDir, name);
 					System.out.println("Exporting " + file.getAbsolutePath());
 					tableMapper.serialize(translates, file);

@@ -19,7 +19,7 @@ public class WebTranslateImport implements Characters
 	protected static final String IMPORTED 					= "_imported_";
 	protected static final String APP						= "app";
 	protected static final String LANG						= "lang";
-	protected static final Pattern APP_LANG_PATTERN			= Pattern.compile("translate_(?<" + APP + ">\\w+?)_(?<" + LANG + ">\\w{2})\\.csv");
+	protected static final Pattern APP_LANG_PATTERN			= Pattern.compile("_(?<" + APP + ">\\w+?)_(?<" + LANG + ">\\w{2})\\.csv");
 	protected static final String TEXT_NAME 				= "%s_%s.json";
 	protected static final String TYPE						= "type";
 	protected static final String LAYOUT					= "layout";
