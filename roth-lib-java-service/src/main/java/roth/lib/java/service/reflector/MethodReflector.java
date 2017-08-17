@@ -156,6 +156,11 @@ public class MethodReflector
 		return serviceMethod.debugResponse();
 	}
 	
+	public boolean isRawRequest()
+	{
+		return serviceMethod.rawRequest();
+	}
+	
 	public Parameter getParameter()
 	{
 		Parameter parameter = null;

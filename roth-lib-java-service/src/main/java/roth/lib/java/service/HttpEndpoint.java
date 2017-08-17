@@ -1,5 +1,6 @@
 package roth.lib.java.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +39,7 @@ import roth.lib.java.service.annotation.ServiceMethod;
 import roth.lib.java.service.reflector.MethodReflector;
 import roth.lib.java.type.MimeType;
 import roth.lib.java.util.EnumUtil;
+import roth.lib.java.util.IoUtil;
 import roth.lib.java.util.ReflectionUtil;
 import roth.lib.java.validate.Validator;
 import roth.lib.java.validate.ValidatorException;
@@ -102,6 +104,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		String debugRequest = "";
 		HttpServiceMethod serviceMethod = null;
 		MethodReflector methodReflector = null;
+		ByteArrayInputStream rawInput = null;
 		List<HttpError> errors = new List<HttpError>();
 		MimeType requestContentType = getRequestContentType(request, response);
 		MimeType responseContentType = getResponseContentType(request, response);
@@ -161,6 +164,11 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 													if(!HttpMethod.GET.equals(httpMethod))
 													{
 														InputStream input = methodReflector.isGzippedInput() ? new GZIPInputStream(request.getInputStream()) : request.getInputStream();
+														if(service.isDebug() && methodReflector.isRawRequest())
+														{
+															rawInput = new ByteArrayInputStream(IoUtil.toBytes(input));
+															input = rawInput;
+														}
 														service.setRequestContentType(requestContentType);
 														requestMapper = getRequestMapper(request, response, requestContentType);
 														requestMapper.setContext(methodReflector.getContext()).setContentType(requestContentType);
@@ -349,7 +357,20 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 			}
 			if(service != null && service.isDebug() && serviceMethod != null)
 			{
-				service.debug(serviceMethod.getServiceName(), serviceMethod.getMethodName(), debugRequest, debugResponse);
+				String rawRequest = null;
+				if(rawInput != null)
+				{
+					try
+					{
+						rawInput.reset();
+						rawRequest = IoUtil.toString(rawInput);
+					}
+					catch(Exception e)
+					{
+						
+					}
+				}
+				service.debug(serviceMethod.getServiceName(), serviceMethod.getMethodName(), debugRequest, debugResponse, rawRequest);
 			}
 		}
 	}

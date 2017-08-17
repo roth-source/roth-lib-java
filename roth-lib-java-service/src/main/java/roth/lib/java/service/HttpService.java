@@ -220,7 +220,7 @@ public abstract class HttpService
 		return false;
 	}
 	
-	public void debug(String service, String method, String request, String response)
+	public void debug(String service, String method, String request, String response, String rawRequest)
 	{
 		
 	}

@@ -23,5 +23,6 @@ public @interface ServiceMethod
 	boolean prettyPrint() 		default false;
 	boolean debugRequest() 		default true;
 	boolean debugResponse() 	default true;
+	boolean rawRequest()		default false;
 	
 }
