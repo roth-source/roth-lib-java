@@ -10,12 +10,12 @@ public class ChecksumUtil
 		
 	}
 	
-	public long checksumCrc32(String value)
+	public static long checksumCrc32(String value)
 	{
 		return checksumCrc32(value.getBytes());
 	}
 	
-	public long checksumCrc32(byte[] bytes)
+	public static long checksumCrc32(byte[] bytes)
 	{
 		try
 		{
