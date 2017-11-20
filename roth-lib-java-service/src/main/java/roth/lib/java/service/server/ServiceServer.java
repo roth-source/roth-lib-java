@@ -20,17 +20,17 @@ import roth.lib.java.lang.Map;
 
 public class ServiceServer
 {
-	protected static String USER_DIR				= "user.dir";
+	protected static String USER_DIR					= "user.dir";
 	protected static String WEB_APP					= "src/main/webapp/";
 	protected static String WEB_INF					= "WEB-INF/";
-	protected static String PORT					= "port";
-	protected static String CONTEXT_PATH			= "contextPath";
+	protected static String PORT						= "port";
+	protected static String CONTEXT_PATH				= "contextPath";
 	protected static String PROJECT_DIR				= "projectDir";
 	protected static String WEB_APP_DIR				= "webAppDir";
 	protected static String WEB_INF_DIR				= "webInfDir";
 	protected static String KEY_STORE_PATH			= "keyStorePath";
 	protected static String KEY_STORE_PASSWORD		= "keyStorePassword";
-	protected static String KEY_MANAGER_PASSWORD	= "keyManagerPassword";
+	protected static String KEY_MANAGER_PASSWORD		= "keyManagerPassword";
 	protected static String ENV						= "env";
 	
 	protected File projectDir = new File(System.getProperty(USER_DIR));

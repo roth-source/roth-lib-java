@@ -2,7 +2,6 @@ package roth.lib.java.web.server;
 
 import java.io.File;
 import java.util.Arrays;
-import roth.lib.java.lang.Map;
 import java.util.List;
 
 import org.eclipse.jetty.http.HttpVersion;
@@ -17,68 +16,43 @@ import org.eclipse.jetty.util.Scanner;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
 
+import roth.lib.java.lang.Map;
+
 public class WebServer
 {
-	protected static String USER_DIR		= "user.dir";
-	protected static String WEB_APP			= "src/main/webapp/";
-	protected static String WEB_INF			= "WEB-INF/";
-	protected static String PORT			= "port";
-	protected static String CONTEXT_PATH	= "contextPath";
-	protected static String PROJECT_DIR		= "projectDir";
-	protected static String WEB_APP_DIR		= "webAppDir";
-	protected static String WEB_INF_DIR		= "webInfDir";
-	protected static String ENV				= "env";
+	protected static String USER_DIR					= "user.dir";
+	protected static String WEB_APP					= "src/main/webapp/";
+	protected static String WEB_INF					= "WEB-INF/";
+	protected static String PORT						= "port";
+	protected static String CONTEXT_PATH				= "contextPath";
+	protected static String PROJECT_DIR				= "projectDir";
+	protected static String WEB_APP_DIR				= "webAppDir";
+	protected static String WEB_INF_DIR				= "webInfDir";
+	protected static String KEY_STORE_PATH			= "keyStorePath";
+	protected static String KEY_STORE_PASSWORD		= "keyStorePassword";
+	protected static String KEY_MANAGER_PASSWORD		= "keyManagerPassword";
+	protected static String ENV						= "env";
 	
-	protected File projectDir;
+	protected File projectDir = new File(System.getProperty(USER_DIR));
 	protected File webAppDir;
 	protected File webInfDir;
-	protected int port;
+	protected int port = 9443;
+	protected String keyStorePath = getClass().getClassLoader().getResource("localhost.jks").toExternalForm();
+	protected String keyStorePassword = "localhost";
+	protected String keyManagerPassword = "localhost";
 	protected Server server;
 	protected SslContextFactory sslContextFactory;
 	protected HttpConfiguration httpsConfig;
 	protected ServerConnector serverConnector;
 	protected WebAppContext webAppContext;
-	protected String contextPath;
+	protected String contextPath = "/";
 	protected Scanner scanner;
-	protected int scanInterval;
+	protected int scanInterval = 2;
 	protected Scanner.Listener scanListener;
 	
 	public WebServer()
 	{
-		init();
-	}
-	
-	protected void init()
-	{
-		projectDir = new File(System.getProperty(USER_DIR));
-		webAppDir = new File(projectDir, WEB_APP);
-		webInfDir = new File(webAppDir, WEB_INF);
-		port = 9443;
-		server = new Server();
-		sslContextFactory = new SslContextFactory();
-		sslContextFactory.setKeyStorePath(getClass().getClassLoader().getResource("localhost.jks").toExternalForm());
-		sslContextFactory.setKeyStorePassword("localhost");
-		sslContextFactory.setKeyManagerPassword("localhost");
-		httpsConfig = new HttpConfiguration();
-		httpsConfig.setSecureScheme("https");
-		httpsConfig.addCustomizer(new SecureRequestCustomizer());
-		serverConnector = new ServerConnector(server, new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()), new HttpConnectionFactory(httpsConfig));
-		webAppContext = new WebAppContext();
-		contextPath = "/";
-		scanner = new Scanner();
-		scanInterval = 2;
-		scanListener = new Scanner.BulkListener()
-		{
-			@Override
-			public void filesChanged(List<String> filenames) throws Exception
-			{
-				if(webAppContext.isRunning())
-				{
-					webAppContext.stop();
-					webAppContext.start();
-				}
-			}
-		};
+		
 	}
 	
 	public File getProjectDir()
@@ -99,6 +73,21 @@ public class WebServer
 	public int getPort()
 	{
 		return port;
+	}
+	
+	public String getKeyStorePath()
+	{
+		return keyStorePath;
+	}
+	
+	public String getKeyStorePassword()
+	{
+		return keyStorePassword;
+	}
+	
+	public String getKeyManagerPassword()
+	{
+		return keyManagerPassword;
 	}
 	
 	public Server getServer()
@@ -163,6 +152,24 @@ public class WebServer
 		return this;
 	}
 	
+	public WebServer setKeyStorePath(String keyStorePath)
+	{
+		this.keyStorePath = keyStorePath;
+		return this;
+	}
+	
+	public WebServer setKeyStorePassword(String keyStorePassword)
+	{
+		this.keyStorePassword = keyStorePassword;
+		return this;
+	}
+	
+	public WebServer setKeyManagerPassword(String keyManagerPassword)
+	{
+		this.keyManagerPassword = keyManagerPassword;
+		return this;
+	}
+	
 	public WebServer setServer(Server server)
 	{
 		this.server = server;
@@ -209,8 +216,39 @@ public class WebServer
 	{
 		try
 		{
-			serverConnector.setPort(port);
+			if(webAppDir == null)
+			{
+				webAppDir = new File(projectDir, WEB_APP);
+			}
+			if(webInfDir == null)
+			{
+				webInfDir = new File(webAppDir, WEB_INF);
+			}
+			server = new Server();
+			sslContextFactory = new SslContextFactory();
+			sslContextFactory.setKeyStorePath(keyStorePath);
+			sslContextFactory.setKeyStorePassword(keyStorePassword);
+			sslContextFactory.setKeyManagerPassword(keyManagerPassword);
+			httpsConfig = new HttpConfiguration();
+			httpsConfig.setSecureScheme("https");
+			httpsConfig.addCustomizer(new SecureRequestCustomizer());
 			httpsConfig.setSecurePort(port);
+			serverConnector = new ServerConnector(server, new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()), new HttpConnectionFactory(httpsConfig));
+			serverConnector.setPort(port);
+			webAppContext = new WebAppContext();
+			scanner = new Scanner();
+			scanListener = new Scanner.BulkListener()
+			{
+				@Override
+				public void filesChanged(List<String> filenames) throws Exception
+				{
+					if(webAppContext.isRunning())
+					{
+						webAppContext.stop();
+						webAppContext.start();
+					}
+				}
+			};
 			server.setConnectors(new Connector[]{serverConnector});
 			webAppContext.setWar(webAppDir.getAbsolutePath());
 			webAppContext.setContextPath(contextPath);
@@ -258,6 +296,18 @@ public class WebServer
 		if(argMap.containsKey(WEB_INF_DIR))
 		{
 			devServer.setWebInfDir(new File(argMap.get(WEB_INF_DIR)));
+		}
+		if(argMap.containsKey(KEY_STORE_PATH))
+		{
+			devServer.setKeyStorePath(argMap.get(KEY_STORE_PATH));
+		}
+		if(argMap.containsKey(KEY_STORE_PASSWORD))
+		{
+			devServer.setKeyStorePassword(argMap.get(KEY_STORE_PASSWORD));
+		}
+		if(argMap.containsKey(KEY_MANAGER_PASSWORD))
+		{
+			devServer.setKeyManagerPassword(argMap.get(KEY_MANAGER_PASSWORD));
 		}
 		if(argMap.containsKey(ENV))
 		{
