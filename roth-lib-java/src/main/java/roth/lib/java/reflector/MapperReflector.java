@@ -186,7 +186,7 @@ public class MapperReflector
 	{
 		EntityReflector entityReflector = null;
 		Class<?> klass = ReflectionUtil.getTypeClass(type);
-		if(!nonEntityTypes.contains(type))
+		if(!nonEntityTypes.contains(klass.getName()))
 		{
 			Entity entity = getEntityAnnotation(type);
 			if(entity != null)
