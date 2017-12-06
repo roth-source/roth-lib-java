@@ -390,7 +390,7 @@ public class TableMapper extends Mapper
 						}
 						else if(qualifier == c)
 						{
-							builder.append(readEscaped(reader, qualifier));
+							builder.append(readEscaped(reader, qualifier, delimiter));
 						}
 						else
 						{
@@ -595,7 +595,7 @@ public class TableMapper extends Mapper
 						}
 						else if(qualifier == c)
 						{
-							builder.append(readEscaped(reader, qualifier));
+							builder.append(readEscaped(reader, qualifier, delimiter));
 						}
 						else
 						{
@@ -666,7 +666,7 @@ public class TableMapper extends Mapper
 						}
 						else if(qualifier == c)
 						{
-							builder.append(readEscaped(reader, qualifier));
+							builder.append(readEscaped(reader, qualifier, delimiter));
 						}
 						else
 						{
@@ -706,7 +706,7 @@ public class TableMapper extends Mapper
 		return nullList;
 	}
 	
-	protected String readEscaped(Reader reader, char qualifier) throws Exception
+	protected String readEscaped(Reader reader, char qualifier, char delimiter) throws Exception
 	{
 		StringBuilder builder = new StringBuilder();
 		int b;
@@ -721,8 +721,15 @@ public class TableMapper extends Mapper
 				c = (char) b;
 				if(qualifier != c)
 				{
-					reader.reset();
-					break;
+					if(delimiter == c || NEW_LINE == c || CARRIAGE_RETURN == c || b == -1)
+					{
+						reader.reset();
+						break;
+					}
+					else
+					{
+						builder.append(qualifier);
+					}
 				}
 			}
 			builder.append(c);

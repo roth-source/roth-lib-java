@@ -462,6 +462,24 @@ public abstract class Mapper implements Characters
 		return builder.toString();
 	}
 	
+	public static void peekRead(Reader reader, Character...characters)
+	{
+		List<Character> charactersList = List.fromArray(characters);
+		try
+		{
+			reader.mark(1);
+			int b = reader.read();
+			if(!charactersList.contains((char) b))
+			{
+				reader.reset();
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	public static boolean matches(Reader reader, String match)
 	{
 		boolean matches = false;

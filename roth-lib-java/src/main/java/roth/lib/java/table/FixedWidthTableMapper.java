@@ -395,24 +395,6 @@ public class FixedWidthTableMapper extends Mapper
 		return list;
 	}
 	
-	protected static void peekRead(Reader reader, Character...characters)
-	{
-		List<Character> charactersList = List.fromArray(characters);
-		try
-		{
-			reader.mark(1);
-			int b = reader.read();
-			if(!charactersList.contains((char) b))
-			{
-				reader.reset();
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
 	protected boolean isEof(Reader reader)
 	{
 		boolean eof = false;
