@@ -18,16 +18,17 @@ public class WebCompile implements Characters
 {
 	protected static Pattern LANG_PATTERN			= Pattern.compile("^(?:\\S+_)?([A-Za-z]{2})\\.json");
 	
-	protected static String USER_DIR_DEFAULT		= "user.dir";
-	protected static String WEB_APP_DEFAULT			= "src/main/webapp";
+	protected static String USER_DIR_DEFAULT			= "user.dir";
+	protected static String MAIN_DEFAULT				= "src/main";
+	protected static String WEB_APP_DEFAULT			= MAIN_DEFAULT + "/webapp";
 	protected static String DEV_DEFAULT				= "dev";
 	protected static String APP_DEFAULT				= "app";
 	protected static String TARGET_DEFAULT			= "app";
 	protected static String SCRIPT_DEFAULT			= "script";
-	protected static String TEXT_DEFAULT			= "text";
+	protected static String TEXT_DEFAULT				= "text";
 	protected static String MIXIN_DEFAULT			= "mixin";
 	protected static String LAYOUT_DEFAULT			= "layout";
-	protected static String PAGE_DEFAULT			= "page";
+	protected static String PAGE_DEFAULT				= "page";
 	protected static String COMPONENT_DEFAULT		= "component";
 	protected static String SERVICE_DEFAULT			= "service";
 	protected static String CONFIG_DEFAULT			= "config";
@@ -39,21 +40,21 @@ public class WebCompile implements Characters
 	protected static String APP_DIR					= "appDir";
 	protected static String TARGET_DIR				= "targetDir";
 	protected static String SCRIPT_DIR				= "scriptDir";
-	protected static String TEXT_DIR				= "textDir";
+	protected static String TEXT_DIR					= "textDir";
 	protected static String MIXIN_DIR				= "mixinDir";
 	protected static String LAYOUT_DIR				= "layoutDir";
-	protected static String PAGE_DIR				= "pageDir";
+	protected static String PAGE_DIR					= "pageDir";
 	protected static String COMPONENT_DIR			= "componentDir";
 	protected static String WEB						= "web";
-	protected static String REGISTER				= "register";
-	protected static String TEXT					= "text";
+	protected static String REGISTER					= "register";
+	protected static String TEXT						= "text";
 	protected static String MIXIN					= "mixin";
 	protected static String LAYOUT					= "layout";
-	protected static String PAGE					= "page";
+	protected static String PAGE						= "page";
 	protected static String COMPONENT				= "component";
 	protected static String SOURCE					= "source";
 	protected static String RETURN_VIEW				= "return View;";
-	protected static String OPEN_CLOSURE			= "(function(){";
+	protected static String OPEN_CLOSURE				= "(function(){";
 	protected static String CLOSE_CLOSURE			= "})();";
 	
 	protected PrintWriter writer = null;
@@ -159,6 +160,15 @@ public class WebCompile implements Characters
 	public String getWeb()
 	{
 		return web;
+	}
+	
+	public void updateProjectDir(File projectDir)
+	{
+		setProjectDir(projectDir);
+		webAppDir = new File(projectDir, MAIN_DEFAULT + "/" + webAppDir.getName());
+		devDir = new File(webAppDir, devDir.getName());
+		appDir = new File(devDir, appDir.getName());
+		targetDir = new File(webAppDir, targetDir.getName());
 	}
 	
 	public void setProjectDir(File projectDir)

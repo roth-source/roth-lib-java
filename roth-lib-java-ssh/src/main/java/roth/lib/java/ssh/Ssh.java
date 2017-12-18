@@ -126,6 +126,11 @@ public class Ssh implements AutoCloseable
 					lines.add(line);
 				}
 			}
+			int code = channelExec.getExitStatus();
+			if(code > 0)
+			{
+				throw new SshExecException(code, command, lines);
+			}
 		}
 		catch(JSchException | IOException e)
 		{

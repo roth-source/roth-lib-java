@@ -4,6 +4,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.project.MavenProject;
 
 import roth.lib.java.web.compile.WebCompile;
 
@@ -21,7 +22,9 @@ public class WebCompilePlugin extends AbstractMojo
 	{
 		try
 		{
+			MavenProject project = (MavenProject) getPluginContext().get("project");
 			WebCompile webCompile = new WebCompile(false);
+			webCompile.updateProjectDir(project.getBasedir());
 			webCompile.compile();
 		}
 		catch(Exception e)
