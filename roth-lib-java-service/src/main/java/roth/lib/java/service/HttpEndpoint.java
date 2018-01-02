@@ -343,7 +343,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 			if(errors.isEmpty())
 			{
 				Time endTime = new Time();
-				int duration = (int) (startTime.toTimestamp() - endTime.toTimestamp());
+				int duration = (int) (endTime.toTimestamp() - startTime.toTimestamp());
 				logResponse(serviceMethod.getServiceName(), serviceMethod.getMethodName(), response, size, duration, startTime, endTime);
 			}
 		}
