@@ -686,6 +686,11 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		builder.append(request.getMethod());
 		builder.append(SPACE);
 		builder.append(request.getRequestURI());
+		if(request.getQueryString() != null)
+		{
+			builder.append(QUESTION);
+			builder.append(request.getQueryString());
+		}
 		builder.append(NEW_LINE);
 		Enumeration<String> names = request.getHeaderNames();
 		while(names.hasMoreElements())
