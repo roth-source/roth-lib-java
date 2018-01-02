@@ -2,9 +2,9 @@ package roth.lib.java.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -37,6 +37,7 @@ import roth.lib.java.reflector.PropertyReflector;
 import roth.lib.java.service.annotation.Service;
 import roth.lib.java.service.annotation.ServiceMethod;
 import roth.lib.java.service.reflector.MethodReflector;
+import roth.lib.java.time.Time;
 import roth.lib.java.type.MimeType;
 import roth.lib.java.util.EnumUtil;
 import roth.lib.java.util.IoUtil;
@@ -48,23 +49,23 @@ import roth.lib.java.validate.ValidatorException;
 public abstract class HttpEndpoint extends HttpServlet implements Characters
 {
 	protected static String ORIGIN 								= "Origin";
-	protected static String ANY 								= "*";
+	protected static String ANY 									= "*";
 	protected static List<String> EXPOSED_HEADERS				= new List<>(HttpService.X_SESSION, HttpService.X_CSRF_TOKEN);
-	protected static String ACCESS_CONTROL_ALLOW_ORIGIN 		= "Access-Control-Allow-Origin";
-	protected static String ACCESS_CONTROL_ALLOW_CREDENTIALS 	= "Access-Control-Allow-Credentials";
-	protected static String ACCESS_CONTROL_ALLOW_METHODS 		= "Access-Control-Allow-Methods";
+	protected static String ACCESS_CONTROL_ALLOW_ORIGIN 			= "Access-Control-Allow-Origin";
+	protected static String ACCESS_CONTROL_ALLOW_CREDENTIALS 		= "Access-Control-Allow-Credentials";
+	protected static String ACCESS_CONTROL_ALLOW_METHODS 			= "Access-Control-Allow-Methods";
 	protected static String ACCESS_CONTROL_EXPOSE_HEADERS 		= "Access-Control-Expose-Headers";
 	protected static String CONTENT_TYPE_PARAM	 				= "contentType";
-	protected static String CONTENT_TYPE_HEADER 				= "Content-Type";
-	protected static String ACCEPT_PARAM		 				= "accept";
+	protected static String CONTENT_TYPE_HEADER 					= "Content-Type";
+	protected static String ACCEPT_PARAM		 					= "accept";
 	protected static String ACCEPT_HEADER		 				= "Accept";
-	protected static String ALLOWED_METHODS 					= "GET, POST";
+	protected static String ALLOWED_METHODS 						= "GET, POST";
 	protected static List<HttpMethod> SUPPORTED_METHODS			= List.fromArray(HttpMethod.GET, HttpMethod.POST);
 	protected static List<String> LOCALHOSTS 					= List.fromArray("localhost", "127.0.0.1");
 	protected static String ENDPOINT 							= "_endpoint";
-	protected static String SERVICE 							= "service";
+	protected static String SERVICE 								= "service";
 	protected static String METHOD 								= "method";
-	protected static Pattern SERVICE_METHOD_PATTERN 			= Pattern.compile("(?:^|/)(?<" + SERVICE + ">[\\w\\-]+)/(?<" + METHOD + ">[\\w]+)(?:/|$)");
+	protected static Pattern SERVICE_METHOD_PATTERN 				= Pattern.compile("(?:^|/)(?<" + SERVICE + ">[\\w\\-]+)/(?<" + METHOD + ">[\\w]+)(?:/|$)");
 	protected static Pattern BOUNDARY_PATTERN					= Pattern.compile("boundary\\=(?:\")?(.+?)(?:\"|;|$)");
 	protected static String MAX_LENGTH_ERROR 					= "%d exceeds max length of %d characters";
 	
@@ -99,6 +100,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response)
 	{
+		Time startTime = new Time();
 		HttpService service = null;
 		Object methodResponse = null;
 		String debugRequest = "";
@@ -135,7 +137,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 						serviceMethod = getServiceMethod(request, response);
 						if(serviceMethod != null)
 						{
-							log(serviceMethod.getServiceName(), serviceMethod.getMethodName(), request);
+							logRequest(serviceMethod.getServiceName(), serviceMethod.getMethodName(), request);
 							if(!ENDPOINT.equalsIgnoreCase(serviceMethod.getServiceName()))
 							{
 								methodReflector = getMethodReflector(request, response, serviceMethod);
@@ -328,13 +330,21 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		}
 		if(methodResponse != null)
 		{
-			try(OutputStream output = response.getOutputStream())
+			int size = 0;
+			try(DataOutputStream output = new DataOutputStream(response.getOutputStream()))
 			{
 				responseMapper.serialize(methodResponse, output);
+				size = output.size();
 			}
 			catch(IOException e)
 			{
 				e.printStackTrace();
+			}
+			if(errors.isEmpty())
+			{
+				Time endTime = new Time();
+				int duration = (int) (startTime.toTimestamp() - endTime.toTimestamp());
+				logResponse(serviceMethod.getServiceName(), serviceMethod.getMethodName(), response, size, duration, startTime, endTime);
 			}
 		}
 		if(dev || (service != null && service.isDebug()))
@@ -743,7 +753,12 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		return builder.toString();
 	}
 	
-	public void log(String service, String method, HttpServletRequest request)
+	public void logRequest(String service, String method, HttpServletRequest request)
+	{
+		
+	}
+	
+	public void logResponse(String service, String method, HttpServletResponse response, int size, int duration, Time startTime, Time endTime)
 	{
 		
 	}
