@@ -14,15 +14,16 @@ public @interface ServiceMethod
 	String context() 			default "";
 	boolean ajax() 				default true;
 	boolean api() 				default false;
-	boolean authenticated() 	default true;
+	boolean authenticated() 		default true;
 	boolean post() 				default true;
 	boolean get() 				default false;
 	boolean put() 				default false;
 	boolean delete() 			default false;
 	boolean gzippedInput() 		default false;
 	boolean prettyPrint() 		default false;
+	boolean skipRequest()		default false;
 	boolean debugRequest() 		default true;
-	boolean debugResponse() 	default true;
-	boolean rawRequest()		default false;
+	boolean debugResponse() 		default true;
+	boolean rawRequest()			default false;
 	
 }

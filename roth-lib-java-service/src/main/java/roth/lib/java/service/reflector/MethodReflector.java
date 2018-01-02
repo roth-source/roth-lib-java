@@ -146,6 +146,11 @@ public class MethodReflector
 		return method;
 	}
 	
+	public boolean isSkipRequest()
+	{
+		return serviceMethod.skipRequest();
+	}
+	
 	public boolean isDebugRequest()
 	{
 		return serviceMethod.debugRequest();

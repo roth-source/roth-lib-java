@@ -102,6 +102,8 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 	{
 		Time startTime = new Time();
 		HttpService service = null;
+		Object methodRequest = null;
+		Mapper requestMapper = null;
 		Object methodResponse = null;
 		String debugRequest = "";
 		HttpServiceMethod serviceMethod = null;
@@ -158,8 +160,6 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 											boolean apiAuthenticated = hasApi && (!methodReflector.isAuthenticated() || service.isApiAuthenticated(methodReflector));
 											if(ajaxAuthenticated || apiAuthenticated)
 											{
-												Object methodRequest = null;
-												Mapper requestMapper = null;
 												Parameter parameter = methodReflector.getParameter();
 												if(parameter != null)
 												{
@@ -194,10 +194,6 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 															methodRequest = ((FormMapper) requestMapper).deserialize(HttpUrl.parseParamMap(request.getQueryString()), parameter.getParameterizedType());
 														}
 													}
-												}
-												if(dev || (service != null && service.isDebug()))
-												{
-													debugRequest = getDebugRequest(request, methodRequest, requestMapper);
 												}
 												boolean validCsrf = !(ajaxAuthenticated && methodReflector.isAuthenticated() && !service.isValidCsrfToken());
 												if(validCsrf)
@@ -344,7 +340,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 			{
 				Time endTime = new Time();
 				int duration = (int) (endTime.toTimestamp() - startTime.toTimestamp());
-				logResponse(serviceMethod.getServiceName(), serviceMethod.getMethodName(), response, size, duration, startTime, endTime);
+				logResponse(serviceMethod.getServiceName(), serviceMethod.getMethodName(), methodReflector.isSkipRequest(), methodRequest, requestMapper, request, response, size, duration, startTime, endTime);
 			}
 		}
 		if(dev || (service != null && service.isDebug()))
@@ -352,9 +348,9 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 			String debugResponse = null;
 			if(methodReflector != null)
 			{
-				if(!methodReflector.isDebugRequest())
+				if(methodReflector.isDebugRequest())
 				{
-					debugRequest = null;
+					debugRequest = getDebugRequest(request, methodRequest, requestMapper);
 				}
 				if(methodReflector.isDebugResponse())
 				{
@@ -758,7 +754,7 @@ public abstract class HttpEndpoint extends HttpServlet implements Characters
 		
 	}
 	
-	public void logResponse(String service, String method, HttpServletResponse response, int size, int duration, Time startTime, Time endTime)
+	public void logResponse(String service, String method, boolean skipRequest, Object methodRequest, Mapper requestMapper, HttpServletRequest request, HttpServletResponse response, int size, int duration, Time startTime, Time endTime)
 	{
 		
 	}

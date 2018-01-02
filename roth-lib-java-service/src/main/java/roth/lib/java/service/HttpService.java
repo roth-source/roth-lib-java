@@ -15,7 +15,7 @@ import roth.lib.java.util.IdUtil;
 public abstract class HttpService
 {
 	public static String X_SESSION				= "X-Session";
-	public static String SESSION				= "session";
+	public static String SESSION					= "session";
 	public static String X_CSRF_TOKEN			= "X-Csrf-Token";
 	public static String CSRF_TOKEN				= "csrfToken";
 	
