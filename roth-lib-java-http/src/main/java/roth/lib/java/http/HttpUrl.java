@@ -14,29 +14,29 @@ public class HttpUrl implements Characters
 {
 	public static final int HTTP_PORT				= 80;
 	public static final int HTTPS_PORT				= 443;
-	public static final String PROTOCOL 			= "protocol";
-	public static final String HOST 				= "host";
+	public static final String PROTOCOL 				= "protocol";
+	public static final String HOST 					= "host";
 	public static final String PORT	 				= "port";
 	public static final String PATH	 				= "path";
-	public static final String PARAM		 		= "param";
+	public static final String PARAM		 			= "param";
 	public static final String HASH	 				= "hash";
 	public static final String NAME	 				= "name";
-	public static final String VALUE	 			= "value";
+	public static final String VALUE	 				= "value";
 	
 	public static final String ALPHA_CHARS			= "A-Za-z";
-	public static final String NUM_CHARS			= "0-9";
+	public static final String NUM_CHARS				= "0-9";
 	public static final String ALPHA_NUM_CHARS		= ALPHA_CHARS + NUM_CHARS;
 	public static final String DOT_DASH_CHARS		= ".\\-";
-	public static final String SPECIAL_CHARS		= DOT_DASH_CHARS + "+_~%/";
+	public static final String SPECIAL_CHARS			= DOT_DASH_CHARS + "+_~%/";
 	
 	public static final String PROTOCOL_CHARS		= ALPHA_NUM_CHARS;
 	public static final String HOST_CHARS			= ALPHA_NUM_CHARS + DOT_DASH_CHARS;
 	public static final String PORT_CHARS			= NUM_CHARS;
 	public static final String PATH_CHARS			= ALPHA_NUM_CHARS + SPECIAL_CHARS;
-	public static final String PARAM_CHARS			= ALPHA_NUM_CHARS + SPECIAL_CHARS + "=&";
+	public static final String PARAM_CHARS			= ALPHA_NUM_CHARS + SPECIAL_CHARS + "=&$";
 	public static final String HASH_CHARS			= ALPHA_NUM_CHARS + SPECIAL_CHARS + "=&,:;";
-	public static final String PARAM_NAME_CHARS		= ALPHA_NUM_CHARS + SPECIAL_CHARS;
-	public static final String PARAM_VALUE_CHARS	= ALPHA_NUM_CHARS + SPECIAL_CHARS;
+	public static final String PARAM_NAME_CHARS		= ALPHA_NUM_CHARS + SPECIAL_CHARS + "$";
+	public static final String PARAM_VALUE_CHARS		= ALPHA_NUM_CHARS + SPECIAL_CHARS;
 	
 	public static final Pattern URL_PATTERN;
 	public static final Pattern PARAM_PATTERN;	
@@ -49,13 +49,13 @@ public class HttpUrl implements Characters
 			 "(?<" 			+ HOST 		+ ">[" 		+ HOST_CHARS 			+ "]+)" +
 			 "(?::(?<" 		+ PORT 		+ ">[" 		+ PORT_CHARS 			+ "]+))?" +
 			 "(?<" 			+ PATH 		+ ">/["		+ PATH_CHARS 			+ "]*)?" +
-			 "(?:\\?(?<" 	+ PARAM 	+ ">[" 		+ PARAM_CHARS 			+ "]+))?" + 
+			 "(?:\\?(?<" 	+ PARAM 		+ ">[" 		+ PARAM_CHARS 			+ "]+))?" + 
 			 "(?:#(?<" 		+ HASH 		+ ">[" 		+ HASH_CHARS 			+ "]+))?$"
 		);
 		PARAM_PATTERN = Pattern.compile
 		(
 			"(?<" 			+ NAME 		+ ">[" 		+ PARAM_NAME_CHARS 		+ "]+)=" + 
-			"(?<" 			+ VALUE 	+ ">[" 		+ PARAM_VALUE_CHARS 	+ "]*)(?:&|$)"
+			"(?<" 			+ VALUE 		+ ">[" 		+ PARAM_VALUE_CHARS 		+ "]*)(?:&|$)"
 		);
 	}
 	
@@ -323,7 +323,7 @@ public class HttpUrl implements Characters
 			for(Entry<String, String> parameterEntry : paramMap.entrySet())
 			{
 				builder.append(seperator);
-				builder.append(UrlUtil.encode(parameterEntry.getKey()));
+				builder.append(parameterEntry.getKey());
 				builder.append("=");
 				if(parameterEntry.getValue() != null)
 				{
@@ -345,9 +345,9 @@ public class HttpUrl implements Characters
 	
 	public static void main(String[] args)
 	{
-		String value = "";
+		String value = "http://api2.alndata.com/odata/Apartments?apiKey=f2d8ebc8-508e-4110-84be-c195fb8c152d&$skip=200";
 		HttpUrl url = new HttpUrl(value);
-		System.out.println(url.getHost());
+		System.out.println(url);
 	}
 	
 }
