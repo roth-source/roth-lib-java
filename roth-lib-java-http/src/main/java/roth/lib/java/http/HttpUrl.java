@@ -15,6 +15,8 @@ public class HttpUrl implements Characters
 	public static final int HTTP_PORT				= 80;
 	public static final int HTTPS_PORT				= 443;
 	public static final String PROTOCOL 				= "protocol";
+	public static final String USER 					= "user";
+	public static final String PASS 					= "pass";
 	public static final String HOST 					= "host";
 	public static final String PORT	 				= "port";
 	public static final String PATH	 				= "path";
@@ -23,6 +25,7 @@ public class HttpUrl implements Characters
 	public static final String NAME	 				= "name";
 	public static final String VALUE	 				= "value";
 	
+	public static final String AUTH_CHARS			= "\\S";
 	public static final String ALPHA_CHARS			= "A-Za-z";
 	public static final String NUM_CHARS				= "0-9";
 	public static final String ALPHA_NUM_CHARS		= ALPHA_CHARS + NUM_CHARS;
@@ -46,11 +49,13 @@ public class HttpUrl implements Characters
 		URL_PATTERN = Pattern.compile
 		(
 			"^(?<" 			+ PROTOCOL 	+ ">[" 		+ PROTOCOL_CHARS 		+ "]+)://" +
-			 "(?<" 			+ HOST 		+ ">[" 		+ HOST_CHARS 			+ "]+)" +
-			 "(?::(?<" 		+ PORT 		+ ">[" 		+ PORT_CHARS 			+ "]+))?" +
-			 "(?<" 			+ PATH 		+ ">/["		+ PATH_CHARS 			+ "]*)?" +
-			 "(?:\\?(?<" 	+ PARAM 		+ ">[" 		+ PARAM_CHARS 			+ "]+))?" + 
-			 "(?:#(?<" 		+ HASH 		+ ">[" 		+ HASH_CHARS 			+ "]+))?$"
+			"((?<"			+ USER		+ ">["		+ AUTH_CHARS				+ "]+?):" +
+			"(?<"			+ PASS		+ ">["		+ AUTH_CHARS				+ "]+?)@)?" +
+			"(?<" 			+ HOST 		+ ">[" 		+ HOST_CHARS 			+ "]+)" +
+			"(?::(?<" 		+ PORT 		+ ">[" 		+ PORT_CHARS 			+ "]+))?" +
+			"(?<" 			+ PATH 		+ ">/["		+ PATH_CHARS 			+ "]*)?" +
+			"(?:\\?(?<" 		+ PARAM 		+ ">[" 		+ PARAM_CHARS 			+ "]+))?" + 
+			"(?:#(?<" 		+ HASH 		+ ">[" 		+ HASH_CHARS 			+ "]+))?$"
 		);
 		PARAM_PATTERN = Pattern.compile
 		(
@@ -60,6 +65,8 @@ public class HttpUrl implements Characters
 	}
 	
 	protected HttpProtocol protocol;
+	protected String user;
+	protected String pass;
 	protected InetAddress inetAddress;
 	protected int port;
 	protected String path = String.valueOf(SLASH);
@@ -102,6 +109,8 @@ public class HttpUrl implements Characters
 			{
 				throw new HttpUrlException("invalid protocol");
 			}
+			this.user = matcher.group(USER);
+			this.pass = matcher.group(PASS);
 			String host = matcher.group(HOST);
 			if(host != null)
 			{
@@ -183,6 +192,16 @@ public class HttpUrl implements Characters
 	public HttpProtocol getProtocol()
 	{
 		return protocol;
+	}
+	
+	public String getUser()
+	{
+		return user;
+	}
+	
+	public String getPass()
+	{
+		return pass;
 	}
 	
 	public InetAddress getInetAddress()
@@ -306,6 +325,13 @@ public class HttpUrl implements Characters
 		StringBuilder builder = new StringBuilder();
 		builder.append(protocol.toString().toLowerCase());
 		builder.append("://");
+		if(user != null && pass != null)
+		{
+			builder.append(user);
+			builder.append(COLON);
+			builder.append(pass);
+			builder.append(AT);
+		}
 		builder.append(inetAddress.getHostName());
 		builder.append(port != HTTP_PORT && port != HTTPS_PORT ? ":" + port : "");
 		builder.append(toResourcePath());
