@@ -87,7 +87,7 @@ public class HttpHeaders implements Characters
 		{
 			for(HttpHeader header : headers)
 			{
-				headersMap.put(header.getName(), List.fromArray(header.getValue()));
+				setHeader(header);
 			}
 		}
 		return this;
