@@ -182,7 +182,7 @@ public class XmlTestModel extends XmlModel
 	{
 		day = new Day();
 		testValue = new XmlTestValue().setType("ERROR");
-		testValue.setValue("TEST");
+		//testValue.setValue("TEST");
 		testBoolean = true;
 		testByte = 123;
 		testShort = 12345;

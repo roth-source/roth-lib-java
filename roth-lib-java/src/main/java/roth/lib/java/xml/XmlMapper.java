@@ -165,39 +165,50 @@ public class XmlMapper extends Mapper
 					name = propertyName;
 				}
 				writeNewLine(writer);
-				writeOpenTag(writer, name, getAttributeMap(value, entityReflector));
 				if(value instanceof XmlValue)
 				{
 					XmlValue<?> xmlValue = (XmlValue<?>) value;
-					Serializer<?> serializer = getSerializer(xmlValue.getValue().getClass(), propertyReflector);
-					if(serializer != null)
+					if(xmlValue.getValue() != null)
 					{
-						TimeZone timeZone = getTimeZone(propertyReflector);
-						String timeFormat = getTimeFormat(propertyReflector);
-						String serializedValue = serializer.serialize(xmlValue.getValue(), timeZone, timeFormat);
-						if(serializedValue != null)
+						writeOpenTag(writer, name, getAttributeMap(value, entityReflector));
+						Serializer<?> serializer = getSerializer(xmlValue.getValue().getClass(), propertyReflector);
+						if(serializer != null)
 						{
-							writeValue(writer, serializedValue);
+							TimeZone timeZone = getTimeZone(propertyReflector);
+							String timeFormat = getTimeFormat(propertyReflector);
+							String serializedValue = serializer.serialize(xmlValue.getValue(), timeZone, timeFormat);
+							if(serializedValue != null)
+							{
+								writeValue(writer, serializedValue);
+							}
 						}
+						writeCloseTag(writer, name);
+					}
+					else
+					{
+						writeEmptyTag(writer, name, getAttributeMap(value, entityReflector));
 					}
 				}
 				else if(value instanceof XmlCdata)
 				{
+					writeOpenTag(writer, name, getAttributeMap(value, entityReflector));
 					XmlCdata xmlCdata = (XmlCdata) value;
 					if(xmlCdata != null)
 					{
 						writer.write("<![CDATA[ " + xmlCdata.getCdata() + " ]]>");
 					}
+					writeCloseTag(writer, name);
 				}
 				else
 				{
+					writeOpenTag(writer, name, getAttributeMap(value, entityReflector));
 					boolean empty = writeEntity(writer, value, entityReflector);
 					if(!empty)
 					{
 						writeNewLine(writer);
 					}
+					writeCloseTag(writer, name);
 				}
-				writeCloseTag(writer, name);
 			}
 			else if(ReflectionUtil.isArray(value.getClass()) || ReflectionUtil.isCollection(value.getClass()))
 			{
@@ -268,6 +279,16 @@ public class XmlMapper extends Mapper
 	
 	protected void writeOpenTag(Writer writer, String name, java.util.Map<String, String> attributeMap) throws IOException
 	{
+		writeOpenTag(writer, name, attributeMap, false);
+	}
+	
+	protected void writeEmptyTag(Writer writer, String name, java.util.Map<String, String> attributeMap) throws IOException
+	{
+		writeOpenTag(writer, name, attributeMap, true);
+	}
+	
+	protected void writeOpenTag(Writer writer, String name, java.util.Map<String, String> attributeMap, boolean empty) throws IOException
+	{
 		writer.write(LEFT_ANGLE_BRACKET);
 		writer.write(name);
 		if(attributeMap != null)
@@ -281,6 +302,11 @@ public class XmlMapper extends Mapper
 				writeValue(writer, attributeEntry.getValue());
 				writer.write(QUOTE);
 			}
+		}
+		if(empty)
+		{
+			writer.write(SPACE);
+			writer.write(SLASH);
 		}
 		writer.write(RIGHT_ANGLE_BRACKET);
 	}
